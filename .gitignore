@@ -498,3 +498,6 @@ Desktop.ini
 *.vpp.working-journal
 *.lock
 tmp/*
+*.lck
+*.bak_000f
+*.bak_001d
