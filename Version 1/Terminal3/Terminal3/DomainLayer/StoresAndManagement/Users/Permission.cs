@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Terminal3.DomainLayer.StoresAndManagment.Stores
+namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
-    class InventoryManager
+    public class Permission
     {
     }
 }
