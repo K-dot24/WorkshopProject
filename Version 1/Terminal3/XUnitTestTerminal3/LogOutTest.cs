@@ -4,7 +4,7 @@ using System.Text;
 
 namespace XUnitTestTerminal3
 {
-    public class LoginTest: XUnitTerminal3TestCase
+    public class LogOutTest: XUnitTerminal3TestCase
     {
     }
 }
