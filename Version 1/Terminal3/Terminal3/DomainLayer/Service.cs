@@ -6,7 +6,7 @@ namespace Terminal3.DomainLayer
 {
     public static class Service
     {
-        public static String GenerateID()
+        public static String GenerateId()
         {
             return Guid.NewGuid().ToString("N");
         }        
@@ -15,21 +15,16 @@ namespace Terminal3.DomainLayer
 
     public class Result<T>
     {
-        public String message { get; set; }
-        public Boolean execStatus { get; set; }
-        public T data { get; set; }      
+        public String Message { get; set; }
+        public Boolean ExecStatus { get; set; }
+        public T Data { get; set; }      
 
         public Result(string message, bool execStatus, T data)
         {
-            this.message = message;
-            this.execStatus = execStatus;
-            this.data = data;
+            this.Message = message;
+            this.ExecStatus = execStatus;
+            this.Data = data;
         }
-
-    }
-
-    public class SearchAttributes
-    {
 
     }
 }

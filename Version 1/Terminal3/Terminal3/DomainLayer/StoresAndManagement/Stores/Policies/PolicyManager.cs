@@ -1,6 +1,12 @@
-﻿namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
+﻿using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+
+namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 {
-    public class PolicyManager
+    public interface IPolicyManager
+    {
+    }
+
+    public class PolicyManager : IPurchasePolicy
     {
     }
 }

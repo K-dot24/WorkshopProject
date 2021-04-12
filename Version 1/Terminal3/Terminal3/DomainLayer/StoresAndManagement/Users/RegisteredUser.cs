@@ -1,21 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Terminal3.DomainLayer.StoresAndManagment.Users
+namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
     class RegisteredUser : User
     {
-        private String userID;
-        private String email;
-        private String password;
+        public string UserId { get; }
+        public string Email { get; }
+        public string Password { get; }
 
 
-        public RegisteredUser(String email , String password) : base()
+        public RegisteredUser(String email , String password)
         {
-            this.userID = Service.GenerateID();
-            this.email = email;
-            this.password = password;
+            this.UserId = Service.GenerateId();
+            this.Email = email;
+            this.Password = password;
         } 
     }
 }

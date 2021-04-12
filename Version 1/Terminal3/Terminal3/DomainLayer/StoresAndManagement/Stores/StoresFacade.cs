@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Terminal3.DomainLayer.StoresAndManagment.Stores
+﻿namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
-    class StoresFacade
+    public interface IStoreFacade{}
+
+    public class StoresFacade : IStoreFacade
     {
     }
 }

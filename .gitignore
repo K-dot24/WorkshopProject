@@ -502,4 +502,5 @@ Desktop.ini
 tmp/*
 *.lck
 *.bak_000f
+**/.bak/**
 *.bak_001d

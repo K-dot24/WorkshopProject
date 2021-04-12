@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
-using Terminal3.DomainLayer.StoresAndManagment.Stores;
 
-namespace Terminal3.DomainLayer.StoresAndManagment.Users
+namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
-    // Assosiaction Class
-    class ShoppingBag
+    // Association Class
+    public class ShoppingBag
     {
-        private User user;
-        private Store store;
-        private LinkedList<Product> products;
+        public User User { get; }
+        public Store Store { get; }
+        public LinkedList<Product> Products { get; }
 
         public ShoppingBag(User user , Store store)
         {
-            this.user = user;
-            this.store = store;
-            products = new LinkedList<Product>();
+            this.User = user;
+            this.Store = store;
+            Products = new LinkedList<Product>();
         }
 
     }
