@@ -6,5 +6,11 @@ namespace Terminal3.DomainLayer.StoresAndManagment.Users
 {
     class History
     {
+        private LinkedList<ShoppingBag> shoppingBags;
+
+        public History(LinkedList<ShoppingBag> shoppingBags)
+        {
+            this.shoppingBags = shoppingBags;
+        }
     }
 }

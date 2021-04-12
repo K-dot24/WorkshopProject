@@ -6,5 +6,7 @@ namespace Terminal3.DomainLayer.StoresAndManagment.Users
 {
     class UsersAndPermissionsFacade
     {
+
+
     }
 }

@@ -4,7 +4,8 @@ using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagment.Stores
 {
-    class Store
+    public class Store
     {
+
     }
 }
