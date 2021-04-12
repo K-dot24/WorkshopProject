@@ -4,6 +4,7 @@ using System.Text;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
+using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.DomainLayer.StoresAndManagment.Users;
 
 namespace Terminal3.ServiceLayer
