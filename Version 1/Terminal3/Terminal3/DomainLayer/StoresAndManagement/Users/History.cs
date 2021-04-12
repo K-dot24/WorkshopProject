@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace Terminal3.DomainLayer.StoresAndManagment.Users
+namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
-    class History
+    public class History
     {
-        private LinkedList<ShoppingBag> shoppingBags;
+        public LinkedList<ShoppingBag> ShoppingBags { get; }
 
         public History(LinkedList<ShoppingBag> shoppingBags)
         {
-            this.shoppingBags = shoppingBags;
+            this.ShoppingBags = shoppingBags;
+        }
+
+        public History()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

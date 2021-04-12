@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Terminal3.DomainLayer.StoresAndManagment.Users
+namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
-    class ShoppingCart
+    public class ShoppingCart
     {
-        private String ShoppingCartID;
-        private Boolean active;
-        private LinkedList<ShoppingBag> shoppingBags;
+        public string ShoppingCartId { get; }
+        public bool Active { get; }
+        public LinkedList<ShoppingBag> ShoppingBags { get; }
 
         public ShoppingCart()
         {
-            ShoppingCartID = Service.GenerateID();
-            active = true;
-            shoppingBags = new LinkedList<ShoppingBag>();
+            ShoppingCartId = Service.GenerateId();
+            Active = true;
+            ShoppingBags = new LinkedList<ShoppingBag>();
         }
     }
 }

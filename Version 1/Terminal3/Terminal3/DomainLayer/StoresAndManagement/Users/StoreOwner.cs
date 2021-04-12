@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
-using Terminal3.DomainLayer.StoresAndManagment.Stores;
 
-
-namespace Terminal3.DomainLayer.StoresAndManagment.Users
+namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
-    class StoreOwner : StoreStaff
+    class StoreOwner : IStoreStaff
     {
-        private RegisteredUser user;
-        private Store store;
-        private StoreOwner storeOwner;
-        private LinkedList<StoreStaff> storeStaffs; 
+        public RegisteredUser User { get; }
+        public Store Store { get; }
+        public StoreOwner Owner { get; }
+        public LinkedList<IStoreStaff> StoreStaffs { get; }
 
         public StoreOwner(RegisteredUser user, Store store, StoreOwner storeOwner)
         {
-            this.user = user;
-            this.store = store;
-            this.storeOwner = storeOwner;
-            storeStaffs = new LinkedList<StoreStaff>();
+            this.User = user;
+            this.Store = store;
+            this.Owner = storeOwner;
+            this.StoreStaffs = new LinkedList<IStoreStaff>();
         }
     }
 }

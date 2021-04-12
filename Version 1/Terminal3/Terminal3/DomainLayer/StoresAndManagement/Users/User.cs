@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Terminal3.DomainLayer.StoresAndManagment.Users
+﻿namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
     public abstract class User
     {
-        private History history;
-        private ShoppingCart shoppingCart;
+        public ShoppingCart ShoppingCart { get; }
 
-        public User()
+        protected User()
         {
-            history = new History();
-            shoppingCart = new ShoppingCart();
+            ShoppingCart = new ShoppingCart();
         }
         
     }

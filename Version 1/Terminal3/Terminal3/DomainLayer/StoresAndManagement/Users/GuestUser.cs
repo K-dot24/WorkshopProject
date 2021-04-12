@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Terminal3.DomainLayer.StoresAndManagment.Users
+﻿namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
-    class GuestUser : User
+    public class GuestUser : User
     {
 
-
-
-        public GuestUser() : base()
+        public GuestUser()
         {
 
         }

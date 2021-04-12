@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
-using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
-using Terminal3.DomainLayer.StoresAndManagment.Users;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.ServiceLayer
 {

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Terminal3.DomainLayer.StoresAndManagment.Users
+﻿namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
-    class UsersAndPermissionsFacade
+    public interface IUsersAndPermissionsFacade
+    {
+    }
+
+    public class UsersAndPermissionsFacade : IUsersAndPermissionsFacade
     {
 
 
