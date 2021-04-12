@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using XUnit;
-using Terminal3;
+using Xunit;
+using Terminal3.ServiceLayer;
 
 namespace XUnitTestTerminal3
 {
     public abstract class XUnitTerminal3TestCase
     {
-        private readonly object _sut;         
+        private readonly IECommerceSystemInterface _sut;         
     }
 }
