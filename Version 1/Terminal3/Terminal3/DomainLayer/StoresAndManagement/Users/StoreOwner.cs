@@ -3,7 +3,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
-    class StoreOwner : IStoreStaff
+    public class StoreOwner : IStoreStaff
     {
         public RegisteredUser User { get; }
         public Store Store { get; }
