@@ -17,131 +17,209 @@ namespace XUnitTestTerminal3.IntegrationTests
 
         public Result<bool> AddProductToCart(User user, Product product)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.AddProductToCart(user, product);
         }
 
         public Result<bool> AddProductToStore(User user, Store store, Product product, int quantity)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.AddProductToStore(user, store, product, quantity);
         }
 
         public Result<bool> AddStoreManager(User addedManager, User currentlyOwner, Store store)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.AddStoreManager(addedManager, currentlyOwner, store);
         }
 
         public Result<bool> AddStoreOwner(User addedOwner, User currentlyOwner, Store store)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.AddStoreOwner(addedOwner, currentlyOwner, store);
         }
 
         public Result<bool> EditProductDetails(User user, Store store, Product product, IDictionary<string, object> details)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.EditProductDetails(user, store, product, details);
         }
 
         public Result<bool> GetDiscountPolicyAtStore(User user, Store store)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.GetDiscountPolicyAtStore(user, store);
         }
 
         public Result<bool> GetPurchasePolicyAtStore(User user, Store store)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.GetPurchasePolicyAtStore(user, store);
         }
 
         public Result<bool> GetStorePurchaseHistory(User owner, Store store)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.GetStorePurchaseHistory(owner, store);
         }
 
         public Result<bool> GetStoreStaff(User owner, Store store)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.GetStoreStaff(owner, store);
         }
 
         public Result<bool> GetTotalShoppingCartPrice(User user)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.GetTotalShoppingCartPrice(user);
         }
 
         public Result<bool> GetUserPurchaseHistory(User user)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.GetUserPurchaseHistory(user);
         }
 
         public Result<bool> GetUserShoppingCart(User user)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.GetUserShoppingCart(user);
         }
 
         public Result<bool> Login(string email, string password)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.Login(email, password);
         }
 
         public Result<bool> LogOut(string email, string password)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.LogOut(email, password);
         }
 
         public Result<bool> OpenNewStore(string storeName, User user)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.OpenNewStore(storeName, user);
         }
 
         public Result<bool> Purchase(User user)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.Purchase(user);
         }
 
         public Result<bool> Register(string email, string password)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.Register(email, password);
         }
 
         public Result<bool> RemoveProductFromStore(User user, Store store, Product product)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.RemoveProductFromStore(user, store, product);
         }
 
         public Result<bool> RemoveStoreManager(User addedManager, User currentlyOwner, Store store)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.RemoveStoreManager(addedManager, currentlyOwner, store);
         }
 
         public Result<bool> ResetSystem()
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.ResetSystem();
         }
 
         public Result<bool> SearchProduct(IDictionary<string, object> details)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.SearchProduct(details);
         }
 
         public Result<bool> SearchStore(IDictionary<string, object> details)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.SearchStore(details);
         }
 
         public Result<bool> SetDiscountPolicyAtStore(User user, Store store, IDiscountPolicy policy)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.SetDiscountPolicyAtStore(user, store, policy);
         }
 
         public Result<bool> SetPermissions(User manager, User owner, Permission permissions)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.SetPermissions(manager, owner, permissions);
         }
 
         public Result<bool> SetPurchasePolicyAtStore(User user, Store store, IPurchasePolicy policy)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.SetPurchasePolicyAtStore(user, store, policy);
         }
 
         public Result<bool> UpdateShoppingCart(User user, Product product, int quantity)
         {
+            if (Real == null)
+                return new Result<bool>(null, true, null);
+
             return Real.UpdateShoppingCart(user, product, quantity);
         }
     }
