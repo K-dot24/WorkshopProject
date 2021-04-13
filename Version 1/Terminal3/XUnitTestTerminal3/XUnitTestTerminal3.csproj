@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Terminal3\Terminal3.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UnitTests\" />
+  </ItemGroup>
+
 </Project>

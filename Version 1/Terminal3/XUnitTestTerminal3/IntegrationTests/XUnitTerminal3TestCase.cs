@@ -8,6 +8,8 @@ namespace XUnitTestTerminal3
 {
     public abstract class XUnitTerminal3TestCase
     {
-        private readonly IECommerceSystemInterface _sut;         
+        private readonly IECommerceSystemInterface _sut = Bridge.getService();   
+        
+
     }
 }
