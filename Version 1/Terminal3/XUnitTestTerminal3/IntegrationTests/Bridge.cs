@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.ServiceLayer;
 
 namespace XUnitTestTerminal3.IntegrationTests
 {
