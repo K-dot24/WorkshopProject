@@ -4,8 +4,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
     public class Product
     {
-        //TODO
-
         public String Id { get; }
         public String Name { get; }
         public Double Price { get; }
@@ -18,5 +16,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Price = price;
             Quantity = quantity;
         }
+
+        //TODO: functions?
     }
 }
