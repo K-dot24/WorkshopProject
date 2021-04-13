@@ -2,7 +2,7 @@
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
-    class StoreManager : IStoreStaff
+    public class StoreManager : IStoreStaff
     {
         public RegisteredUser User { get; }
         public Store Store { get; }

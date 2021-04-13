@@ -2,5 +2,6 @@
 {
     public class Offer : IPurchasePolicy
     {
+        //TODO
     }
 }

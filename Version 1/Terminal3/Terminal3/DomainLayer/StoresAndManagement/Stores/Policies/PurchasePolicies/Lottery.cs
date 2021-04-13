@@ -2,5 +2,6 @@
 {
     public class Lottery : IPurchasePolicy
     {
+        //TODO
     }
 }

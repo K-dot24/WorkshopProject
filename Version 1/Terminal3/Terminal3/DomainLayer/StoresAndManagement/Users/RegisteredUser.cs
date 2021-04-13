@@ -2,7 +2,7 @@
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
-    class RegisteredUser : User
+    public class RegisteredUser : User
     {
         public string UserId { get; }
         public string Email { get; }
