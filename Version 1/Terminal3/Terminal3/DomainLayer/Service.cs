@@ -26,5 +26,11 @@ namespace Terminal3.DomainLayer
             this.Data = data;
         }
 
+        public Result(bool execStatus) //for proxy implementation 
+        {
+            this.Message = null;
+            this.ExecStatus = execStatus;
+            this.Data = default;
+        }
     }
 }

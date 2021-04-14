@@ -18,7 +18,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> AddProductToCart(User user, Product product)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.AddProductToCart(user, product);
         }
@@ -26,7 +26,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> AddProductToStore(User user, Store store, Product product, int quantity)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.AddProductToStore(user, store, product, quantity);
         }
@@ -34,7 +34,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> AddStoreManager(User addedManager, User currentlyOwner, Store store)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.AddStoreManager(addedManager, currentlyOwner, store);
         }
@@ -42,7 +42,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> AddStoreOwner(User addedOwner, User currentlyOwner, Store store)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.AddStoreOwner(addedOwner, currentlyOwner, store);
         }
@@ -50,7 +50,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> EditProductDetails(User user, Store store, Product product, IDictionary<string, object> details)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.EditProductDetails(user, store, product, details);
         }
@@ -58,7 +58,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> GetDiscountPolicyAtStore(User user, Store store)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.GetDiscountPolicyAtStore(user, store);
         }
@@ -66,7 +66,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> GetPurchasePolicyAtStore(User user, Store store)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.GetPurchasePolicyAtStore(user, store);
         }
@@ -74,7 +74,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> GetStorePurchaseHistory(User owner, Store store)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.GetStorePurchaseHistory(owner, store);
         }
@@ -82,7 +82,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> GetStoreStaff(User owner, Store store)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.GetStoreStaff(owner, store);
         }
@@ -90,7 +90,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> GetTotalShoppingCartPrice(User user)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.GetTotalShoppingCartPrice(user);
         }
@@ -98,7 +98,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> GetUserPurchaseHistory(User user)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.GetUserPurchaseHistory(user);
         }
@@ -106,7 +106,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> GetUserShoppingCart(User user)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.GetUserShoppingCart(user);
         }
@@ -114,7 +114,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> Login(string email, string password)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.Login(email, password);
         }
@@ -122,7 +122,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> LogOut(string email, string password)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.LogOut(email, password);
         }
@@ -130,7 +130,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> OpenNewStore(string storeName, User user)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.OpenNewStore(storeName, user);
         }
@@ -138,7 +138,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> Purchase(User user)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.Purchase(user);
         }
@@ -146,7 +146,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> Register(string email, string password)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.Register(email, password);
         }
@@ -154,7 +154,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> RemoveProductFromStore(User user, Store store, Product product)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.RemoveProductFromStore(user, store, product);
         }
@@ -162,7 +162,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> RemoveStoreManager(User addedManager, User currentlyOwner, Store store)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.RemoveStoreManager(addedManager, currentlyOwner, store);
         }
@@ -170,7 +170,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> ResetSystem()
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.ResetSystem();
         }
@@ -178,7 +178,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> SearchProduct(IDictionary<string, object> details)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.SearchProduct(details);
         }
@@ -186,7 +186,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> SearchStore(IDictionary<string, object> details)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.SearchStore(details);
         }
@@ -194,7 +194,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> SetDiscountPolicyAtStore(User user, Store store, IDiscountPolicy policy)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.SetDiscountPolicyAtStore(user, store, policy);
         }
@@ -202,7 +202,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> SetPermissions(User manager, User owner, Permission permissions)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.SetPermissions(manager, owner, permissions);
         }
@@ -210,7 +210,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> SetPurchasePolicyAtStore(User user, Store store, IPurchasePolicy policy)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.SetPurchasePolicyAtStore(user, store, policy);
         }
@@ -218,7 +218,7 @@ namespace XUnitTestTerminal3.IntegrationTests
         public Result<bool> UpdateShoppingCart(User user, Product product, int quantity)
         {
             if (Real == null)
-                return new Result<bool>(null, true, null);
+                return new Result<bool>(true);
 
             return Real.UpdateShoppingCart(user, product, quantity);
         }

@@ -6,5 +6,6 @@ namespace XUnitTestTerminal3
 {
     public class SearchStoreTest: XUnitTerminal3TestCase
     {
+
     }
 }
