@@ -7,4 +7,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
     {
         Result<Object> Register(String email, String password);
     }
+    public class StoresAndManagementInterface : IStoresAndManagementInterface
+    {
+        public Result<Object> Register(String email, String password)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
