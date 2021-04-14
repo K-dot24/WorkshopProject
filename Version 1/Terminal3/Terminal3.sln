@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal3", "Terminal3\Terminal3.csproj", "{BB8CAB6F-E9F8-47F1-AF60-72B3C45865F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnitTestTerminal3", "XUnitTestTerminal3\XUnitTestTerminal3.csproj", "{7483445B-5243-4EDE-9448-FD0EB58F31BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTestTerminal3", "XUnitTestTerminal3\XUnitTestTerminal3.csproj", "{7483445B-5243-4EDE-9448-FD0EB58F31BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal3-UnitTests", "Terminal3Tests\Terminal3-UnitTests.csproj", "{E328A82A-D91A-4173-8622-3FD2E4A5A534}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{7483445B-5243-4EDE-9448-FD0EB58F31BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7483445B-5243-4EDE-9448-FD0EB58F31BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7483445B-5243-4EDE-9448-FD0EB58F31BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E328A82A-D91A-4173-8622-3FD2E4A5A534}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E328A82A-D91A-4173-8622-3FD2E4A5A534}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E328A82A-D91A-4173-8622-3FD2E4A5A534}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E328A82A-D91A-4173-8622-3FD2E4A5A534}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
