@@ -18,70 +18,70 @@ public class Permission: IStoreOperations
         {
             this.Store = store;
         }
-        
-        public Result<bool> AddNewProduct(Product product)
+
+        public Result<object> AddNewProduct(Product product)
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).AddNewProduct(product);
         }
 
-        public Result<bool> RemoveProduct(Product product)
+        public Result<object> RemoveProduct(Product product)
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).RemoveProduct(product);
         }
 
-        public Result<bool> EditProduct(IDictionary<string, object> attributes, Product product)
+        public Result<object> EditProduct(IDictionary<string, object> attributes, Product product)
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).EditProduct(attributes, product);
         }
 
-        public Result<bool> AddStoreOwner(RegisteredUser addedOwner, User currentlyOwner)
+        public Result<object> AddStoreOwner(RegisteredUser addedOwner, User currentlyOwner)
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).AddStoreOwner(addedOwner, currentlyOwner);
         }
 
-        public Result<bool> AddStoreManager(RegisteredUser addedManager, User currentlyOwner)
+        public Result<object> AddStoreManager(RegisteredUser addedManager, User currentlyOwner)
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).AddStoreManager(addedManager, currentlyOwner);
         }
 
-        public Result<bool> RemoveStoreManager(RegisteredUser addedManager, RegisteredUser currentlyOwner)
+        public Result<object> RemoveStoreManager(RegisteredUser addedManager, RegisteredUser currentlyOwner)
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).RemoveStoreManager(addedManager, currentlyOwner);
         }
 
-        public Result<bool> SetPermissions(RegisteredUser manager, RegisteredUser owner, Permission permissions)
+        public Result<object> SetPermissions(RegisteredUser manager, RegisteredUser owner, Permission permissions)
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).SetPermissions(manager, owner, permissions);
         }
 
-        public Result<bool> GetStoreStaff()
+        public Result<object> GetStoreStaff()
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).GetStoreStaff();
         }
 
-        public Result<bool> SetPurchasePolicyAtStore(IPurchasePolicy policy)
+        public Result<object> SetPurchasePolicyAtStore(IPurchasePolicy policy)
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).SetPurchasePolicyAtStore(policy);
         }
 
-        public Result<bool> GetPurchasePolicyAtStore()
+        public Result<object> GetPurchasePolicyAtStore()
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).GetPurchasePolicyAtStore();
         }
 
-        public Result<bool> SetDiscountPolicyAtStore(IDiscountPolicy policy)
+        public Result<object> SetDiscountPolicyAtStore(IDiscountPolicy policy)
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).SetDiscountPolicyAtStore(policy);
         }
 
-        public Result<bool> GetDiscountPolicyAtStore()
+        public Result<object> GetDiscountPolicyAtStore()
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).GetDiscountPolicyAtStore();
         }
 
-        public Result<bool> GetStorePurchaseHistory()
+        public Result<object> GetStorePurchaseHistory()
         {
-            throw new NotImplementedException();
+            return ((IStoreOperations)Store).GetStorePurchaseHistory();
         }
     }
 }

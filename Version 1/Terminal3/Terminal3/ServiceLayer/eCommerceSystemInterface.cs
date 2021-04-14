@@ -12,38 +12,38 @@ namespace Terminal3.ServiceLayer
     public interface IECommerceSystemInterface
     {
         #region System related operations
-        Result<Boolean> ResetSystem();
+        Result<Object> ResetSystem();
         #endregion
 
         #region User related operations
-        Result<Boolean> Register(String email , String password);         
-        Result<Boolean> Login(String email, String password);
-        Result<Boolean> LogOut(String email, String password);
-        Result<Boolean> SearchStore(IDictionary<String,Object> details);
-        Result<Boolean> SearchProduct(IDictionary<String, Object> details);
-        Result<Boolean> AddProductToCart(User user, Product product);   // Redundent ?
-        Result<Boolean> GetUserShoppingCart(User user);
-        Result<Boolean> UpdateShoppingCart(User user , Product product , int quantity);
-        Result<Boolean> Purchase(User user);
-        Result<Boolean> GetUserPurchaseHistory(User user);
-        Result<Boolean> GetTotalShoppingCartPrice(User user);
+        Result<Object> Register(String email , String password);         
+        Result<Object> Login(String email, String password);
+        Result<Object> LogOut(String email, String password);
+        Result<Object> SearchStore(IDictionary<String,Object> details);
+        Result<Object> SearchProduct(IDictionary<String, Object> details);
+        Result<Object> AddProductToCart(User user, Product product);   // Redundent ?
+        Result<Object> GetUserShoppingCart(User user);
+        Result<Object> UpdateShoppingCart(User user , Product product , int quantity);
+        Result<Object> Purchase(User user);
+        Result<Object> GetUserPurchaseHistory(User user);
+        Result<Object> GetTotalShoppingCartPrice(User user);
         #endregion 
 
         #region Store related operations
-        Result<Boolean> OpenNewStore(String storeName,User user);
-        Result<Boolean> AddProductToStore(User user, Store store, Product product, int quantity);
-        Result<Boolean> RemoveProductFromStore(User user, Store store, Product product);
-        Result<Boolean> EditProductDetails(User user, Store store, Product product, IDictionary<String, Object> details);
-        Result<Boolean> SetPurchasePolicyAtStore(User user, Store store, IPurchasePolicy policy);
-        Result<Boolean> GetPurchasePolicyAtStore(User user, Store store);
-        Result<Boolean> SetDiscountPolicyAtStore(User user, Store store, IDiscountPolicy policy);
-        Result<Boolean> GetDiscountPolicyAtStore(User user, Store store);
-        Result<Boolean> AddStoreOwner(User addedOwner,User currentlyOwner ,Store store);
-        Result<Boolean> AddStoreManager(User addedManager,User currentlyOwner ,Store store);
-        Result<Boolean> RemoveStoreManager(User addedManager,User currentlyOwner ,Store store);
-        Result<Boolean> SetPermissions(User manager,User owner ,Permission permissions);
-        Result<Boolean> GetStoreStaff(User owner ,Store store);
-        Result<Boolean> GetStorePurchaseHistory(User owner ,Store store);
+        Result<Object> OpenNewStore(String storeName,User user);
+        Result<Object> AddProductToStore(User user, Store store, Product product, int quantity);
+        Result<Object> RemoveProductFromStore(User user, Store store, Product product);
+        Result<Object> EditProductDetails(User user, Store store, Product product, IDictionary<String, Object> details);
+        Result<Object> SetPurchasePolicyAtStore(User user, Store store, IPurchasePolicy policy);
+        Result<Object> GetPurchasePolicyAtStore(User user, Store store);
+        Result<Object> SetDiscountPolicyAtStore(User user, Store store, IDiscountPolicy policy);
+        Result<Object> GetDiscountPolicyAtStore(User user, Store store);
+        Result<Object> AddStoreOwner(User addedOwner,User currentlyOwner ,Store store);
+        Result<Object> AddStoreManager(User addedManager,User currentlyOwner ,Store store);
+        Result<Object> RemoveStoreManager(User addedManager,User currentlyOwner ,Store store);
+        Result<Object> SetPermissions(User manager,User owner ,Permission permissions);
+        Result<Object> GetStoreStaff(User owner ,Store store);
+        Result<Object> GetStorePurchaseHistory(User owner ,Store store);
         #endregion
 
     }
