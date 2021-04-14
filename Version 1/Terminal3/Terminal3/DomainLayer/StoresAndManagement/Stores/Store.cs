@@ -43,6 +43,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public PolicyManager PolicyManager { get; }
         public History History { get; }
 
+        public Store(RegisteredUser founder)
+        {
+            Founder = new StoreOwner(founder,this,null);
+            this.Owners = new LinkedList<StoreOwner>();
+            this.Managers = new LinkedList<StoreManager>();
+            this.InventoryManager = new InventoryManager();
+            this.PolicyManager = new PolicyManager();
+            this.History = new History();
+        }
+
+
+
         //TODO: Implement functions
         public Result<bool> AddNewProduct(Product product)
         {
