@@ -15,7 +15,7 @@ namespace XUnitTestTerminal3
         public void SerchProductNotExist()
         {
             sut.ResetSystem();
-            Result<Boolean> res = sut.AddProductToStore();
+            Result<Object> res = sut.AddProductToStore();
             Assert.False(res.ExecStatus);
         }
     }
