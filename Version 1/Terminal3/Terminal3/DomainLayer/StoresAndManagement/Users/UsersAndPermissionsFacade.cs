@@ -9,8 +9,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     public interface IUsersAndPermissionsFacade
     {
         Result<RegisteredUser> Register(String email, String password);
-        Result<RegisteredUser> AddSystemAdmin(String email, String password); 
-        Result<RegisteredUser> RemoveSystemAdmin(String email, String password); 
+        Result<RegisteredUser> AddSystemAdmin(String email); 
+        Result<RegisteredUser> RemoveSystemAdmin(String email); 
 
     }
 
@@ -27,8 +27,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
 
             //Add first system admin
-            this.SystemAdmins.TryAdd("Admin@terminal3", new RegisteredUser("Admin@terminal3", "Admin"));
+            //this.SystemAdmins.TryAdd("Admin@terminal3", new RegisteredUser("Admin@terminal3", "Admin"));
 
+        }
+        //Constructor for the initializer
+        public UsersAndPermissionsFacade(ConcurrentDictionary<String, RegisteredUser>  registeredUsers,
+                                           ConcurrentDictionary<String, RegisteredUser>  systemAdmins)
+        {
+            this.RegisteredUsers = registeredUsers;
+            this.SystemAdmins = systemAdmins;
         }
 
         //Methods
@@ -59,9 +66,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns>result of the operation</returns>
-        public Result<RegisteredUser> AddSystemAdmin(String email, String password) 
+        public Result<RegisteredUser> AddSystemAdmin(String email) 
         {
-            Result<RegisteredUser> searchResult = FindUserByEmail(email);
+            Result<RegisteredUser> searchResult = FindUserByEmail(email,RegisteredUsers);
             //registered user has been found
             if (searchResult.ExecStatus)
             {
@@ -83,9 +90,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns>result of the operation</returns>
-        public Result<RegisteredUser> RemoveSystemAdmin(String email, String password)
+        public Result<RegisteredUser> RemoveSystemAdmin(String email)
         {
-            Result<RegisteredUser> searchResult = FindUserByEmail(email);
+            Result<RegisteredUser> searchResult = FindUserByEmail(email,SystemAdmins);
             RegisteredUser removedUser;
             if (searchResult.ExecStatus)
             {
@@ -128,17 +135,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// Util function to get RegisterUser object if tis exist
         /// </summary>
         /// <param name="email"></param>
+        /// <param name="table">from which table source to find the user [RegisteredUser/ SystemAdmins]</param>
         /// <returns></returns>
-        private Result<RegisteredUser> FindUserByEmail(String email)
+        private Result<RegisteredUser> FindUserByEmail(String email, ConcurrentDictionary<String, RegisteredUser> table)
         {
             RegisteredUser requestedUser;
-            if (RegisteredUsers.TryGetValue(email, out requestedUser)) 
+            if (table.TryGetValue(email, out requestedUser)) 
             {
                 return new Result<RegisteredUser>($"found user with email:{email}\n",true, requestedUser);
             }
             else
             {
-                return new Result<RegisteredUser>($"found user with email:{email}\n", true, requestedUser);
+                return new Result<RegisteredUser>($"could not find user with email:{email}\n", false, null);
             } 
         }
 

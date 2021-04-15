@@ -8,15 +8,62 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
 {
     public class UsersAndPermissionsFacadeTests
     {
+        //Properties
+        public UsersAndPermissionsFacade Facade { get; }
+
+        //Constructor
+        public UsersAndPermissionsFacadeTests()
+        {
+            Facade = new UsersAndPermissionsFacade();
+        }
+
+        //Tests
         [Theory()]
         [Trait("Category", "Unit")]
         [InlineData("tomer@gmail.com", "raz@gmail.com", true)]
         [InlineData("tomer@gmail.com", "tomer@gmail.com", false)]
         public void RegisterTest(String usedEmail, String requestedEmail, Boolean expectedResult)
         {
-            UsersAndPermissionsFacade facade = new UsersAndPermissionsFacade();
-            Assert.True(facade.Register(usedEmail, "123123").ExecStatus);
-            Assert.Equal(facade.Register(requestedEmail, "123123").ExecStatus, expectedResult);
+            Assert.True(Facade.Register(usedEmail, "password").ExecStatus);
+            Assert.Equal(expectedResult,Facade.Register(requestedEmail, "password").ExecStatus);
+        }
+
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData("tomer@gmail.com", "tomer@gmail.com", true)]
+        [InlineData("tomer@gmail.com", "raz@gmail.com", false)]
+        //System admin need to be registered user
+        public void AddSystemAdminTest(String registeredEmail, String adminEmail, Boolean expectedResult)
+        {
+            Facade.Register(registeredEmail, "password");
+            Assert.Equal(expectedResult, Facade.AddSystemAdmin(adminEmail).ExecStatus);
+        }
+
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData("tomer@gmail.com", "raz@gmail.com", "raz@gmail.com", true)]  //user is exist in SystemAdmins
+        [InlineData("tomer@gmail.com", "raz@gmail.com", "tomer@gmail.com", true)] //user is exist in SystemAdmins
+        [InlineData("tomer@gmail.com", "raz@gmail.com", "shaked@gmail.com", false)] //user is NOT exist in SystemAdmins
+        public void RemoveSystemAdminTest(String admin1, String admin2, String adminToRemove, Boolean expectedResult)
+        {
+            Facade.Register(admin1, "password");
+            Facade.Register(admin2, "password");
+            Facade.AddSystemAdmin(admin1);
+            Facade.AddSystemAdmin(admin2);
+            Assert.Equal(expectedResult, Facade.RemoveSystemAdmin(adminToRemove).ExecStatus);
+
+        }
+
+        [Fact()]
+        [Trait("Category", "Unit")]
+        //at least one system admin in the system test
+        public void RemoveSystemAdminTestAtLeastOne()
+        {
+            String email = "tomer@gmail.com";
+            Facade.Register(email, "password");
+            Facade.AddSystemAdmin(email);
+            Assert.False(Facade.RemoveSystemAdmin(email).ExecStatus);
+
         }
     }
 }
