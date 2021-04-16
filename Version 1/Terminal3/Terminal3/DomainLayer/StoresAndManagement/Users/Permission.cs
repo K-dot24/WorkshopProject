@@ -7,16 +7,48 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 { 
-     //Access proxy for store instance
-public class Permission: IStoreOperations
+
+    public enum methods : int
+    {
+        #region Inventory Management
+        AddNewProduct = 0,
+        RemoveProduct = 1,
+        EditProduct = 2,
+        #endregion
+
+        #region Staff Management
+        AddStoreOwner = 3,
+        AddStoreManager = 4,
+        RemoveStoreManager = 5,
+        SetPermissions = 6,
+        GetStoreStaff = 7,
+        #endregion
+
+        #region Policies Management
+        SetPurchasePolicyAtStore = 8,
+        GetPurchasePolicyAtStore = 9,
+        SetDiscountPolicyAtStore = 10,
+        GetDiscountPolicyAtStore = 11,
+        #endregion
+
+        #region Information
+        GetStorePurchaseHistory = 12
+        #endregion
+
+    }
+    //Access proxy for store instance
+    public class Permission: IStoreOperations
     {
         //TODO: figure out how to set permissions flags for each operation and add machanisem for it
 
         public Store Store { get; }
+        public Boolean[] functionsBitMask { get; }
 
         public Permission(Store store)
         {
             this.Store = store;
+            functionsBitMask = new Boolean[13];
+            functionsBitMask[(int)methods.GetStoreStaff] = true;    //requierment 4.5
         }
 
         public Result<object> AddNewProduct(Product product)
