@@ -10,8 +10,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         Result<RegisteredUser> Register(String email, String password);
         Result<RegisteredUser> AddSystemAdmin(String email); 
-        Result<RegisteredUser> RemoveSystemAdmin(String email); 
-
+        Result<RegisteredUser> RemoveSystemAdmin(String email);
+        Result<RegisteredUser> Login(String email, String password);
+        Result<RegisteredUser> LogOut(String email);
     }
 
     public class UsersAndPermissionsFacade : IUsersAndPermissionsFacade
@@ -148,6 +149,50 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             {
                 return new Result<RegisteredUser>($"could not find user with email:{email}\n", false, null);
             } 
+        }
+
+        /// <summary>
+        /// Login function - this function will look for the user with the given email address
+        /// and try to verify the given password
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public Result<RegisteredUser> Login(String email, String password)
+        {
+            Result<RegisteredUser> searchResult = FindUserByEmail(email, RegisteredUsers);
+            if (searchResult.ExecStatus)
+            {
+                //User Found
+                return searchResult.Data.Login(password);
+            }
+            else
+            {
+                //No user if found using the given email
+                return new Result<RegisteredUser>($"There is not user using this email:{email}\n", false, null);
+
+            }
+        }
+
+        /// <summary>
+        /// Logout function - the function will look for the user with the given email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public Result<RegisteredUser> LogOut(String email)
+        {
+            Result<RegisteredUser> searchResult = FindUserByEmail(email, RegisteredUsers);
+            if (searchResult.ExecStatus)
+            {
+                //User found
+                return searchResult.Data.LogOut();
+            }
+            else
+            {
+                //No user if found using the given email
+                return new Result<RegisteredUser>($"There is not user using this email:{email}\n", false, null);
+
+            }
         }
 
      

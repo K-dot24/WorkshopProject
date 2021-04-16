@@ -25,7 +25,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         public void RegisterTest(String usedEmail, String requestedEmail, Boolean expectedResult)
         {
             Assert.True(Facade.Register(usedEmail, "password").ExecStatus);
-            Assert.Equal(expectedResult,Facade.Register(requestedEmail, "password").ExecStatus);
+            Assert.Equal(expectedResult, Facade.Register(requestedEmail, "password").ExecStatus);
         }
 
         [Theory()]
@@ -63,6 +63,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             Facade.Register(email, "password");
             Facade.AddSystemAdmin(email);
             Assert.False(Facade.RemoveSystemAdmin(email).ExecStatus);
+
+        }
+
+        [Fact()]
+        [Trait("Category", "Unit")]
+        public void LoginTest()
+        {
+            String email = "tomer@gmail.com";
+            String password = "password";
+            Facade.Register(email, password);
+            Assert.True(Facade.Login(email, password).ExecStatus, "Fail to login");
+            Assert.False(Facade.Login(email, password).ExecStatus, "Able to loggin twice");
+        }
+
+        [Fact()]
+        [Trait("Category", "Unit")]
+        public void LogOutTest()
+        {
+            String email = "tomer@gmail.com";
+            String password = "password";
+            Facade.Register(email, password);
+            Assert.False(Facade.LogOut(email).ExecStatus, "Able to loggout twice");
+            Assert.True(Facade.Login(email, password).ExecStatus, "Not able to log in");
+            Assert.True(Facade.LogOut(email).ExecStatus, "Not able to log out");
 
         }
     }

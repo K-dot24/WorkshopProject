@@ -18,7 +18,7 @@ namespace Terminal3.ServiceLayer
         #region User related operations
         Result<Object> Register(String email , String password);         
         Result<Object> Login(String email, String password);
-        Result<Object> LogOut(String email, String password);
+        Result<Object> LogOut(String email);
         Result<Object> SearchStore(IDictionary<String,Object> details);
         Result<Object> SearchProduct(IDictionary<String, Object> details);
         Result<Object> AddProductToCart(User user, Product product);   // Redundent ?
