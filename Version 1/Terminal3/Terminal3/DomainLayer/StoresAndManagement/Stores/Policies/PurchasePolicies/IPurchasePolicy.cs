@@ -4,4 +4,12 @@
     {
         //TODO
     }
+
+    public enum policyType : int
+    {
+        Auction = 0 ,
+        BuyNow = 1,
+        Lottery = 2 ,
+        Offer = 3
+    }
 }
