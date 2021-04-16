@@ -10,18 +10,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
     public interface IStoreOperations
     {
+        //TODO: Update functions sigs
+
         #region Inventory Management
-        Result<Object> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category);
-        Result<Object> RemoveProduct(Product product);
-        Result<Object> EditProduct(IDictionary<String,Object> attributes, Product product);
+        Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category);
+        Result<Product> RemoveProduct(String userID, String productID);
+        Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details);
         #endregion
 
         #region Staff Management
-        Result<Object> AddStoreOwner(RegisteredUser addedOwner, User currentlyOwner);
-        Result<Object> AddStoreManager(RegisteredUser addedManager, User currentlyOwner);
-        Result<Object> RemoveStoreManager(RegisteredUser addedManager, RegisteredUser currentlyOwner);
-        Result<Object> SetPermissions(RegisteredUser manager, RegisteredUser owner, Permission permissions);
-        Result<Object> GetStoreStaff();
+        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreManager(String removedOwnerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
         #region Policies Management
@@ -50,80 +53,83 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             StoreID = Service.GenerateId();
             Name = name;
-            Founder = new StoreOwner(founder,this,null);
+            Founder = new StoreOwner(founder, this, null);
             Owners = new ConcurrentDictionary<String, StoreOwner>();
             Managers = new ConcurrentDictionary<String, StoreManager>();
             InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
             History = new History();
+
+            //Add founder to list of owners
+            Owners.TryAdd(founder.Email, Founder);
         }
 
+        //TODO: Implement all functions
 
-
-        //TODO: Implement functions
+        #region Inventory Management
         public Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category)
         {
-            throw new NotImplementedException();
+            if (CheckStoreOwner(userID) || CheckStoreManager(userID, Methods.AddNewProduct))
+            {
+                return InventoryManager.AddNewProduct(productName, price, initialQuantity, category);
+            }
+            else
+            {
+                return new Result<Product>($"{userID} does not have permissions to add new product to {this.Name}\n", false, null);
+            }
+        }
+        public Result<Product> RemoveProduct(String userID, String productID)
+        {
+            if (CheckStoreOwner(userID) || CheckStoreManager(userID, Methods.RemoveProduct))
+            {
+                return InventoryManager.RemoveProduct(productID);
+            }
+            else
+            {
+                return new Result<Product>($"{userID} does not have permissions to remove products from {this.Name}\n", false, null);
+            }
+        }
+        public Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details)
+        {
+            if (CheckStoreOwner(userID) || CheckStoreManager(userID, Methods.EditProduct))
+            {
+                return InventoryManager.EditProduct(productID, details);
+            }
+            else
+            {
+                return new Result<Product>($"{userID} does not have permissions to edit products' information in {this.Name}\n", false, null);
+            }
+        }
+        #endregion
+
+        #region Staff Management
+        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID)
+        {
+
         }
 
-        public Result<Object> AddStoreManager(RegisteredUser addedManager, User currentlyOwner)
+        Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreManager(String removedOwnerID, String currentlyOwnerID, String storeID);
+        #endregion
+
+
+
+        #region Private Functions
+        private Boolean CheckStoreOwner(String userID)    // If user is Store Owner => has permissions
         {
-            throw new NotImplementedException();
+            return Owners.TryGetValue(userID, out _);
         }
 
-        public Result<Object> AddStoreOwner(RegisteredUser addedOwner, User currentlyOwner)
+        private Boolean CheckStoreManager(String userID, Methods method)    // Check if userID is Store Manager + has certain permission
         {
-            throw new NotImplementedException();
+            return Managers.TryGetValue(userID, out StoreManager manager) && CheckPermission(manager, method);
         }
-
-        public Result<Object> EditProduct(IDictionary<String, Object> attributes, Product product)
+        
+        private Boolean CheckPermission(StoreManager manager, Methods method)
         {
-            throw new NotImplementedException();
+            return manager.Permission.functionsBitMask[(int)method];
         }
-
-        public Result<Object> GetDiscountPolicyAtStore()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> GetPurchasePolicyAtStore()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> GetStorePurchaseHistory()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> GetStoreStaff()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> RemoveProduct(Product product)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> RemoveStoreManager(RegisteredUser addedManager, RegisteredUser currentlyOwner)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> SetDiscountPolicyAtStore(IDiscountPolicy policy)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> SetPermissions(RegisteredUser manager, RegisteredUser owner, Permission permissions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> SetPurchasePolicyAtStore(IPurchasePolicy policy)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
     }
 }

@@ -16,6 +16,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
         Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreManager(String removedOwnerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
@@ -37,8 +39,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         Result<StoreDAL> OpenNewStore(String storeName, String userID)
         {
-            RegisteredUser founder;
-            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out founder))  // Check if userID is a registered user
+            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser founder))  // Check if userID is a registered user
             {
                 // Open store
                 return StoresFacade.OpenNewStore(founder, userID);
@@ -51,8 +52,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category)
         {
-            
+            return StoresFacade.AddProductToStore(userID, storeID, productName, price, initialQuantity, category);
         }
+
+        Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details)
+        {
+            return StoresFacade.EditProductDetails(userID, storeID, productID, details);
+        }
+
 
 
     }
