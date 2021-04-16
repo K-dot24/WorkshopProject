@@ -13,7 +13,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
         Result<RegisteredUser> LogOut(String email);
-
     }
 
     public class UsersAndPermissionsFacade : IUsersAndPermissionsFacade
@@ -195,5 +194,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             }
         }
+
+     
     }
 }

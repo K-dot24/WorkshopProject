@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface IStoresAndManagementInterface
     {
+
         Result<RegisteredUser> Register(String email, String password);
         Result<RegisteredUser> Login(String email, String password);
         Result<RegisteredUser> LogOut(String email);
@@ -36,6 +38,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         }
 
         public Result<RegisteredUser> RemoveSystemAdmin(String email)
+        Result<Object> Register(String email, String password);
+    }
+    public class StoresAndManagementInterface : IStoresAndManagementInterface
+    {
+        public Result<Object> Register(String email, String password)
+
         {
             throw new NotImplementedException();
         }

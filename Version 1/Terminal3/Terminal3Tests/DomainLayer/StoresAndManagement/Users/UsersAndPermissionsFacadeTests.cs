@@ -87,6 +87,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             Assert.False(Facade.LogOut(email).ExecStatus, "Able to loggout twice");
             Assert.True(Facade.Login(email, password).ExecStatus, "Not able to log in");
             Assert.True(Facade.LogOut(email).ExecStatus, "Not able to log out");
+
         }
     }
 }
