@@ -15,34 +15,39 @@ namespace Terminal3.ServiceLayer
 
         #region User related operations
         Result<Boolean> Register(String email, String password);
+
         Result<Boolean> Login(String email, String password);
+
         Result<Boolean> LogOut(String email);
+
         //TODO: refine requirement
         Result<Object> SearchStore(IDictionary<String, Object> details);
-        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> details);
-        Result<Boolean> AddProductToCart(IDictionary<String,Object>);   // Redundent ?
-        Result<Object> GetUserShoppingCart(User user);
-        Result<Object> UpdateShoppingCart(User user, Product product, int quantity);
-        Result<Object> Purchase(User user);
-        Result<Object> GetUserPurchaseHistory(User user);
-        Result<Object> GetTotalShoppingCartPrice(User user);
+
+        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+        
+        Result<Boolean> AddProductToCart(String userID , String ProductID, int ProductQuantity , String StoreID);   // Redundent ?
+
+        Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
+
+        Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID , String productID , int quantity);
+
+        Result<Object> Purchase(String userID , IDictionary<String, Object> paymentDetails , IDictionary<String, Object> deliveryDetails);
+
+        Result<HistoryDAL> GetUserPurchaseHistory(String userID);
+
+        Result<int> GetTotalShoppingCartPrice(String userID);
         #endregion
 
         #region Store related operations
-        Result<Object> OpenNewStore(String storeName, User user);
-        Result<Object> AddProductToStore(User user, Store store, Product product, int quantity);
-        Result<Object> RemoveProductFromStore(User user, Store store, Product product);
-        Result<Object> EditProductDetails(User user, Store store, Product product, IDictionary<String, Object> details);
-        Result<Object> SetPurchasePolicyAtStore(User user, Store store, IPurchasePolicy policy);
-        Result<Object> GetPurchasePolicyAtStore(User user, Store store);
-        Result<Object> SetDiscountPolicyAtStore(User user, Store store, IDiscountPolicy policy);
-        Result<Object> GetDiscountPolicyAtStore(User user, Store store);
-        Result<Object> AddStoreOwner(User addedOwner, User currentlyOwner, Store store);
-        Result<Object> AddStoreManager(User addedManager, User currentlyOwner, Store store);
-        Result<Object> RemoveStoreManager(User addedManager, User currentlyOwner, Store store);
-        Result<Object> SetPermissions(User manager, User owner, Permission permissions);
-        Result<Object> GetStoreStaff(User owner, Store store);
-        Result<Object> GetStorePurchaseHistory(User owner, Store store);
+        Result<StoreDAL> OpenNewStore(String storeName, String userID);
+        Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName , double price, int initialQuantity, String category );
+        Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
+        Result<ProductDAL> EditProductDetails(String userID, String storeID , String productID, IDictionary<String, Object> details);
+        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Dictionary<UserDAL , PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
         #endregion
 
  
