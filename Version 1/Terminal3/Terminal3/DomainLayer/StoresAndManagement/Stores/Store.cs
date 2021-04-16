@@ -4,6 +4,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
+using Terminal3.DALobjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -53,6 +54,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             this.History = new History();
         }
 
+        public Store(StoreDAL store)
+        {
+            Founder = new StoreOwner(store.Founder);
+            this.Owners = new LinkedList<StoreOwner>();
+            foreach(StoreOwnerDAL storeOwner in store.Owners)
+            {
+                this.Owners.AddLast(new StoreOwner(storeOwner));
+            }
+            this.Managers = new LinkedList<StoreManager>();
+            foreach (StoreManagerDAL storeManager in store.Managers)
+            {
+                this.Managers.AddLast(new StoreManager(storeManager));
+            }
+            this.InventoryManager = new InventoryManager(); //TODO??
+            this.PolicyManager = new PolicyManager();       //TODO??
+            this.History = new History(store.History);
+        }
 
 
         //TODO: Implement functions
@@ -93,6 +111,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Object> GetStoreStaff()
         {
+            throw new NotImplementedException();
+        }
+
+        public Result<Product> GetProduct(ProductDAL productDAL)
+        {
+            // this function is for the shoppingBag constructor that converts DAL object to domain objects
             throw new NotImplementedException();
         }
 

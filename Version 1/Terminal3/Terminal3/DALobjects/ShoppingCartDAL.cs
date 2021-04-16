@@ -4,13 +4,15 @@ using System.Text;
 
 namespace Terminal3.DALobjects
 {
-    public class HistoryDAL
+    public class ShoppingCartDAL
     {
         //Properties
+        public string ShoppingCartId { get; }
         public LinkedList<ShoppingBagDAL> ShoppingBags { get; }
 
-        public HistoryDAL(LinkedList<ShoppingBagDAL> shoppingBags)
+        public ShoppingCartDAL(string shoppingCartId, LinkedList<ShoppingBagDAL> shoppingBags)
         {
+            ShoppingCartId = shoppingCartId;
             ShoppingBags = shoppingBags;
         }
     }

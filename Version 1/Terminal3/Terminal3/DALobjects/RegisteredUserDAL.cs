@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Terminal3.DALobjects
 {
-    public class RegisteredUserDAL
+    public class RegisteredUserDAL : UserDAL
     {
         //Properties
         public String UserId { get; }
@@ -13,7 +13,7 @@ namespace Terminal3.DALobjects
         public Boolean LoggedIn { get; set; }
 
         //Constructor
-        public RegisteredUserDAL(string userId, string email, string password, bool loggedIn)
+        public RegisteredUserDAL(string userId, string email, string password, bool loggedIn , ShoppingCartDAL shoppingCartDAL) : base(shoppingCartDAL)
         {
             UserId = userId;
             Email = email;
