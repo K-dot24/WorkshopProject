@@ -16,10 +16,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #endregion
 
         #region Staff Management
-        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreManager(String removedOwnerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID, String storeID);
+        Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreManager(RegisteredUser removedManager, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
@@ -55,10 +54,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     return new Result<ProductDAL>(res.Message, res.ExecStatus, null);
                 }
             }
-            else
-            {
-                return new Result<ProductDAL>($"Store ID {storeID} not found.\n", false, null);
-            }
+            //else
+            return new Result<ProductDAL>($"Store ID {storeID} not found.\n", false, null);
+            
         }
         
         public Result<Boolean> RemoveProductFromStore(string userID, string storeID, string productID)
@@ -75,10 +73,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     return new Result<Boolean>(res.Message, res.ExecStatus, false);
                 }
             }
-            else
-            {
-                return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
-            }
+            //else
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
         
         public Result<ProductDAL> EditProductDetails(string userID, string storeID, string productID, IDictionary<String, Object> details)
@@ -96,32 +92,40 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     return new Result<ProductDAL>(res.Message, res.ExecStatus, null);
                 }
             }
-            else
-            {
-                return new Result<ProductDAL>($"Store ID {storeID} not found.\n", false, null);
-            }
+            //else
+            return new Result<ProductDAL>($"Store ID {storeID} not found.\n", false, null);           
         }
         #endregion
 
         #region Staff Management
-        public Result<bool> AddStoreManager(string addedManagerID, string currentlyOwnerID, string storeID)
+        public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID, string storeID)
         {
-            throw new NotImplementedException();
+            if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
+            {
+                return store.AddStoreOwner(futureOwner, currentlyOwnerID);
+            }
+            //else failed
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
+        }
+        
+        public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID, string storeID)
+        {
+            if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
+            {
+                return store.AddStoreManager(futureManager, currentlyOwnerID);
+            }
+            //else failed
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
 
-        public Result<bool> AddStoreOwner(string addedOwnerID, string currentlyOwnerID, string storeID)
+        public Result<Boolean> RemoveStoreManager(RegisteredUser removedManager, string currentlyOwnerID, string storeID)
         {
-            throw new NotImplementedException();
-        }
-
-        public Result<bool> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<bool> RemoveStoreManager(string removedOwnerID, string currentlyOwnerID, string storeID)
-        {
-            throw new NotImplementedException();
+            if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
+            {
+                return store.RemoveStoreManager(removedManager, currentlyOwnerID);
+            }
+            //else failed
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
 
         public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)

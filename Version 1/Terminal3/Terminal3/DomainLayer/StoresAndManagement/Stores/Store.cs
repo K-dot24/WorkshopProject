@@ -19,12 +19,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #endregion
 
         #region Staff Management
-        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreManager(String removedOwnerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID);
+        Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID);
+        Result<Boolean> RemoveStoreManager(RegisteredUser removedManager, String currentlyOwnerID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID);
         #endregion
 
         #region Policies Management
@@ -69,7 +68,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #region Inventory Management
         public Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category)
         {
-            if (CheckStoreOwner(userID) || CheckStoreManager(userID, Methods.AddNewProduct))
+            if (CheckIfStoreOwner(userID) || CheckStoreManagerAndPermissions(userID, Methods.AddNewProduct))
             {
                 return InventoryManager.AddNewProduct(productName, price, initialQuantity, category);
             }
@@ -80,7 +79,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         public Result<Product> RemoveProduct(String userID, String productID)
         {
-            if (CheckStoreOwner(userID) || CheckStoreManager(userID, Methods.RemoveProduct))
+            if (CheckIfStoreOwner(userID) || CheckStoreManagerAndPermissions(userID, Methods.RemoveProduct))
             {
                 return InventoryManager.RemoveProduct(productID);
             }
@@ -91,7 +90,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         public Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details)
         {
-            if (CheckStoreOwner(userID) || CheckStoreManager(userID, Methods.EditProduct))
+            if (CheckIfStoreOwner(userID) || CheckStoreManagerAndPermissions(userID, Methods.EditProduct))
             {
                 return InventoryManager.EditProduct(productID, details);
             }
@@ -102,33 +101,103 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         #endregion
 
-        #region Staff Management
-        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID)
+        public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
         {
+            if (!CheckIfStoreOwner(futureOwner.Email) && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new owner not already an owner + appointing owner is not a fraud
+            {
+                StoreOwner newOwner = new StoreOwner(futureOwner, this, owner);
+                Owners.TryAdd(futureOwner.Email, newOwner);
 
+                if (CheckIfStoreManager(futureOwner.Email)) //remove from managers list if needed
+                {
+                    Managers.TryRemove(futureOwner.Email, out _);
+                }
+            }
+            //else failed
+            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
+                $"is not an owner at ${this.Name}.\n", false, false);
         }
 
-        Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreManager(String removedOwnerID, String currentlyOwnerID, String storeID);
-        #endregion
+        public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)
+        {
+            if (!CheckIfStoreManager(futureManager.Email) && !CheckIfStoreOwner(futureManager.Email) 
+                    && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new manager not already an owner/manager + appointing owner is not a fraud
+            {
+                StoreManager newManager = new StoreManager(futureManager, this, new Permission(this), owner);
+                Managers.TryAdd(futureManager.Email, newManager);
+            }
+            //else failed
+            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
+                $"is not an owner at ${this.Name}.\n", false, false);
+        }
+
+        public Result<bool> RemoveStoreManager(RegisteredUser removedManager, string currentlyOwnerID)
+        {
+            if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner) && Managers.TryGetValue(removedManager.Email, out StoreManager manager))
+            {
+                if (manager.AppointedBy.Equals(owner))
+                {
+                    Managers.TryRemove(removedManager.Email, out _);
+                    return new Result<bool>($"User (Email: {removedManager.Email}) was successfully removed from store management at {this.Name}.\n", true, true);
+                }
+                //else failed
+                return new Result<bool>($"Failed to remove user (Email: {removedManager.Email}) from store management: Unauthorized owner (Email: {currentlyOwnerID}).\n", false, false);
+            }
+            //else failed
+            return new Result<bool>($"Failed to remove user (Email: {removedManager.Email}) from store management: Either not a manager or owner not found.\n", false, false);
+        }
+
+        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<object> SetPurchasePolicyAtStore(IPurchasePolicy policy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<object> GetPurchasePolicyAtStore()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<object> SetDiscountPolicyAtStore(IDiscountPolicy policy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<object> GetDiscountPolicyAtStore()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<object> GetStorePurchaseHistory()
+        {
+            throw new NotImplementedException();
+        }
 
 
 
         #region Private Functions
-        private Boolean CheckStoreOwner(String userID)    // If user is Store Owner => has permissions
+        private Boolean CheckIfStoreOwner(String userID)    // If user is Store Owner => has permissions
         {
-            return Owners.TryGetValue(userID, out _);
+            return Owners.ContainsKey(userID);
         }
 
-        private Boolean CheckStoreManager(String userID, Methods method)    // Check if userID is Store Manager + has certain permission
+        private Boolean CheckIfStoreManager(String userID)
         {
-            return Managers.TryGetValue(userID, out StoreManager manager) && CheckPermission(manager, method);
+            return Managers.ContainsKey(userID);
         }
-        
-        private Boolean CheckPermission(StoreManager manager, Methods method)
+
+        private Boolean CheckStoreManagerAndPermissions(String userID, Methods method)    // Check if userID is Store Manager + has certain permission
         {
-            return manager.Permission.functionsBitMask[(int)method];
+            return Managers.TryGetValue(userID, out StoreManager manager) && manager.Permission.functionsBitMask[(int)method];
         }
         #endregion
     }

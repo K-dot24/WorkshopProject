@@ -7,15 +7,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public RegisteredUser User { get; }
         public Store Store { get; }
-        public StoreOwner Owner { get; }
+        public StoreOwner AppointedBy { get; }
         public LinkedList<IStoreStaff> StoreStaffs { get; }
 
-        public StoreOwner(RegisteredUser user, Store store, StoreOwner storeOwner)
+        public StoreOwner(RegisteredUser user, Store store, StoreOwner appointedBy)
         {
-            this.User = user;
-            this.Store = store;
-            this.Owner = storeOwner;
-            this.StoreStaffs = new LinkedList<IStoreStaff>();
+            User = user;
+            Store = store;
+            AppointedBy = appointedBy;
+            StoreStaffs = new LinkedList<IStoreStaff>();
         }
     }
 }

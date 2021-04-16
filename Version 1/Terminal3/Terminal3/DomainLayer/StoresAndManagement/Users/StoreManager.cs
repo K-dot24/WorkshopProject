@@ -9,12 +9,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Permission Permission { get; }
         public StoreOwner AppointedBy { get; }
 
-        public StoreManager(RegisteredUser user, Store store, Permission permission , StoreOwner storeOwner)
+        public StoreManager(RegisteredUser user, Store store, Permission permission , StoreOwner appointedBy)
         {
             User = user;
             Store = store;
             Permission = permission;
-            AppointedBy = storeOwner;
+            AppointedBy = appointedBy;
         }
     }
 }

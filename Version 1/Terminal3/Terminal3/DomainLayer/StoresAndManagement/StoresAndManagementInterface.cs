@@ -11,15 +11,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         //TODO: add all relevant functions to interface
 
         Result<StoreDAL> OpenNewStore(String storeName, String userID);
+
+        #region Inventory Management
         Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category);
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
+        #endregion
+
+        #region Staff Management
         Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreManager(String removedOwnerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        #endregion
+
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -44,10 +50,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 // Open store
                 return StoresFacade.OpenNewStore(founder, userID);
             }
-            else
-            {
-                return new Result<StoreDAL>($"{userID} is not a registered user. Unable to open store {storeName}\n", false, null);
-            }
+            //else
+            return new Result<StoreDAL>($"Failed to open store {storeName}: {userID} is not a registered user.\n", false, null);
         }
 
         Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category)
@@ -58,6 +62,36 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details)
         {
             return StoresFacade.EditProductDetails(userID, storeID, productID, details);
+        }
+
+        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID)
+        {
+            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(addedOwnerID, out RegisteredUser futureOwner))  // Check if addedOwnerID is a registered user
+            {
+                return StoresFacade.AddStoreOwner(futureOwner, currentlyOwnerID, storeID);
+            }
+            //else
+            return new Result<Boolean>($"Failed to appoint store owner: {addedOwnerID} is not a registered user.\n", false, false);
+        }
+
+        Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID)
+        {
+            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(addedManagerID, out RegisteredUser futureManager))  // Check if addedManagerID is a registered user
+            {
+                return StoresFacade.AddStoreOwner(futureManager, currentlyOwnerID, storeID);
+            }
+            //else
+            return new Result<Boolean>($"Failed to appoint store manager: {addedManagerID} is not a registered user.\n", false, false);
+        }
+        
+        Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID)
+        {
+            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(removedManagerID, out RegisteredUser removedManager))  // Check if addedManagerID is a registered user
+            {
+                return StoresFacade.RemoveStoreManager(removedManager, currentlyOwnerID, storeID);
+            }
+            //else
+            return new Result<Boolean>($"Failed to remove store manager: {removedManagerID} is not a registered user.\n", false, false);
         }
 
 
