@@ -36,16 +36,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     }
     public class Store: IStoreOperations
     {
+        //Properties
+        public String Name { get; }
         public StoreOwner Founder { get; }
         public LinkedList<StoreOwner> Owners { get; }
         public LinkedList<StoreManager> Managers { get; }
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; }
         public History History { get; }
+        public Double Rating { get; private set; }
+        public int NumberOfRates { get; private set; }
 
-        public Store(RegisteredUser founder)
+        //Constructor
+        public Store(String Name,RegisteredUser founder)
         {
-            Founder = new StoreOwner(founder,this,null);
+            this.Name = Name;
+            this.Founder = new StoreOwner(founder,this,null);
             this.Owners = new LinkedList<StoreOwner>();
             this.Managers = new LinkedList<StoreManager>();
             this.InventoryManager = new InventoryManager();
@@ -53,8 +59,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             this.History = new History();
         }
 
-
-
+        //Methods
+        public Result<Double> AddRating(Double rate)
+        {
+            this.NumberOfRates = NumberOfRates + 1;
+            Rating = (Rating + rate) / NumberOfRates;
+            return new Result<Double>($"Store {Name} rate is: {Rating}\n", true, Rating);
+        }
+        public Result<List<Product>> SearchProduct(IDictionary<String, Object> productDetails)
+        {
+            return InventoryManager.SearchProduct(IDictionary<String, Object> productDetails);
+        }
         //TODO: Implement functions
         public Result<Object> AddNewProduct(Product product)
         {
