@@ -1,4 +1,5 @@
 ﻿using System;
+using Terminal3.DALobjects;
 using System.Collections.Generic;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
@@ -12,6 +13,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             ShoppingCartId = Service.GenerateId();
             ShoppingBags = new LinkedList<ShoppingBag>();
+        }
+
+        public ShoppingCart(ShoppingCartDAL shoppingCart)
+        {
+            ShoppingCartId = shoppingCart.ShoppingCartId;
+            ShoppingBags = new LinkedList<ShoppingBag>();
+            foreach(ShoppingBagDAL shoppingBag in shoppingCart.ShoppingBags)
+            {
+                ShoppingBags.AddLast(new ShoppingBag(shoppingBag));
+            }
         }
     }
 }
