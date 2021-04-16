@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
@@ -10,7 +11,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     public interface IStoreOperations
     {
         #region Inventory Management
-        Result<Object> AddNewProduct(Product product);
+        Result<Object> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category);
         Result<Object> RemoveProduct(Product product);
         Result<Object> EditProduct(IDictionary<String,Object> attributes, Product product);
         #endregion
@@ -36,27 +37,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     }
     public class Store: IStoreOperations
     {
+        public String StoreID { get; }
+        public String Name { get; }
         public StoreOwner Founder { get; }
-        public LinkedList<StoreOwner> Owners { get; }
-        public LinkedList<StoreManager> Managers { get; }
+        public ConcurrentDictionary<String, StoreOwner> Owners { get; }
+        public ConcurrentDictionary<String, StoreManager> Managers { get; }
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; }
         public History History { get; }
 
-        public Store(RegisteredUser founder)
+        public Store(String name, RegisteredUser founder)
         {
+            StoreID = Service.GenerateId();
+            Name = name;
             Founder = new StoreOwner(founder,this,null);
-            this.Owners = new LinkedList<StoreOwner>();
-            this.Managers = new LinkedList<StoreManager>();
-            this.InventoryManager = new InventoryManager();
-            this.PolicyManager = new PolicyManager();
-            this.History = new History();
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+            InventoryManager = new InventoryManager();
+            PolicyManager = new PolicyManager();
+            History = new History();
         }
 
 
 
         //TODO: Implement functions
-        public Result<Object> AddNewProduct(Product product)
+        public Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category)
         {
             throw new NotImplementedException();
         }
