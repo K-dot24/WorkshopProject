@@ -96,10 +96,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.GetUserShoppingCart(userID);
         }
 
-        public Result<bool> Login(string email, string password)
+        public Result<string> Login(string email, string password)
         {
             if (Real == null)
-                return new Result<bool>(true);
+                return new Result<string>(true);
 
             return Real.Login(email, password);
         }
@@ -112,10 +112,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.LogOut(email);
         }
 
-        public Result<StoreDAL> OpenNewStore(string storeName, string userID)
+        public Result<string> OpenNewStore(string storeName, string userID)
         {
             if (Real == null)
-                return new Result<StoreDAL>(true);
+                return new Result<string>(true);
 
             return Real.OpenNewStore(storeName, userID);
         }

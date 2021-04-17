@@ -18,10 +18,8 @@ namespace XUnitTestTerminal3
         {
             sut.ResetSystem();
             sut.Register("test@gmail.com", "test123");
-            Result<UserDAL> login_res = sut.Login("test@gmail.com", "test123");
-            this.user_id = login_res.Data.id;
-            Result<StoreDAL> store_res = sut.OpenNewStore("test_store", user_id);
-            this.store_id = login_res.Data.id;
+            this.user_id = sut.Login("test@gmail.com", "test123").Data;
+            this.store_id = sut.OpenNewStore("test_store", user_id).Data;
         }
 
 

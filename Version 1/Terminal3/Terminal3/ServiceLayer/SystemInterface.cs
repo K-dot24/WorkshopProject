@@ -17,7 +17,7 @@ namespace Terminal3.ServiceLayer
         #region User related operations
         Result<Boolean> Register(String email, String password);
 
-        Result<UserDAL> Login(String email, String password);
+        Result<string> Login(String email, String password); //user id
 
         Result<Boolean> LogOut(String email);
 
@@ -36,15 +36,15 @@ namespace Terminal3.ServiceLayer
 
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
 
-        Result<int> GetTotalShoppingCartPrice(String userID);
+        Result<int> GetTotalShoppingCartPrice(String userID); 
         #endregion
 
         #region Store related operations
-        Result<StoreDAL> OpenNewStore(String storeName, String userID);
-        Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName , double price, int initialQuantity, String category );
+        Result<string> OpenNewStore(String storeName, String userID); //store id
+        Result<string> AddProductToStore(String userID, String storeID, String productName , double price, int initialQuantity, String category ); //product id
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
-        Result<ProductDAL> EditProductDetails(String userID, String storeID , String productID, IDictionary<String, Object> details);
-        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
+        Result<ProductDAL> EditProductDetails(String userID, String storeID , String productID, IDictionary<String, Object> details); //TODO
+        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID); 
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<UserDAL , PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
