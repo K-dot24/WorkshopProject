@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DALobjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
@@ -49,6 +50,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.Store = store;
             functionsBitMask = new Boolean[13];
             functionsBitMask[(int)methods.GetStoreStaff] = true;    //requierment 4.5
+        }
+
+        public Permission(PermissionDAL permissionDAL)
+        {
+            this.Store = Mapper.GetStore(permissionDAL.Store);     //TODO
+            this.functionsBitMask = permissionDAL.functionsBitMask;
         }
 
         public Result<object> AddNewProduct(Product product)
@@ -114,6 +121,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<object> GetStorePurchaseHistory()
         {
             return ((IStoreOperations)Store).GetStorePurchaseHistory();
+        }
+
+        public Result<PermissionDAL> GetDAL()
+        {
+            StoreDAL storeDAL = Store.GetDAL().Data;
+            return new Result<PermissionDAL>("Permmision DAL object", true, new PermissionDAL(storeDAL, functionsBitMask));
         }
     }
 }

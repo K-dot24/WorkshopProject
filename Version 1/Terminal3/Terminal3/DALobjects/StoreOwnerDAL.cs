@@ -13,6 +13,7 @@ namespace Terminal3.DALobjects
         public LinkedList<StoreOwnerDAL> StoreOwners { get; }
         public LinkedList<StoreManagerDAL> StoreManager { get; }
 
+        //Constructor
         public StoreOwnerDAL(RegisteredUserDAL user, StoreDAL store, StoreOwnerDAL owner, LinkedList<StoreOwnerDAL> storeOwners, LinkedList<StoreManagerDAL> storeManager)
         {
             User = user;

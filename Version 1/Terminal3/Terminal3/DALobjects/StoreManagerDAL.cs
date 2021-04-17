@@ -11,6 +11,7 @@ namespace Terminal3.DALobjects
         public PermissionDAL Permissions { get; }
         public StoreOwnerDAL Owner { get; }
 
+        //Constructor
         public StoreManagerDAL(RegisteredUserDAL user, PermissionDAL permissions, StoreOwnerDAL owner)
         {
             User = user;

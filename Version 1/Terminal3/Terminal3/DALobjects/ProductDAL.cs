@@ -13,6 +13,7 @@ namespace Terminal3.DALobjects
         public int Quantity { get; }
         public String Category { get; }
 
+        //Constructor
         public ProductDAL(string id, string name, double price, int quantity, string category)
         {
             Id = id;

@@ -43,6 +43,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; }
         public History History { get; }
+        public String StoreID { get; }
 
         public Store(RegisteredUser founder)
         {
@@ -52,6 +53,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             this.InventoryManager = new InventoryManager();
             this.PolicyManager = new PolicyManager();
             this.History = new History();
+            this.StoreID = Service.GenerateId();
         }
 
         public Store(StoreDAL store)
@@ -70,6 +72,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             this.InventoryManager = new InventoryManager(); //TODO??
             this.PolicyManager = new PolicyManager();       //TODO??
             this.History = new History(store.History);
+            this.StoreID = store.StoreID;
         }
 
 
@@ -144,5 +147,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             throw new NotImplementedException();
         }
+
+
+        public Result<StoreDAL> GetDAL()
+        {
+            StoreOwnerDAL founder = Founder.GetDAL().Data;
+            LinkedList<StoreOwnerDAL> owners = new LinkedList<StoreOwnerDAL>();
+            foreach(StoreOwner so in Owners)
+            {
+                owners.AddLast(so.GetDAL().Data);
+            }
+            LinkedList<StoreManagerDAL> managers = new LinkedList<StoreManagerDAL>();
+            foreach(StoreManager sm in Managers)
+            {
+                managers.AddLast(sm.GetDAL().Data);
+            }
+            InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
+            PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
+            HistoryDAL history = History.GetDAL().Data;
+
+            StoreDAL store = new StoreDAL(founder, owners, managers, inventoryManager, policyManager, history, this.StoreID);
+            return new Result<StoreDAL>("Store DAL object", true, store);
+    }
     }
 }

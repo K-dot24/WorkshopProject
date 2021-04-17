@@ -10,6 +10,7 @@ namespace Terminal3.DALobjects
         public string ShoppingCartId { get; }
         public LinkedList<ShoppingBagDAL> ShoppingBags { get; }
 
+        //Constructor
         public ShoppingCartDAL(string shoppingCartId, LinkedList<ShoppingBagDAL> shoppingBags)
         {
             ShoppingCartId = shoppingCartId;
