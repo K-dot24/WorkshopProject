@@ -13,6 +13,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category);
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
+        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+
         #endregion
 
         #region Staff Management
@@ -126,6 +128,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
             //else failed
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
+        }
+
+        public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails)
+        {
+            ProductSearchAttributes searchAttributes = ObjectDictionaryMapper<ProductSearchAttributes>.GetObject(productDetails);
+            List<Product> searchResult = new List<Product>();
+            foreach(Store store in this.Stores.Values)
+            {
+                Result<List<Product>> storeResult = store.SearchProduct(searchAttributes);
+                if (storeResult.ExecStatus)
+                {
+                    searchResult.AddRange(storeResult.Data);
+                }
+            }
+            if (searchResult.Count > 0) {
+                return new Result<List<ProductDAL>>($"{searchResult.Count } items has been found\n",true,Service.ConvertToDAL<Product>(searchResult));
+            }
+            else{
+                return new Result<List<ProductDAL>>($"No has been found\n", false, null);
+            }
+
         }
 
         public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)

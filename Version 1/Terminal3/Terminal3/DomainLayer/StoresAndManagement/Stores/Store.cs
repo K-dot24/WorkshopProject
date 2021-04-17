@@ -74,9 +74,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Rating = (Rating + rate) / NumberOfRates;
             return new Result<Double>($"Store {Name} rate is: {Rating}\n", true, Rating);
         }
-        public Result<List<Product>> SearchProduct(IDictionary<String, Object> productDetails)
+        public Result<List<Product>> SearchProduct(ProductSearchAttributes searchAttributes)
         {
-            return InventoryManager.SearchProduct(IDictionary<String, Object> productDetails);
+            return InventoryManager.SearchProduct(this.Rating, searchAttributes);
         }
 
         #region Inventory Management
