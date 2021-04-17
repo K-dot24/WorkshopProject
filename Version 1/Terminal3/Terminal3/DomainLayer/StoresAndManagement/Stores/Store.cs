@@ -92,9 +92,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         //Methods
         public Result<Double> AddRating(Double rate)
         {
-            this.NumberOfRates = NumberOfRates + 1;
-            Rating = (Rating + rate) / NumberOfRates;
-            return new Result<Double>($"Store {Name} rate is: {Rating}\n", true, Rating);
+            if (rate > 5 || rate < 1)
+            {
+                return new Result<Double>($"Store {Name} could not be rated. Please use number between 1 to 5\n", false, Rating);
+            }
+            else
+            {
+                this.NumberOfRates = NumberOfRates + 1;
+                Rating = (Rating + rate) / NumberOfRates;
+                return new Result<Double>($"Store {Name} rate is: {Rating}\n", true, Rating);
+            }
         }
         public Result<List<Product>> SearchProduct(ProductSearchAttributes searchAttributes)
         {
