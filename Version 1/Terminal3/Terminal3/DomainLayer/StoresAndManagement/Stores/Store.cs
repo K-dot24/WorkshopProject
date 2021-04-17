@@ -103,7 +103,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 return new Result<Double>($"Store {Name} rate is: {Rating}\n", true, Rating);
             }
         }
-        public Result<List<Product>> SearchProduct(ProductSearchAttributes searchAttributes)
+        public Result<List<Product>> SearchProduct(IDictionary<String, Object> searchAttributes)
         {
             return InventoryManager.SearchProduct(this.Rating, searchAttributes);
         }

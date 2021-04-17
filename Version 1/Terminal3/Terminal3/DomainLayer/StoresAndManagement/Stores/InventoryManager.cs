@@ -54,12 +54,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Product>($"Faild to edit product (ID: {productID}): Product not found.\n", false, null);
         }
 
-        public Result<List<Product>> SearchProduct(Double StoreRating, ProductSearchAttributes searchAttributes)
+        public Result<List<Product>> SearchProduct(Double StoreRating, IDictionary<String,Object> searchAttributes)
         {
             List<Product> searchResults = new List<Product>();
             foreach(Product product in this.Products.Values)
             {
-                if (searchAttributes.checkProduct(StoreRating,product))
+                if (ProductSearchAttributes.checkProduct(StoreRating,product,searchAttributes))
                 {
                     searchResults.Add(product);
                 }

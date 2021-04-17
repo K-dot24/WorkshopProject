@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -80,16 +81,16 @@ namespace Terminal3.DomainLayer
             PropertyInfo[] properties = typeof(ProductSearchAttributes).GetProperties();
             for (int i=0; i< properties.Length && result; i++)
             {   var value = properties[i].GetValue(this);
-                if (value != null)
+                if (value != null && !value.Equals(0))
                 {
                     switch((string)properties[i].Name)
                     { 
                         case "Name":
-                            if (!product.Name.Contains((string)value)) {result = false;}
+                            if (!product.Name.ToLower().Contains(((string)value).ToLower())) {result = false;}
                             break;
 
                         case "Category":
-                            if (!product.Category.Equals((string)value)) { result = false; }
+                            if (!product.Category.ToLower().Equals(((string)value).ToLower())) { result = false; }
                             break;
                         case "LowPrice":
                             if (product.Price<(Double)value) { result = false; }
@@ -104,9 +105,10 @@ namespace Terminal3.DomainLayer
                             if (StoreRating < (Double)value) { result = false; }
                             break;
                         case "Keywords":
-                            foreach(string keyword in (List<String>)value)
+                            List<string> productKeywords = product.Keywords.Select(word => word.ToLower()).ToList();
+                            foreach (string keyword in (List<String>)value)
                             {
-                                if (product.Keywords.Contains(keyword)) { 
+                                if (productKeywords.Contains(keyword.ToLower())) {
                                     //One keyword has been found
                                     break;
                                 }
@@ -122,7 +124,50 @@ namespace Terminal3.DomainLayer
             }
             return result;
         }
-
+        public static bool checkProduct(Double StoreRating, Product product, IDictionary<String,Object> searchAttributes)
+        {
+            Boolean result = true;
+            ICollection<String> properties = searchAttributes.Keys;
+            foreach(string property in properties)
+            {
+                var value = searchAttributes[property];
+                switch (property.ToLower())
+                {
+                    case "name":
+                        if (!product.Name.ToLower().Contains(((string)value).ToLower())) { result = false; }
+                        break;
+                    case "category":
+                        if (!product.Category.ToLower().Equals(((string)value).ToLower())) { result = false; }
+                        break;
+                    case "lowprice":
+                        if (product.Price < (Double)value) { result = false; }
+                        break;
+                    case "highprice":
+                        if (product.Price > (Double)value) { result = false; }
+                        break;
+                    case "productrating":
+                        if (product.Rating < (Double)value) { result = false; }
+                        break;
+                    case "storerating":
+                        if (StoreRating < (Double)value) { result = false; }
+                        break;
+                    case "keywords":
+                        List<string> productKeywords = product.Keywords.Select(word => word.ToLower()).ToList();
+                        foreach (string keyword in (List<String>)value)
+                        {
+                            if (productKeywords.Contains(keyword.ToLower()))
+                            {
+                                //One keyword has been found
+                                break;
+                            }
+                        }
+                        //No keyword has been found
+                        result = false;
+                        break;
+                }
+            }
+            return result;
+        }
         public override bool Equals(object obj)
         {
             return obj is ProductSearchAttributes attributes &&
