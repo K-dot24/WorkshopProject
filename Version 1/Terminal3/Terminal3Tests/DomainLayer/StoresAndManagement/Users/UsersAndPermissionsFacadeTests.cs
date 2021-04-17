@@ -15,6 +15,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         public UsersAndPermissionsFacadeTests()
         {
             Facade = new UsersAndPermissionsFacade();
+
         }
 
         //Tests

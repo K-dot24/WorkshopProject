@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
@@ -10,18 +11,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
     public interface IStoreOperations
     {
+        //TODO: Update functions sigs
+
         #region Inventory Management
-        Result<Object> AddNewProduct(Product product);
-        Result<Object> RemoveProduct(Product product);
-        Result<Object> EditProduct(IDictionary<String,Object> attributes, Product product);
+        Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null);
+        Result<Product> RemoveProduct(String userID, String productID);
+        Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details);
         #endregion
 
         #region Staff Management
-        Result<Object> AddStoreOwner(RegisteredUser addedOwner, User currentlyOwner);
-        Result<Object> AddStoreManager(RegisteredUser addedManager, User currentlyOwner);
-        Result<Object> RemoveStoreManager(RegisteredUser addedManager, RegisteredUser currentlyOwner);
-        Result<Object> SetPermissions(RegisteredUser manager, RegisteredUser owner, Permission permissions);
-        Result<Object> GetStoreStaff();
+        Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID);
+        Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID);
+        Result<Boolean> RemoveStoreManager(RegisteredUser removedManager, String currentlyOwnerID);
+        Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID);
         #endregion
 
         #region Policies Management
@@ -37,82 +40,170 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     }
     public class Store: IStoreOperations
     {
+        public String Id { get; }
+        public String Name { get; }
         public StoreOwner Founder { get; }
-        public LinkedList<StoreOwner> Owners { get; }
-        public LinkedList<StoreManager> Managers { get; }
+        public ConcurrentDictionary<String, StoreOwner> Owners { get; }
+        public ConcurrentDictionary<String, StoreManager> Managers { get; }
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; }
         public History History { get; }
-        public String StoreID { get; }
+        public Double Rating { get; private set; }
+        public int NumberOfRates { get; private set; }
 
-        public Store(RegisteredUser founder)
+        //Constructors
+        public Store(String name, RegisteredUser founder)
         {
-            Founder = new StoreOwner(founder,this,null);
-            this.Owners = new LinkedList<StoreOwner>();
-            this.Managers = new LinkedList<StoreManager>();
-            this.InventoryManager = new InventoryManager();
-            this.PolicyManager = new PolicyManager();
-            this.History = new History();
-            this.StoreID = Service.GenerateId();
-        }
+            Id = Service.GenerateId();
+            Name = name;
+            Founder = new StoreOwner(founder, this, null);
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+            InventoryManager = new InventoryManager();
+            PolicyManager = new PolicyManager();
+            History = new History();
 
-        public Store(StoreDAL store)
+            //Add founder to list of owners
+            Owners.TryAdd(founder.Email, Founder);
+        }
+        
+        /*public Store(StoreDAL store)
         {
             Founder = new StoreOwner(store.Founder);
-            this.Owners = new LinkedList<StoreOwner>();
-            foreach(StoreOwnerDAL storeOwner in store.Owners)
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            foreach (StoreOwnerDAL storeOwner in store.Owners)
             {
-                this.Owners.AddLast(new StoreOwner(storeOwner));
+                StoreOwner owner = new StoreOwner(storeOwner);
+                Owners.TryAdd(storeOwner.User.Email, owner);
             }
-            this.Managers = new LinkedList<StoreManager>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
             foreach (StoreManagerDAL storeManager in store.Managers)
             {
-                this.Managers.AddLast(new StoreManager(storeManager));
+                StoreManager manager = new StoreManager(storeManager);
+                Managers.TryAdd(storeManager.User.Email, manager);
             }
-            this.InventoryManager = new InventoryManager(); //TODO??
-            this.PolicyManager = new PolicyManager();       //TODO??
-            this.History = new History(store.History);
-            this.StoreID = store.StoreID;
+            InventoryManager = new InventoryManager(); //TODO??
+            PolicyManager = new PolicyManager();       //TODO??
+            History = new History(store.History);
+            Id = store.StoreID;
+        }*/
+
+        //TODO: Implement all functions
+        //Methods
+        public Result<Double> AddRating(Double rate)
+        {
+            this.NumberOfRates = NumberOfRates + 1;
+            Rating = (Rating + rate) / NumberOfRates;
+            return new Result<Double>($"Store {Name} rate is: {Rating}\n", true, Rating);
+        }
+        public Result<List<Product>> SearchProduct(ProductSearchAttributes searchAttributes)
+        {
+            return InventoryManager.SearchProduct(this.Rating, searchAttributes);
         }
 
+        #region Inventory Management
+        public Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null)
+        {
+            if (CheckIfStoreOwner(userID) || CheckStoreManagerAndPermissions(userID, Methods.AddNewProduct))
+            {
+                return InventoryManager.AddNewProduct(productName, price, initialQuantity, category, keywords);
+            }
+            else
+            {
+                return new Result<Product>($"{userID} does not have permissions to add new product to {this.Name}\n", false, null);
+            }
+        }
+        public Result<Product> RemoveProduct(String userID, String productID)
+        {
+            if (CheckIfStoreOwner(userID) || CheckStoreManagerAndPermissions(userID, Methods.RemoveProduct))
+            {
+                return InventoryManager.RemoveProduct(productID);
+            }
+            else
+            {
+                return new Result<Product>($"{userID} does not have permissions to remove products from {this.Name}\n", false, null);
+            }
+        }
+        public Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details)
+        {
+            if (CheckIfStoreOwner(userID) || CheckStoreManagerAndPermissions(userID, Methods.EditProduct))
+            {
+                return InventoryManager.EditProduct(productID, details);
+            }
+            else
+            {
+                return new Result<Product>($"{userID} does not have permissions to edit products' information in {this.Name}\n", false, null);
+            }
+        }
+        #endregion
 
-        //TODO: Implement functions
-        public Result<Object> AddNewProduct(Product product)
+        public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
+        {
+            if (!CheckIfStoreOwner(futureOwner.Email) && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new owner not already an owner + appointing owner is not a fraud
+            {
+                StoreOwner newOwner = new StoreOwner(futureOwner, this, owner);
+                Owners.TryAdd(futureOwner.Email, newOwner);
+
+                if (CheckIfStoreManager(futureOwner.Email)) //remove from managers list if needed
+                {
+                    Managers.TryRemove(futureOwner.Email, out _);
+                }
+            }
+            //else failed
+            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
+                $"is not an owner at ${this.Name}.\n", false, false);
+        }
+
+        public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)
+        {
+            if (!CheckIfStoreManager(futureManager.Email) && !CheckIfStoreOwner(futureManager.Email) 
+                    && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new manager not already an owner/manager + appointing owner is not a fraud
+            {
+                StoreManager newManager = new StoreManager(futureManager, this, new Permission(), owner);
+                Managers.TryAdd(futureManager.Email, newManager);
+            }
+            //else failed
+            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
+                $"is not an owner at ${this.Name}.\n", false, false);
+        }
+
+        public Result<bool> RemoveStoreManager(RegisteredUser removedManager, string currentlyOwnerID)
+        {
+            if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner) && Managers.TryGetValue(removedManager.Email, out StoreManager manager))
+            {
+                if (manager.AppointedBy.Equals(owner))
+                {
+                    Managers.TryRemove(removedManager.Email, out _);
+                    return new Result<bool>($"User (Email: {removedManager.Email}) was successfully removed from store management at {this.Name}.\n", true, true);
+                }
+                //else failed
+                return new Result<bool>($"Failed to remove user (Email: {removedManager.Email}) from store management: Unauthorized owner (Email: {currentlyOwnerID}).\n", false, false);
+            }
+            //else failed
+            return new Result<bool>($"Failed to remove user (Email: {removedManager.Email}) from store management: Either not a manager or owner not found.\n", false, false);
+        }
+
+        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
         {
             throw new NotImplementedException();
         }
 
-        public Result<Object> AddStoreManager(RegisteredUser addedManager, User currentlyOwner)
+        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID)
         {
             throw new NotImplementedException();
         }
 
-        public Result<Object> AddStoreOwner(RegisteredUser addedOwner, User currentlyOwner)
+        public Result<object> SetPurchasePolicyAtStore(IPurchasePolicy policy)
         {
             throw new NotImplementedException();
         }
 
-        public Result<Object> EditProduct(IDictionary<String, Object> attributes, Product product)
+        public Result<object> GetPurchasePolicyAtStore()
         {
             throw new NotImplementedException();
         }
 
-        public Result<Object> GetDiscountPolicyAtStore()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> GetPurchasePolicyAtStore()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> GetStorePurchaseHistory()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> GetStoreStaff()
+        public Result<object> SetDiscountPolicyAtStore(IDiscountPolicy policy)
         {
             throw new NotImplementedException();
         }
@@ -123,29 +214,37 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
+        public Result<object> GetDiscountPolicyAtStore()
+        {
+            throw new NotImplementedException();
+        }
+        
         public Result<Object> RemoveProduct(Product product)
         {
             throw new NotImplementedException();
         }
 
-        public Result<Object> RemoveStoreManager(RegisteredUser addedManager, RegisteredUser currentlyOwner)
+        public Result<object> GetStorePurchaseHistory()
         {
             throw new NotImplementedException();
         }
 
-        public Result<Object> SetDiscountPolicyAtStore(IDiscountPolicy policy)
+
+
+        #region Private Functions
+        private Boolean CheckIfStoreOwner(String userID)    // If user is Store Owner => has permissions
         {
-            throw new NotImplementedException();
+            return Owners.ContainsKey(userID);
         }
 
-        public Result<Object> SetPermissions(RegisteredUser manager, RegisteredUser owner, Permission permissions)
+        private Boolean CheckIfStoreManager(String userID)
         {
-            throw new NotImplementedException();
+            return Managers.ContainsKey(userID);
         }
 
-        public Result<Object> SetPurchasePolicyAtStore(IPurchasePolicy policy)
+        private Boolean CheckStoreManagerAndPermissions(String userID, Methods method)    // Check if userID is Store Manager + has certain permission
         {
-            throw new NotImplementedException();
+            return Managers.TryGetValue(userID, out StoreManager manager) && manager.Permission.functionsBitMask[(int)method];
         }
 
 

@@ -7,16 +7,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public RegisteredUser User { get; }
         public Permission Permission { get; }
-        public StoreOwner Owner { get; }
+        public StoreOwner AppointedBy { get; }
+        public Store Store { get; }
 
-        public StoreManager(RegisteredUser user, Permission permission , StoreOwner storeOwner)
+        public StoreManager(RegisteredUser user, Store store, Permission permission , StoreOwner appointedBy)
         {
-            this.User = user;
-            this.Permission = permission;
-            this.Owner = storeOwner;
+            User = user;
+            Store = store;
+            Permission = permission;
+            AppointedBy = appointedBy;
         }
 
-        public StoreManager(StoreManagerDAL storeManagerDAL)
+        //TODO: Fix DAL
+
+        /*public StoreManager(StoreManagerDAL storeManagerDAL)
         {
             this.User = Mapper.GetStoreManager(storeManagerDAL.User);
             this.Permission = Mapper.GetPermission(storeManagerDAL.Permissions);

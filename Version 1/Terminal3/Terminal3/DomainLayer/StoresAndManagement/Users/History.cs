@@ -7,12 +7,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public LinkedList<ShoppingBag> ShoppingBags { get; }
 
+        public History()
+        {
+            ShoppingBags = new LinkedList<ShoppingBag>();
+        }
+
         public History(LinkedList<ShoppingBag> shoppingBags)
         {
             this.ShoppingBags = shoppingBags;
         }
 
-        public History(HistoryDAL historyDAL)
+        //TODO: Fix DAL
+
+        /*public History(HistoryDAL historyDAL)
         {
             LinkedList<ShoppingBag> shoppingBags = new LinkedList<ShoppingBag>();
             foreach(ShoppingBagDAL sb in historyDAL.ShoppingBags){
@@ -31,5 +38,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             return new Result<HistoryDAL>("History DAL object", true, new HistoryDAL(SBD));
         }
+
+        public Result<HistoryDAL> GetDAL()
+        {
+            LinkedList<ShoppingBagDAL> SBD = new LinkedList<ShoppingBagDAL>();
+            foreach(ShoppingBag sb in ShoppingBags)
+            {
+                SBD.AddLast(sb.GetDAL().Data);
+            }
+
+            return new Result<HistoryDAL>("History DAL object", true, new HistoryDAL(SBD));
+        }*/
     }
 }

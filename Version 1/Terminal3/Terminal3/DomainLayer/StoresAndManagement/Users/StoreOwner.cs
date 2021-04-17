@@ -8,24 +8,26 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public RegisteredUser User { get; }
         public Store Store { get; }
-        public StoreOwner Owner { get; }
+        public StoreOwner AppointedBy { get; }
         public LinkedList<IStoreStaff> StoreStaffs { get; }
 
-        public StoreOwner(RegisteredUser user, Store store, StoreOwner storeOwner)
+        public StoreOwner(RegisteredUser user, Store store, StoreOwner appointedBy)
         {
-            this.User = user;
-            this.Store = store;
-            this.Owner = storeOwner;
-            this.StoreStaffs = new LinkedList<IStoreStaff>();
+            User = user;
+            Store = store;
+            AppointedBy = appointedBy;
+            StoreStaffs = new LinkedList<IStoreStaff>();
         }
 
-        public StoreOwner(StoreOwnerDAL storeOwner)
+        //TODO: Fix DAL
+
+/*        public StoreOwner(StoreOwnerDAL storeOwner)
         {
             this.User = Mapper.GetRegisteredUser(storeOwner.User);
             this.Store = Mapper.GetStore(storeOwner.Store);
-            this.Owner = Mapper.GetStoreOwner(storeOwner.Owner); 
+            this.AppointedBy = Mapper.GetStoreOwner(storeOwner.Owner);
             this.StoreStaffs = new LinkedList<IStoreStaff>();
-            foreach(StoreOwnerDAL so in storeOwner.StoreOwners)
+            foreach (StoreOwnerDAL so in storeOwner.StoreOwners)
             {
                 StoreStaffs.AddLast(Mapper.GetStoreOwner(so));
             }
