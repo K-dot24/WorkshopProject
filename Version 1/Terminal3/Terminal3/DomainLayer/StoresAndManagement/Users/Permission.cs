@@ -51,69 +51,133 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             functionsBitMask[(int)methods.GetStoreStaff] = true;    //requierment 4.5
         }
 
+        public Boolean isPermitted(int method)
+        {
+            return functionsBitMask[method];
+        }
+
+        public Result<object> NoPermissionResult(String method)
+        {
+            return new Result<object>("Manager does not have permission to " + method, false, null);
+        }
+
         public Result<object> AddNewProduct(Product product)
         {
-            return ((IStoreOperations)Store).AddNewProduct(product);
+            if (isPermitted((int)methods.AddNewProduct))
+            {
+                return ((IStoreOperations)Store).AddNewProduct(product);
+            }
+            return NoPermissionResult("add new product");
         }
 
         public Result<object> RemoveProduct(Product product)
         {
-            return ((IStoreOperations)Store).RemoveProduct(product);
+            if (isPermitted((int)methods.RemoveProduct))
+            {
+                return ((IStoreOperations)Store).RemoveProduct(product);
+            }
+            return NoPermissionResult("remove product");
         }
 
         public Result<object> EditProduct(IDictionary<string, object> attributes, Product product)
         {
-            return ((IStoreOperations)Store).EditProduct(attributes, product);
+            if (isPermitted((int)methods.EditProduct))
+            {
+                return ((IStoreOperations)Store).EditProduct(attributes, product);
+            }
+            return NoPermissionResult("edit product");
         }
 
         public Result<object> AddStoreOwner(RegisteredUser addedOwner, User currentlyOwner)
         {
-            return ((IStoreOperations)Store).AddStoreOwner(addedOwner, currentlyOwner);
+            if (isPermitted((int)methods.AddStoreOwner))
+            {
+                return ((IStoreOperations)Store).AddStoreOwner(addedOwner, currentlyOwner);
+            }
+            return NoPermissionResult("add store owner");                
         }
 
         public Result<object> AddStoreManager(RegisteredUser addedManager, User currentlyOwner)
         {
-            return ((IStoreOperations)Store).AddStoreManager(addedManager, currentlyOwner);
+            if (isPermitted((int)methods.AddStoreManager))
+            {
+                return ((IStoreOperations)Store).AddStoreManager(addedManager, currentlyOwner);
+            }
+            return NoPermissionResult("add store manager");                
         }
 
         public Result<object> RemoveStoreManager(RegisteredUser addedManager, RegisteredUser currentlyOwner)
         {
-            return ((IStoreOperations)Store).RemoveStoreManager(addedManager, currentlyOwner);
+            if (isPermitted((int)methods.RemoveStoreManager))
+            {
+                return ((IStoreOperations)Store).RemoveStoreManager(addedManager, currentlyOwner);
+            }
+            return NoPermissionResult("remove store manager");                
         }
 
         public Result<object> SetPermissions(RegisteredUser manager, RegisteredUser owner, Permission permissions)
         {
-            return ((IStoreOperations)Store).SetPermissions(manager, owner, permissions);
+            if (isPermitted((int)methods.SetPermissions))
+            {
+                return ((IStoreOperations)Store).SetPermissions(manager, owner, permissions);
+            }
+            return NoPermissionResult("set permissions");              
         }
 
         public Result<object> GetStoreStaff()
         {
-            return ((IStoreOperations)Store).GetStoreStaff();
+            if (isPermitted((int)methods.GetStoreStaff))
+            {
+                return ((IStoreOperations)Store).GetStoreStaff();
+            }
+            return NoPermissionResult("get store staff");                
         }
 
         public Result<object> SetPurchasePolicyAtStore(IPurchasePolicy policy)
         {
-            return ((IStoreOperations)Store).SetPurchasePolicyAtStore(policy);
+            if (isPermitted((int)methods.SetPurchasePolicyAtStore))
+            {
+                return ((IStoreOperations)Store).SetPurchasePolicyAtStore(policy);
+            }
+            return NoPermissionResult("set purchase policy at store");
         }
 
         public Result<object> GetPurchasePolicyAtStore()
         {
-            return ((IStoreOperations)Store).GetPurchasePolicyAtStore();
+            if (isPermitted((int)methods.GetPurchasePolicyAtStore))
+            {
+                return ((IStoreOperations)Store).GetPurchasePolicyAtStore();
+            }
+            return NoPermissionResult("get purchase policy at store");
         }
 
         public Result<object> SetDiscountPolicyAtStore(IDiscountPolicy policy)
         {
-            return ((IStoreOperations)Store).SetDiscountPolicyAtStore(policy);
+            if (isPermitted((int)methods.SetDiscountPolicyAtStore))
+            {
+                return ((IStoreOperations)Store).SetDiscountPolicyAtStore(policy);
+            }
+            return NoPermissionResult("set discount policy at store");                
         }
 
         public Result<object> GetDiscountPolicyAtStore()
         {
-            return ((IStoreOperations)Store).GetDiscountPolicyAtStore();
+            if (isPermitted((int)methods.GetDiscountPolicyAtStore))
+            {
+                return ((IStoreOperations)Store).GetDiscountPolicyAtStore();
+            }
+            return NoPermissionResult("get discount policy at store");
+                
         }
 
         public Result<object> GetStorePurchaseHistory()
         {
-            return ((IStoreOperations)Store).GetStorePurchaseHistory();
+            if (isPermitted((int)methods.GetStorePurchaseHistory))
+            {
+                return ((IStoreOperations)Store).GetStorePurchaseHistory();
+            }
+            return NoPermissionResult("get store purchase history");
+                
         }
     }
 }
