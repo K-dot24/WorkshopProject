@@ -142,12 +142,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<StoreDAL> OpenNewStore(RegisteredUser founder, string storeName)
         {
-            String id = Service.GenerateId();
             Store newStore = new Store(storeName, founder);
-            Stores.TryAdd(id, newStore);
+            Stores.TryAdd(newStore.Id, newStore);
 
             //TODO: Complete with DAL object
-            return new Result<StoreDAL>($"New store {storeName}, ID: {id} was created successfully by {founder}\n", true, StoreDAL);
+            return new Result<StoreDAL>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, StoreDAL);
         }
 
 

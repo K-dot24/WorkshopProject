@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
+
     public interface IInventoryManager
     {
         Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category);
@@ -45,8 +46,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Product> EditProduct(string productID, IDictionary<String, object> details)
         {
-            //TODO: Tomer- how to work with IDictionary details
-            throw new NotImplementedException();
+            if (Products.TryGetValue(productID, out Product toEdit))
+            {
+                ObjectDictionaryMapper<Product>.SetPropertyValue(toEdit, details);
+            }
+            //else failed
+            return new Result<Product>($"Faild to edit product (ID: {productID}): Product not found.\n", false, null);
+        }
+
+        public Result<List<Product>> SearchProduct(IDictionary<String, Object> productDetails)
+        {
+            List<Product> searchResults = new List<Product>();
         }
     }
 }

@@ -39,7 +39,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     }
     public class Store: IStoreOperations
     {
-        public String StoreID { get; }
+        public String Id { get; }
         public String Name { get; }
         public StoreOwner Founder { get; }
         public ConcurrentDictionary<String, StoreOwner> Owners { get; }
@@ -47,10 +47,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; }
         public History History { get; }
+        public Double Rating { get; private set; }
+        public int NumberOfRates { get; private set; }
 
         public Store(String name, RegisteredUser founder)
         {
-            StoreID = Service.GenerateId();
+            Id = Service.GenerateId();
             Name = name;
             Founder = new StoreOwner(founder, this, null);
             Owners = new ConcurrentDictionary<String, StoreOwner>();
@@ -64,6 +66,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
 
         //TODO: Implement all functions
+                //Methods
+        public Result<Double> AddRating(Double rate)
+        {
+            this.NumberOfRates = NumberOfRates + 1;
+            Rating = (Rating + rate) / NumberOfRates;
+            return new Result<Double>($"Store {Name} rate is: {Rating}\n", true, Rating);
+        }
+        public Result<List<Product>> SearchProduct(IDictionary<String, Object> productDetails)
+        {
+            return InventoryManager.SearchProduct(IDictionary<String, Object> productDetails);
+        }
 
         #region Inventory Management
         public Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category)
