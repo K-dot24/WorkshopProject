@@ -39,7 +39,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     }
     public class Store: IStoreOperations
     {
-        public String StoreID { get; }
+        public String Id { get; }
         public String Name { get; }
         public StoreOwner Founder { get; }
         public ConcurrentDictionary<String, StoreOwner> Owners { get; }
@@ -50,7 +50,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Store(String name, RegisteredUser founder)
         {
-            StoreID = Service.GenerateId();
+            Id = Service.GenerateId();
             Name = name;
             Founder = new StoreOwner(founder, this, null);
             Owners = new ConcurrentDictionary<String, StoreOwner>();
