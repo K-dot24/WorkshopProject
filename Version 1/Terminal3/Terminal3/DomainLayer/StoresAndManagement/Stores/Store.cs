@@ -14,7 +14,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         //TODO: Update functions sigs
 
         #region Inventory Management
-        Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category);
+        Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Product> RemoveProduct(String userID, String productID);
         Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details);
         #endregion
@@ -66,24 +66,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //Add founder to list of owners
             Owners.TryAdd(founder.Email, Founder);
         }
-        public Store(StoreDAL store)
+        
+        /*public Store(StoreDAL store)
         {
             Founder = new StoreOwner(store.Founder);
-            this.Owners = new LinkedList<StoreOwner>();
-            foreach(StoreOwnerDAL storeOwner in store.Owners)
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            foreach (StoreOwnerDAL storeOwner in store.Owners)
             {
-                this.Owners.AddLast(new StoreOwner(storeOwner));
+                StoreOwner owner = new StoreOwner(storeOwner);
+                Owners.TryAdd(storeOwner.User.Email, owner);
             }
-            this.Managers = new LinkedList<StoreManager>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
             foreach (StoreManagerDAL storeManager in store.Managers)
             {
-                this.Managers.AddLast(new StoreManager(storeManager));
+                StoreManager manager = new StoreManager(storeManager);
+                Managers.TryAdd(storeManager.User.Email, manager);
             }
-            this.InventoryManager = new InventoryManager(); //TODO??
-            this.PolicyManager = new PolicyManager();       //TODO??
-            this.History = new History(store.History);
-            this.StoreID = store.StoreID;
-        }
+            InventoryManager = new InventoryManager(); //TODO??
+            PolicyManager = new PolicyManager();       //TODO??
+            History = new History(store.History);
+            Id = store.StoreID;
+        }*/
 
         //TODO: Implement all functions
         //Methods
@@ -96,21 +99,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<List<Product>> SearchProduct(ProductSearchAttributes searchAttributes)
         {
             return InventoryManager.SearchProduct(this.Rating, searchAttributes);
-            Founder = new StoreOwner(founder,this,null);
-            this.Owners = new LinkedList<StoreOwner>();
-            this.Managers = new LinkedList<StoreManager>();
-            this.InventoryManager = new InventoryManager();
-            this.PolicyManager = new PolicyManager();
-            this.History = new History();
-            this.StoreID = Service.GenerateId();
         }
 
         #region Inventory Management
-        public Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category)
+        public Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
             if (CheckIfStoreOwner(userID) || CheckStoreManagerAndPermissions(userID, Methods.AddNewProduct))
             {
-                return InventoryManager.AddNewProduct(productName, price, initialQuantity, category);
+                return InventoryManager.AddNewProduct(productName, price, initialQuantity, category, keywords);
             }
             else
             {
@@ -163,7 +159,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             if (!CheckIfStoreManager(futureManager.Email) && !CheckIfStoreOwner(futureManager.Email) 
                     && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new manager not already an owner/manager + appointing owner is not a fraud
             {
-                StoreManager newManager = new StoreManager(futureManager, this, new Permission(this), owner);
+                StoreManager newManager = new StoreManager(futureManager, this, new Permission(), owner);
                 Managers.TryAdd(futureManager.Email, newManager);
             }
             //else failed
@@ -253,25 +249,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #endregion
 
 
-        public Result<StoreDAL> GetDAL()
-        {
-            StoreOwnerDAL founder = Founder.GetDAL().Data;
-            LinkedList<StoreOwnerDAL> owners = new LinkedList<StoreOwnerDAL>();
-            foreach(StoreOwner so in Owners)
-            {
-                owners.AddLast(so.GetDAL().Data);
-            }
-            LinkedList<StoreManagerDAL> managers = new LinkedList<StoreManagerDAL>();
-            foreach(StoreManager sm in Managers)
-            {
-                managers.AddLast(sm.GetDAL().Data);
-            }
-            InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
-            PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
-            HistoryDAL history = History.GetDAL().Data;
+        //public Result<StoreDAL> GetDAL()
+        //{
+        //    StoreOwnerDAL founder = Founder.GetDAL().Data;
+        //    LinkedList<StoreOwnerDAL> owners = new LinkedList<StoreOwnerDAL>();
+        //    foreach(StoreOwner so in Owners)
+        //    {
+        //        owners.AddLast(so.GetDAL().Data);
+        //    }
+        //    LinkedList<StoreManagerDAL> managers = new LinkedList<StoreManagerDAL>();
+        //    foreach(StoreManager sm in Managers)
+        //    {
+        //        managers.AddLast(sm.GetDAL().Data);
+        //    }
+        //    InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
+        //    PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
+        //    HistoryDAL history = History.GetDAL().Data;
 
-            StoreDAL store = new StoreDAL(founder, owners, managers, inventoryManager, policyManager, history, this.StoreID);
-            return new Result<StoreDAL>("Store DAL object", true, store);
-    }
+        //    StoreDAL store = new StoreDAL(founder, owners, managers, inventoryManager, policyManager, history, this.StoreID);
+        //    return new Result<StoreDAL>("Store DAL object", true, store);
+        //}
     }
 }

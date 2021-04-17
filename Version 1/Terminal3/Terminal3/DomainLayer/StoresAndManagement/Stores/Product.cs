@@ -33,7 +33,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Name = productDAL.Name;
             Price = productDAL.Price;
             Quantity = productDAL.Quantity;
-            Category = productDAL.Category
+            Category = productDAL.Category;
         }
 
         //Method
