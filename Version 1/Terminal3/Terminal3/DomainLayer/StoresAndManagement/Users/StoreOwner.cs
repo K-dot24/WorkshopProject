@@ -19,13 +19,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             StoreStaffs = new LinkedList<IStoreStaff>();
         }
 
-        public StoreOwner(StoreOwnerDAL storeOwner)
+        //TODO: Fix DAL
+
+/*        public StoreOwner(StoreOwnerDAL storeOwner)
         {
             this.User = Mapper.GetRegisteredUser(storeOwner.User);
             this.Store = Mapper.GetStore(storeOwner.Store);
-            this.Owner = Mapper.GetStoreOwner(storeOwner.Owner); 
+            this.AppointedBy = Mapper.GetStoreOwner(storeOwner.Owner);
             this.StoreStaffs = new LinkedList<IStoreStaff>();
-            foreach(StoreOwnerDAL so in storeOwner.StoreOwners)
+            foreach (StoreOwnerDAL so in storeOwner.StoreOwners)
             {
                 StoreStaffs.AddLast(Mapper.GetStoreOwner(so));
             }
@@ -44,10 +46,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             LinkedList<StoreManagerDAL> storeManagers = new LinkedList<StoreManagerDAL>();
 
             //TODO ?!?! instanceOF ??
-            foreach(IStoreStaff ISF in StoreStaffs)
+            foreach (IStoreStaff ISF in StoreStaffs)
             {
-                if(ISF.GetType() == )
+                if (ISF.GetType() == )
             }
-    }
+        }*/
     }
 }

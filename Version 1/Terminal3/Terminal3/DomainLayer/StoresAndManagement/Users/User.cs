@@ -13,10 +13,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             ShoppingCart = new ShoppingCart();
         }
 
-        protected User(UserDAL userDAL)
+        //TODO: Fix DAL
+        /*protected User(UserDAL userDAL)
         {
             ShoppingCart = new ShoppingCart(userDAL.ShoppingCart);
-        }
+        }*/
 
     }
 }

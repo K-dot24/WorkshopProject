@@ -8,6 +8,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public RegisteredUser User { get; }
         public Permission Permission { get; }
         public StoreOwner AppointedBy { get; }
+        public Store Store { get; }
 
         public StoreManager(RegisteredUser user, Store store, Permission permission , StoreOwner appointedBy)
         {
@@ -17,20 +18,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             AppointedBy = appointedBy;
         }
 
-        public StoreManager(StoreManagerDAL storeManagerDAL)
+        //TODO: Fix DAL
+
+        /*public StoreManager(StoreManagerDAL storeManagerDAL)
         {
             this.User = Mapper.GetStoreManager(storeManagerDAL.User);
             this.Permission = Mapper.GetPermission(storeManagerDAL.Permissions);
             this.Owner = Mapper.GetOwner(storeManagerDAL.Owner);
-        }
+        }*/
 
-        public Result<StoreManagerDAL> GetDAL()
+        /*public Result<StoreManagerDAL> GetDAL()
         {
             RegisteredUserDAL user = User.GetDAL().Data;
             PermissionDAL permission = Permission.GetDAL().Data;
             StoreOwnerDAL owner = Owner.GetDAL().Data;
 
             return new Result<StoreManagerDAL>("Store manager DAL object", true, new StoreManagerDAL(user, permission, owner));
-        }
+        }*/
     }
 }

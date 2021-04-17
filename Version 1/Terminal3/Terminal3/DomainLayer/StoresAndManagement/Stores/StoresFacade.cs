@@ -11,7 +11,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<StoreDAL> OpenNewStore(RegisteredUser founder, String storeName);
 
         #region Inventory Management
-        Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category);
+        Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
         Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
@@ -42,15 +42,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         //TODO: Implement all functions
 
         #region Inventory Management
-        public Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, Double price, int initialQuantity, String category)
+        public Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
             if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
             {
-                Result<Product> res = store.AddNewProduct(userID, productName, price, initialQuantity, category);
+                Result<Product> res = store.AddNewProduct(userID, productName, price, initialQuantity, category, keywords);
                 if (res.ExecStatus)
                 {
                     //TODO: Complete with DAL object
-                    return new Result<ProductDAL>(res.Message, res.ExecStatus, ...);
+                    return new Result<ProductDAL>(res.Message, res.ExecStatus, new ProductDAL(res.Data.Id, res.Data.Name, res.Data.Price, res.Data.Quantity, res.Data.Category));
                 }
                 else
                 {
@@ -88,7 +88,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     //TODO: Complete with DAL object
-                    return new Result<ProductDAL>(res.Message, res.ExecStatus, ...);
+                    return new Result<ProductDAL>(res.Message, res.ExecStatus, new ProductDAL(res.Data.Id, res.Data.Name, res.Data.Price, res.Data.Quantity, res.Data.Category));
                 }
                 else
                 {
@@ -144,7 +144,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 }
             }
             if (searchResult.Count > 0) {
-                return new Result<List<ProductDAL>>($"{searchResult.Count } items has been found\n",true,Service.ConvertToDAL<Product>(searchResult));
+                return new Result<List<ProductDAL>>($"{searchResult.Count } items has been found\n",true, null); //TODO: Fix with DAL
             }
             else{
                 return new Result<List<ProductDAL>>($"No has been found\n", false, null);
@@ -170,7 +170,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Stores.TryAdd(newStore.Id, newStore);
 
             //TODO: Complete with DAL object
-            return new Result<StoreDAL>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, StoreDAL);
+            return new Result<StoreDAL>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, null); //TODO: Fix with DAL
         }
 
 
