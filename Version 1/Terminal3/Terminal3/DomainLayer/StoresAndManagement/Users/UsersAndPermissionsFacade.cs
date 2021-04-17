@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DALobjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
