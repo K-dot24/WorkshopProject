@@ -9,6 +9,7 @@ namespace Terminal3.DALobjects
         //Properties
         public ShoppingCartDAL ShoppingCart { get; }
 
+        //Constructor
         public UserDAL(ShoppingCartDAL shoppingCart)
         {
             ShoppingCart = shoppingCart;

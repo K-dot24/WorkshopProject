@@ -24,5 +24,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 ShoppingBags.AddLast(new ShoppingBag(shoppingBag));
             }
         }
+
+        public Result<ShoppingCartDAL> GetDAL()
+        {
+            LinkedList<ShoppingBagDAL> SBD = new LinkedList<ShoppingBagDAL>();
+            foreach(ShoppingBag sb in ShoppingBags)
+            {
+                SBD.AddLast(sb.GetDAL().Data);
+            }
+            return new Result<ShoppingCartDAL>("shopping cart DAL object", true, new ShoppingCartDAL(ShoppingCartId, SBD));
+
+        }
     }
 }

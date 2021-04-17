@@ -9,6 +9,7 @@ namespace Terminal3.DALobjects
         //Properties
         public LinkedList<ShoppingBagDAL> ShoppingBags { get; }
 
+        //Constructor
         public HistoryDAL(LinkedList<ShoppingBagDAL> shoppingBags)
         {
             ShoppingBags = shoppingBags;

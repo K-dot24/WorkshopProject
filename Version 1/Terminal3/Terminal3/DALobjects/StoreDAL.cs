@@ -13,8 +13,10 @@ namespace Terminal3.DALobjects
         public InventoryManager InventoryManager { get; }   //TODO - do we need a DAL calss of the Inventory Manager?
         public PolicyManager PolicyManager { get; }     //TODO - do we need a DAL calss of the Policy Manager?
         public HistoryDAL History { get; }
+        public String StoreID { get; }
 
-        public StoreDAL(StoreOwnerDAL founder, LinkedList<StoreOwnerDAL> owners, LinkedList<StoreManagerDAL> managers, InventoryManager inventoryManager, PolicyManager policyManager, HistoryDAL history)
+        //Constructor
+        public StoreDAL(StoreOwnerDAL founder, LinkedList<StoreOwnerDAL> owners, LinkedList<StoreManagerDAL> managers, InventoryManager inventoryManager, PolicyManager policyManager, HistoryDAL history , String ID)
         {
             Founder = founder;
             Owners = owners;
@@ -22,6 +24,7 @@ namespace Terminal3.DALobjects
             InventoryManager = inventoryManager;
             PolicyManager = policyManager;
             History = history;
+            StoreID = ID;
         }
     }
 }

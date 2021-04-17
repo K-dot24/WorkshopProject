@@ -63,7 +63,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<RegisteredUserDAL> GetDAL()
         {
-            return new Result<RegisteredUserDAL>("RegisteredUser DAL object" , true , new RegisteredUserDAL(this.UserId, this.Email, this.Password, this.LoggedIn));
+            ShoppingCartDAL SCD = this.ShoppingCart.GetDAL().Data;
+            return new Result<RegisteredUserDAL>("RegisteredUser DAL object" , true , new RegisteredUserDAL(this.UserId, this.Email, this.Password, this.LoggedIn , SCD));
         }
     }
 }
