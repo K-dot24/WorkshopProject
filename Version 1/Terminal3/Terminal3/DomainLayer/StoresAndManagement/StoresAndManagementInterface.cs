@@ -94,9 +94,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID)
         {
-            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(removedManagerID, out RegisteredUser removedManager))  // Check if addedManagerID is a registered user
+            if (UsersAndPermissionsFacade.RegisteredUsers.ContainsKey(removedManagerID))  // Check if addedManagerID is a registered user
             {
-                return StoresFacade.RemoveStoreManager(removedManager, currentlyOwnerID, storeID);
+                return StoresFacade.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID);
             }
             //else
             return new Result<Boolean>($"Failed to remove store manager: {removedManagerID} is not a registered user.\n", false, false);
