@@ -47,6 +47,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; }
         public History History { get; }
+        public Double Rating { get; private set; }
+        public int NumberOfRates { get; private set; }
 
         public Store(String name, RegisteredUser founder)
         {
@@ -64,6 +66,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
 
         //TODO: Implement all functions
+                //Methods
+        public Result<Double> AddRating(Double rate)
+        {
+            this.NumberOfRates = NumberOfRates + 1;
+            Rating = (Rating + rate) / NumberOfRates;
+            return new Result<Double>($"Store {Name} rate is: {Rating}\n", true, Rating);
+        }
+        public Result<List<Product>> SearchProduct(IDictionary<String, Object> productDetails)
+        {
+            return InventoryManager.SearchProduct(IDictionary<String, Object> productDetails);
+        }
 
         #region Inventory Management
         public Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category)

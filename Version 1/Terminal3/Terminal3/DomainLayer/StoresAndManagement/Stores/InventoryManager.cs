@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
+
     public interface IInventoryManager
     {
         Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category);
@@ -47,6 +48,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             //TODO: Tomer- how to work with IDictionary details
             throw new NotImplementedException();
+                //TODO
+                
+        public Result<List<Product>> SearchProduct(IDictionary<String, Object> productDetails)
+        {
+            List<Product> searchResults = new List<Product>();
         }
     }
 }
