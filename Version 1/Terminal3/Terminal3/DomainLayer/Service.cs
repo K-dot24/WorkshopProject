@@ -12,7 +12,9 @@ namespace Terminal3.DomainLayer
         public static String GenerateId()
         {
             return Guid.NewGuid().ToString("N");
-        }        
+        }
+        //TODO: add function to create T-DAL object from T
+        //TODO: add function to create list of T-DAL object from list of T
         
     }
 

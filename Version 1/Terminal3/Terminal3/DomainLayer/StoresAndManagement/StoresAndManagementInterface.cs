@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
-
+using Terminal3.DALobjects;
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface IStoresAndManagementInterface
@@ -16,6 +16,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category);
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
+        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+
         #endregion
 
         #region Staff Management
@@ -63,6 +65,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             return StoresFacade.EditProductDetails(userID, storeID, productID, details);
         }
+
+        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails)
+        {
+            return StoresFacade.SearchProduct(productDetails);
+        }
+
 
         Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID)
         {

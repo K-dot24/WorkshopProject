@@ -54,9 +54,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Product>($"Faild to edit product (ID: {productID}): Product not found.\n", false, null);
         }
 
-        public Result<List<Product>> SearchProduct(IDictionary<String, Object> productDetails)
+        public Result<List<Product>> SearchProduct(Double StoreRating, ProductSearchAttributes searchAttributes)
         {
             List<Product> searchResults = new List<Product>();
+            foreach(Product product in this.Products.Values)
+            {
+                if (searchAttributes.checkProduct(StoreRating,product))
+                {
+                    searchResults.Add(product);
+                }
+            }
+            if (searchResults.Count > 0){
+                return new Result<List<Product>>($"{searchResults.Count} items has been found\n", true, searchResults);
+            }
+            else{
+                return new Result<List<Product>>($"No item has been found\n", false, null);
+            }
         }
     }
 }
