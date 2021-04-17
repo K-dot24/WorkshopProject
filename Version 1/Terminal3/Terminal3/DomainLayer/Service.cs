@@ -122,6 +122,18 @@ namespace Terminal3.DomainLayer
             }
             return result;
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ProductSearchAttributes attributes &&
+                   Name == attributes.Name &&
+                   Category == attributes.Category &&
+                   LowPrice == attributes.LowPrice &&
+                   HighPrice == attributes.HighPrice &&
+                   ProductRating == attributes.ProductRating &&
+                   StoreRating == attributes.StoreRating &&
+                   EqualityComparer<List<string>>.Default.Equals(Keywords, attributes.Keywords);
+        }
     }
 
     public static class ObjectDictionaryMapper<T>
@@ -147,6 +159,7 @@ namespace Terminal3.DomainLayer
 
         /// <summary>
         /// Util function to dump object of type T to dictionary
+        /// works with primitive data- not recursive
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>

@@ -8,13 +8,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     {
         //Properties
         public String Id { get; }
-        public String Name { get; }
-        public Double Price { get; }
-        public int Quantity { get; }
-        public String Category { get; }
-        public Double Rating { get; private set; }
-        public int NumberOfRates { get; private set; }
-        public LinkedList<String> Keywords { get; private set; }
+        public String Name { get; set; }
+        public Double Price { get; set; }
+        public int Quantity { get; set; }
+        public String Category { get; set; }
+        public Double Rating { get; set; }
+        public int NumberOfRates { get; set; }
+        public LinkedList<String> Keywords { get; set; }
         
         //Constructor
         public Product(String name, Double price, int quantity , String category, LinkedList<String> Keywords = null)
@@ -39,9 +39,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         //Method
         public Result<Double> AddRating(Double rate)
         {
-            this.NumberOfRates=NumberOfRates+1;
-            Rating = (Rating + rate) / NumberOfRates;
-            return new Result<Double>($"Product {Name} rate is: {Rating}\n", true, Rating);
+            if(rate>5 || rate< 1) {
+                return new Result<Double>($"Product {Name} could not be rated. Please use number between 1 to 5\n", false, Rating);
+            }
+            else{
+                this.NumberOfRates = NumberOfRates + 1;
+                Rating = (Rating + rate) / (Double) NumberOfRates;
+                return new Result<Double>($"Product {Name} rate is: {Rating}\n", true, Rating);
+            }
         }
         
         public Result<String> AddKeyword(String keyword)
