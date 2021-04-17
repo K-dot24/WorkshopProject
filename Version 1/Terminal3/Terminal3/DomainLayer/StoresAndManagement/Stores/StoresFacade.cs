@@ -164,7 +164,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Stores.TryAdd(newStore.Id, newStore);
 
             //TODO: Complete with DAL object
-            return new Result<StoreDAL>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, null); //TODO: Fix with DAL
+            return new Result<StoreDAL>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, null);
         }
 
 

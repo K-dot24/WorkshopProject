@@ -50,6 +50,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             if (Products.TryGetValue(productID, out Product toEdit))
             {
                 ObjectDictionaryMapper<Product>.SetPropertyValue(toEdit, details);
+                return new Result<Product>($"Product (ID: {productID}) was edited successfully.\n", true, toEdit);
             }
             //else failed
             return new Result<Product>($"Faild to edit product (ID: {productID}): Product not found.\n", false, null);

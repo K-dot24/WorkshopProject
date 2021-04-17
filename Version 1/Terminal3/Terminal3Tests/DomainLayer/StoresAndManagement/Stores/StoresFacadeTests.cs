@@ -76,15 +76,39 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
         }
 
         [Theory()]
-        /*[InlineData("papi@hotmale.com", true)]  // Success: Store Owner
+        [InlineData("papi@hotmale.com", true)]  // Success: Store Owner
         [InlineData("tomer@gmail.com", true)]   // Success: Manager with permissions
         [InlineData("raz@gmail.com", false)]    // Fail: Manager without permissions
-        [InlineData("zoe@gmail.com", false)]    // Fail: Not staff*/
-        public void EditProductDetailsTest(string userID, IDictionary<String, Object> details, Boolean expectedResult)
+        [InlineData("zoe@gmail.com", false)]    // Fail: Not staff
+        public void EditProductDetailsTest(string userID, Boolean expectedResult)
         {
-            throw new NotImplementedException();
+            // Manager with permissions
+            RegisteredUser user = new RegisteredUser("tomer@gmail.com", "Why6AfraidOf7?");
+            StoreManager manager = new StoreManager(user, TestStore, new Permission(), TestStore.Founder);
+            manager.Permission.SetPermission(Methods.AddNewProduct, true);
+            manager.Permission.SetPermission(Methods.EditProduct, true);
+            TestStore.Managers.TryAdd(manager.User.Email, manager);
 
-            //string userID, string storeID, string productID, IDictionary<String, Object> details
+            // Manager without permissions
+            RegisteredUser user2 = new RegisteredUser("raz@gmail.com", "Because789");
+            StoreManager manager2 = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
+            manager.Permission.SetPermission(Methods.AddNewProduct, true);
+            TestStore.Managers.TryAdd(manager2.User.Email, manager2);
+
+            // Add product
+            Product product = TestStore.AddNewProduct(Founder.Email, "Shampoo", 18.50, 10, "Hygiene").Data;
+
+            IDictionary<String, Object> searchAttributes = new Dictionary<String, Object>()
+                                                            {{ "Name", "Soap" }, { "Price", 10 } };
+
+            Assert.Equal(expectedResult, Facade.EditProductDetails(userID, TestStore.Id, product.Id, searchAttributes).ExecStatus);
+
+            if (expectedResult)
+            {
+                TestStore.InventoryManager.Products.TryGetValue(product.Id, out Product newName);
+                Assert.Equal("Soap", newName.Name);
+                Assert.Equal(10, newName.Price);
+            }
         }
 
         [Theory()]
@@ -132,10 +156,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
         }
 
-        [Fact()]
-        public void OpenNewStoreTest()
+        [Theory()]
+        [InlineData("papi@hotmale.com", "My Second Store", true)]   // Success: Owner
+        [InlineData("tomer@gmail.com", "TOMER HAIR DESIGN", true)]  // Success: Manager
+        [InlineData("raz@gmail.com", "Story", true)]                // Success: RegisteredUser
+        public void OpenNewStoreTest(string userID, string storeName, Boolean expectedResult)
         {
-            throw new NotImplementedException();
+            RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "Why6AfraidOf7?");
+            StoreManager manager = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Managers.TryAdd(manager.User.Email, manager);
+
+            RegisteredUser user = new RegisteredUser(userID, "ManInTheMiddle");
+            Assert.Equal(expectedResult, Facade.OpenNewStore(user, storeName).ExecStatus);
         }
     }
 }

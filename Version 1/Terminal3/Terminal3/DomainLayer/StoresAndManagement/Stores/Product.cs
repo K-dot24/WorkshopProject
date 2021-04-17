@@ -7,11 +7,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     public class Product
     {
         //Properties
-        public String Id { get; }
-        public String Name { get; }
-        public Double Price { get; }
-        public int Quantity { get; }
-        public String Category { get; }
+        public String Id { get; private set; }
+        public String Name { get; private set; }
+        public Double Price { get; private set; }
+        public int Quantity { get; private set; }
+        public String Category { get; private set; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
         public LinkedList<String> Keywords { get; private set; }
