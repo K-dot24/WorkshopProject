@@ -46,10 +46,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Product> EditProduct(string productID, IDictionary<String, object> details)
         {
-            //TODO: Tomer- how to work with IDictionary details
-            throw new NotImplementedException();
-            //TODO
+            if (Products.TryGetValue(productID, out Product toEdit))
+            {
+                ObjectDictionaryMapper<Product>.SetPropertyValue(toEdit, details);
+            }
+            //else failed
+            return new Result<Product>($"Faild to edit product (ID: {productID}): Product not found.\n", false, null);
         }
+
         public Result<List<Product>> SearchProduct(Double StoreRating, ProductSearchAttributes searchAttributes)
         {
             List<Product> searchResults = new List<Product>();
@@ -66,7 +70,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             else{
                 return new Result<List<Product>>($"No item has been found\n", false, null);
             }
-        }
         }
     }
 }

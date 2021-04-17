@@ -26,6 +26,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Category = category;
             if (Keywords == null) { this.Keywords = new LinkedList<String>(); }
         }
+        
+        public Product(ProductDAL productDAL)
+        {
+            Id = productDAL.Id;
+            Name = productDAL.Name;
+            Price = productDAL.Price;
+            Quantity = productDAL.Quantity;
+            Category = productDAL.Category
+        }
 
         //Method
         public Result<Double> AddRating(Double rate)
@@ -39,15 +48,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             this.Keywords.AddLast(keyword);
             return new Result<string>($"keyword:{keyword} has been added to product:{Name}", true, keyword);
-        }
-
-        public Product(ProductDAL productDAL)
-        {
-            Id = productDAL.Id;
-            Name = productDAL.Name;
-            Price = productDAL.Price;
-            Quantity = productDAL.Quantity;
-            Category = productDAL.Category
         }
 
         public Result<ProductDAL> GetDAL()
