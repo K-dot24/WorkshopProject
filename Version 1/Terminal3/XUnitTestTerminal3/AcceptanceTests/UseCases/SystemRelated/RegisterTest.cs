@@ -19,8 +19,7 @@ namespace XUnitTestTerminal3
         public void Register()
         {
             sut.Register("test@gmail.com", "test123");
-            Result<Object> res = sut.Login("test@gmail.com", "test123");
-            Assert.True(res.ExecStatus);
+            Assert.True(sut.Login("test@gmail.com", "test123").ExecStatus);
         }
 
 
@@ -31,8 +30,7 @@ namespace XUnitTestTerminal3
             sut.Register("test@gmail.com", "test_1");  //true
             sut.Register("test@gmail.com", "test_2");  //false - same email 
 
-            Result<Object> res = sut.Login("test@gmail.com", "test_2");
-            Assert.False(res.ExecStatus);
+            Assert.False(sut.Login("test@gmail.com", "test_2").ExecStatus);
         }
     }
 }

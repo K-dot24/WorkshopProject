@@ -19,16 +19,14 @@ namespace XUnitTestTerminal3
         public void LogOut()
         {            
             sut.Login("test@gmail.com", "test123");
-            Result<Object> res = sut.LogOut("test@gmail.com", "test123");
-            Assert.True(res.ExecStatus);
+            Assert.True(sut.LogOut("test@gmail.com", "test123").ExecStatus);
         }
 
         [Fact]
         [Trait("Category", "acceptance")]
         public void LogOutWithoutLogin()
         {
-            Result<Object> res = sut.LogOut("test@gmail.com", "test123");
-            Assert.False(res.ExecStatus);
+            Assert.False(sut.LogOut("test@gmail.com", "test123").ExecStatus);
         }
     }
 }

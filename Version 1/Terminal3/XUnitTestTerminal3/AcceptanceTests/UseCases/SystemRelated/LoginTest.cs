@@ -18,8 +18,7 @@ namespace XUnitTestTerminal3
         public void Login()
         {
             sut.Register("test@gmail.com", "test123");
-            Result<Object> res = sut.Login("test@gmail.com", "test123");
-            Assert.True(res.ExecStatus);
+            Assert.True(sut.Login("test@gmail.com", "test123").ExecStatus);
         }
 
         [Fact]
@@ -27,16 +26,14 @@ namespace XUnitTestTerminal3
         public void LoginIncorrectPass()
         {
             sut.Register("test@gmail.com", "test123");
-            Result<Object> res = sut.Login("test@gmail.com", "worng_pass");
-            Assert.False(res.ExecStatus);
+            Assert.False(sut.Login("test@gmail.com", "worng_pass").ExecStatus);
         }
 
         [Fact]
         [Trait("Category", "acceptance")]
         public void LoginNotRegister()
         {
-            Result<Object> res = sut.Login("test@gmail.com", "worng_pass");
-            Assert.False(res.ExecStatus);
+            Assert.False(sut.Login("test@gmail.com", "worng_pass").ExecStatus);
         }
     }
 }

@@ -6,52 +6,44 @@ using Terminal3.ServiceLayer;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
+using Terminal3.DALobjects;
 
 namespace XUnitTestTerminal3
 {
     public class SearchProductTest: XUnitTerminal3TestCase
     {
-        private RegisteredUser user; 
-        private Store store; 
-        private Product product; 
+        private string user_id; 
+        private string store_id; 
         public SearchProductTest()
         {
             sut.ResetSystem();
-            this.user = new RegisteredUser("test@gmail.com", "test123"); 
-            this.store = new Store(user);
-            this.product = new Product("test", 10, 10);
-        }
-
-/*
-        public void SerchProductByName1()
-        {
-            sut.ResetSystem();
             sut.Register("test@gmail.com", "test123");
-            sut.OpenNewStore("test_store", ); 
+            Result<UserDAL> login_res = sut.Login("test@gmail.com", "test123");
+            this.user_id = login_res.Data.id;
+            Result<StoreDAL> store_res = sut.OpenNewStore("test_store", user_id);
+            this.store_id = login_res.Data.id;
         }
 
 
         [Fact]
         [Trait("Category", "acceptance")]
         public void SerchProductByName()
-        {            
-            sut.AddProductToStore()
-            IDictionary<String, Object> dictonary = new Dictionary<String, Object>() {{ "Name", "test" }}; 
+        {
+            sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test");
+            IDictionary<String, Object> dictonary = new Dictionary<String, Object>(){{ "Name", "test_product" } }; 
 
-            Result<Object> res = sut.SearchProduct(dictonary); 
-            Assert.True(res.ExecStatus);
+            Assert.True(sut.SearchProduct(dictonary).ExecStatus);
         }
-*/
+
 
         [Fact]
         [Trait("Category", "acceptance")]
         public void SerchProductByPrice()
         {
-            store.AddNewProduct(product);
+            sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test");
             IDictionary<String, Object> dictonary = new Dictionary<String, Object>() {{ "Price", 10 }};
 
-            Result<Object> res = sut.SearchProduct(dictonary); 
-            Assert.True(res.ExecStatus);
+            Assert.True(sut.SearchProduct(dictonary).ExecStatus);
         }
 
         [Fact]
@@ -59,8 +51,7 @@ namespace XUnitTestTerminal3
         public void SerchProductNotExist()
         {
             IDictionary<String, Object> dictonary = new Dictionary<String, Object>() {{ "Name", "test" }};
-            Result<Object> res = sut.SearchProduct(dictonary); 
-            Assert.False(res.ExecStatus);
+            Assert.False(sut.SearchProduct(dictonary).ExecStatus);
         }
 
     }

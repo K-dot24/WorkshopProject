@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DALobjects;
 using Terminal3.DomainLayer;
 
 namespace Terminal3.ServiceLayer
@@ -16,7 +17,7 @@ namespace Terminal3.ServiceLayer
         #region User related operations
         Result<Boolean> Register(String email, String password);
 
-        Result<Boolean> Login(String email, String password);
+        Result<UserDAL> Login(String email, String password);
 
         Result<Boolean> LogOut(String email);
 
