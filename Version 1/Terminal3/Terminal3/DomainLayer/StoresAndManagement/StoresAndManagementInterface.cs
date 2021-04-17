@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
-
+using Terminal3.DALobjects;
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface IStoresAndManagementInterface
@@ -13,9 +13,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<StoreDAL> OpenNewStore(String storeName, String userID);
 
         #region Inventory Management
-        Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category);
+        Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
+        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+
         #endregion
 
         #region Staff Management
@@ -43,7 +45,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         //TODO: Implement all functions
 
-        Result<StoreDAL> OpenNewStore(String storeName, String userID)
+        public Result<StoreDAL> OpenNewStore(String storeName, String userID)
         {
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser founder))  // Check if userID is a registered user
             {
@@ -54,17 +56,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<StoreDAL>($"Failed to open store {storeName}: {userID} is not a registered user.\n", false, null);
         }
 
-        Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category)
+        public Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
-            return StoresFacade.AddProductToStore(userID, storeID, productName, price, initialQuantity, category);
+            return StoresFacade.AddProductToStore(userID, storeID, productName, price, initialQuantity, category, keywords);
         }
 
-        Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details)
+        public Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details)
         {
             return StoresFacade.EditProductDetails(userID, storeID, productID, details);
         }
 
-        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID)
+        public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails)
+        {
+            return StoresFacade.SearchProduct(productDetails);
+        }
+
+
+        public Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID)
         {
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(addedOwnerID, out RegisteredUser futureOwner))  // Check if addedOwnerID is a registered user
             {
@@ -74,7 +82,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<Boolean>($"Failed to appoint store owner: {addedOwnerID} is not a registered user.\n", false, false);
         }
 
-        Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID)
+        public Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID)
         {
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(addedManagerID, out RegisteredUser futureManager))  // Check if addedManagerID is a registered user
             {
@@ -83,8 +91,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             //else
             return new Result<Boolean>($"Failed to appoint store manager: {addedManagerID} is not a registered user.\n", false, false);
         }
-        
-        Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID)
+
+        public Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID)
         {
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(removedManagerID, out RegisteredUser removedManager))  // Check if addedManagerID is a registered user
             {
@@ -94,7 +102,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<Boolean>($"Failed to remove store manager: {removedManagerID} is not a registered user.\n", false, false);
         }
 
+        public Result<bool> RemoveProductFromStore(string userID, string storeID, string productID)
+        {
+            throw new NotImplementedException();
+        }
 
+        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        {
+            throw new NotImplementedException();
+        }
 
+        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

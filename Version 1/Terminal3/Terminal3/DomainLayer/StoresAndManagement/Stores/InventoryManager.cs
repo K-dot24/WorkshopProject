@@ -7,7 +7,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
     public interface IInventoryManager
     {
-        Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category);
+        Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Product> RemoveProduct(String productID);
         Result<Product> EditProduct(String productID, IDictionary<String, Object> details);
     }
@@ -28,9 +28,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Products = products;
         }
 
-        public Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category)
+        public Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
-            Product newProduct = new Product(productName, price, initialQuantity, category);
+            Product newProduct = new Product(productName, price, initialQuantity, category, keywords);
             return new Result<Product>($"Product {newProduct.Name} was created successfully. ID: {newProduct.Id}\n", true, newProduct);
         }
 
@@ -54,9 +54,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Product>($"Faild to edit product (ID: {productID}): Product not found.\n", false, null);
         }
 
-        public Result<List<Product>> SearchProduct(IDictionary<String, Object> productDetails)
+        public Result<List<Product>> SearchProduct(Double StoreRating, ProductSearchAttributes searchAttributes)
         {
             List<Product> searchResults = new List<Product>();
+            foreach(Product product in this.Products.Values)
+            {
+                if (searchAttributes.checkProduct(StoreRating,product))
+                {
+                    searchResults.Add(product);
+                }
+            }
+            if (searchResults.Count > 0){
+                return new Result<List<Product>>($"{searchResults.Count} items has been found\n", true, searchResults);
+            }
+            else{
+                return new Result<List<Product>>($"No item has been found\n", false, null);
+            }
         }
     }
 }

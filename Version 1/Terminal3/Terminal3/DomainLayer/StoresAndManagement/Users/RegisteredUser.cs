@@ -1,4 +1,6 @@
 ﻿using System;
+using Terminal3.DALobjects;
+using System.Reflection;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -18,7 +20,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.Password = password;
             this.LoggedIn = false;
         }
-        
+
+        public RegisteredUser(RegisteredUserDAL registeredUserDAL)
+        {
+            this.UserId = registeredUserDAL.UserId;
+            this.Email = registeredUserDAL.Email;
+            this.Password = registeredUserDAL.Password;
+            this.LoggedIn = registeredUserDAL.LoggedIn;
+        }
+
         //Methods
         public Result<RegisteredUser> Login(String password) {
             if (LoggedIn) {
@@ -50,5 +60,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<RegisteredUser>($"{this.Email} is Logged out\n", true, this);
             }           
         }
+
+        //TODO: FIX DAL
+
+        /*public Result<RegisteredUserDAL> GetDAL()
+        {
+            ShoppingCartDAL SCD = this.ShoppingCart.GetDAL().Data;
+            return new Result<RegisteredUserDAL>("RegisteredUser DAL object" , true , new RegisteredUserDAL(this.UserId, this.Email, this.Password, this.LoggedIn , SCD));
+        }*/
     }
 }
