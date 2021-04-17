@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DALobjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
@@ -49,6 +50,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.Store = store;
             functionsBitMask = new Boolean[13];
             functionsBitMask[(int)Methods.GetStoreStaff] = true;    //requierment 4.5
+        }
+
+        public Permission(PermissionDAL permissionDAL)
+        {
+            this.Store = Mapper.GetStore(permissionDAL.Store);     //TODO
+            this.functionsBitMask = permissionDAL.functionsBitMask;
         }
 
         public Result<Boolean> SetPermission(Methods method, Boolean active)

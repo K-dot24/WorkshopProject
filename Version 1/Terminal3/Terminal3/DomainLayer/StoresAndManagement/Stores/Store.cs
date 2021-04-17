@@ -5,6 +5,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
+using Terminal3.DALobjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -51,6 +52,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
 
+        //Constructors
         public Store(String name, RegisteredUser founder)
         {
             StoreID = Service.GenerateId();
@@ -65,9 +67,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //Add founder to list of owners
             Owners.TryAdd(founder.Email, Founder);
         }
+        public Store(StoreDAL store)
+        {
+            Founder = new StoreOwner(store.Founder);
+            this.Owners = new LinkedList<StoreOwner>();
+            foreach(StoreOwnerDAL storeOwner in store.Owners)
+            {
+                this.Owners.AddLast(new StoreOwner(storeOwner));
+            }
+            this.Managers = new LinkedList<StoreManager>();
+            foreach (StoreManagerDAL storeManager in store.Managers)
+            {
+                this.Managers.AddLast(new StoreManager(storeManager));
+            }
+            this.InventoryManager = new InventoryManager(); //TODO??
+            this.PolicyManager = new PolicyManager();       //TODO??
+            this.History = new History(store.History);
+            this.StoreID = store.StoreID;
+        }
 
         //TODO: Implement all functions
-                //Methods
+        //Methods
         public Result<Double> AddRating(Double rate)
         {
             this.NumberOfRates = NumberOfRates + 1;
@@ -77,6 +97,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<List<Product>> SearchProduct(ProductSearchAttributes searchAttributes)
         {
             return InventoryManager.SearchProduct(this.Rating, searchAttributes);
+            Founder = new StoreOwner(founder,this,null);
+            this.Owners = new LinkedList<StoreOwner>();
+            this.Managers = new LinkedList<StoreManager>();
+            this.InventoryManager = new InventoryManager();
+            this.PolicyManager = new PolicyManager();
+            this.History = new History();
+            this.StoreID = Service.GenerateId();
         }
 
         #region Inventory Management
@@ -186,7 +213,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
+        public Result<Product> GetProduct(ProductDAL productDAL)
+        {
+            // this function is for the shoppingBag constructor that converts DAL object to domain objects
+            throw new NotImplementedException();
+        }
+
         public Result<object> GetDiscountPolicyAtStore()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public Result<Object> RemoveProduct(Product product)
         {
             throw new NotImplementedException();
         }
@@ -214,5 +252,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return Managers.TryGetValue(userID, out StoreManager manager) && manager.Permission.functionsBitMask[(int)method];
         }
         #endregion
+
+
+        public Result<StoreDAL> GetDAL()
+        {
+            StoreOwnerDAL founder = Founder.GetDAL().Data;
+            LinkedList<StoreOwnerDAL> owners = new LinkedList<StoreOwnerDAL>();
+            foreach(StoreOwner so in Owners)
+            {
+                owners.AddLast(so.GetDAL().Data);
+            }
+            LinkedList<StoreManagerDAL> managers = new LinkedList<StoreManagerDAL>();
+            foreach(StoreManager sm in Managers)
+            {
+                managers.AddLast(sm.GetDAL().Data);
+            }
+            InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
+            PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
+            HistoryDAL history = History.GetDAL().Data;
+
+            StoreDAL store = new StoreDAL(founder, owners, managers, inventoryManager, policyManager, history, this.StoreID);
+            return new Result<StoreDAL>("Store DAL object", true, store);
+    }
     }
 }
