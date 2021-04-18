@@ -24,7 +24,7 @@ namespace Terminal3.ServiceLayer
         //TODO: refine requirement
         Result<Object> SearchStore(IDictionary<String, Object> details);
 
-        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+        Result<List<string>> SearchProduct(IDictionary<String, Object> productDetails); //list<pid>
         
         Result<Boolean> AddProductToCart(String userID , String ProductID, int ProductQuantity , String StoreID);   // Redundent ?
 
@@ -43,7 +43,7 @@ namespace Terminal3.ServiceLayer
         Result<string> OpenNewStore(String storeName, String userID); //store id
         Result<string> AddProductToStore(String userID, String storeID, String productName , double price, int initialQuantity, String category ); //product id
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
-        Result<ProductDAL> EditProductDetails(String userID, String storeID , String productID, IDictionary<String, Object> details); //TODO
+        Result<string> EditProductDetails(String userID, String storeID , String productID, IDictionary<String, Object> details); //TODO
         Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID); 
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
