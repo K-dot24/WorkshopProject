@@ -66,6 +66,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //Add founder to list of owners
             Owners.TryAdd(founder.Email, Founder);
         }
+<<<<<<< Updated upstream
+=======
+        
+        public Store(StoreDAL store)
+        {
+            Founder = new StoreOwner(store.Founder);
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            foreach (StoreOwnerDAL storeOwner in store.Owners)
+            {
+                StoreOwner owner = new StoreOwner(storeOwner);
+                Owners.TryAdd(storeOwner.User.Email, owner);
+            }
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+            foreach (StoreManagerDAL storeManager in store.Managers)
+            {
+                StoreManager manager = new StoreManager(storeManager);
+                Managers.TryAdd(storeManager.User.Email, manager);
+            }
+            InventoryManager = new InventoryManager(); //TODO??
+            PolicyManager = new PolicyManager();       //TODO??
+            History = new History(store.History);
+            Id = store.StoreID;
+        }
+>>>>>>> Stashed changes
 
         //TODO: Implement all functions
         //Methods
