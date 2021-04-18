@@ -127,6 +127,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             throw new NotImplementedException();
         }
 
+        public Result<HistoryDAL> GetUserPurchaseHistory(String userID)
+        {
+            Result<History> res = UsersAndPermissionsFacade.GetUserPurchaseHistory(userID);
+            if (res.ExecStatus)
+            {
+                return new Result<HistoryDAL>(res.Message , true , res.Data.GetDAL().Data);
+            }
+            return new Result<HistoryDAL>(res.Message, false, null);
+        }
+        
         public Result<Boolean> AddProductToCart(string userID, string productID, int productQuantity, string storeID)
         {
             if (StoresFacade.Stores.TryGetValue(storeID, out Store store))  // Check if store exists
