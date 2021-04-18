@@ -109,7 +109,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<bool> RemoveProductFromStore(string userID, string storeID, string productID)
         {
-            throw new NotImplementedException();
+            return StoresFacade.RemoveProductFromStore(userID, storeID, productID);
         }
 
         public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
