@@ -12,11 +12,12 @@ namespace Terminal3.DALobjects
         public StoreOwnerDAL Owner { get; }
 
         //Constructor
-        public StoreManagerDAL(RegisteredUserDAL user, PermissionDAL permissions, StoreOwnerDAL owner)
+        public StoreManagerDAL(RegisteredUserDAL user, PermissionDAL permissions, StoreOwnerDAL owner):base(user.Id)
         {
             User = user;
             Permissions = permissions;
             Owner = owner;
         }
+
     }
 }

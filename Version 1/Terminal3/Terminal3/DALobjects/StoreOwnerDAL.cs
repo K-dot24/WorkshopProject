@@ -14,7 +14,7 @@ namespace Terminal3.DALobjects
         public LinkedList<StoreManagerDAL> StoreManager { get; }
 
         //Constructor
-        public StoreOwnerDAL(RegisteredUserDAL user, StoreDAL store, StoreOwnerDAL owner, LinkedList<StoreOwnerDAL> storeOwners, LinkedList<StoreManagerDAL> storeManager)
+        public StoreOwnerDAL(RegisteredUserDAL user, StoreDAL store, StoreOwnerDAL owner, LinkedList<StoreOwnerDAL> storeOwners, LinkedList<StoreManagerDAL> storeManager):base(user.Id)
         {
             User = user;
             Store = store;
@@ -22,6 +22,7 @@ namespace Terminal3.DALobjects
             StoreOwners = storeOwners;
             StoreManager = storeManager;
         }
+
     }
 
     

@@ -51,7 +51,10 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             Result<HistoryDAL> fromSystem = system.GetStorePurchaseHistory(ownerID, storeID);
             if (fromSystem.ExecStatus)
             {
-                List<string> Ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
+                //List<string> Ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
+                List<ShoppingBagDAL> ShoppingBags = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags);
+                List<string> Ids = new List<string>();
+                foreach (ShoppingBagDAL dal in ShoppingBags) { Ids.Add(dal.Id); }
                 return new Result<List<string>>("", fromSystem.ExecStatus, Ids);
             }
             else
@@ -62,10 +65,13 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<Dictionary<string, List<int>>> GetStoreStaff(string ownerID, string storeID)
         {
-            Result<Dictionary<UserDAL, PermissionDAL>> fromSystem = system.GetStoreStaff(ownerID, storeID);
+            Result<Dictionary<IStoreStaffDAL, PermissionDAL>> fromSystem = system.GetStoreStaff(ownerID, storeID);
             if (fromSystem.ExecStatus)
             {
-                List<string> userIDS = new List<UserDAL>(fromSystem.Data.Keys).ForEach(userdal => userdal.Id);
+                // List<string> userIDS = (new List<IStoreStaffDAL>(fromSystem.Data.Keys)).Select(userdal => userdal.Id)
+                List<IStoreStaffDAL> StoreStaffDals = new List<IStoreStaffDAL>(fromSystem.Data.Keys);
+                List<string> userIDS = new List<string>();
+                foreach (IStoreStaffDAL dal in StoreStaffDals) { userIDS.Add(dal.Id); }
                 List<List<int>> userPermisions = new List<List<int>>();
                 foreach (PermissionDAL permission in fromSystem.Data.Values)
                 {
@@ -99,7 +105,10 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             Result<HistoryDAL> fromSystem = system.GetUserPurchaseHistory(userID);
             if (fromSystem.ExecStatus)
             {
-                List<string> Ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
+                //List<string> Ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
+                List<ShoppingBagDAL> ShoppingBags = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags);
+                List<string> Ids = new List<string>();
+                foreach (ShoppingBagDAL dal in ShoppingBags) { Ids.Add(dal.Id); }
                 return new Result<List<string>>("", fromSystem.ExecStatus, Ids);
             }
             else
@@ -118,8 +127,11 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             Result<ShoppingCartDAL> fromSystem = system.GetUserShoppingCart(userID);
             if (fromSystem.ExecStatus)
             {
-                List<string> shoppingBagsIds = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
-                return new Result<List<string>>("", fromSystem.ExecStatus, shoppingBagsIds);
+                //List<string> shoppingBagsIds = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
+                List<ShoppingBagDAL> ShoppingBags = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags);
+                List<string> Ids = new List<string>();
+                foreach (ShoppingBagDAL dal in ShoppingBags) { Ids.Add(dal.Id); }
+                return new Result<List<string>>("", fromSystem.ExecStatus, Ids);
 
             }
             else
@@ -191,8 +203,9 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             Result<List<ProductDAL>> fromSystem = system.SearchProduct(productDetails);
             if (fromSystem.ExecStatus)
             {
-                List<string> productIDS = fromSystem.Data.ForEach(product => product.Id);
-                return new Result<List<string>>("", fromSystem.ExecStatus, productIDS);
+                List<string> productIDS = new List<string>();
+                foreach (ProductDAL dal in fromSystem.Data) { productIDS.Add(dal.Id); }
+                 return new Result<List<string>>("", fromSystem.ExecStatus, productIDS);
 
             }
             else
