@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Terminal3.DALobjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
@@ -17,7 +18,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public LinkedList<String> Keywords { get; set; }
         
         //Constructor
-        public Product(String name, Double price, int quantity , String category, [OptionalAttribute]LinkedList<String> Keywords)
+        public Product(String name, Double price, int quantity , String category, [System.Runtime.InteropServices.OptionalAttribute]LinkedList<String> Keywords)
         {
             Id = Service.GenerateId();
             Name = name;
