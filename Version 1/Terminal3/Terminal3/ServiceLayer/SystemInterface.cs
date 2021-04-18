@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal3.DALobjects;
 using Terminal3.DomainLayer;
-
+using Terminal3.DALobjects;
 namespace Terminal3.ServiceLayer
 {
     //Primitive-DAL oriented interface
@@ -26,7 +26,7 @@ namespace Terminal3.ServiceLayer
 
         Result<List<String>> SearchProduct(IDictionary<String, Object> productDetails); //list<pid>
         
-        Result<Boolean> AddProductToCart(String userID , String ProductID, int ProductQuantity , String StoreID);   // Redundent ?
+        Result<Boolean> AddProductToCart(String userID , String productID, int productQuantity , String storeID);
 
         Result<List<String>> GetUserShoppingCart(String userID); //LinkedList<ShoppingBagID> 
 
@@ -48,6 +48,7 @@ namespace Terminal3.ServiceLayer
         Result<String> EditProductDetails(String userID, String storeID , String productID, IDictionary<String, Object> details); //TODO
         Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID); 
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<String , List<int>>> GetStoreStaff(String ownerID, String storeID);
         Result<List<String>> GetStorePurchaseHistory(String ownerID, String storeID); //List<shoppingBagID>

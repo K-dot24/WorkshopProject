@@ -1,21 +1,52 @@
-﻿using Terminal3.DALobjects;
-
+﻿using System;
+using Terminal3.DALobjects;
+using Terminal3.DomainLayer.StoresAndManagement.Stores;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
     public abstract class User
     {
+        public String Id { get; }
         public ShoppingCart ShoppingCart { get; }
-        //TODO - unique field 
 
         protected User()
         {
+            Id = Service.GenerateId();
             ShoppingCart = new ShoppingCart();
         }
 
-        protected User(UserDAL userDAL)
+        public Result<bool> AddProductToCart(Product product, int productQuantity, Store store)
         {
-            ShoppingCart = new ShoppingCart(userDAL.ShoppingCart);
+            ShoppingBag sb;
+            Result<Boolean> res;
+            Result<ShoppingBag> getSB = ShoppingCart.GetShoppingBag(store.Id);
+            if (getSB.ExecStatus)  // Check if shopping bag for store exists
+            {
+                sb = getSB.Data;
+                res = sb.AddProtuctToShoppingBag(product, productQuantity);
+                if (res.ExecStatus)
+                {
+                    return new Result<bool>($"Product {product.Name} was added successfully to shopping cart.\n", true, true);
+                }
+                //else failed
+                return res;
+            }
+            //else create shopping bag for storeID
+            sb = new ShoppingBag(this, store);
+            res = sb.AddProtuctToShoppingBag(product, productQuantity);
+            if (res.ExecStatus)
+            {
+                ShoppingCart.AddShoppingBagToCart(sb);
+                return new Result<bool>($"Product {product.Name} was added successfully to cart.\n", true, true);
+            }
+            // else failed
+            return res;
+        }
+
+        public Result<UserDAL> GetDAL()
+        {
+            ShoppingCartDAL shoppingCart = ShoppingCart.GetDAL().Data;
+            return new Result<UserDAL>("User DAL object", true, new UserDAL(shoppingCart));
         }
 
     }

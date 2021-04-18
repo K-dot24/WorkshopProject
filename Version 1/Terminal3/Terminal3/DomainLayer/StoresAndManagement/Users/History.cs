@@ -7,17 +7,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public LinkedList<ShoppingBag> ShoppingBags { get; }
 
-        public History(LinkedList<ShoppingBag> shoppingBags)
+        public History()
         {
-            this.ShoppingBags = shoppingBags;
+            ShoppingBags = new LinkedList<ShoppingBag>();
         }
 
-        public History(HistoryDAL historyDAL)
+        public History(LinkedList<ShoppingBag> shoppingBags)
         {
-            LinkedList<ShoppingBag> shoppingBags = new LinkedList<ShoppingBag>();
-            foreach(ShoppingBagDAL sb in historyDAL.ShoppingBags){
-                shoppingBags.AddLast(new ShoppingBag(sb));
-            }
             this.ShoppingBags = shoppingBags;
         }
 
