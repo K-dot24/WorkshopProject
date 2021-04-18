@@ -24,7 +24,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID);
+        Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String ownerID);
         #endregion
 
         #region Policies Management
@@ -257,7 +257,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             ConcurrentDictionary<String, StoreOwnerDAL> owners = new ConcurrentDictionary<String, StoreOwnerDAL>();
             foreach (var so in Owners)
             {
-                owners.TryAdd(so.Key, so.Value.GetDAL().Data);
+                owners.TryAdd(so.Key, (StoreOwnerDAL)so.Value.GetDAL().Data);
             }
             ConcurrentDictionary<String, StoreManagerDAL> managers = new ConcurrentDictionary<String, StoreManagerDAL>();
             foreach (var sm in Managers)

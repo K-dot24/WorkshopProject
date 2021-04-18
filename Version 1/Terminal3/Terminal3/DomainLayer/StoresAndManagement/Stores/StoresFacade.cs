@@ -23,7 +23,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID, String storeID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
@@ -147,9 +147,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
 
         public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID, string storeID)
-        {
-            Stores.TryGetValue(storeID, out Store store);
-            if(store != null)
+        {            
+            if(Stores.TryGetValue(storeID, out Store store))
             {
                 return store.GetStoreStaff(ownerID);
             }

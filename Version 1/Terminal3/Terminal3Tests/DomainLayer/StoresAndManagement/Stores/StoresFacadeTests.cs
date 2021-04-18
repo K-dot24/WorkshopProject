@@ -185,7 +185,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
         }
 
         [Theory()]
-        [InlineData("papi@hotmale.com", "My Second Store", false)]   // Success : Owner
+        [InlineData("papi@hotmale.com", "My Second Store", true)]   // Success : Owner
         public void GetStoreStaffTest2(string ownerID, string storeID, Boolean expectedResult)
         {
             RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "Why6AfraidOf7?");
