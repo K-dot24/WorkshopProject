@@ -31,7 +31,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
             Product newProduct = new Product(productName, price, initialQuantity, category, keywords);
-            return new Result<Product>($"Product {newProduct.Name} was created successfully. ID: {newProduct.Id}\n", true, newProduct);
+            Products.TryAdd(newProduct.Id, newProduct);
+            return new Result<Product>($"Product {newProduct.Name} was added successfully to store's inventory. ID: {newProduct.Id}\n", true, newProduct);
         }
 
         public Result<Product> RemoveProduct(string productID)
@@ -40,7 +41,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             {
                 return new Result<Product>($"Product (ID: {toRemove.Id}) was removed successfully\n", true, toRemove);
             }
-            //else
+            //else failed
             return new Result<Product>($"Product (ID: {productID}) not found.\n", false, null);
         }
 
@@ -49,6 +50,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             if (Products.TryGetValue(productID, out Product toEdit))
             {
                 ObjectDictionaryMapper<Product>.SetPropertyValue(toEdit, details);
+                return new Result<Product>($"Product (ID: {productID}) was edited successfully.\n", true, toEdit);
             }
             //else failed
             return new Result<Product>($"Faild to edit product (ID: {productID}): Product not found.\n", false, null);

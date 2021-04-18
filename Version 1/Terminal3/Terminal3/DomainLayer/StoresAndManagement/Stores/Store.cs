@@ -22,7 +22,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #region Staff Management
         Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID);
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID);
-        Result<Boolean> RemoveStoreManager(RegisteredUser removedManager, String currentlyOwnerID);
+        Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID);
         #endregion
@@ -89,6 +89,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }*/
 
         //TODO: Implement all functions
+        
         //Methods
         public Result<Double> AddRating(Double rate)
         {
@@ -148,6 +149,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     Managers.TryRemove(futureOwner.Email, out _);
                 }
+
+                return new Result<bool>($"User (ID: {newOwner.User.Email}) was added to store owners list in {this.Name} successfully.\n", true, true);
             }
             //else failed
             return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
@@ -161,26 +164,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             {
                 StoreManager newManager = new StoreManager(futureManager, this, new Permission(), owner);
                 Managers.TryAdd(futureManager.Email, newManager);
+
+                return new Result<bool>($"User (ID: {newManager.User.Email}) was added to store owners list in {this.Name} successfully.\n", true, true);
             }
             //else failed
             return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
                 $"is not an owner at ${this.Name}.\n", false, false);
         }
 
-        public Result<bool> RemoveStoreManager(RegisteredUser removedManager, string currentlyOwnerID)
+        public Result<bool> RemoveStoreManager(String removedManagerID, string currentlyOwnerID)
         {
-            if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner) && Managers.TryGetValue(removedManager.Email, out StoreManager manager))
+            if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner) && Managers.TryGetValue(removedManagerID, out StoreManager manager))
             {
                 if (manager.AppointedBy.Equals(owner))
                 {
-                    Managers.TryRemove(removedManager.Email, out _);
-                    return new Result<bool>($"User (Email: {removedManager.Email}) was successfully removed from store management at {this.Name}.\n", true, true);
+                    Managers.TryRemove(removedManagerID, out _);
+                    return new Result<bool>($"User (Email: {removedManagerID}) was successfully removed from store management at {this.Name}.\n", true, true);
                 }
                 //else failed
-                return new Result<bool>($"Failed to remove user (Email: {removedManager.Email}) from store management: Unauthorized owner (Email: {currentlyOwnerID}).\n", false, false);
+                return new Result<bool>($"Failed to remove user (Email: {removedManagerID}) from store management: Unauthorized owner (Email: {currentlyOwnerID}).\n", false, false);
             }
             //else failed
-            return new Result<bool>($"Failed to remove user (Email: {removedManager.Email}) from store management: Either not a manager or owner not found.\n", false, false);
+            return new Result<bool>($"Failed to remove user (Email: {removedManagerID}) from store management: Either not a manager or owner not found.\n", false, false);
         }
 
         public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
@@ -228,7 +233,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             throw new NotImplementedException();
         }
-
 
 
         #region Private Functions

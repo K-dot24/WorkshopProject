@@ -21,7 +21,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #region Staff Management
         Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID, String storeID);
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreManager(RegisteredUser removedManager, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
@@ -49,15 +49,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 Result<Product> res = store.AddNewProduct(userID, productName, price, initialQuantity, category, keywords);
                 if (res.ExecStatus)
                 {
-                    //TODO: Complete with DAL object
+                    //TODO: DAL object - OK?
                     return new Result<ProductDAL>(res.Message, res.ExecStatus, new ProductDAL(res.Data.Id, res.Data.Name, res.Data.Price, res.Data.Quantity, res.Data.Category));
                 }
-                else
-                {
-                    return new Result<ProductDAL>(res.Message, res.ExecStatus, null);
-                }
+                //else failed
+                return new Result<ProductDAL>(res.Message, res.ExecStatus, null);
             }
-            //else
+            //else failed
             return new Result<ProductDAL>($"Store ID {storeID} not found.\n", false, null);
             
         }
@@ -71,12 +69,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     return new Result<Boolean>(res.Message, res.ExecStatus, true);
                 }
-                else
-                {
-                    return new Result<Boolean>(res.Message, res.ExecStatus, false);
-                }
+                //else failed
+                return new Result<Boolean>(res.Message, res.ExecStatus, false);               
             }
-            //else
+            //else failed
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
         
@@ -87,16 +83,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 Result<Product> res = store.EditProduct(userID, productID, details);
                 if (res.ExecStatus)
                 {
-                    //TODO: Complete with DAL object
+                    //TODO: DAL object - OK?
                     return new Result<ProductDAL>(res.Message, res.ExecStatus, new ProductDAL(res.Data.Id, res.Data.Name, res.Data.Price, res.Data.Quantity, res.Data.Category));
                 }
-                else
-                {
-                    return new Result<ProductDAL>(res.Message, res.ExecStatus, null);
-                }
+                //else failed
+                return new Result<ProductDAL>(res.Message, res.ExecStatus, null);               
             }
-            //else
-            return new Result<ProductDAL>($"Store ID {storeID} not found.\n", false, null);           
+            //else failed
+            return new Result<ProductDAL>($"Store ID {storeID} not found.\n", false, null);          
         }
         #endregion
 
@@ -121,11 +115,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
 
-        public Result<Boolean> RemoveStoreManager(RegisteredUser removedManager, string currentlyOwnerID, string storeID)
+        public Result<Boolean> RemoveStoreManager(String removedManagerID, string currentlyOwnerID, string storeID)
         {
             if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
             {
-                return store.RemoveStoreManager(removedManager, currentlyOwnerID);
+                return store.RemoveStoreManager(removedManagerID, currentlyOwnerID);
             }
             //else failed
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
@@ -170,7 +164,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Stores.TryAdd(newStore.Id, newStore);
 
             //TODO: Complete with DAL object
-            return new Result<StoreDAL>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, null); //TODO: Fix with DAL
+            return new Result<StoreDAL>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, null);
         }
 
 
