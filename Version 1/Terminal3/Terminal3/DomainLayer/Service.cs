@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -39,6 +40,9 @@ namespace Terminal3.DomainLayer
         }
     }
 
+    /// <summary>
+    /// NOT IN USE
+    /// </summary>
     public class ProductSearchAttributes
     {
 
@@ -80,16 +84,16 @@ namespace Terminal3.DomainLayer
             PropertyInfo[] properties = typeof(ProductSearchAttributes).GetProperties();
             for (int i=0; i< properties.Length && result; i++)
             {   var value = properties[i].GetValue(this);
-                if (value != null)
+                if (value != null && !value.Equals(0))
                 {
                     switch((string)properties[i].Name)
                     { 
                         case "Name":
-                            if (!product.Name.Contains((string)value)) {result = false;}
+                            if (!product.Name.ToLower().Contains(((string)value).ToLower())) {result = false;}
                             break;
 
                         case "Category":
-                            if (!product.Category.Equals((string)value)) { result = false; }
+                            if (!product.Category.ToLower().Equals(((string)value).ToLower())) { result = false; }
                             break;
                         case "LowPrice":
                             if (product.Price<(Double)value) { result = false; }
@@ -104,9 +108,10 @@ namespace Terminal3.DomainLayer
                             if (StoreRating < (Double)value) { result = false; }
                             break;
                         case "Keywords":
-                            foreach(string keyword in (List<String>)value)
+                            List<string> productKeywords = product.Keywords.Select(word => word.ToLower()).ToList();
+                            foreach (string keyword in (List<String>)value)
                             {
-                                if (product.Keywords.Contains(keyword)) { 
+                                if (productKeywords.Contains(keyword.ToLower())) {
                                     //One keyword has been found
                                     break;
                                 }
@@ -121,6 +126,61 @@ namespace Terminal3.DomainLayer
                 }
             }
             return result;
+        }
+        public static bool checkProduct(Double StoreRating, Product product, IDictionary<String,Object> searchAttributes)
+        {
+            Boolean result = true;
+            ICollection<String> properties = searchAttributes.Keys;
+            foreach(string property in properties)
+            {
+                var value = searchAttributes[property];
+                switch (property.ToLower())
+                {
+                    case "name":
+                        if (!product.Name.ToLower().Contains(((string)value).ToLower())) { result = false; }
+                        break;
+                    case "category":
+                        if (!product.Category.ToLower().Equals(((string)value).ToLower())) { result = false; }
+                        break;
+                    case "lowprice":
+                        if (product.Price < (Double)value) { result = false; }
+                        break;
+                    case "highprice":
+                        if (product.Price > (Double)value) { result = false; }
+                        break;
+                    case "productrating":
+                        if (product.Rating < (Double)value) { result = false; }
+                        break;
+                    case "storerating":
+                        if (StoreRating < (Double)value) { result = false; }
+                        break;
+                    case "keywords":
+                        List<string> productKeywords = product.Keywords.Select(word => word.ToLower()).ToList();
+                        foreach (string keyword in (List<String>)value)
+                        {
+                            if (productKeywords.Contains(keyword.ToLower()))
+                            {
+                                //One keyword has been found
+                                break;
+                            }
+                        }
+                        //No keyword has been found
+                        result = false;
+                        break;
+                }
+            }
+            return result;
+        }
+        public override bool Equals(object obj)
+        {
+            return obj is ProductSearchAttributes attributes &&
+                   Name == attributes.Name &&
+                   Category == attributes.Category &&
+                   LowPrice == attributes.LowPrice &&
+                   HighPrice == attributes.HighPrice &&
+                   ProductRating == attributes.ProductRating &&
+                   StoreRating == attributes.StoreRating &&
+                   EqualityComparer<List<string>>.Default.Equals(Keywords, attributes.Keywords);
         }
     }
 
@@ -147,6 +207,7 @@ namespace Terminal3.DomainLayer
 
         /// <summary>
         /// Util function to dump object of type T to dictionary
+        /// works with primitive data- not recursive
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
@@ -166,17 +227,19 @@ namespace Terminal3.DomainLayer
 
         /// <summary>
         /// Util function for update several properties of an object using dictionary
+        /// will work as case insensitive
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="dict"></param>
         public static void SetPropertyValue(Object obj, IDictionary<String, Object> dict)
         {
             PropertyInfo[] properties = obj.GetType().GetProperties();
+            IDictionary<String, Object> lowerCaseDict = dict.ToDictionary(k => k.Key.ToLower(), k => k.Value);
             for (int i = 0; i < properties.Length; i++)
             {
-                if (properties[i].CanWrite && dict.ContainsKey(properties[i].Name))
+                if (properties[i].CanWrite && lowerCaseDict.ContainsKey(properties[i].Name.ToLower()))
                 {
-                    properties[i].SetValue(obj, dict[properties[i].Name], null);
+                    properties[i].SetValue(obj, lowerCaseDict[properties[i].Name.ToLower()], null);
                 }
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -31,8 +32,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
             Product newProduct = new Product(productName, price, initialQuantity, category, keywords);
-            Products.TryAdd(newProduct.Id, newProduct);
-            return new Result<Product>($"Product {newProduct.Name} was added successfully to store's inventory. ID: {newProduct.Id}\n", true, newProduct);
+            return new Result<Product>($"Product {newProduct.Name} was created successfully. ID: {newProduct.Id}\n", true, newProduct);
         }
 
         public Result<Product> RemoveProduct(string productID)
@@ -41,7 +41,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             {
                 return new Result<Product>($"Product (ID: {toRemove.Id}) was removed successfully\n", true, toRemove);
             }
-            //else failed
+            //else
             return new Result<Product>($"Product (ID: {productID}) not found.\n", false, null);
         }
 
@@ -50,18 +50,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             if (Products.TryGetValue(productID, out Product toEdit))
             {
                 ObjectDictionaryMapper<Product>.SetPropertyValue(toEdit, details);
-                return new Result<Product>($"Product (ID: {productID}) was edited successfully.\n", true, toEdit);
             }
             //else failed
             return new Result<Product>($"Faild to edit product (ID: {productID}): Product not found.\n", false, null);
         }
 
-        public Result<List<Product>> SearchProduct(Double StoreRating, ProductSearchAttributes searchAttributes)
+        public Result<List<Product>> SearchProduct(Double StoreRating, IDictionary<String,Object> searchAttributes)
         {
             List<Product> searchResults = new List<Product>();
             foreach(Product product in this.Products.Values)
             {
-                if (searchAttributes.checkProduct(StoreRating,product))
+                if (checkProduct(StoreRating,product,searchAttributes))
                 {
                     searchResults.Add(product);
                 }
@@ -72,6 +71,63 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             else{
                 return new Result<List<Product>>($"No item has been found\n", false, null);
             }
+        }
+        /// <summary>
+        ///  Filter out product if its not meet the search criteria
+        /// </summary>
+        /// <param name="StoreRating"></param>
+        /// <param name="product"></param>
+        /// <param name="searchAttributes"></param>
+        /// <returns></returns>
+        internal bool checkProduct(Double StoreRating, Product product, IDictionary<String, Object> searchAttributes)
+        {
+            Boolean result = true;
+            ICollection<String> properties = searchAttributes.Keys;
+            foreach (string property in properties)
+            {
+                var value = searchAttributes[property];
+                switch (property.ToLower())
+                {
+                    case "name":
+                        if (!product.Name.ToLower().Contains(((string)value).ToLower())) { result = false; }
+                        break;
+                    case "category":
+                        if (!product.Category.ToLower().Equals(((string)value).ToLower())) { result = false; }
+                        break;
+                    case "lowprice":
+                        if (product.Price < (Double)value) { result = false; }
+                        break;
+                    case "highprice":
+                        if (product.Price > (Double)value) { result = false; }
+                        break;
+                    case "productrating":
+                        if (product.Rating < (Double)value) { result = false; }
+                        break;
+                    case "storerating":
+                        if (StoreRating < (Double)value) { result = false; }
+                        break;
+                    case "keywords":
+                        bool found = false;
+                        List<string> productKeywords = product.Keywords.Select(word => word.ToLower()).ToList();
+                        //foreach (string keyword in (List<String>)value)
+                        List<string> searchWords = (List<String>)value;
+                        for (int i=0; i<searchWords.Count && !found ; i++)
+                        {
+                            if (productKeywords.Contains(searchWords[i].ToLower()))
+                            {
+                                //One keyword has been found
+                                found=true;
+                            }
+                        }
+                        //No keyword has been found
+                        if (!found)
+                        {
+                            result = false;
+                        }
+                        break;
+                }
+            }
+            return result;
         }
     }
 }

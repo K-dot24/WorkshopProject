@@ -125,9 +125,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
 
-        public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails)
+        public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> searchAttributes)
         {
-            ProductSearchAttributes searchAttributes = ObjectDictionaryMapper<ProductSearchAttributes>.GetObject(productDetails);
+            //ProductSearchAttributes searchAttributes = ObjectDictionaryMapper<ProductSearchAttributes>.GetObject(productDetails);
             List<Product> searchResult = new List<Product>();
             foreach(Store store in this.Stores.Values)
             {

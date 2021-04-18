@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Terminal3.DALobjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
@@ -7,17 +8,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     public class Product
     {
         //Properties
-        public String Id { get; private set; }
-        public String Name { get; private set; }
-        public Double Price { get; private set; }
-        public int Quantity { get; private set; }
-        public String Category { get; private set; }
-        public Double Rating { get; private set; }
-        public int NumberOfRates { get; private set; }
-        public LinkedList<String> Keywords { get; private set; }
+        public String Id { get; }
+        public String Name { get; set; }
+        public Double Price { get; set; }
+        public int Quantity { get; set; }
+        public String Category { get; set; }
+        public Double Rating { get; set; }
+        public int NumberOfRates { get; set; }
+        public LinkedList<String> Keywords { get; set; }
         
         //Constructor
-        public Product(String name, Double price, int quantity , String category, LinkedList<String> Keywords = null)
+        public Product(String name, Double price, int quantity , String category, [OptionalAttribute]LinkedList<String> Keywords)
         {
             Id = Service.GenerateId();
             Name = name;
@@ -25,6 +26,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Quantity = quantity;
             Category = category;
             if (Keywords == null) { this.Keywords = new LinkedList<String>(); }
+            else { this.Keywords = Keywords; }
         }
         
         public Product(ProductDAL productDAL)
@@ -39,9 +41,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         //Method
         public Result<Double> AddRating(Double rate)
         {
-            this.NumberOfRates=NumberOfRates+1;
-            Rating = (Rating + rate) / NumberOfRates;
-            return new Result<Double>($"Product {Name} rate is: {Rating}\n", true, Rating);
+            if(rate>5 || rate< 1) {
+                return new Result<Double>($"Product {Name} could not be rated. Please use number between 1 to 5\n", false, Rating);
+            }
+            else{
+                this.NumberOfRates = NumberOfRates + 1;
+                Rating = (Rating + rate) / (Double) NumberOfRates;
+                return new Result<Double>($"Product {Name} rate is: {Rating}\n", true, Rating);
+            }
         }
         
         public Result<String> AddKeyword(String keyword)
