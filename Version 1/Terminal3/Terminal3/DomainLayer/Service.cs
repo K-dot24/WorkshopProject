@@ -40,6 +40,9 @@ namespace Terminal3.DomainLayer
         }
     }
 
+    /// <summary>
+    /// NOT IN USE
+    /// </summary>
     public class ProductSearchAttributes
     {
 
@@ -224,17 +227,19 @@ namespace Terminal3.DomainLayer
 
         /// <summary>
         /// Util function for update several properties of an object using dictionary
+        /// will work as case insensitive
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="dict"></param>
         public static void SetPropertyValue(Object obj, IDictionary<String, Object> dict)
         {
             PropertyInfo[] properties = obj.GetType().GetProperties();
+            IDictionary<String, Object> lowerCaseDict = dict.ToDictionary(k => k.Key.ToLower(), k => k.Value);
             for (int i = 0; i < properties.Length; i++)
             {
-                if (properties[i].CanWrite && dict.ContainsKey(properties[i].Name))
+                if (properties[i].CanWrite && lowerCaseDict.ContainsKey(properties[i].Name.ToLower()))
                 {
-                    properties[i].SetValue(obj, dict[properties[i].Name], null);
+                    properties[i].SetValue(obj, lowerCaseDict[properties[i].Name.ToLower()], null);
                 }
             }
         }

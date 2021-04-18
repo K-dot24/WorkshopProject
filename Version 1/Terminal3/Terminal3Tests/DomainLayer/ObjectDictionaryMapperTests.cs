@@ -52,7 +52,7 @@ namespace Terminal3.DomainLayer.Tests
 
         [Fact()]
         [Trait("Category", "Unit")]
-        public void SetPropertyValueTest()
+        public void SetPropertyValueTestCaseSensative()
         {
             string[] keywords = { "Food", "Market" };
             Product product = new Product("Banana", 19.9, 10, "Fruit", new LinkedList<string>(keywords));
@@ -66,6 +66,23 @@ namespace Terminal3.DomainLayer.Tests
             Assert.Equal("Fruit", product.Category);
             Assert.True(product.Price.Equals((Double)dict["Price"]));
             Assert.True(product.Quantity.Equals((int)dict["Quantity"]));
+        }
+        [Fact()]
+        [Trait("Category", "Unit")]
+        public void SetPropertyValueTestCaseInensative()
+        {
+            string[] keywords = { "Food", "Market" };
+            Product product = new Product("Banana", 19.9, 10, "Fruit", new LinkedList<string>(keywords));
+            Dictionary<String, Object> dict = new Dictionary<string, object>()
+                                        { {"name","tes" },
+                                          {"price", 15.99 },
+                                          {"quantity" , 15 }
+                                        };
+            ObjectDictionaryMapper<Product>.SetPropertyValue(product, dict);
+            Assert.Equal((String)dict["name"], product.Name);
+            Assert.Equal("Fruit", product.Category);
+            Assert.True(product.Price.Equals((Double)dict["price"]));
+            Assert.True(product.Quantity.Equals((int)dict["quantity"]));
         }
     }
 }
