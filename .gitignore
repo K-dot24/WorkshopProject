@@ -479,6 +479,8 @@ FodyWeavers.xsd
 **/.idea/**/*.iml
 **/.idea/**/contentModel.xml
 **/.idea/**/modules.xml
+**/.idea/**
+
 
 *.suo
 *.user
@@ -500,4 +502,5 @@ Desktop.ini
 tmp/*
 *.lck
 *.bak_000f
+**/.bak/**
 *.bak_001d
