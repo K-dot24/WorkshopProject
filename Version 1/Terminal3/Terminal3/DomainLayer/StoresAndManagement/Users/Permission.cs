@@ -56,6 +56,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<Boolean>($"Permission for {method} set successfully to {active}\n", true, true);
         }
 
+        public Result<Boolean> SetAllMethodesPermitted()
+        {
+            for(int i = 0; i<functionsBitMask.Length; i++)
+            {
+                functionsBitMask[i] = true;
+            }
+            
+            return new Result<Boolean>("All methodes are permitted\n", true, true);
+        }
+
         public Result<PermissionDAL> GetDAL()
         {
             return new Result<PermissionDAL>("Permission DAL object", true, new PermissionDAL(this.functionsBitMask));
