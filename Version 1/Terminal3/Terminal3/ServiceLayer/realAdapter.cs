@@ -1,47 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DALobjects;
 using Terminal3.DomainLayer;
 using Terminal3.ServiceLayer;
 
 
 namespace XUnitTestTerminal3.AcceptanceTests.Utils
 {
-    public class SystemInterfaceReal : ISystemInterface
+    public class realAdapter : ISystemInterface
     {
+        public IECommerceSystemInterface system = new ECommerceSystem();
         public Result<bool> AddProductToCart(string userID, string ProductID, int ProductQuantity, string StoreID)
         {
-            throw new NotImplementedException();
+            return system.AddProductToCart( userID,  ProductID,  ProductQuantity,  StoreID);
         }
 
         public Result<string> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category)
         {
-            throw new NotImplementedException();
+            Result<ProductDAL> fromSystem = system.AddProductToStore(userID, storeID, productName, price, initialQuantity, category);
+            return new Result<string>("", fromSystem.ExecStatus, fromSystem.Data.Id); 
         }
 
         public Result<bool> AddStoreManager(string addedManagerID, string currentlyOwnerID, string storeID)
         {
-            throw new NotImplementedException();
+            return system.AddStoreManager(addedManagerID, currentlyOwnerID, storeID);
         }
 
         public Result<bool> AddStoreOwner(string addedOwnerID, string currentlyOwnerID, string storeID)
         {
-            throw new NotImplementedException();
+            return system.AddStoreOwner(addedOwnerID, currentlyOwnerID, storeID);
         }
 
         public Result<string> EditProductDetails(string userID, string storeID, string productID, IDictionary<string, object> details)
         {
-            throw new NotImplementedException();
+            Result<ProductDAL> fromSystem = system.EditProductDetails(userID, storeID, productID, details);
+            return new Result<string>("", fromSystem.ExecStatus, fromSystem.Data.Id);
         }
 
         public Result<List<string>> GetStorePurchaseHistory(string ownerID, string storeID)
         {
-            throw new NotImplementedException();
+            Result<HistoryDAL> fromSystem = system.GetStorePurchaseHistory( ownerID, storeID);
+            List<string> ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.id);
+            return new Result<string>("", fromSystem.ExecStatus, ids);
         }
 
         public Result<Dictionary<string, List<int>>> GetStoreStaff(string ownerID, string storeID)
         {
-            throw new NotImplementedException();
+            Result<Dictionary<UserDAL, PermissionDAL>> fromSystem = system.GetStoreStaff(ownerID, storeID);
+            Dictionary<string,List<int>> toReturn = fromSystem.Data.
         }
 
         public Result<int> GetTotalShoppingCartPrice(string userID)
