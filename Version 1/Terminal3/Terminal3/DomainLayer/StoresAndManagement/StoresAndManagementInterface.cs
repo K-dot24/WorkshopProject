@@ -31,6 +31,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #region User Actions
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
+
+        Result<Boolean> ExitSystem(String userID);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -152,6 +154,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             }
             //else failed
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
+        }
+
+        public Result<Boolean> ExitSystem(String userID)
+        {
+            return UsersAndPermissionsFacade.ExitSystem(userID);
         }
     }
 }
