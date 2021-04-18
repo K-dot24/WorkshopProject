@@ -184,7 +184,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             // Manager without permissions
             RegisteredUser user2 = new RegisteredUser("raz@gmail.com", "Because789");
             StoreManager manager2 = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
-            manager.Permission.SetPermission(Methods.GetStorePurchaseHistory, true);
+            manager2.Permission.SetPermission(Methods.GetStorePurchaseHistory, true);
             TestStore.Managers.TryAdd(manager2.User.Email, manager2);
 
             Assert.Equal(expectedResult, Facade.GetStorePurchaseHistory(userID, TestStore.Id).ExecStatus);
