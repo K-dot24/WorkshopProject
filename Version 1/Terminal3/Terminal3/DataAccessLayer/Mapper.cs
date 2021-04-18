@@ -30,12 +30,12 @@ namespace Terminal3.DataAccessLayer
         }
 
         #region History
-        /*public void create(History history)
+        public void create(History history)
         {
             Historys.TryAdd(history.UserID, history);
-        }*/
+        }
 
-        /*public void update(History history)
+        public void update(History history)
         {
             Historys.AddOrUpdate(history.UserID, history, (oldkey, oldvalue) => history);
         }
@@ -44,20 +44,18 @@ namespace Terminal3.DataAccessLayer
         {
             History _history;
             Historys.Remove(history.UserID , out _history);
-        }*/
+        }
 
-        //public History get(String UserID)
-        //{
-        //    //TODO
-        //}
-        //public History get(HistoryDAL historyDAL)
-        //{
-        //    //TODO
-        //}
+        public History get(String UserID)
+        {
+            //TODO
+        }
+        public History get(HistoryDAL historyDAL)
+        {
+            //TODO
+        }
+        #endregion
 
-//        #endregion
+    }
+}*/
 
-
-//    }
-//}
-//*/
