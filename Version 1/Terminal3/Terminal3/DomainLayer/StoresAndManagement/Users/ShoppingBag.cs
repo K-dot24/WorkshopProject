@@ -24,18 +24,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<bool> AddProtuctToShoppingBag(Product product, int quantity)
         {
-            Products.TryAdd(product, quantity);
-            return new Result<bool>($"Product {product.Name} was added successfully to shopping bag of {Store.Name}\n", true, true);
+            if (product.Quantity >= quantity && quantity > 0)
+            {
+                Products.TryAdd(product, quantity);
+                return new Result<bool>($"Product {product.Name} was added successfully to shopping bag of {Store.Name}\n", true, true);
+            }
+            //else failed
+            return new Result<bool>($"Asked quantity ({quantity}) of product {product.Name} is higher than quantity in store ({product.Quantity}).\n", false, false);
         }
 
         public Result<ShoppingBagDAL> GetDAL()
         {
-            RegisteredUserDAL user = (RegisteredUser)User.GetDAL().Data;
+            RegisteredUserDAL user = (RegisteredUserDAL)User.GetDAL().Data;
             StoreDAL store = Store.GetDAL().Data;
             LinkedList<ProductDAL> products = new LinkedList<ProductDAL>();
-            foreach(Product p in Products)
+            foreach (var p in Products)
             {
-                products.AddLast(p.GetDAL().Data);
+                products.AddLast(p.Key.GetDAL().Data);
             }
 
             return new Result<ShoppingBagDAL>("Shopping bag DAL object", true, new ShoppingBagDAL(user, store, products));

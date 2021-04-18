@@ -29,8 +29,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         //Constructor
         public UsersAndPermissionsFacade()
         {
-            this.RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
-            this.SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
+            RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
+            SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
+            GuestUsers = new ConcurrentDictionary<String, GuestUser>();
+            
 
             //Add first system admin
             //this.SystemAdmins.TryAdd("Admin@terminal3", new RegisteredUser("Admin@terminal3", "Admin"));
