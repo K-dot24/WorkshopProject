@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,12 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
     public class RealAdapter : ISystemInterface
     {
         public IECommerceSystemInterface system = new ECommerceSystem();
+
+        public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<bool> AddProductToCart(string userID, string ProductID, int ProductQuantity, string StoreID)
         {
             return system.AddProductToCart(userID, ProductID, ProductQuantity, StoreID);
@@ -44,6 +51,11 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
         {
             Result<ProductDAL> fromSystem = system.EditProductDetails(userID, storeID, productID, details);
             return new Result<string>("", fromSystem.ExecStatus, fromSystem.Data.Id);
+        }
+
+        public Result<ConcurrentDictionary<string, string>> GetProductReview(string storeID, string productID)
+        {
+            throw new NotImplementedException();
         }
 
         public Result<List<string>> GetStorePurchaseHistory(string ownerID, string storeID)
@@ -227,6 +239,16 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
         public Result<bool> UpdateShoppingCart(string userID, string shoppingBagID, string productID, int quantity)
         {
             return system.UpdateShoppingCart(userID, shoppingBagID, productID, quantity);
+        }
+
+        Result<HistoryDAL> ISystemInterface.GetStorePurchaseHistory(string ownerID, string storeID)
+        {
+            throw new NotImplementedException();
+        }
+
+        Result<Dictionary<UserDAL, PermissionDAL>> ISystemInterface.GetStoreStaff(string ownerID, string storeID)
+        {
+            throw new NotImplementedException();
         }
     }
 }

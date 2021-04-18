@@ -163,6 +163,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             // Add review to product 
             Assert.False(Facade.AddProductReview(founder.Id, store, product, review).ExecStatus);
             Assert.False(product.Review.TryGetValue(founder.Id, out String msg));
+        }
+
         [Fact]
         [Trait("Category", "Unit")]
         public void ExitSystemTestGuest()

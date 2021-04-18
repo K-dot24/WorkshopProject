@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DALobjects;
@@ -192,5 +193,29 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.UpdateShoppingCart(userID, shoppingBagID, productID, quantity);
         }
 
+        public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<bool> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID)
+        {
+            throw new NotImplementedException();
+        }
+
+        Result<Dictionary<UserDAL, PermissionDAL>> ISystemInterface.GetStoreStaff(string ownerID, string storeID)
+        {
+            throw new NotImplementedException();
+        }
+
+        Result<HistoryDAL> ISystemInterface.GetStorePurchaseHistory(string ownerID, string storeID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<ConcurrentDictionary<string, string>> GetProductReview(string storeID, string productID)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
