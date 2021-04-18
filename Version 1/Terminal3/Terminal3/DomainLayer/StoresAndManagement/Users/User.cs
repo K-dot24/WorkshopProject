@@ -13,7 +13,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             ShoppingCart = new ShoppingCart();
         }
 
-        protected Result<UserDAL> GetDAL()
+        public Result<UserDAL> GetDAL()
         {
             ShoppingCartDAL shoppingCart = ShoppingCart.GetDAL().Data;
             return new Result<UserDAL>("User DAL object", true, new UserDAL(shoppingCart));
