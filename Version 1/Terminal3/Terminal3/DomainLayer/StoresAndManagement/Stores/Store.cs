@@ -22,7 +22,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #region Staff Management
         Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID);
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID);
-        Result<Boolean> RemoveStoreManager(RegisteredUser removedManager, String currentlyOwnerID);
+        Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID);
         #endregion
@@ -38,7 +38,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<History> GetStorePurchaseHistory(string ownerID);
         #endregion
     }
-    public class Store: IStoreOperations
+    public class Store : IStoreOperations
     {
         public String Id { get; }
         public String Name { get; }
@@ -142,7 +142,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)
         {
-            if (!CheckIfStoreManager(futureManager.Email) && !CheckIfStoreOwner(futureManager.Email) 
+            if (!CheckIfStoreManager(futureManager.Email) && !CheckIfStoreOwner(futureManager.Email)
                     && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new manager not already an owner/manager + appointing owner is not a fraud
             {
                 StoreManager newManager = new StoreManager(futureManager, this, new Permission(), owner);
@@ -153,20 +153,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 $"is not an owner at ${this.Name}.\n", false, false);
         }
 
-        public Result<bool> RemoveStoreManager(RegisteredUser removedManager, string currentlyOwnerID)
+        public Result<bool> RemoveStoreManager(String removedManagerID, string currentlyOwnerID)
         {
-            if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner) && Managers.TryGetValue(removedManager.Email, out StoreManager manager))
+            if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner) && Managers.TryGetValue(removedManagerID, out StoreManager manager))
             {
                 if (manager.AppointedBy.Equals(owner))
                 {
-                    Managers.TryRemove(removedManager.Email, out _);
-                    return new Result<bool>($"User (Email: {removedManager.Email}) was successfully removed from store management at {this.Name}.\n", true, true);
+                    Managers.TryRemove(removedManagerID, out _);
+                    return new Result<bool>($"User (Email: {removedManagerID}) was successfully removed from store management at {this.Name}.\n", true, true);
                 }
                 //else failed
-                return new Result<bool>($"Failed to remove user (Email: {removedManager.Email}) from store management: Unauthorized owner (Email: {currentlyOwnerID}).\n", false, false);
+                return new Result<bool>($"Failed to remove user (Email: {removedManagerID}) from store management: Unauthorized owner (Email: {currentlyOwnerID}).\n", false, false);
             }
             //else failed
-            return new Result<bool>($"Failed to remove user (Email: {removedManager.Email}) from store management: Either not a manager or owner not found.\n", false, false);
+            return new Result<bool>($"Failed to remove user (Email: {removedManagerID}) from store management: Either not a manager or owner not found.\n", false, false);
         }
 
         public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
@@ -194,17 +194,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
-        public Result<Product> GetProduct(ProductDAL productDAL)
-        {
-            // this function is for the shoppingBag constructor that converts DAL object to domain objects
-            throw new NotImplementedException();
-        }
 
         public Result<object> GetDiscountPolicyAtStore()
         {
             throw new NotImplementedException();
         }
-        
+
         public Result<Object> RemoveProduct(Product product)
         {
             throw new NotImplementedException();
@@ -219,7 +214,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<History>("No permission to see store purchase history\n", false, null);
         }
 
-
+        //Getter
+        public Result<Product> GetProduct(String productID)
+        {
+            return InventoryManager.GetProduct(productID);
+        }
 
         #region Private Functions
         private Boolean CheckIfStoreOwner(String userID)    // If user is Store Owner => has permissions
@@ -236,28 +235,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             return Managers.TryGetValue(userID, out StoreManager manager) && manager.Permission.functionsBitMask[(int)method];
         }
-
+        #endregion
 
         public Result<StoreDAL> GetDAL()
         {
             StoreOwnerDAL founder = Founder.GetDAL().Data;
             ConcurrentDictionary<String, StoreOwnerDAL> owners = new ConcurrentDictionary<String, StoreOwnerDAL>();
-            foreach(var so in Owners)
+            foreach (var so in Owners)
             {
-                owners.TryAdd(so.Key , so.Value.GetDAL().Data);
+                owners.TryAdd(so.Key, so.Value.GetDAL().Data);
             }
-            ConcurrentDictionary<String, StoreManagerDAL> managers = new ConcurrentDictionary<String, StoreManagerDAL();
-            foreach(var sm in Managers)
+            ConcurrentDictionary<String, StoreManagerDAL> managers = new ConcurrentDictionary<String, StoreManagerDAL>();
+            foreach (var sm in Managers)
             {
                 managers.TryAdd(sm.Key, sm.Value.GetDAL().Data);
             }
-           // InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
-           // PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
+            // InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
+            // PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
             HistoryDAL history = History.GetDAL().Data;
 
             StoreDAL store = new StoreDAL(this.Id, this.Name, founder, owners, managers, history, this.Rating, this.NumberOfRates);
             return new Result<StoreDAL>("Store DAL object", true, store);
 
-    }
+        }
     }
 }

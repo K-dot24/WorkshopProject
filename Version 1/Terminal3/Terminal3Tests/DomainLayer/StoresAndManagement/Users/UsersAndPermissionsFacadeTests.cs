@@ -3,6 +3,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DomainLayer.StoresAndManagement.Stores;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
 {
@@ -90,5 +91,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             Assert.True(Facade.LogOut(email).ExecStatus, "Not able to log out");
 
         }
+
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData("tomer@gmail.com", 5, true, true)]      // Success
+        [InlineData("raz@gmail.com", 10, true, false)]      // Fail 2: Higher quantity than quantity in store
+        [InlineData("zoe@gmail.com", 0, false, false)]      // Fail: Illegal quantity
+        [InlineData("shaked@gmail.com", -1, false, false)]  // Fail: Illegal quantity
+        public void AddProductToCartTest(string userID, int productQuantity, Boolean expectedResult, Boolean expectedResult2)
+        {
+            // Open store
+            RegisteredUser founder = new RegisteredUser(userID, "password");
+            Facade.RegisteredUsers.TryAdd(userID, founder);
+            Store store = new Store("Testore", founder);
+
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 100, "Fruits");
+            Product product2 = new Product("Apple", 4.9, 5, "Fruits");
+            store.InventoryManager.Products.TryAdd(product.Id, product);
+            store.InventoryManager.Products.TryAdd(product2.Id, product2);
+
+            Assert.Equal(expectedResult, Facade.AddProductToCart(userID, product, productQuantity, store).ExecStatus);
+            Assert.Equal(expectedResult2, Facade.AddProductToCart(userID, product2, productQuantity, store).ExecStatus);
+        }
+
+
     }
 }
