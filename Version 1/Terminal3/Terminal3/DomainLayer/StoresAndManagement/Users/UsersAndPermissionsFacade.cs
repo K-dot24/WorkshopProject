@@ -15,7 +15,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
         Result<RegisteredUser> LogOut(String email);
-        Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
+        Result<Boolean> AddProductReview(String userID, Store store, Product product, String review);
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
     }
@@ -223,7 +223,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
 
 
-        public Result<bool> AddProductToCart(string userID, Product product, int productQuantity, Store store)
+        public Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store)
         {
             if (RegisteredUsers.TryGetValue(userID, out RegisteredUser user))   // Check if user is registered
             {

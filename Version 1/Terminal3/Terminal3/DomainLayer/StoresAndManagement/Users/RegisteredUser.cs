@@ -60,16 +60,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             if (checkIfProductPurchasedByUser(store , product))
             {
-                product.AddProductReview(UserId , review);
+                product.AddProductReview(Id , review);
                 return new Result<Boolean>("The product review was added successfuly\n", true, true);
             }
             return new Result<Boolean>("The User did not purchase the product before, therefore can not write it a review\n", false, false);
         }
 
-        private Boolean checkIfProductPurchasedByUser(Store store ,Product product)
+        private Boolean checkIfProductPurchasedByUser(Store store, Product product)
         {
             LinkedList<ShoppingBag> shoppingBags = History.ShoppingBags;
-            foreach(ShoppingBag bag in shoppingBags)
+            foreach (ShoppingBag bag in shoppingBags)
             {
                 if (bag.Products.ContainsKey(product))  // TODO - check updated : in branch AddProductToCart the Products field in ShoppingBag is public ConcurrentDictionary<Product, int> Products 
                 {
@@ -77,6 +77,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 }
             }
             return false;
+        }
+
         public Result<History> GetUserPurchaseHistory()
         {
             return new Result<History>("User history\n", true, History);

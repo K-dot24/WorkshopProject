@@ -33,7 +33,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
-        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
         Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
         
         #region User Actions
