@@ -3,7 +3,7 @@ using Terminal3.DALobjects;
 using System.Reflection;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using System.Collections.Concurrent;
-
+using System.Collections.Generic;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -68,11 +68,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         private Boolean checkIfProductPurchasedByUser(Store store ,Product product)
         {
-            ConcurrentDictionary<String, ShoppingBag> shoppingBags = History.ShoppingBags;
-            if (shoppingBags.TryGetValue(store.Id , out ShoppingBag bag))
+            LinkedList<ShoppingBag> shoppingBags = History.ShoppingBags;
+            foreach(ShoppingBag bag in shoppingBags)
             {
-                return bag.Products.Contains(product);
-            }            
+                if (bag.Products.ContainsKey(product))  // TODO - check updated : in branch AddProductToCart the Products field in ShoppingBag is public ConcurrentDictionary<Product, int> Products 
+                {
+                    return true;
+                }
+            }
             return false;
         }
         public Result<RegisteredUserDAL> GetDAL()

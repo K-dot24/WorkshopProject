@@ -139,7 +139,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<Store> storeRes = StoresFacade.GetStore(storeID);
             if (storeRes.ExecStatus)
             {                
-                Result<Product> productRes = storeRes.Data.GetProduct(productID);
+                Result<Product> productRes = storeRes.Data.GetProduct(productID);   // TODO - check updated :function exists in branch - AddProductToCart 
                 if (productRes.ExecStatus)
                 {
                     return UsersAndPermissionsFacade.AddProductReview(userID, storeRes.Data, productRes.Data , review);
