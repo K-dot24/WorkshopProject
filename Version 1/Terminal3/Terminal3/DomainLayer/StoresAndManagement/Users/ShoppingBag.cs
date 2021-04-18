@@ -20,7 +20,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<ShoppingBagDAL> GetDAL()
         {
-            RegisteredUserDAL user = (RegisteredUser)User.GetDAL().Data;
+            RegisteredUserDAL user = (RegisteredUserDAL)User.GetDAL().Data;
             StoreDAL store = Store.GetDAL().Data;
             LinkedList<ProductDAL> products = new LinkedList<ProductDAL>();
             foreach(Product p in Products)
