@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Terminal3.DALobjects;
 using System.Collections.Concurrent;
 
@@ -20,7 +21,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, String> Review { get; set; }    //<userID , usersReview>
 
         //Constructor
-        public Product(String name, Double price, int quantity , String category, [OptionalAttribute]LinkedList<String> Keywords)
+        public Product(String name, Double price, int quantity , String category, [System.Runtime.InteropServices.OptionalAttribute]LinkedList<String> Keywords)
         {
             Id = Service.GenerateId();
             Name = name;

@@ -33,9 +33,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         #endregion
 
         #region Information
-        GetStorePurchaseHistory = 12
+        GetStorePurchaseHistory = 12,
         #endregion
 
+        AllPermissions = 777
     }
 
     public class Permission

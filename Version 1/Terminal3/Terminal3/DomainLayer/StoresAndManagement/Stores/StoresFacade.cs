@@ -29,7 +29,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
-        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
+        Result<History> GetStorePurchaseHistory(String userID, String storeID);
     }
 
     public class StoresFacade : IStoresFacade
@@ -155,9 +155,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         #endregion
 
-        public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
+        public Result<History> GetStorePurchaseHistory(string userID, string storeID)
         {
-            throw new NotImplementedException();
+            if(Stores.TryGetValue(storeID, out Store store))
+            {
+                return store.GetStorePurchaseHistory(userID);
+            }
+            return new Result<History>("Store Id does not exists\n", false, null);
         }
 
         public Result<StoreDAL> OpenNewStore(RegisteredUser founder, string storeName)

@@ -9,7 +9,7 @@ namespace XUnitTestTerminal3
 {
     public abstract class XUnitTerminal3TestCase
     {
-        protected IECommerceSystemInterface sut = Bridge.getService();         
+        protected ISystemInterface sut = Bridge.getService();         
 
     }
 }

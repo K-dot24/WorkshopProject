@@ -34,11 +34,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #endregion
 
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
-
         Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
+        
+        #region User Actions
+        Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
+        Result<HistoryDAL> GetStorePurchaseHistory(String userID, String storeID);
+        #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
     {
+        // Properties
         public StoresFacade StoresFacade { get; }
         public UsersAndPermissionsFacade UsersAndPermissionsFacade { get; }
 
@@ -52,6 +57,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         //TODO: Implement all functions
 
+        // Methods
         public Result<StoreDAL> OpenNewStore(String storeName, String userID)
         {
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser founder))  // Check if userID is a registered user
@@ -124,9 +130,41 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             throw new NotImplementedException();
         }
 
-        public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
+        public Result<HistoryDAL> GetStorePurchaseHistory(string userID, string storeID)
         {
-            throw new NotImplementedException();
+            Result<History> res = StoresFacade.GetStorePurchaseHistory(userID, storeID);
+            if (res.ExecStatus)
+            {
+                return new Result<HistoryDAL>("Store purchase history\n" , true ,res.Data.GetDAL().Data);
+            }
+            return new Result<HistoryDAL>(res.Message, false, null);
+        }
+
+        public Result<HistoryDAL> GetUserPurchaseHistory(String userID)
+        {
+            Result<History> res = UsersAndPermissionsFacade.GetUserPurchaseHistory(userID);
+            if (res.ExecStatus)
+            {
+                return new Result<HistoryDAL>(res.Message , true , res.Data.GetDAL().Data);
+            }
+            return new Result<HistoryDAL>(res.Message, false, null);
+        }
+        
+        public Result<Boolean> AddProductToCart(string userID, string productID, int productQuantity, string storeID)
+        {
+            if (StoresFacade.Stores.TryGetValue(storeID, out Store store))  // Check if store exists
+            {
+                Result<Product> searchProductRes = store.GetProduct(productID);
+                if (searchProductRes.ExecStatus)    // Check if product exists in store
+                {
+                    Product product = searchProductRes.Data;
+                    return UsersAndPermissionsFacade.AddProductToCart(userID, product, productQuantity, store);
+                }
+                //else failed
+                return new Result<Boolean>($"Product (ID: {productID}) was not found in {store.Name}\n", false, false);
+            }
+            //else failed
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
        
         public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID)

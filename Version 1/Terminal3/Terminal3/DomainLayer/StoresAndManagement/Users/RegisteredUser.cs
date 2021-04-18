@@ -10,18 +10,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     public class RegisteredUser : User
     {
         //Properties
-        public String UserId { get; }
         public String Email { get; }
         public String Password { get; }
         public Boolean LoggedIn { get; set; }
+        public History History { get; set; }
 
         //Constructor
-        public RegisteredUser(String email , String password)
+        public RegisteredUser(String email , String password) : base()
         {
-            this.UserId = Service.GenerateId();
             this.Email = email;
             this.Password = password;
             this.LoggedIn = false;
+            this.History = new History();
         }
 
         //Methods
@@ -77,11 +77,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 }
             }
             return false;
+        public Result<History> GetUserPurchaseHistory()
+        {
+            return new Result<History>("User history\n", true, History);
         }
         public Result<RegisteredUserDAL> GetDAL()
         {
             ShoppingCartDAL SCD = this.ShoppingCart.GetDAL().Data;
-            return new Result<RegisteredUserDAL>("RegisteredUser DAL object" , true , new RegisteredUserDAL(this.UserId, this.Email, this.Password, this.LoggedIn , SCD));
+            return new Result<RegisteredUserDAL>("RegisteredUser DAL object" , true , new RegisteredUserDAL(this.Id, this.Email, this.Password, this.LoggedIn , SCD));
         }
     }
 }

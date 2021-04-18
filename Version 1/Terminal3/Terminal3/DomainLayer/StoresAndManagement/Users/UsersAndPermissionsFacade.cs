@@ -16,6 +16,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> Login(String email, String password);
         Result<RegisteredUser> LogOut(String email);
         Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
+        Result<History> GetUserPurchaseHistory(String userID);
+        Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
     }
 
     public class UsersAndPermissionsFacade : IUsersAndPermissionsFacade
@@ -23,12 +25,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         //Properties
         public ConcurrentDictionary<String,RegisteredUser> RegisteredUsers { get; }
         public ConcurrentDictionary<String, RegisteredUser> SystemAdmins { get; }
+        public ConcurrentDictionary<String, GuestUser> GuestUsers { get; }
 
         //Constructor
         public UsersAndPermissionsFacade()
         {
-            this.RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
-            this.SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
+            RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
+            SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
+            GuestUsers = new ConcurrentDictionary<String, GuestUser>();
+            
 
             //Add first system admin
             //this.SystemAdmins.TryAdd("Admin@terminal3", new RegisteredUser("Admin@terminal3", "Admin"));
@@ -208,6 +213,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
 
 
+        public Result<History> GetUserPurchaseHistory(String userID)
+        {
+            if (RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
+            {
+                return user.GetUserPurchaseHistory();
+            }
+            return new Result<History>("Not a registered user\n", false, null);
+        }
 
+
+        public Result<bool> AddProductToCart(string userID, Product product, int productQuantity, Store store)
+        {
+            if (RegisteredUsers.TryGetValue(userID, out RegisteredUser user))   // Check if user is registered
+            {
+                return user.AddProductToCart(product, productQuantity, store);
+            }
+            else if (GuestUsers.TryGetValue(userID, out GuestUser guest))   // Check if active guest
+            {
+                return guest.AddProductToCart(product, productQuantity, store);
+            }
+            //else failed
+            return new Result<bool>($"User (ID: {userID}) does not exists.\n", false, false);
+        }
     }
 }
