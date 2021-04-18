@@ -22,7 +22,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID, String storeID);
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID, String storeID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
@@ -168,9 +169,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
 
 
-        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        public Result<bool> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions)
         {
-            throw new NotImplementedException();
+            if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
+            {
+                return store.SetPermissions(managerID, ownerID, permissions);
+            }
+            //else failed
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
+        }
+
+        public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
+        {
+            if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
+            {
+                return store.RemovePermissions(managerID, ownerID, permissions);
+            }
+            //else failed
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
     }
 }

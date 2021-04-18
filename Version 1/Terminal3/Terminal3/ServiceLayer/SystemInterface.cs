@@ -47,7 +47,8 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID); 
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<String , List<int>>> GetStoreStaff(String ownerID, String storeID);
         Result<List<String>> GetStorePurchaseHistory(String ownerID, String storeID); //List<shoppingBagID>
         #endregion

@@ -55,6 +55,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<Boolean>($"Permission for {method} set successfully to {active}\n", true, true);
         }
 
+        public Result<Boolean> SetPermission(int method, Boolean active)
+        {
+            functionsBitMask[method] = active;
+            return new Result<Boolean>($"Permission for {(Methods)method} set successfully to {active}\n", true, true);
+        }
+
         public Result<PermissionDAL> GetDAL()
         {
             return new Result<PermissionDAL>("Permission DAL object", true, new PermissionDAL(this.functionsBitMask));

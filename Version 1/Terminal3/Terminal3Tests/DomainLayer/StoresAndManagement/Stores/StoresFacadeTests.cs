@@ -61,7 +61,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             // Manager without permissions
             RegisteredUser user2 = new RegisteredUser("raz@gmail.com", "Because789");
             StoreManager manager2 = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
-            manager.Permission.SetPermission(Methods.AddNewProduct, true);
+            manager2.Permission.SetPermission(Methods.AddNewProduct, true);
             TestStore.Managers.TryAdd(manager2.User.Email, manager2);
 
             // Add product
@@ -92,7 +92,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             // Manager without permissions
             RegisteredUser user2 = new RegisteredUser("raz@gmail.com", "Because789");
             StoreManager manager2 = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
-            manager.Permission.SetPermission(Methods.AddNewProduct, true);
+            manager2.Permission.SetPermission(Methods.AddNewProduct, true);
             TestStore.Managers.TryAdd(manager2.User.Email, manager2);
 
             // Add product
@@ -146,7 +146,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             // prepare new Store Owner
             RegisteredUser user = new RegisteredUser("raz@gmail.com", "ClassyBougieRatchet");
             StoreOwner newOwner = new StoreOwner(user, TestStore, TestStore.Founder);
-            
+
             // Prepare new Store Manager, appointed by founder
             RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "SassyMoodyNasty");
             StoreManager manager = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
@@ -168,6 +168,41 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
             RegisteredUser user = new RegisteredUser(userID, "ManInTheMiddle");
             Assert.Equal(expectedResult, Facade.OpenNewStore(user, storeName).ExecStatus);
+        }
+
+        [Theory()]
+        [InlineData("tomer@gmail.com", "papi@hotmale.com", true, new bool[13] { true, true, true, false, false, false, false, true, false, false, false, false, false })]   // Success
+        [InlineData("tomer@gmail.com", "raz@gmail.com", false, new bool[13] { false, false, false, false, false, false, false, true, false, false, false, false, false })]     // Fail: Trying to remove by not the appointer
+        [InlineData("raz@gmail.com", "tomer@hotmale.com", false, new bool[13] { false, false, false, false, false, false, false, true, false, false, false, false, false })]    // Fail: not a manager
+        public void SetPermissionsTest(String managerID, String ownerID, Boolean expectedResult, bool[] pers)
+        {
+            // Manager
+            RegisteredUser user = new RegisteredUser("tomer@gmail.com", "Why6AfraidOf7?");
+            StoreManager manager = new StoreManager(user, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Managers.TryAdd(manager.User.Email, manager);
+
+            // Manager2
+            RegisteredUser user2 = new RegisteredUser("raz@gmail.com", "Because789");
+            StoreManager manager2 = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Managers.TryAdd(manager2.User.Email, manager2);
+
+            // Permissions
+            LinkedList<int> permissions = new LinkedList<int>();
+            permissions.AddLast(0);
+            permissions.AddLast(1);
+            permissions.AddLast(2);
+
+            Assert.Equal(expectedResult, Facade.SetPermissions(TestStore.Id, managerID, ownerID, permissions).ExecStatus);
+
+            TestStore.Managers.TryGetValue(managerID, out StoreManager sm);
+            bool[] current_permissions = sm.Permission.functionsBitMask;
+            Assert.Equal(pers, current_permissions);
+        }
+
+        [Fact()]
+        public void RemovePermissionsTest()
+        {
+            throw new NotImplementedException();
         }
     }
 }

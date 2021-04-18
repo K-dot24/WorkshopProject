@@ -24,6 +24,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Boolean> RemovePermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID);
         #endregion
 
@@ -171,7 +172,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
         {
-            throw new NotImplementedException();
+            if (Owners.TryGetValue(ownerID, out StoreOwner owner) && Managers.TryGetValue(managerID, out StoreManager manager))
+            {
+                foreach (int per in permissions)
+                {
+                    manager.SetPermission(per, true);    
+                }
+                return new Result<bool>($"Permissions for manager ({manager.User.Email} updated successfully.\n", true, true);
+            }
+            //else failed
+            return new Result<bool>($"Staff ID not found in store.\n", false, false);
         }
 
         public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID)
@@ -194,7 +204,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
-
         public Result<object> GetDiscountPolicyAtStore()
         {
             throw new NotImplementedException();
@@ -208,6 +217,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<object> GetStorePurchaseHistory()
         {
             throw new NotImplementedException();
+        }
+        
+        public Result<bool> RemovePermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        {
+            if (Owners.TryGetValue(ownerID, out StoreOwner owner) && Managers.TryGetValue(managerID, out StoreManager manager))
+            {
+                foreach (int per in permissions)
+                {
+                    manager.SetPermission(per, false);
+                }
+                return new Result<bool>($"Permissions for manager ({manager.User.Email} updated successfully.\n", true, true);
+            }
+            //else failed
+            return new Result<bool>($"Staff ID not found in store.\n", false, false);
         }
 
         //Getter
@@ -254,5 +277,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<StoreDAL>("Store DAL object", true, store);
 
         }
+
     }
 }
