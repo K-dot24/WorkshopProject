@@ -198,6 +198,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             Assert.True(res.Data.ContainsKey(manager));
             Assert.True(res.Data.ContainsKey(TestStore.Founder));
 
+
         }
     }
 }

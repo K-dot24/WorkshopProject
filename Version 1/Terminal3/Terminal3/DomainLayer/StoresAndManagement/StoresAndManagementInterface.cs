@@ -31,6 +31,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #region User Actions
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
+
+        Result<Boolean> ExitSystem(String userID);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -135,9 +137,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<Dictionary<IStoreStaffDAL, PermissionDAL>>(storeStaffResult.Message , false , null);
         }
 
-        public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
+        public Result<HistoryDAL> GetStorePurchaseHistory(string userID, string storeID)
         {
-            throw new NotImplementedException();
+            Result<History> res = StoresFacade.GetStorePurchaseHistory(userID, storeID);
+            if (res.ExecStatus)
+            {
+                return new Result<HistoryDAL>("Store purchase history\n" , true ,res.Data.GetDAL().Data);
+            }
+            return new Result<HistoryDAL>(res.Message, false, null);
         }
 
         public Result<HistoryDAL> GetUserPurchaseHistory(String userID)
@@ -165,6 +172,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             }
             //else failed
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
+        }
+
+        public Result<Boolean> ExitSystem(String userID)
+        {
+            return UsersAndPermissionsFacade.ExitSystem(userID);
         }
     }
 }
