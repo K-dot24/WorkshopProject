@@ -66,27 +66,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //Add founder to list of owners
             Owners.TryAdd(founder.Email, Founder);
         }
-        
-        /*public Store(StoreDAL store)
-        {
-            Founder = new StoreOwner(store.Founder);
-            Owners = new ConcurrentDictionary<String, StoreOwner>();
-            foreach (StoreOwnerDAL storeOwner in store.Owners)
-            {
-                StoreOwner owner = new StoreOwner(storeOwner);
-                Owners.TryAdd(storeOwner.User.Email, owner);
-            }
-            Managers = new ConcurrentDictionary<String, StoreManager>();
-            foreach (StoreManagerDAL storeManager in store.Managers)
-            {
-                StoreManager manager = new StoreManager(storeManager);
-                Managers.TryAdd(storeManager.User.Email, manager);
-            }
-            InventoryManager = new InventoryManager(); //TODO??
-            PolicyManager = new PolicyManager();       //TODO??
-            History = new History(store.History);
-            Id = store.StoreID;
-        }*/
 
         //TODO: Implement all functions
         //Methods
@@ -253,28 +232,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             return Managers.TryGetValue(userID, out StoreManager manager) && manager.Permission.functionsBitMask[(int)method];
         }
-        #endregion
 
 
-        //public Result<StoreDAL> GetDAL()
-        //{
-        //    StoreOwnerDAL founder = Founder.GetDAL().Data;
-        //    LinkedList<StoreOwnerDAL> owners = new LinkedList<StoreOwnerDAL>();
-        //    foreach(StoreOwner so in Owners)
-        //    {
-        //        owners.AddLast(so.GetDAL().Data);
-        //    }
-        //    LinkedList<StoreManagerDAL> managers = new LinkedList<StoreManagerDAL>();
-        //    foreach(StoreManager sm in Managers)
-        //    {
-        //        managers.AddLast(sm.GetDAL().Data);
-        //    }
-        //    InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
-        //    PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
-        //    HistoryDAL history = History.GetDAL().Data;
+        public Result<StoreDAL> GetDAL()
+        {
+            StoreOwnerDAL founder = Founder.GetDAL().Data;
+            ConcurrentDictionary<String, StoreOwnerDAL> owners = new ConcurrentDictionary<String, StoreOwnerDAL>();
+            foreach(var so in Owners)
+            {
+                owners.TryAdd(so.Key , so.Value.GetDAL().Data);
+            }
+            ConcurrentDictionary<String, StoreManagerDAL> managers = new ConcurrentDictionary<String, StoreManagerDAL();
+            foreach(var sm in Managers)
+            {
+                managers.TryAdd(sm.Key, sm.Value.GetDAL().Data);
+            }
+           // InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
+           // PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
+            HistoryDAL history = History.GetDAL().Data;
 
-        //    StoreDAL store = new StoreDAL(founder, owners, managers, inventoryManager, policyManager, history, this.StoreID);
-        //    return new Result<StoreDAL>("Store DAL object", true, store);
-        //}
+            StoreDAL store = new StoreDAL(this.Id, this.Name, founder, owners, managers, history, this.Rating, this.NumberOfRates);
+            return new Result<StoreDAL>("Store DAL object", true, store);
+
+    }
     }
 }

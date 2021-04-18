@@ -15,18 +15,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             ShoppingBags = new LinkedList<ShoppingBag>();
         }
 
-        //TODO: Fix DAL
-
-       /* public ShoppingCart(ShoppingCartDAL shoppingCart)
-        {
-            ShoppingCartId = shoppingCart.ShoppingCartId;
-            ShoppingBags = new LinkedList<ShoppingBag>();
-            foreach(ShoppingBagDAL shoppingBag in shoppingCart.ShoppingBags)
-            {
-                ShoppingBags.AddLast(new ShoppingBag(shoppingBag));
-            }
-        }
-
         public Result<ShoppingCartDAL> GetDAL()
         {
             LinkedList<ShoppingBagDAL> SBD = new LinkedList<ShoppingBagDAL>();
@@ -36,6 +24,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
             return new Result<ShoppingCartDAL>("shopping cart DAL object", true, new ShoppingCartDAL(ShoppingCartId, SBD));
 
-        }*/
+        }
     }
 }

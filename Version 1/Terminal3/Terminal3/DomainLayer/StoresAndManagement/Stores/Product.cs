@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using Terminal3.DALobjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
@@ -26,17 +25,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Quantity = quantity;
             Category = category;
             if (Keywords == null) { this.Keywords = new LinkedList<String>(); }
-            else { this.Keywords = Keywords; }
-        }
-        
-        public Product(ProductDAL productDAL)
-        {
-            Id = productDAL.Id;
-            Name = productDAL.Name;
-            Price = productDAL.Price;
-            Quantity = productDAL.Quantity;
-            Category = productDAL.Category;
-        }
+        }       
 
         //Method
         public Result<Double> AddRating(Double rate)
@@ -62,6 +51,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<ProductDAL>("Product DAL object", true, new ProductDAL(this.Id, this.Name, this.Price, this.Quantity, this.Category));
         }
 
-        //TODO: functions?
+        //TODO: functions
     }
 }

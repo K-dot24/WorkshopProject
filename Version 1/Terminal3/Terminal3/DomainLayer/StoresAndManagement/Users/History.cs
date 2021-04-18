@@ -17,17 +17,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.ShoppingBags = shoppingBags;
         }
 
-        //TODO: Fix DAL
-
-        /*public History(HistoryDAL historyDAL)
-        {
-            LinkedList<ShoppingBag> shoppingBags = new LinkedList<ShoppingBag>();
-            foreach(ShoppingBagDAL sb in historyDAL.ShoppingBags){
-                shoppingBags.AddLast(new ShoppingBag(sb));
-            }
-            this.ShoppingBags = shoppingBags;
-        }
-
         public Result<HistoryDAL> GetDAL()
         {
             LinkedList<ShoppingBagDAL> SBD = new LinkedList<ShoppingBagDAL>();
@@ -37,6 +26,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
 
             return new Result<HistoryDAL>("History DAL object", true, new HistoryDAL(SBD));
-        }*/
+        }
     }
 }

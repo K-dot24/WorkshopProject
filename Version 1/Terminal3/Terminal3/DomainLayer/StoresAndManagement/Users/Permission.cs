@@ -49,15 +49,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             functionsBitMask[(int)Methods.GetStoreStaff] = true;    //requierment 4.5
         }
 
-        public Permission(PermissionDAL permissionDAL)
-        {
-            this.functionsBitMask = permissionDAL.functionsBitMask;
-        }
-
         public Result<Boolean> SetPermission(Methods method, Boolean active)
         {
             functionsBitMask[(int)method] = active;
             return new Result<Boolean>($"Permission for {method} set successfully to {active}\n", true, true);
+        }
+
+        public Result<PermissionDAL> GetDAL()
+        {
+            return new Result<PermissionDAL>("Permission DAL object", true, new PermissionDAL(this.functionsBitMask));
         }
 
     }
