@@ -205,9 +205,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
-        public Result<History> GetStorePurchaseHistory(string ownerID)
+        public Result<History> GetStorePurchaseHistory(string userID)
         {
-            if(CheckStoreManagerAndPermissions(ownerID, Methods.GetStorePurchaseHistory) || CheckIfStoreOwner(ownerID))
+            if(CheckStoreManagerAndPermissions(userID, Methods.GetStorePurchaseHistory) || CheckIfStoreOwner(userID))
             {
                 return new Result<History>("Store purchase history\n", true, History);
             }

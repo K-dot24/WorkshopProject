@@ -146,7 +146,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             // prepare new Store Owner
             RegisteredUser user = new RegisteredUser("raz@gmail.com", "ClassyBougieRatchet");
             StoreOwner newOwner = new StoreOwner(user, TestStore, TestStore.Founder);
-            
+
             // Prepare new Store Manager, appointed by founder
             RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "SassyMoodyNasty");
             StoreManager manager = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
@@ -168,6 +168,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
             RegisteredUser user = new RegisteredUser(userID, "ManInTheMiddle");
             Assert.Equal(expectedResult, Facade.OpenNewStore(user, storeName).ExecStatus);
+        }
+
+        [Theory()]
+        [InlineData("papi@hotmale.com", true)]   // Success: Owner
+        [InlineData("tomer@gmail.com", false)]  // False
+        [InlineData("raz@gmail.com", true)]     // Success: Manager
+        public void GetStorePurchaseHistoryTest(string userID, Boolean expectedResult)
+        {
+            // Manager with permissions
+            RegisteredUser user = new RegisteredUser("tomer@gmail.com", "Why6AfraidOf7?");
+            StoreManager manager = new StoreManager(user, TestStore, new Permission(), TestStore.Founder);            
+            TestStore.Managers.TryAdd(manager.User.Email, manager);
+
+            // Manager without permissions
+            RegisteredUser user2 = new RegisteredUser("raz@gmail.com", "Because789");
+            StoreManager manager2 = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
+            manager.Permission.SetPermission(Methods.GetStorePurchaseHistory, true);
+            TestStore.Managers.TryAdd(manager2.User.Email, manager2);
+
+            Assert.Equal(expectedResult, Facade.GetStorePurchaseHistory(userID, TestStore.Id).ExecStatus);
+
         }
     }
 }
