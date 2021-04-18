@@ -14,7 +14,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
         public IECommerceSystemInterface system = new ECommerceSystem();
         public Result<bool> AddProductToCart(string userID, string ProductID, int ProductQuantity, string StoreID)
         {
-            return system.AddProductToCart( userID,  ProductID,  ProductQuantity,  StoreID);
+            return system.AddProductToCart(userID, ProductID, ProductQuantity, StoreID);
         }
 
         public Result<string> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category)
@@ -26,7 +26,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             }
             else
             {
-                return new Result<string>("", fromSystem.ExecStatus,null);
+                return new Result<string>("", fromSystem.ExecStatus, null);
             }
         }
 
@@ -48,7 +48,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<List<string>> GetStorePurchaseHistory(string ownerID, string storeID)
         {
-            Result<HistoryDAL> fromSystem = system.GetStorePurchaseHistory( ownerID, storeID);
+            Result<HistoryDAL> fromSystem = system.GetStorePurchaseHistory(ownerID, storeID);
             if (fromSystem.ExecStatus)
             {
                 List<string> Ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
@@ -56,14 +56,15 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             }
             else
             {
-                return new Result<List<string>>("",fromSystem.ExecStatus,new List<string>());
+                return new Result<List<string>>("", fromSystem.ExecStatus, new List<string>());
             }
         }
 
         public Result<Dictionary<string, List<int>>> GetStoreStaff(string ownerID, string storeID)
         {
             Result<Dictionary<UserDAL, PermissionDAL>> fromSystem = system.GetStoreStaff(ownerID, storeID);
-            if (fromSystem.ExecStatus) {
+            if (fromSystem.ExecStatus)
+            {
                 List<string> userIDS = new List<UserDAL>(fromSystem.Data.Keys).ForEach(userdal => userdal.Id);
                 List<List<int>> userPermisions = new List<List<int>>();
                 foreach (PermissionDAL permission in fromSystem.Data.Values)
