@@ -17,6 +17,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> LogOut(String email);
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
+        Result<Boolean> ExitSystem(String userID);
+
     }
 
     public class UsersAndPermissionsFacade : IUsersAndPermissionsFacade
@@ -211,7 +213,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<History>("Not a registered user\n", false, null);
         }
 
-
         public Result<bool> AddProductToCart(string userID, Product product, int productQuantity, Store store)
         {
             if (RegisteredUsers.TryGetValue(userID, out RegisteredUser user))   // Check if user is registered
@@ -225,5 +226,26 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             //else failed
             return new Result<bool>($"User (ID: {userID}) does not exists.\n", false, false);
         }
+
+        public Result<Boolean> ExitSystem(String userID)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser gest_user))
+            {
+                Result<Boolean> res = gest_user.ExitSystem();
+                GuestUsers.Remove(userID, out GuestUser gu);
+                return res;
+            }
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser register_user))
+            {
+                Result<Boolean> res = register_user.ExitSystem();
+                return res;
+            }
+            else
+            {
+                return new Result<Boolean>("User does not exist\n", false, false);
+            }
+
+        }
+
     }
 }

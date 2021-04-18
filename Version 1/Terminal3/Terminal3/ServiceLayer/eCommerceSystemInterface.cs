@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal3.DALobjects;
 using Terminal3.DomainLayer;
+using Terminal3.DomainLayer.StoresAndManagement;
 using XUnitTestTerminal3.AcceptanceTests.Utils;
 
 namespace Terminal3.ServiceLayer
@@ -13,6 +14,8 @@ namespace Terminal3.ServiceLayer
 
         #region System related operations
         Result<Boolean> ResetSystem();
+
+        void ExitSystem(String userID); 
 
         #endregion
 
@@ -60,6 +63,12 @@ namespace Terminal3.ServiceLayer
     }
     public class ECommerceSystem : IECommerceSystemInterface
     {
+        public IStoresAndManagementInterface StoresAndManagement { get; }
+        public ECommerceSystem()
+        {
+            StoresAndManagement = new StoresAndManagementInterface(); 
+        }
+
         public Result<bool> AddProductToCart(string userID, string ProductID, int ProductQuantity, string StoreID)
         {
             throw new NotImplementedException();
@@ -175,5 +184,12 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
 
         }
+        public void ExitSystem(String userID)
+        {
+            StoresAndManagement.ExitSystem(userID);
+            //TODO
+            System.Environment.Exit(0);
+        }
+
     }
 }
