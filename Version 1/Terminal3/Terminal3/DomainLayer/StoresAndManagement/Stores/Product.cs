@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Terminal3.DALobjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
