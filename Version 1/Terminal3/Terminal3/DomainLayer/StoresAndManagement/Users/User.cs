@@ -6,33 +6,44 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
     public abstract class User
     {
-        public String UserId { get; }
+        public String Id { get; }
         public ShoppingCart ShoppingCart { get; }
 
         protected User()
         {
-            UserId = Service.GenerateId();
+            Id = Service.GenerateId();
             ShoppingCart = new ShoppingCart();
         }
 
         public Result<bool> AddProductToCart(Product product, int productQuantity, Store store)
         {
             ShoppingBag sb;
+            Result<Boolean> res;
             Result<ShoppingBag> getSB = ShoppingCart.GetShoppingBag(store.Id);
             if (getSB.ExecStatus)  // Check if shopping bag for store exists
             {
                 sb = getSB.Data;
-                sb.AddProtuctToShoppingBag(product, productQuantity);
-                return new Result<bool>($"Product {product.Name} was added successfully to shopping cart.\n", true, true);
+                res = sb.AddProtuctToShoppingBag(product, productQuantity);
+                if (res.ExecStatus)
+                {
+                    return new Result<bool>($"Product {product.Name} was added successfully to shopping cart.\n", true, true);
+                }
+                //else failed
+                return res;
             }
             //else create shopping bag for storeID
             sb = new ShoppingBag(this, store);
-            sb.AddProtuctToShoppingBag(product, productQuantity);
-            ShoppingCart.AddShoppingBagToCart(sb);
-            return new Result<bool>($"Product {product.Name} was added successfully to cart.\n", true, true);
+            res = sb.AddProtuctToShoppingBag(product, productQuantity);
+            if (res.ExecStatus)
+            {
+                ShoppingCart.AddShoppingBagToCart(sb);
+                return new Result<bool>($"Product {product.Name} was added successfully to cart.\n", true, true);
+            }
+            // else failed
+            return res;
         }
 
-        protected Result<UserDAL> GetDAL()
+        public Result<UserDAL> GetDAL()
         {
             ShoppingCartDAL shoppingCart = ShoppingCart.GetDAL().Data;
             return new Result<UserDAL>("User DAL object", true, new UserDAL(shoppingCart));

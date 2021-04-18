@@ -30,6 +30,10 @@ namespace Terminal3.DomainLayer
             this.Message = message;
             this.ExecStatus = execStatus;
             this.Data = data;
+            if (execStatus)
+                Logger.LogInfo(message);
+            else
+                Logger.LogError(message);
         }
 
         public Result(bool execStatus) //for proxy implementation 

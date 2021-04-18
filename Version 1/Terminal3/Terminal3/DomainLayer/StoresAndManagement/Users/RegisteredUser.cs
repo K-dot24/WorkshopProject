@@ -10,6 +10,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public String Email { get; }
         public String Password { get; }
         public Boolean LoggedIn { get; set; }
+        public History History { get; set; }
 
         //Constructor
         public RegisteredUser(String email , String password) : base()
@@ -17,6 +18,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.Email = email;
             this.Password = password;
             this.LoggedIn = false;
+            this.History = new History();
         }
 
         //Methods
@@ -50,11 +52,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<RegisteredUser>($"{this.Email} is Logged out\n", true, this);
             }           
         }
-
+        public Result<History> GetUserPurchaseHistory()
+        {
+            return new Result<History>("User history\n", true, History);
+        }
         public Result<RegisteredUserDAL> GetDAL()
         {
             ShoppingCartDAL SCD = this.ShoppingCart.GetDAL().Data;
-            return new Result<RegisteredUserDAL>("RegisteredUser DAL object" , true , new RegisteredUserDAL(this.UserId, this.Email, this.Password, this.LoggedIn , SCD));
+            return new Result<RegisteredUserDAL>("RegisteredUser DAL object" , true , new RegisteredUserDAL(this.Id, this.Email, this.Password, this.LoggedIn , SCD));
         }
     }
 }

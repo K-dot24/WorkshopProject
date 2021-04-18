@@ -241,7 +241,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             {
                 owners.TryAdd(so.Key, so.Value.GetDAL().Data);
             }
-            ConcurrentDictionary<String, StoreManagerDAL> managers = new ConcurrentDictionary<String, StoreManagerDAL();
+            ConcurrentDictionary<String, StoreManagerDAL> managers = new ConcurrentDictionary<String, StoreManagerDAL>();
             foreach (var sm in Managers)
             {
                 managers.TryAdd(sm.Key, sm.Value.GetDAL().Data);

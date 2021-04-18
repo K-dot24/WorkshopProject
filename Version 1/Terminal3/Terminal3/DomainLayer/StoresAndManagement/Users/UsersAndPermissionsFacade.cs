@@ -15,7 +15,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
         Result<RegisteredUser> LogOut(String email);
-
+        Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
     }
 
@@ -29,8 +29,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         //Constructor
         public UsersAndPermissionsFacade()
         {
-            this.RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
-            this.SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
+            RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
+            SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
+            GuestUsers = new ConcurrentDictionary<String, GuestUser>();
+            
 
             //Add first system admin
             //this.SystemAdmins.TryAdd("Admin@terminal3", new RegisteredUser("Admin@terminal3", "Admin"));
@@ -199,6 +201,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             }
         }
+
+        public Result<History> GetUserPurchaseHistory(String userID)
+        {
+            if (RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
+            {
+                return user.GetUserPurchaseHistory();
+            }
+            return new Result<History>("Not a registered user\n", false, null);
+        }
+
 
         public Result<bool> AddProductToCart(string userID, Product product, int productQuantity, Store store)
         {
