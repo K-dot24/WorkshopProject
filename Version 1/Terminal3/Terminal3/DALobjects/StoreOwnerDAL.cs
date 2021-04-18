@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Terminal3.DALobjects
 {
-    public class StoreOwnerDAL
+    public class StoreOwnerDAL : IStoreStaffDAL
     {
         //Properties
         public RegisteredUserDAL User { get; }

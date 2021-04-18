@@ -112,9 +112,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             throw new NotImplementedException();
         }
 
-        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
         {
-            throw new NotImplementedException();
+            Result<Dictionary<IStoreStaff, Permission>> storeStaffResult = StoresFacade.GetStoreStaff(ownerID, storeID);
+            if (storeStaffResult.ExecStatus)
+            {
+                Dictionary<IStoreStaff, Permission> storeStaff = storeStaffResult.Data;
+                Dictionary<IStoreStaffDAL, PermissionDAL> storeStaffDAL = new Dictionary<IStoreStaffDAL, PermissionDAL>();
+
+                foreach (var user in storeStaff)
+                {
+                    storeStaffDAL.Add((IStoreStaffDAL)user.Key.GetDAL().Data, user.Value.GetDAL().Data);
+                }
+                return new Result<Dictionary<IStoreStaffDAL, PermissionDAL>>(storeStaffResult.Message, true, storeStaffDAL);
+            }
+
+            return new Result<Dictionary<IStoreStaffDAL, PermissionDAL>>(storeStaffResult.Message , false , null);
         }
 
         public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)

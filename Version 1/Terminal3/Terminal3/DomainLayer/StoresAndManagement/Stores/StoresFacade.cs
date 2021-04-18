@@ -146,9 +146,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         }
 
-        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID, string storeID)
         {
-            throw new NotImplementedException();
+            Stores.TryGetValue(storeID, out Store store);
+            if(store != null)
+            {
+                return store.GetStoreStaff(ownerID);
+            }
+            return new Result<Dictionary<IStoreStaff, Permission>>("The given store ID does not exists", false, null);
+            
         }
         #endregion
 

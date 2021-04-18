@@ -2,5 +2,6 @@
 {
     public interface IStoreStaff
     {
+        Result<object> GetDAL();
     }
 }

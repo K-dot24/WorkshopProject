@@ -174,9 +174,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
-        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID)
+        public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID)
         {
-            throw new NotImplementedException();
+            Dictionary<IStoreStaff, Permission> storeStaff = new Dictionary<IStoreStaff, Permission>();
+            Permission ownerPermission = new Permission();
+            ownerPermission.SetAllMethodesPermitted();
+
+            if(CheckStoreManagerAndPermissions(ownerID, Methods.GetStoreStaff ) || CheckIfStoreOwner(ownerID))           
+            {
+                foreach(var owner in Owners)
+                {
+                    storeStaff.Add(owner.Value, ownerPermission);
+                }
+
+                foreach (var manager in Managers)
+                {
+                    storeStaff.Add(manager.Value, manager.Value.Permission);
+                }
+
+                return new Result<Dictionary<IStoreStaff, Permission>>("Store sfaffs details\n", true, storeStaff);
+            }
+            return new Result<Dictionary<IStoreStaff, Permission>>("The given store staff does not have permission to see the stores staff members\n", false, null);
         }
 
         public Result<object> SetPurchasePolicyAtStore(IPurchasePolicy policy)
@@ -236,16 +254,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<StoreDAL> GetDAL()
         {
-            StoreOwnerDAL founder = Founder.GetDAL().Data;
+            StoreOwnerDAL founder = (StoreOwnerDAL)Founder.GetDAL().Data;
             ConcurrentDictionary<String, StoreOwnerDAL> owners = new ConcurrentDictionary<String, StoreOwnerDAL>();
             foreach(var so in Owners)
             {
-                owners.TryAdd(so.Key , so.Value.GetDAL().Data);
+                owners.TryAdd(so.Key , (StoreOwnerDAL)so.Value.GetDAL().Data);
             }
             ConcurrentDictionary<String, StoreManagerDAL> managers = new ConcurrentDictionary<String, StoreManagerDAL();
             foreach(var sm in Managers)
             {
-                managers.TryAdd(sm.Key, sm.Value.GetDAL().Data);
+                managers.TryAdd(sm.Key, (StoreManagerDAL)sm.Value.GetDAL().Data);
             }
            // InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
            // PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
