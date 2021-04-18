@@ -35,7 +35,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #endregion
 
         #region Information
-        Result<Object> GetStorePurchaseHistory();
+        Result<History> GetStorePurchaseHistory(string ownerID);
         #endregion
     }
     public class Store: IStoreOperations
@@ -210,9 +210,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
-        public Result<object> GetStorePurchaseHistory()
+        public Result<History> GetStorePurchaseHistory(string ownerID)
         {
-            throw new NotImplementedException();
+            if(CheckStoreManagerAndPermissions(ownerID, Methods.GetStorePurchaseHistory) || CheckIfStoreOwner(ownerID))
+            {
+                return new Result<History>("Store purchase history\n", true, History);
+            }
+            return new Result<History>("No permission to see store purchase history\n", false, null);
         }
 
 

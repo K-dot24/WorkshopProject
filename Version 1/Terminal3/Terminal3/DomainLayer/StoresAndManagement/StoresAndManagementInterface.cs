@@ -119,7 +119,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
         {
-            throw new NotImplementedException();
+            Result<History> res = StoresFacade.GetStorePurchaseHistory(ownerID, storeID);
+            if (res.ExecStatus)
+            {
+                return new Result<HistoryDAL>("Store purchase history\n" , true ,res.Data.GetDAL().Data);
+            }
+            return new Result<HistoryDAL>(res.Message, false, null);
         }
     }
 }

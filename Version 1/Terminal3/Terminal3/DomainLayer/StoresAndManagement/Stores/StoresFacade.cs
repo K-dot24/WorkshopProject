@@ -152,9 +152,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         #endregion
 
-        public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
+        public Result<History> GetStorePurchaseHistory(string ownerID, string storeID)
         {
-            throw new NotImplementedException();
+            Stores.TryGetValue(storeID, out Store store);
+            return store.GetStorePurchaseHistory(ownerID);
         }
 
 
