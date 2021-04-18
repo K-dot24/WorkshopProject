@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal3.DALobjects;
 using Terminal3.DomainLayer;
+using Terminal3.DomainLayer.StoresAndManagement;
 using XUnitTestTerminal3.AcceptanceTests.Utils;
 
 namespace Terminal3.ServiceLayer
@@ -13,6 +14,8 @@ namespace Terminal3.ServiceLayer
 
         #region System related operations
         Result<Boolean> ResetSystem();
+
+        void ExitSystem(String userID); 
 
         #endregion
 
@@ -52,7 +55,7 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
         Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID);
 
@@ -60,6 +63,12 @@ namespace Terminal3.ServiceLayer
     }
     public class ECommerceSystem : IECommerceSystemInterface
     {
+        public IStoresAndManagementInterface StoresAndManagement { get; }
+        public ECommerceSystem()
+        {
+            StoresAndManagement = new StoresAndManagementInterface(); 
+        }
+
         public Result<bool> AddProductToCart(string userID, string ProductID, int ProductQuantity, string StoreID)
         {
             throw new NotImplementedException();
@@ -90,7 +99,7 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
         }
 
-        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
         {
             throw new NotImplementedException();
         }
@@ -175,5 +184,12 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
 
         }
+        public void ExitSystem(String userID)
+        {
+            StoresAndManagement.ExitSystem(userID);
+            //TODO
+            System.Environment.Exit(0);
+        }
+
     }
 }

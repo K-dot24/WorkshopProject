@@ -30,14 +30,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
         Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
         
         #region User Actions
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
-        Result<HistoryDAL> GetStorePurchaseHistory(String userID, String storeID);
+        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
+
+        Result<Boolean> ExitSystem(String userID);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -124,9 +126,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             throw new NotImplementedException();
         }
 
-        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
         {
-            throw new NotImplementedException();
+            Result<Dictionary<IStoreStaff, Permission>> storeStaffResult = StoresFacade.GetStoreStaff(ownerID, storeID);
+            if (storeStaffResult.ExecStatus)
+            {
+                Dictionary<IStoreStaff, Permission> storeStaff = storeStaffResult.Data;
+                Dictionary<IStoreStaffDAL, PermissionDAL> storeStaffDAL = new Dictionary<IStoreStaffDAL, PermissionDAL>();
+
+                foreach (var user in storeStaff)
+                {
+                    storeStaffDAL.Add((IStoreStaffDAL)user.Key.GetDAL().Data, user.Value.GetDAL().Data);
+                }
+                return new Result<Dictionary<IStoreStaffDAL, PermissionDAL>>(storeStaffResult.Message, true, storeStaffDAL);
+            }
+
+            return new Result<Dictionary<IStoreStaffDAL, PermissionDAL>>(storeStaffResult.Message , false , null);
         }
 
         public Result<HistoryDAL> GetStorePurchaseHistory(string userID, string storeID)
@@ -187,5 +202,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             
         }
 
+
+        public Result<Boolean> ExitSystem(String userID)
+        {
+            return UsersAndPermissionsFacade.ExitSystem(userID);
+        }
     }
 }
