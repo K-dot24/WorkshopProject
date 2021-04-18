@@ -121,5 +121,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             throw new NotImplementedException();
         }
+
+        public Result<HistoryDAL> GetUserPurchaseHistory(String userID)
+        {
+            Result<History> res = UsersAndPermissionsFacade.GetUserPurchaseHistory(userID);
+            if (res.ExecStatus)
+            {
+                return new Result<HistoryDAL>(res.Message , true , res.Data.GetDAL().Data);
+            }
+            return new Result<HistoryDAL>(res.Message, false, null);
+        }
     }
 }

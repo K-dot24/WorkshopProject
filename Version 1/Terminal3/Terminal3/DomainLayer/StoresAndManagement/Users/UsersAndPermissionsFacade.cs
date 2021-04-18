@@ -14,6 +14,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
         Result<RegisteredUser> LogOut(String email);
+        Result<History> GetUserPurchaseHistory(String userID);
+
+
     }
 
     public class UsersAndPermissionsFacade : IUsersAndPermissionsFacade
@@ -196,6 +199,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
         }
 
-     
+        public Result<History> GetUserPurchaseHistory(String userID)
+        {
+            if (RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
+            {
+                return user.GetUserPurchaseHistory();
+            }
+            return new Result<History>("Not a registered user\n", false, null);
+        }
+
+
     }
 }
