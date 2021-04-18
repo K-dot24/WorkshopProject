@@ -56,12 +56,20 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.EditProductDetails(userID, storeID, productID, details);
         }
 
-        public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
+        public Result<List<String>> GetStorePurchaseHistory(string ownerID, string storeID)
         {
             if (Real == null)
-                return new Result<HistoryDAL>(true);
+                return new Result<List<String>>(true);
 
             return Real.GetStorePurchaseHistory(ownerID, storeID);
+        }
+
+        public Result<Dictionary<String, int>> GetUserShoppingBag(String userID, String shoppingBagID)
+        {
+            if (Real == null)
+                return new Result<Dictionary<String, int>>(true);
+
+            return Real.GetUserShoppingBag(userID, shoppingBagID);
         }
 
         public Result<Dictionary<String, List<int>>> GetStoreStaff(string ownerID, string storeID)
@@ -80,18 +88,18 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.GetTotalShoppingCartPrice(userID);
         }
 
-        public Result<HistoryDAL> GetUserPurchaseHistory(string userID)
+        public Result<List<String>> GetUserPurchaseHistory(string userID)
         {
             if (Real == null)
-                return new Result<HistoryDAL>(true);
+                return new Result<List<String>>(true);
 
             return Real.GetUserPurchaseHistory(userID);
         }
 
-        public Result<LinkedList<String>> GetUserShoppingCart(string userID)
+        public Result<List<String>> GetUserShoppingCart(string userID)
         {
             if (Real == null)
-                return new Result<LinkedList<String>>(true);
+                return new Result<List<String>>(true);
 
             return Real.GetUserShoppingCart(userID);
         }

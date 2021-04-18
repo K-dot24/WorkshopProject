@@ -28,13 +28,15 @@ namespace Terminal3.ServiceLayer
         
         Result<Boolean> AddProductToCart(String userID , String ProductID, int ProductQuantity , String StoreID);   // Redundent ?
 
-        Result<LinkedList<String>> GetUserShoppingCart(String userID); //LinkedList<ShoppingBagID> 
+        Result<List<String>> GetUserShoppingCart(String userID); //LinkedList<ShoppingBagID> 
 
+        Result<Dictionary<String, int>> GetUserShoppingBag(String userID, String shoppingBagID); //Dictionary<pid , countity>
+        
         Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID , String productID , int quantity);
 
         Result<Object> Purchase(String userID , IDictionary<String, Object> paymentDetails , IDictionary<String, Object> deliveryDetails);
 
-        Result<HistoryDAL> GetUserPurchaseHistory(String userID);
+        Result<List<String>> GetUserPurchaseHistory(String userID); //List<shoppingBagID>
 
         Result<int> GetTotalShoppingCartPrice(String userID); 
         #endregion
@@ -48,9 +50,9 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<String , List<int>>> GetStoreStaff(String ownerID, String storeID);
-        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
+        Result<List<String>> GetStorePurchaseHistory(String ownerID, String storeID); //List<shoppingBagID>
         #endregion
 
- 
+
     }
 }
