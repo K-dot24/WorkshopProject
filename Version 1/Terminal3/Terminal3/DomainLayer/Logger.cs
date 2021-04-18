@@ -7,21 +7,17 @@ namespace Terminal3.DomainLayer
     public class Logger
     {
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog InfoLogger = log4net.LogManager.GetLogger("Info");
+        private static readonly log4net.ILog ErrorLogger = log4net.LogManager.GetLogger("Error");
 
         public static void LogInfo(String msg)
         {
-            log.Info(msg);
+            InfoLogger.Info(msg);
         }
 
         public static void LogError(String msg)
         {
-            log.Error(msg);
-        }
-
-        public static void LogDebug(String msg)
-        {
-            log.Debug(msg);
+            ErrorLogger.Error(msg);
         }
     }
 }
