@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DALobjects;
+using Terminal3.DomainLayer.StoresAndManagement.Stores;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -14,6 +15,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
         Result<RegisteredUser> LogOut(String email);
+        Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
     }
 
     public class UsersAndPermissionsFacade : IUsersAndPermissionsFacade
@@ -196,6 +198,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
         }
 
-     
+        public Result<Boolean> AddProductReview(String userID, Store store, Product product , String review)
+        {
+            if(RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
+            {
+                return user.AddProductReview(store, product , review);
+            }
+            return new Result<Boolean>("User does not exists\n", false, false);
+        }
+
+
+
     }
 }

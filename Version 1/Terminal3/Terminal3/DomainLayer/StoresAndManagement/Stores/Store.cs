@@ -36,6 +36,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         #region Information
         Result<Object> GetStorePurchaseHistory();
+        Result<ConcurrentDictionary<String, String>> GetProductReview(String productID)
         #endregion
     }
     public class Store: IStoreOperations
@@ -213,6 +214,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<object> GetStorePurchaseHistory()
         {
             throw new NotImplementedException();
+        }
+
+
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String productID)
+        {
+            return InventoryManager.GetProductReview(productID);
         }
 
 

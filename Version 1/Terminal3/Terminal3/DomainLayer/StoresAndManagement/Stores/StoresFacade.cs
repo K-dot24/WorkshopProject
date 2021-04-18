@@ -15,6 +15,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
         Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+        Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+
+        Result<Store> GetStore(String storeID);
 
         #endregion
 
@@ -157,7 +160,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
-
         public Result<StoreDAL> OpenNewStore(RegisteredUser founder, string storeName)
         {
             Store newStore = new Store(storeName, founder);
@@ -167,10 +169,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<StoreDAL>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, null);
         }
 
-
         public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
         {
             throw new NotImplementedException();
         }
+
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID)
+        {
+            if(Stores.TryGetValue(storeID , out Store store))
+            {
+                return store.GetProductReview(productID);
+            }
+            return new Result<ConcurrentDictionary<string, string>>("Store does not exists\n", false, null);
+        }
+
+        public Result<Store> GetStore(String storeID)
+        {
+            if (Stores.TryGetValue(storeID, out Store store))
+            {
+                return new Result<Store>("", true, store);
+            }
+            return new Result<Store>("Store does not exists\n", false, null);
+        }
+
     }
 }

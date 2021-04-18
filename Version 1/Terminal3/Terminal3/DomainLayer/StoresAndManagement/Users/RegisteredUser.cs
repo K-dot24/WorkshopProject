@@ -1,6 +1,9 @@
 ﻿using System;
 using Terminal3.DALobjects;
 using System.Reflection;
+using Terminal3.DomainLayer.StoresAndManagement.Stores;
+using System.Collections.Concurrent;
+
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -53,6 +56,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }           
         }
 
+        public Result<Boolean> AddProductReview(Store store, Product product , String review)
+        {
+            if (checkIfProductPurchasedByUser(store , product))
+            {
+                product.AddProductReview(UserId , review);
+                return new Result<Boolean>("The product review was added successfuly\n", true, true);
+            }
+            return new Result<Boolean>("The User did not purchase the product before, therefore can not write it a review\n", false, false);
+        }
+
+        private Boolean checkIfProductPurchasedByUser(Store store ,Product product)
+        {
+            ConcurrentDictionary<String, ShoppingBag> shoppingBags = History.ShoppingBags;
+            if (shoppingBags.TryGetValue(store.Id , out ShoppingBag bag))
+            {
+                return bag.Products.Contains(product);
+            }            
+            return false;
+        }
         public Result<RegisteredUserDAL> GetDAL()
         {
             ShoppingCartDAL SCD = this.ShoppingCart.GetDAL().Data;

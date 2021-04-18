@@ -4,6 +4,9 @@ using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.DALobjects;
+using System.Collections.Concurrent;
+
+
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface IStoresAndManagementInterface
@@ -17,6 +20,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
         Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+        Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+
 
         #endregion
 
@@ -29,6 +34,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #endregion
 
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
+
+        Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
     {
@@ -121,5 +128,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             throw new NotImplementedException();
         }
+       
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID)
+        {
+            return StoresFacade.GetProductReview(storeID, productID);
+        }
+
+        public Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review)
+        {
+            Result<Store> storeRes = StoresFacade.GetStore(storeID);
+            if (storeRes.ExecStatus)
+            {                
+                Result<Product> productRes = storeRes.Data.GetProduct(productID);
+                if (productRes.ExecStatus)
+                {
+                    return UsersAndPermissionsFacade.AddProductReview(userID, storeRes.Data, productRes.Data , review);
+                }
+                return new Result<Boolean>(productRes.Message, false, false);                
+            }
+            return new Result<Boolean>(storeRes.Message, false, false);
+            
+        }
+
     }
 }
