@@ -3,18 +3,36 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal3.DALobjects;
 using Terminal3.DomainLayer;
+using XUnitTestTerminal3.AcceptanceTests.Utils;
+
 namespace Terminal3.ServiceLayer
 {
-    interface Interface1
+    public class SystemAdapter
     {
+        private SystemInterfaceReal Real;
+
+        public SystemAdapter()
+        {
+            this.Real = new SystemInterfaceReal();
+        }
+
         #region System related operations
-        Result<Boolean> ResetSystem();
+        Result<Boolean> ResetSystem()
+        {
+            return Real.ResetSystem();
+        }
         #endregion
 
         #region User related operations
-        Result<Boolean> Register(String email, String password);
+        Result<Boolean> Register(String email, String password)
+        {
+            return Real.Register(email, password);
+        }
 
-        Result<UserDAL> Login(String email, String password);
+        Result<UserDAL> Login(String email, String password)
+        {
+            
+        }
 
         Result<Boolean> LogOut(String email);
 
@@ -26,6 +44,8 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);   // Redundent ?
 
         Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
+
+        Result<Dictionary<String, int>> GetUserShoppingBag(String userID, String shoppingBagID); //Dictionary<pid , countity>
 
         Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity);
 
