@@ -22,7 +22,7 @@ namespace XUnitTestTerminal3
         [Trait("Category", "acceptance")]
         public void AddStoreOwner()
         {
-            sut.Register("newOwner@gmail.com", "test123");
+            sut.Register("newOwner@gmail.com", "newOwner123");
             string newOwnerID = sut.Login("newOwner@gmail.com", "newOwner123").Data;
 
             Assert.True(sut.AddStoreOwner(newOwnerID, user_id, store_id).ExecStatus);
@@ -32,7 +32,7 @@ namespace XUnitTestTerminal3
         [Trait("Category", "acceptance")]
         public void AddStoreOwnerSwapID()
         {
-            sut.Register("newOwner@gmail.com", "test123");
+            sut.Register("newOwner@gmail.com", "newOwner123");
             string newOwnerID = sut.Login("newOwner@gmail.com", "newOwner123").Data;
 
             Assert.False(sut.AddStoreOwner(user_id, newOwnerID, store_id).ExecStatus);
@@ -47,9 +47,16 @@ namespace XUnitTestTerminal3
 
         [Fact]
         [Trait("Category", "acceptance")]
+        public void AddStoreOwnerWrongID()
+        {
+            Assert.False(sut.AddStoreOwner("0123", user_id, store_id).ExecStatus);
+        }
+
+        [Fact]
+        [Trait("Category", "acceptance")]
         public void AddStoreOwnerAlreadyOwner()
         {
-            sut.Register("newOwner@gmail.com", "test123");
+            sut.Register("newOwner@gmail.com", "newOwner123");
             string newOwnerID = sut.Login("newOwner@gmail.com", "newOwner123").Data;
             sut.OpenNewStore("newOwner_store", newOwnerID);
 

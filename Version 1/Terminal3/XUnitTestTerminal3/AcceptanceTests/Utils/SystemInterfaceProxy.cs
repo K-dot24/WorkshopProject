@@ -24,10 +24,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.AddProductToCart(userID, ProductID, ProductQuantity, StoreID);
         }
 
-        public Result<ProductDAL> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category)
+        public Result<string> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category)
         {
             if (Real == null)
-                return new Result<ProductDAL>(true);
+                return new Result<string>(true);
 
             return Real.AddProductToStore(userID, storeID, productName, price, initialQuantity, category);
         }
@@ -48,10 +48,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.AddStoreOwner(addedOwnerID, currentlyOwnerID, storeID);
         }
 
-        public Result<ProductDAL> EditProductDetails(string userID, string storeID, string productID, IDictionary<string, object> details)
+        public Result<string> EditProductDetails(string userID, string storeID, string productID, IDictionary<string, object> details)
         {
             if (Real == null)
-                return new Result<ProductDAL>(true);
+                return new Result<string>(true);
 
             return Real.EditProductDetails(userID, storeID, productID, details);
         }
@@ -152,10 +152,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.ResetSystem();
         }
 
-        public Result<List<ProductDAL>> SearchProduct(IDictionary<string, object> productDetails)
+        public Result<List<string>> SearchProduct(IDictionary<string, object> productDetails)
         {
             if (Real == null)
-                return new Result<List<ProductDAL>>(true);
+                return new Result<List<string>>(true);
 
             return Real.SearchProduct(productDetails);
         }
