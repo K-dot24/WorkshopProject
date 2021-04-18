@@ -64,10 +64,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.GetStorePurchaseHistory(ownerID, storeID);
         }
 
-        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        public Result<Dictionary<String, List<int>>> GetStoreStaff(string ownerID, string storeID)
         {
             if (Real == null)
-                return new Result<Dictionary<UserDAL, PermissionDAL>>(true);
+                return new Result<Dictionary<string, List<int>>>(true);
 
             return Real.GetStoreStaff(ownerID, storeID);
         }
@@ -88,15 +88,15 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.GetUserPurchaseHistory(userID);
         }
 
-        public Result<ShoppingCartDAL> GetUserShoppingCart(string userID)
+        public Result<LinkedList<String>> GetUserShoppingCart(string userID)
         {
             if (Real == null)
-                return new Result<ShoppingCartDAL>(true);
+                return new Result<LinkedList<String>>(true);
 
             return Real.GetUserShoppingCart(userID);
         }
 
-        public Result<string> Login(string email, string password)
+        public Result<String> Login(string email, string password)
         {
             if (Real == null)
                 return new Result<string>(true);
@@ -112,7 +112,7 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.LogOut(email);
         }
 
-        public Result<string> OpenNewStore(string storeName, string userID)
+        public Result<String> OpenNewStore(string storeName, string userID)
         {
             if (Real == null)
                 return new Result<string>(true);
