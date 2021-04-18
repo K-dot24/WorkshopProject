@@ -115,6 +115,33 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             Assert.Equal(expectedResult2, Facade.AddProductToCart(userID, product2, productQuantity, store).ExecStatus);
         }
 
+        [Fact]
+        [Trait("Category", "Unit")]
+        public void ExitSystemTestGuest()
+        {
+            GuestUser user = new GuestUser();
+            Facade.GuestUsers.TryAdd(user.Id, user);
+            Facade.ExitSystem(user.Id);
 
+            Assert.False(user.Active);
+        }
+
+        [Fact]
+        [Trait("Category", "Unit")]
+        public void ExitSystemTestResisterd()
+        {
+            RegisteredUser user = Facade.Login("raz@gmail.com", "123").Data;
+            Facade.RegisteredUsers.TryAdd(user.Id, user);
+            Facade.ExitSystem(user.Id);
+
+            Assert.False(user.LoggedIn);
+        }
+
+        [Fact]
+        [Trait("Category", "Unit")]
+        public void ExitSystemTestNotExist()
+        {
+            Assert.False(Facade.ExitSystem("0123").ExecStatus);
+        }
     }
 }
