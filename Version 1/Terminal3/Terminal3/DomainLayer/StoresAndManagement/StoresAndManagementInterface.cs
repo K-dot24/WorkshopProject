@@ -28,10 +28,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
+        #region User Actions
+        Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
+        #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
     {
+        // Properties
         public StoresFacade StoresFacade { get; }
         public UsersAndPermissionsFacade UsersAndPermissionsFacade { get; }
 
@@ -45,6 +49,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         //TODO: Implement all functions
 
+        // Methods
         public Result<StoreDAL> OpenNewStore(String storeName, String userID)
         {
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser founder))  // Check if userID is a registered user
@@ -133,6 +138,33 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
         {
             throw new NotImplementedException();
+        }
+
+        public Result<HistoryDAL> GetUserPurchaseHistory(String userID)
+        {
+            Result<History> res = UsersAndPermissionsFacade.GetUserPurchaseHistory(userID);
+            if (res.ExecStatus)
+            {
+                return new Result<HistoryDAL>(res.Message , true , res.Data.GetDAL().Data);
+            }
+            return new Result<HistoryDAL>(res.Message, false, null);
+        }
+        
+        public Result<Boolean> AddProductToCart(string userID, string productID, int productQuantity, string storeID)
+        {
+            if (StoresFacade.Stores.TryGetValue(storeID, out Store store))  // Check if store exists
+            {
+                Result<Product> searchProductRes = store.GetProduct(productID);
+                if (searchProductRes.ExecStatus)    // Check if product exists in store
+                {
+                    Product product = searchProductRes.Data;
+                    return UsersAndPermissionsFacade.AddProductToCart(userID, product, productQuantity, store);
+                }
+                //else failed
+                return new Result<Boolean>($"Product (ID: {productID}) was not found in {store.Name}\n", false, false);
+            }
+            //else failed
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
     }
 }
