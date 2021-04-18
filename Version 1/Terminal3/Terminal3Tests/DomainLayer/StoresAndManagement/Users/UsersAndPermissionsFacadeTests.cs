@@ -90,5 +90,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             Assert.True(Facade.LogOut(email).ExecStatus, "Not able to log out");
 
         }
+
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData("tomer@gmail.com", 10, true)]  //user is exist in SystemAdmins
+        [InlineData("tomer@gmail.com", 10, true)] //user is exist in SystemAdmins
+        [InlineData("tomer@gmail.com", 10, false)] //user is NOT exist in SystemAdmins
+        public void AddProductToCartTest(string userID, int productQuantity, Boolean expectedResult)
+        {
+            throw new NotImplementedException();
+
+            // string userID, Product product, int productQuantity, Store store
+        }
     }
 }

@@ -25,7 +25,7 @@ namespace Terminal3.ServiceLayer
 
         Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
         
-        Result<Boolean> AddProductToCart(String userID , String ProductID, int ProductQuantity , String StoreID);   // Redundent ?
+        Result<Boolean> AddProductToCart(String userID , String productID, int productQuantity , String storeID);
 
         Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
 

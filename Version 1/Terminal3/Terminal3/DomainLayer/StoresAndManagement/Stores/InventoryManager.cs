@@ -129,5 +129,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
             return result;
         }
+
+        public Result<Product> GetProduct(String productID)
+        {
+            if (Products.TryGetValue(productID, out Product product))
+            {
+                return new Result<Product>("", true, product);
+            }
+            //else failed
+            return new Result<Product>($"Product (ID: {productID}) not found.\n", false, null);
+        }
     }
 }

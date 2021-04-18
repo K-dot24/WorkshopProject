@@ -7,15 +7,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     public class RegisteredUser : User
     {
         //Properties
-        public String UserId { get; }
         public String Email { get; }
         public String Password { get; }
         public Boolean LoggedIn { get; set; }
 
         //Constructor
-        public RegisteredUser(String email , String password)
+        public RegisteredUser(String email , String password) : base()
         {
-            this.UserId = Service.GenerateId();
             this.Email = email;
             this.Password = password;
             this.LoggedIn = false;
