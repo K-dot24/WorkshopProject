@@ -6,7 +6,8 @@ using Terminal3.DomainLayer;
 using XUnitTestTerminal3.AcceptanceTests.Utils;
 
 namespace Terminal3.ServiceLayer
-{
+{   
+    //System Real interface with DAL
     public interface IECommerceSystemInterface
     {
 
@@ -53,6 +54,8 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
+        Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID);
+
         #endregion
     }
     public class ECommerceSystem : IECommerceSystemInterface
@@ -165,6 +168,12 @@ namespace Terminal3.ServiceLayer
         public Result<bool> UpdateShoppingCart(string userID, string shoppingBagID, string productID, int quantity)
         {
             throw new NotImplementedException();
+        }
+
+        public Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID)
+        {
+            throw new NotImplementedException();
+
         }
     }
 }

@@ -175,6 +175,11 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             return system.RemoveProductFromStore(userID, storeID, productID);
         }
 
+        public Result<bool> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<bool> ResetSystem()
         {
             return system.ResetSystem();
