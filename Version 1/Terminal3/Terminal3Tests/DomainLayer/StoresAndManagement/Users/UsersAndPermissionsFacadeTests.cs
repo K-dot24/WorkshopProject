@@ -115,6 +115,54 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             Assert.Equal(expectedResult2, Facade.AddProductToCart(userID, product2, productQuantity, store).ExecStatus);
         }
 
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData("tomer@gmail.com", "The banana was awsome")]  //user is exist in SystemAdmins
+        public void AddProductReviewTest1(String email , String review)
+        {
+            // Open store
+            RegisteredUser founder = new RegisteredUser(email, "password");
+            Facade.RegisteredUsers.TryAdd(founder.Id, founder);
+            Store store = new Store("Testore", founder);
+
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 100, "Fruits");
+            store.InventoryManager.Products.TryAdd(product.Id, product);
+
+            // Add product to user shopping bag
+            founder.ShoppingCart.ShoppingBags.TryAdd(store.Id, new ShoppingBag(founder, store));
+            founder.ShoppingCart.ShoppingBags.TryGetValue(store.Id, out ShoppingBag bag);
+            bag.Products.TryAdd(product, 2);
+
+            // Add shopping bag to history
+            founder.History.ShoppingBags.AddLast(bag);
+
+            // Add review to product 
+            Facade.AddProductReview(founder.Id, store, product, review);
+
+            product.Review.TryGetValue(founder.Id, out String msg);
+
+            Assert.Equal("The banana was awsome", msg);
+        }
+
+
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData("tomer@gmail.com", "The banana was awsome")]  //user is exist in SystemAdmins
+        public void AddProductReviewTest2(String email, String review)
+        {
+            // Open store
+            RegisteredUser founder = new RegisteredUser(email, "password");
+            Facade.RegisteredUsers.TryAdd(founder.Id, founder);
+            Store store = new Store("Testore", founder);
+
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 100, "Fruits");
+            store.InventoryManager.Products.TryAdd(product.Id, product);
+
+            // Add review to product 
+            Assert.False(Facade.AddProductReview(founder.Id, store, product, review).ExecStatus);
+            Assert.False(product.Review.TryGetValue(founder.Id, out String msg));
         [Fact]
         [Trait("Category", "Unit")]
         public void ExitSystemTestGuest()

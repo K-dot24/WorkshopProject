@@ -34,7 +34,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Object> GetDiscountPolicyAtStore();
         #endregion
 
-        #region Information
+        #region Information        
+        Result<ConcurrentDictionary<String, String>> GetProductReview(String productID);
         Result<History> GetStorePurchaseHistory(string ownerID);
         #endregion
     }
@@ -231,6 +232,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
             return new Result<History>("No permission to see store purchase history\n", false, null);
         }
+
+
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String productID)
+        {
+            return InventoryManager.GetProductReview(productID);
+        }
+
 
         //Getter
         public Result<Product> GetProduct(String productID)
