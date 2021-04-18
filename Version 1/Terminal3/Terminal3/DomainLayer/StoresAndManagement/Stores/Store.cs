@@ -230,33 +230,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<StoreDAL> GetDAL()
         {
             StoreOwnerDAL founder = Founder.GetDAL().Data;
-            LinkedList<StoreOwnerDAL> owners = new LinkedList<StoreOwnerDAL>();
-            foreach(StoreOwner so in Owners)
+            ConcurrentDictionary<String, StoreOwnerDAL> owners = new ConcurrentDictionary<String, StoreOwnerDAL>();
+            foreach(var so in Owners)
             {
-                owners.AddLast(so.GetDAL().Data);
+                owners.TryAdd(so.Key , so.Value.GetDAL().Data);
             }
-            LinkedList<StoreManagerDAL> managers = new LinkedList<StoreManagerDAL>();
-            foreach(StoreManager sm in Managers)
+            ConcurrentDictionary<String, StoreManagerDAL> managers = new ConcurrentDictionary<String, StoreManagerDAL();
+            foreach(var sm in Managers)
             {
-                managers.AddLast(sm.GetDAL().Data);
+                managers.TryAdd(sm.Key, sm.Value.GetDAL().Data);
             }
-            InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
-            PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
+           // InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
+           // PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
             HistoryDAL history = History.GetDAL().Data;
 
-            StoreDAL store = new StoreDAL(founder, owners, managers, inventoryManager, policyManager, history, this.Id);
+            StoreDAL store = new StoreDAL(this.Id, this.Name, founder, owners, managers, history, this.Rating, this.NumberOfRates);
             return new Result<StoreDAL>("Store DAL object", true, store);
 
-
-        public String Name { get; }
-        public StoreOwner Founder { get; }
-        public ConcurrentDictionary<String, StoreOwner> Owners { get; }
-        public ConcurrentDictionary<String, StoreManager> Managers { get; }
-        public InventoryManager InventoryManager { get; }
-        public PolicyManager PolicyManager { get; }
-        public History History { get; }
-        public Double Rating { get; private set; }
-        public int NumberOfRates { get; private set; }
     }
     }
 }

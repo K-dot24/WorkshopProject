@@ -22,7 +22,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             RegisteredUserDAL user = User.GetDAL().Data;
             PermissionDAL permission = Permission.GetDAL().Data;
-            StoreOwnerDAL owner = Owner.GetDAL().Data;
+            StoreOwnerDAL owner = AppointedBy.GetDAL().Data;
 
             return new Result<StoreManagerDAL>("Store manager DAL object", true, new StoreManagerDAL(user, permission, owner));
         }
