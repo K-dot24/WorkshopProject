@@ -66,27 +66,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //Add founder to list of owners
             Owners.TryAdd(founder.Email, Founder);
         }
-        
-        /*public Store(StoreDAL store)
-        {
-            Founder = new StoreOwner(store.Founder);
-            Owners = new ConcurrentDictionary<String, StoreOwner>();
-            foreach (StoreOwnerDAL storeOwner in store.Owners)
-            {
-                StoreOwner owner = new StoreOwner(storeOwner);
-                Owners.TryAdd(storeOwner.User.Email, owner);
-            }
-            Managers = new ConcurrentDictionary<String, StoreManager>();
-            foreach (StoreManagerDAL storeManager in store.Managers)
-            {
-                StoreManager manager = new StoreManager(storeManager);
-                Managers.TryAdd(storeManager.User.Email, manager);
-            }
-            InventoryManager = new InventoryManager(); //TODO??
-            PolicyManager = new PolicyManager();       //TODO??
-            History = new History(store.History);
-            Id = store.StoreID;
-        }*/
 
         //TODO: Implement all functions
         //Methods
@@ -265,8 +244,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
             HistoryDAL history = History.GetDAL().Data;
 
-            StoreDAL store = new StoreDAL(founder, owners, managers, inventoryManager, policyManager, history, this.StoreID);
+            StoreDAL store = new StoreDAL(founder, owners, managers, inventoryManager, policyManager, history, this.Id);
             return new Result<StoreDAL>("Store DAL object", true, store);
+
+
+        public String Name { get; }
+        public StoreOwner Founder { get; }
+        public ConcurrentDictionary<String, StoreOwner> Owners { get; }
+        public ConcurrentDictionary<String, StoreManager> Managers { get; }
+        public InventoryManager InventoryManager { get; }
+        public PolicyManager PolicyManager { get; }
+        public History History { get; }
+        public Double Rating { get; private set; }
+        public int NumberOfRates { get; private set; }
     }
     }
 }

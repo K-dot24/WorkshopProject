@@ -18,15 +18,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             AppointedBy = appointedBy;
         }
 
-        //TODO: Fix DAL
-
-        /*public StoreManager(StoreManagerDAL storeManagerDAL)
-        {
-            this.User = Mapper.GetStoreManager(storeManagerDAL.User);
-            this.Permission = Mapper.GetPermission(storeManagerDAL.Permissions);
-            this.Owner = Mapper.GetOwner(storeManagerDAL.Owner);
-        }
-
         public Result<StoreManagerDAL> GetDAL()
         {
             RegisteredUserDAL user = User.GetDAL().Data;

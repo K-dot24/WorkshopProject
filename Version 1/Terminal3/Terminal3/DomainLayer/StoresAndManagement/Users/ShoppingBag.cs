@@ -18,17 +18,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             Products = new LinkedList<Product>();
         }
 
-        public ShoppingBag(ShoppingBagDAL shoppingBagDAL)
-        {
-            this.User = Mapper.GetRegisteredUser((RegisteredUserDAL)shoppingBagDAL.User);    // TODO - check if only registered users shopping bag is saved
-            this.Store = Mapper.GetStore(shoppingBagDAL.Store);
-            this.Products = new LinkedList<Product>();
-            foreach(ProductDAL product in shoppingBagDAL.Products)
-            {
-                Products.AddLast(Store.GetProduct(product).Data);
-            }
-        }
-
         public Result<ShoppingBagDAL> GetDAL()
         {
             RegisteredUserDAL user = (RegisteredUser)user.GetDAL().Data;

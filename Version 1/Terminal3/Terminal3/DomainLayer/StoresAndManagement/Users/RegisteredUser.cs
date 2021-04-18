@@ -21,14 +21,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.LoggedIn = false;
         }
 
-        public RegisteredUser(RegisteredUserDAL registeredUserDAL)
-        {
-            this.UserId = registeredUserDAL.UserId;
-            this.Email = registeredUserDAL.Email;
-            this.Password = registeredUserDAL.Password;
-            this.LoggedIn = registeredUserDAL.LoggedIn;
-        }
-
         //Methods
         public Result<RegisteredUser> Login(String password) {
             if (LoggedIn) {

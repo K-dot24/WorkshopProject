@@ -19,29 +19,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             StoreStaffs = new LinkedList<IStoreStaff>();
         }
 
-        //TODO: Fix DAL
-
-/*        public StoreOwner(StoreOwnerDAL storeOwner)
-        {
-            this.User = Mapper.GetRegisteredUser(storeOwner.User);
-            this.Store = Mapper.GetStore(storeOwner.Store);
-            this.AppointedBy = Mapper.GetStoreOwner(storeOwner.Owner);
-            this.StoreStaffs = new LinkedList<IStoreStaff>();
-            foreach (StoreOwnerDAL so in storeOwner.StoreOwners)
-            {
-                StoreStaffs.AddLast(Mapper.GetStoreOwner(so));
-            }
-            foreach (StoreManagerDAL sm in storeOwner.StoreManager)
-            {
-                StoreStaffs.AddLast(Mapper.GetStoreManager(sm));
-            }
-        }
-
         public Result<StoreOwnerDAL> GetDAL()
         {
-            RegisteredUserDAL user = (RegisteredUser)user.GetDAL().Data;
-            StoreDAL store = store.GetDAL().Data;
-            StoreOwnerDAL owner = Owner.GetDAL().Data;
+            RegisteredUserDAL user = User.GetDAL().Data;
+            StoreDAL store = Store.GetDAL().Data;
+            StoreOwnerDAL owner = AppointedBy.GetDAL().Data;
             LinkedList<StoreOwnerDAL> storeOwners = new LinkedList<StoreOwnerDAL>();
             LinkedList<StoreManagerDAL> storeManagers = new LinkedList<StoreManagerDAL>();
 
