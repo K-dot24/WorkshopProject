@@ -43,6 +43,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return res;
         }
 
+        public Result<Boolean> UpdateShoppingCart(String storeID, Product product, int quantity)
+        {
+            Result<ShoppingBag> resBag = ShoppingCart.GetShoppingBag(storeID);
+            if (resBag.ExecStatus)
+            {
+                ShoppingBag bag = resBag.Data;
+                return bag.UpdateShoppingBag(product, quantity);
+            }
+            //else faild
+            return new Result<bool>(resBag.Message, false, false);
+        }
         public Result<UserDAL> GetDAL()
         {
             ShoppingCartDAL shoppingCart = ShoppingCart.GetDAL().Data;

@@ -18,7 +18,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<Boolean> AddProductReview(String userID, Store store, Product product, String review);
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
+        Result<Boolean> UpdateShoppingCart(string userID, string storeID, Product product, int quantity);
         Result<Boolean> ExitSystem(String userID);
+
 
     }
 
@@ -238,6 +240,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<bool>($"User (ID: {userID}) does not exists.\n", false, false);
         }
 
+        public Result<Boolean> UpdateShoppingCart(string userID, string storeID, Product product, int quantity)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+            {
+                return guest_user.UpdateShoppingCart(storeID, product, quantity);
+            }
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+            {
+                return registerd_user.UpdateShoppingCart(storeID, product, quantity);
+            }
+            else
+            {
+                return new Result<Boolean>("User does not exist\n", false, false);
+            }
+
+        }
         public Result<Boolean> ExitSystem(String userID)
         {
             if (GuestUsers.TryGetValue(userID, out GuestUser gest_user))

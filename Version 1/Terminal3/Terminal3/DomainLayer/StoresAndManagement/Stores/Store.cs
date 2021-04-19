@@ -25,7 +25,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID);
+        Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String userID);
         #endregion
 
         #region Policies Management
@@ -190,13 +190,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>($"Staff ID not found in store.\n", false, false);
         }
 
-        public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID)
+        public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string userID)
         {
             Dictionary<IStoreStaff, Permission> storeStaff = new Dictionary<IStoreStaff, Permission>();
             Permission ownerPermission = new Permission();
             ownerPermission.SetAllMethodesPermitted();
 
-            if(CheckStoreManagerAndPermissions(ownerID, Methods.GetStoreStaff ) || CheckIfStoreOwner(ownerID))           
+            if(CheckStoreManagerAndPermissions(userID, Methods.GetStoreStaff ) || CheckIfStoreOwner(userID))           
             {
                 foreach(var owner in Owners)
                 {

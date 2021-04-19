@@ -27,7 +27,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String userID, String storeID);
         #endregion
 
         Result<History> GetStorePurchaseHistory(String userID, String storeID, bool sysAdmin);
@@ -136,11 +136,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         }
 
-        public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID, string storeID)
+        public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string userID, string storeID)
         {            
             if(Stores.TryGetValue(storeID, out Store store))
             {
-                return store.GetStoreStaff(ownerID);
+                return store.GetStoreStaff(userID);
             }
             return new Result<Dictionary<IStoreStaff, Permission>>("The given store ID does not exists", false, null);
             

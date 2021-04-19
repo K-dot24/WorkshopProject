@@ -29,7 +29,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
         #region User Actions
@@ -156,9 +156,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return StoresFacade.SetPermissions(storeID, managerID, ownerID, permissions);
         }
 
-        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string userID, string storeID)
         {
-            Result<Dictionary<IStoreStaff, Permission>> storeStaffResult = StoresFacade.GetStoreStaff(ownerID, storeID);
+            Result<Dictionary<IStoreStaff, Permission>> storeStaffResult = StoresFacade.GetStoreStaff(userID, storeID);
             if (storeStaffResult.ExecStatus)
             {
                 Dictionary<IStoreStaff, Permission> storeStaff = storeStaffResult.Data;
@@ -213,7 +213,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity)
         {
+            Result<Store> resStore = StoresFacade.GetStore(storeID);
+            if (resStore.ExecStatus)
+            {
+                Result<Product> resProduct = resStore.Data.GetProduct(productID);
+                if (resProduct.ExecStatus)
+                {
+                    return UsersAndPermissionsFacade.UpdateShoppingCart(userID, resStore.Data.Id, resProduct.Data, quantity);
+                }
+                //else faild
+                return new Result<Boolean>(resProduct.Message, false, false);
+            }
+            //else faild
+            return new Result<Boolean>(resStore.Message, false, false);
 
+            
         }
 
         public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)

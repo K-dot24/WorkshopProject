@@ -38,7 +38,7 @@ namespace Terminal3.ServiceLayer
 
         Result<Dictionary<String, int>> GetUserShoppingBag(String userID, String shoppingBagID); //Dictionary<pid , quantity>
 
-        Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity); // this quantity will be the updated quantity of the product in the bag . if negitiva or zero then the product will be removed
+        Result<Boolean> UpdateShoppingCart(String userID, String storeID, String productID, int quantity); // this quantity will be the updated quantity of the product in the bag . if negative or zero then the product will be removed
 
         Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
 
@@ -56,7 +56,7 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(String userID, String storeID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
         Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID);
 
@@ -100,7 +100,7 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
         }
 
-        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string userID, string storeID)
         {
             throw new NotImplementedException();
         }
