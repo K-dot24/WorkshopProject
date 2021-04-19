@@ -58,7 +58,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             throw new NotImplementedException();
         }
 
-        public Result<List<string>> GetStorePurchaseHistory(string ownerID, string storeID)
+        public Result<List<String>> GetStorePurchaseHistory(String ownerID, String storeID)
         {
             Result<HistoryDAL> fromSystem = system.GetStorePurchaseHistory(ownerID, storeID);
             if (fromSystem.ExecStatus)
@@ -75,7 +75,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             }
         }
 
-        public Result<Dictionary<string, List<int>>> GetStoreStaff(string ownerID, string storeID)
+        public Result<Dictionary<String, List<int>>> GetStoreStaff(String ownerID, String storeID)
         {
             Result<Dictionary<IStoreStaffDAL, PermissionDAL>> fromSystem = system.GetStoreStaff(ownerID, storeID);
             if (fromSystem.ExecStatus)
@@ -107,7 +107,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         }
 
-        public Result<int> GetTotalShoppingCartPrice(string userID)
+        public Result<double> GetTotalShoppingCartPrice(string userID)
         {
             return system.GetTotalShoppingCartPrice(userID);
         }
@@ -131,7 +131,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<Dictionary<string, int>> GetUserShoppingBag(string userID, string shoppingBagID)
         {
-            return system.GetUserShoppingBag(userID, shoppingBagID);
+            throw new NotImplementedException();
         }
 
         public Result<List<string>> GetUserShoppingCart(string userID)
@@ -155,7 +155,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<string> Login(string email, string password)
         {
-            Result<UserDAL> fromSystem = system.Login(email, password);
+            Result<RegisteredUserDAL> fromSystem = system.Login(email, password);
             if (fromSystem.ExecStatus)
             {
                 return new Result<string>("", fromSystem.ExecStatus, fromSystem.Data.Id);
@@ -246,14 +246,5 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             return system.UpdateShoppingCart(userID, shoppingBagID, productID, quantity);
         }
 
-        Result<List<String>> ISystemInterface.GetStorePurchaseHistory(string ownerID, string storeID)
-        {
-            throw new NotImplementedException();
-        }
-
-        Result<Dictionary<String, List<int>>> ISystemInterface.GetStoreStaff(string ownerID, string storeID)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
