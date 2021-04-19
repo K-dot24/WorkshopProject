@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Terminal3.DomainLayer
 {
-    public class Logger
+    public static class Logger
     {
 
         private static readonly log4net.ILog InfoLogger = log4net.LogManager.GetLogger("InfoLogger");
