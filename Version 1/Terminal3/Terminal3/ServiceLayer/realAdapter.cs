@@ -246,12 +246,12 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             return system.UpdateShoppingCart(userID, shoppingBagID, productID, quantity);
         }
 
-        Result<HistoryDAL> ISystemInterface.GetStorePurchaseHistory(string ownerID, string storeID)
+        Result<List<String>> ISystemInterface.GetStorePurchaseHistory(string ownerID, string storeID)
         {
             throw new NotImplementedException();
         }
 
-        Result<Dictionary<UserDAL, PermissionDAL>> ISystemInterface.GetStoreStaff(string ownerID, string storeID)
+        Result<Dictionary<String, List<int>>> ISystemInterface.GetStoreStaff(string ownerID, string storeID)
         {
             throw new NotImplementedException();
         }

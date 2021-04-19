@@ -1,4 +1,5 @@
-﻿using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+﻿using System;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 {
@@ -9,5 +10,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
     public class PolicyManager : IPurchasePolicy
     {
         //TODO
+        internal double GetCurrentProductPrice(Product product, int v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

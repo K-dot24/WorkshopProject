@@ -43,16 +43,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             }
         }
-        public Result<RegisteredUser> LogOut() {
+        public Result<Boolean> LogOut() {
             if (!LoggedIn)
             {
                 //User already logged out
-                return new Result<RegisteredUser>($"{this.Email} already logged out", false, null);
+                return new Result<Boolean>($"{this.Email} already logged out", false, false);
             }
             else 
             {
                 LoggedIn = false;
-                return new Result<RegisteredUser>($"{this.Email} is Logged out\n", true, this);
+                return new Result<Boolean>($"{this.Email} is Logged out\n", true, true);
             }           
         }
 
@@ -91,8 +91,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<Boolean> ExitSystem()
         {
-            Result < RegisteredUser> res =  LogOut();
-            return new Result<Boolean>(res.Message, res.ExecStatus, res.ExecStatus);
+            return LogOut();
         }
     }
 }

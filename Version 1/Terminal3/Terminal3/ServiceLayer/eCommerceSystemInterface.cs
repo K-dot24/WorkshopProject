@@ -23,7 +23,7 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> Register(String email, String password);
 
 
-        Result<UserDAL> Login(String email, String password);
+        Result<RegisteredUserDAL> Login(String email, String password);
 
         Result<Boolean> LogOut(String email);
 
@@ -44,7 +44,7 @@ namespace Terminal3.ServiceLayer
 
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
 
-        Result<int> GetTotalShoppingCartPrice(String userID);
+        Result<double> GetTotalShoppingCartPrice(String userID);
         #endregion
 
         #region Store related operations
@@ -105,7 +105,7 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
         }
 
-        public Result<int> GetTotalShoppingCartPrice(string userID)
+        public Result<double> GetTotalShoppingCartPrice(string userID)
         {
             throw new NotImplementedException();
         }
@@ -115,17 +115,12 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
         }
 
-        public Result<Dictionary<string, int>> GetUserShoppingBag(string userID, string shoppingBagID)
-        {
-            throw new NotImplementedException();
-        }
-
         public Result<ShoppingCartDAL> GetUserShoppingCart(string userID)
         {
             throw new NotImplementedException();
         }
 
-        public Result<UserDAL> Login(string email, string password)
+        public Result<RegisteredUserDAL> Login(string email, string password)
         {
             throw new NotImplementedException();
         }

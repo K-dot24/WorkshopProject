@@ -43,5 +43,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<ShoppingCartDAL>("shopping cart DAL object", true, new ShoppingCartDAL(ShoppingCartId, SBD));
 
         }
+
+        public Double GetTotalShoppingCartPrice()
+        {
+            Double sum=0;
+            foreach(ShoppingBag bag in ShoppingBags.Values)
+            {
+                sum = sum + bag.GetTotalPrice();
+            }
+            return sum;
+        }
     }
 }

@@ -117,7 +117,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<List<Product>> SearchProduct(IDictionary<String, Object> searchAttributes)
         {
-            //ProductSearchAttributes searchAttributes = ObjectDictionaryMapper<ProductSearchAttributes>.GetObject(productDetails);
             List<Product> searchResult = new List<Product>();
             foreach(Store store in this.Stores.Values)
             {
@@ -202,5 +201,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
             return new Result<Store>("Store does not exists\n", false, null);
         }
+
     }
 }

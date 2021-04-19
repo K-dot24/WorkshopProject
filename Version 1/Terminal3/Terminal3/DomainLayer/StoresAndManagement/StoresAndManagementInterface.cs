@@ -5,7 +5,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.DALobjects;
 using System.Collections.Concurrent;
-
+using System.Linq;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
@@ -33,12 +33,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #endregion
 
         #region User Actions
+        Result<RegisteredUserDAL> Register(String email, String password);
+        Result<RegisteredUserDAL> Login(String email, String password);
+        Result<Boolean> LogOut(String email);
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity);
-        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin);
+        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin=false);
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
+        Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        Result<double> GetTotalShoppingCartPrice(String userID);
         #endregion
 
         #region System Managment
@@ -225,9 +230,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 return new Result<Boolean>(resProduct.Message, false, false);
             }
             //else faild
-            return new Result<Boolean>(resStore.Message, false, false);
-
-            
+            return new Result<Boolean>(resStore.Message, false, false);    
         }
 
         public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
@@ -279,6 +282,43 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             bool isContains = UsersAndPermissionsFacade.SystemAdmins.ContainsKey(userID);
             return new Result<Boolean>($"is {userID} is system admin? {isContains}\n", true, isContains);
+        }
+
+        public Result<RegisteredUserDAL> Register(string email, string password)
+        {
+            Result<RegisteredUser> res = UsersAndPermissionsFacade.Register(email, password);
+            if (res.ExecStatus)
+            {
+                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
+            }
+            else
+            {
+                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, null);
+            }
+        }
+
+        public Result<RegisteredUserDAL> Login(string email, string password)
+        {
+            Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password);
+            if (res.ExecStatus)
+            {
+                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
+            }
+            else
+            {
+                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, null);
+            }
+        }
+
+        public Result<bool> LogOut(string email)
+        {
+            return UsersAndPermissionsFacade.LogOut(email);
+        }
+
+        public Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails) { throw new NotImplementedException(); }
+        public Result<double> GetTotalShoppingCartPrice(String userID)
+        {
+            return UsersAndPermissionsFacade.GetTotalShoppingCartPrice(userID);
         }
     }
 }
