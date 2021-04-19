@@ -11,6 +11,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Product> RemoveProduct(String productID);
         Result<Product> EditProduct(String productID, IDictionary<String, Object> details);
+        Result<ConcurrentDictionary<String, String>> GetProductReview(String productID);
     }
 
     public class InventoryManager : IInventoryManager
@@ -72,6 +73,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 return new Result<List<Product>>($"No item has been found\n", false, null);
             }
         }
+
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String productID)
+        {
+            if(Products.TryGetValue(productID , out Product product))
+            {
+                return product.GetProductReview();
+            }
+            return new Result<ConcurrentDictionary<string, string>>("Product does not exists in the store\n", false, null);
+
+        }
+
         /// <summary>
         ///  Filter out product if its not meet the search criteria
         /// </summary>

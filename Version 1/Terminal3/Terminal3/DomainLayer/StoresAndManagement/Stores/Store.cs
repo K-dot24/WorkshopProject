@@ -35,8 +35,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Object> GetDiscountPolicyAtStore();
         #endregion
 
-        #region Information
-        Result<Object> GetStorePurchaseHistory();
+        #region Information        
+        Result<ConcurrentDictionary<String, String>> GetProductReview(String productID);
+        Result<History> GetStorePurchaseHistory(string ownerID);
         #endregion
     }
     public class Store : IStoreOperations
@@ -184,9 +185,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>($"Staff ID not found in store.\n", false, false);
         }
 
-        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID)
+        public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID)
         {
-            throw new NotImplementedException();
+            Dictionary<IStoreStaff, Permission> storeStaff = new Dictionary<IStoreStaff, Permission>();
+            Permission ownerPermission = new Permission();
+            ownerPermission.SetAllMethodesPermitted();
+
+            if(CheckStoreManagerAndPermissions(ownerID, Methods.GetStoreStaff ) || CheckIfStoreOwner(ownerID))           
+            {
+                foreach(var owner in Owners)
+                {
+                    storeStaff.Add(owner.Value, ownerPermission);
+                }
+
+                foreach (var manager in Managers)
+                {
+                    storeStaff.Add(manager.Value, manager.Value.Permission);
+                }
+
+                return new Result<Dictionary<IStoreStaff, Permission>>("Store sfaffs details\n", true, storeStaff);
+            }
+            return new Result<Dictionary<IStoreStaff, Permission>>("The given store staff does not have permission to see the stores staff members\n", false, null);
         }
 
         public Result<object> SetPurchasePolicyAtStore(IPurchasePolicy policy)
@@ -214,9 +233,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
-        public Result<object> GetStorePurchaseHistory()
+        public Result<History> GetStorePurchaseHistory(string userID)
         {
-            throw new NotImplementedException();
+            if(CheckStoreManagerAndPermissions(userID, Methods.GetStorePurchaseHistory) || CheckIfStoreOwner(userID))
+            {
+                return new Result<History>("Store purchase history\n", true, History);
+            }
+            return new Result<History>("No permission to see store purchase history\n", false, null);
+        }
+
+
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String productID)
+        {
+            return InventoryManager.GetProductReview(productID);
         }
         
         public Result<bool> RemovePermissions(string managerID, string ownerID, LinkedList<int> permissions)
@@ -258,16 +287,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<StoreDAL> GetDAL()
         {
-            StoreOwnerDAL founder = Founder.GetDAL().Data;
+            StoreOwnerDAL founder = (StoreOwnerDAL)Founder.GetDAL().Data;
             ConcurrentDictionary<String, StoreOwnerDAL> owners = new ConcurrentDictionary<String, StoreOwnerDAL>();
             foreach (var so in Owners)
             {
-                owners.TryAdd(so.Key, so.Value.GetDAL().Data);
+                owners.TryAdd(so.Key, (StoreOwnerDAL)so.Value.GetDAL().Data);
             }
             ConcurrentDictionary<String, StoreManagerDAL> managers = new ConcurrentDictionary<String, StoreManagerDAL>();
             foreach (var sm in Managers)
             {
-                managers.TryAdd(sm.Key, sm.Value.GetDAL().Data);
+                managers.TryAdd(sm.Key, (StoreManagerDAL)sm.Value.GetDAL().Data);
             }
             // InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
             // PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?

@@ -171,6 +171,37 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
         }
 
         [Theory()]
+        [InlineData("papi@hotmale.com", "My Second Store", false)]   // Fail: Store does not exsist
+        [InlineData("tomer@gmail.com", "TOMER HAIR DESIGN", false)]  // Fail: Manager without permissions
+        public void GetStoreStaffTest1(string ownerID, string storeID , Boolean expectedResult)
+        {
+            RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "Why6AfraidOf7?");
+            StoreManager manager = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Managers.TryAdd(manager.User.Email, manager);
+
+            Result<Dictionary<IStoreStaff, Permission>> res = Facade.GetStoreStaff(ownerID, storeID);
+
+            Assert.Equal(expectedResult, res.ExecStatus);
+        }
+
+        [Theory()]
+        [InlineData("papi@hotmale.com", "My Second Store", true)]   // Success : Owner
+        public void GetStoreStaffTest2(string ownerID, string storeID, Boolean expectedResult)
+        {
+            RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "Why6AfraidOf7?");
+            StoreManager manager = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Managers.TryAdd(manager.User.Email, manager);
+
+            Result<Dictionary<IStoreStaff, Permission>> res = Facade.GetStoreStaff(ownerID, TestStore.Id);
+
+            Assert.Equal(expectedResult, res.ExecStatus);
+            Assert.True(res.Data.ContainsKey(manager));
+            Assert.True(res.Data.ContainsKey(TestStore.Founder));
+
+
+        }
+
+        [Theory()]
         [InlineData("tomer@gmail.com", "papi@hotmale.com", true, new bool[13] { true, true, true, false, false, false, false, true, false, false, false, false, false })]   // Success
         [InlineData("tomer@gmail.com", "raz@gmail.com", false, new bool[13] { false, false, false, false, false, false, false, true, false, false, false, false, false })]     // Fail: Trying to remove by not the appointer
         [InlineData("raz@gmail.com", "tomer@hotmale.com", false, new bool[13] { false, false, false, false, false, false, false, true, false, false, false, false, false })]    // Fail: not a manager

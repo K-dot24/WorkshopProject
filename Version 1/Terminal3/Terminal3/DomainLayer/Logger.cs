@@ -18,6 +18,7 @@ namespace Terminal3.DomainLayer
             IsInitiated = true;
         }
         
+        //for action in the system
         public static void LogInfo(String msg)
         {
             if (!IsInitiated)
@@ -25,6 +26,7 @@ namespace Terminal3.DomainLayer
             InfoLogger.Info(msg);
         }
 
+        //for error and failed action
         public static void LogError(String msg)
         {
             if (!IsInitiated)

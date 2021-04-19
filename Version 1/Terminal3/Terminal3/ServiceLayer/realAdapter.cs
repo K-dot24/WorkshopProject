@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +13,15 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
     public class RealAdapter : ISystemInterface
     {
         public IECommerceSystemInterface system = new ECommerceSystem();
+
+        public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<bool> AddProductToCart(string userID, string ProductID, int ProductQuantity, string StoreID)
         {
-            return system.AddProductToCart( userID,  ProductID,  ProductQuantity,  StoreID);
+            return system.AddProductToCart(userID, ProductID, ProductQuantity, StoreID);
         }
 
         public Result<string> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category)
@@ -26,7 +33,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             }
             else
             {
-                return new Result<string>("", fromSystem.ExecStatus,null);
+                return new Result<string>("", fromSystem.ExecStatus, null);
             }
         }
 
@@ -46,25 +53,37 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             return new Result<string>("", fromSystem.ExecStatus, fromSystem.Data.Id);
         }
 
+        public Result<ConcurrentDictionary<string, string>> GetProductReview(string storeID, string productID)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<List<string>> GetStorePurchaseHistory(string ownerID, string storeID)
         {
-            Result<HistoryDAL> fromSystem = system.GetStorePurchaseHistory( ownerID, storeID);
+            Result<HistoryDAL> fromSystem = system.GetStorePurchaseHistory(ownerID, storeID);
             if (fromSystem.ExecStatus)
             {
-                List<string> Ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
+                //List<string> Ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
+                List<ShoppingBagDAL> ShoppingBags = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags);
+                List<string> Ids = new List<string>();
+                foreach (ShoppingBagDAL dal in ShoppingBags) { Ids.Add(dal.Id); }
                 return new Result<List<string>>("", fromSystem.ExecStatus, Ids);
             }
             else
             {
-                return new Result<List<string>>("",fromSystem.ExecStatus,new List<string>());
+                return new Result<List<string>>("", fromSystem.ExecStatus, new List<string>());
             }
         }
 
         public Result<Dictionary<string, List<int>>> GetStoreStaff(string ownerID, string storeID)
         {
-            Result<Dictionary<UserDAL, PermissionDAL>> fromSystem = system.GetStoreStaff(ownerID, storeID);
-            if (fromSystem.ExecStatus) {
-                List<string> userIDS = new List<UserDAL>(fromSystem.Data.Keys).ForEach(userdal => userdal.Id);
+            Result<Dictionary<IStoreStaffDAL, PermissionDAL>> fromSystem = system.GetStoreStaff(ownerID, storeID);
+            if (fromSystem.ExecStatus)
+            {
+                // List<string> userIDS = (new List<IStoreStaffDAL>(fromSystem.Data.Keys)).Select(userdal => userdal.Id)
+                List<IStoreStaffDAL> StoreStaffDals = new List<IStoreStaffDAL>(fromSystem.Data.Keys);
+                List<string> userIDS = new List<string>();
+                foreach (IStoreStaffDAL dal in StoreStaffDals) { userIDS.Add(dal.Id); }
                 List<List<int>> userPermisions = new List<List<int>>();
                 foreach (PermissionDAL permission in fromSystem.Data.Values)
                 {
@@ -98,7 +117,10 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             Result<HistoryDAL> fromSystem = system.GetUserPurchaseHistory(userID);
             if (fromSystem.ExecStatus)
             {
-                List<string> Ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
+                //List<string> Ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
+                List<ShoppingBagDAL> ShoppingBags = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags);
+                List<string> Ids = new List<string>();
+                foreach (ShoppingBagDAL dal in ShoppingBags) { Ids.Add(dal.Id); }
                 return new Result<List<string>>("", fromSystem.ExecStatus, Ids);
             }
             else
@@ -117,8 +139,11 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             Result<ShoppingCartDAL> fromSystem = system.GetUserShoppingCart(userID);
             if (fromSystem.ExecStatus)
             {
-                List<string> shoppingBagsIds = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
-                return new Result<List<string>>("", fromSystem.ExecStatus, shoppingBagsIds);
+                //List<string> shoppingBagsIds = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
+                List<ShoppingBagDAL> ShoppingBags = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags);
+                List<string> Ids = new List<string>();
+                foreach (ShoppingBagDAL dal in ShoppingBags) { Ids.Add(dal.Id); }
+                return new Result<List<string>>("", fromSystem.ExecStatus, Ids);
 
             }
             else
@@ -195,8 +220,9 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             Result<List<ProductDAL>> fromSystem = system.SearchProduct(productDetails);
             if (fromSystem.ExecStatus)
             {
-                List<string> productIDS = fromSystem.Data.ForEach(product => product.Id);
-                return new Result<List<string>>("", fromSystem.ExecStatus, productIDS);
+                List<string> productIDS = new List<string>();
+                foreach (ProductDAL dal in fromSystem.Data) { productIDS.Add(dal.Id); }
+                 return new Result<List<string>>("", fromSystem.ExecStatus, productIDS);
 
             }
             else
@@ -218,6 +244,16 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
         public Result<bool> UpdateShoppingCart(string userID, string shoppingBagID, string productID, int quantity)
         {
             return system.UpdateShoppingCart(userID, shoppingBagID, productID, quantity);
+        }
+
+        Result<HistoryDAL> ISystemInterface.GetStorePurchaseHistory(string ownerID, string storeID)
+        {
+            throw new NotImplementedException();
+        }
+
+        Result<Dictionary<UserDAL, PermissionDAL>> ISystemInterface.GetStoreStaff(string ownerID, string storeID)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -15,6 +15,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
         Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+        Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+
+        Result<Store> GetStore(String storeID);
 
         #endregion
 
@@ -27,7 +30,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
-        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
+        Result<History> GetStorePurchaseHistory(String userID, String storeID);
     }
 
     public class StoresFacade : IStoresFacade
@@ -147,17 +150,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         }
 
-        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
-        {
-            throw new NotImplementedException();
+        public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID, string storeID)
+        {            
+            if(Stores.TryGetValue(storeID, out Store store))
+            {
+                return store.GetStoreStaff(ownerID);
+            }
+            return new Result<Dictionary<IStoreStaff, Permission>>("The given store ID does not exists", false, null);
+            
         }
         #endregion
 
-        public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
+        public Result<History> GetStorePurchaseHistory(string userID, string storeID)
         {
-            throw new NotImplementedException();
+            if(Stores.TryGetValue(storeID, out Store store))
+            {
+                return store.GetStorePurchaseHistory(userID);
+            }
+            return new Result<History>("Store Id does not exists\n", false, null);
         }
-
 
         public Result<StoreDAL> OpenNewStore(RegisteredUser founder, string storeName)
         {
@@ -188,5 +199,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //else failed
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
+
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID)
+        {
+            if(Stores.TryGetValue(storeID , out Store store))
+            {
+                return store.GetProductReview(productID);
+            }
+            return new Result<ConcurrentDictionary<string, string>>("Store does not exists\n", false, null);
+        }
+
+        public Result<Store> GetStore(String storeID)
+        {
+            if (Stores.TryGetValue(storeID, out Store store))
+            {
+                return new Result<Store>("", true, store);
+            }
+            return new Result<Store>("Store does not exists\n", false, null);
+        }
+
     }
 }
