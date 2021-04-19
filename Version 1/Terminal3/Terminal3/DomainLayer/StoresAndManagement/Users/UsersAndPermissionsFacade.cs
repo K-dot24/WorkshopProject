@@ -19,6 +19,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
         Result<Boolean> ExitSystem(String userID);
+        Result<double> GetTotalShoppingCartPrice(String userID);
 
     }
 
@@ -254,6 +255,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             else
             {
                 return new Result<Boolean>("User does not exist\n", false, false);
+            }
+
+        }
+
+        public Result<double> GetTotalShoppingCartPrice(String userID) {
+
+            if (RegisteredUsers.ContainsKey(userID))
+            {
+                //User Found
+                Double TotalPrice = RegisteredUsers[userID].ShoppingCart.GetTotalShoppingCartPrice();
+                return new Result<double>($"Total price of current shoppinh cart is: {TotalPrice}", true, TotalPrice);
+            }
+            else
+            {
+                //No user if found using the given email
+                return new Result<double>($"There is no suck user with ID:{userID}\n", false, -1);
+
             }
 
         }

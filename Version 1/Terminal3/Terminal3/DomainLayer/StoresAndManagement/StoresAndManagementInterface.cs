@@ -42,6 +42,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
+        Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        Result<int> GetTotalShoppingCartPrice(String userID);
         #endregion
 
         #region System Managment
@@ -216,7 +218,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity)
         {
-
+            throw new NotImplementedException();
         }
 
         public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
@@ -306,5 +308,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return UsersAndPermissionsFacade.LogOut(email);
         }
 
+        public Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails) { throw new NotImplementedException(); }
+        public Result<int> GetTotalShoppingCartPrice(String userID)
+        {
+            return UsersAndPermissionsFacade.GetTotalShoppingCartPrice(userID);
+        }
     }
 }

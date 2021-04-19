@@ -24,13 +24,13 @@ namespace Terminal3.ServiceLayer.Controllers
         public Result<Boolean> LogOut(String email) { return StoresAndManagementInterface.LogOut(email); }
         public Result<Object> SearchStore(IDictionary<String, Object> details) { throw new NotImplementedException(); }
         public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails) { return StoresAndManagementInterface.SearchProduct(productDetails); }
-        public Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID) { return StoresAndManagementInterface.AddProductToCart(userID,ProductID,ProductQuantity,StoreID) }   // Redundent ?
+        public Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID) { return StoresAndManagementInterface.AddProductToCart(userID, ProductID, ProductQuantity, StoreID); }   // Redundent ?
         public Result<ShoppingCartDAL> GetUserShoppingCart(String userID) { return GetUserShoppingCart(userID); }
-        public Result<Boolean> UpdateShoppingCart(String userID, String storeID, String productID, int quantity) { return StoresAndManagementInterface. }
-        public Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails) { throw new NotImplementedException(); }
-        public Result<HistoryDAL> GetUserPurchaseHistory(String userID) { throw new NotImplementedException(); }
-        public Result<int> GetTotalShoppingCartPrice(String userID) { throw new NotImplementedException(); }
-        public Result<StoreDAL> OpenNewStore(String storeName, String userID) { throw new NotImplementedException(); }
+        public Result<Boolean> UpdateShoppingCart(String userID, String storeID, String productID, int quantity) { return StoresAndManagementInterface.UpdateShoppingCart(userID,  storeID,  productID,  quantity); }
+        public Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails) { return StoresAndManagementInterface.Purchase(userID, paymentDetails, deliveryDetails); }
+        public Result<HistoryDAL> GetUserPurchaseHistory(String userID) { return StoresAndManagementInterface.GetUserPurchaseHistory(userID); }
+        public Result<int> GetTotalShoppingCartPrice(String userID) { return StoresAndManagementInterface.GetTotalShoppingCartPrice(userID); }
+        public Result<StoreDAL> OpenNewStore(String storeName, String userID) { return StoresAndManagementInterface.OpenNewStore(storeName, userID); }
 
         #endregion
     }
