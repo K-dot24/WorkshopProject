@@ -4,14 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Terminal3.ServiceLayer;
 
 namespace Terminal3WebAPI.Controllers
 {
     public class Terminal3Controller : ApiController
     {
-        ECommerceSystem system = new ECommerceSystem();
-
         // GET: api/Terminal3
         public IEnumerable<string> Get()
         {
