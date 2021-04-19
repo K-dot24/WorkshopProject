@@ -24,7 +24,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String ownerID);
+        Result<Boolean> RemovePermissions(String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID);
         #endregion
 
         #region Policies Management
@@ -65,7 +66,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             History = new History();
 
             //Add founder to list of owners
-            Owners.TryAdd(founder.Email, Founder);
+            Owners.TryAdd(founder.Id, Founder);
         }
 
         //TODO: Implement all functions
@@ -126,14 +127,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
         {
-            if (!CheckIfStoreOwner(futureOwner.Email) && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new owner not already an owner + appointing owner is not a fraud
+            if (!CheckIfStoreOwner(futureOwner.Id) && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new owner not already an owner + appointing owner is not a fraud
             {
                 StoreOwner newOwner = new StoreOwner(futureOwner, this, owner);
-                Owners.TryAdd(futureOwner.Email, newOwner);
+                Owners.TryAdd(futureOwner.Id, newOwner);
 
-                if (CheckIfStoreManager(futureOwner.Email)) //remove from managers list if needed
+                if (CheckIfStoreManager(futureOwner.Id)) //remove from managers list if needed
                 {
-                    Managers.TryRemove(futureOwner.Email, out _);
+                    Managers.TryRemove(futureOwner.Id, out _);
                 }
             }
             //else failed
@@ -143,11 +144,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)
         {
-            if (!CheckIfStoreManager(futureManager.Email) && !CheckIfStoreOwner(futureManager.Email)
+            if (!CheckIfStoreManager(futureManager.Id) && !CheckIfStoreOwner(futureManager.Id)
                     && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new manager not already an owner/manager + appointing owner is not a fraud
             {
                 StoreManager newManager = new StoreManager(futureManager, this, new Permission(), owner);
-                Managers.TryAdd(futureManager.Email, newManager);
+                Managers.TryAdd(futureManager.Id, newManager);
             }
             //else failed
             return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
@@ -170,9 +171,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>($"Failed to remove user (Email: {removedManagerID}) from store management: Either not a manager or owner not found.\n", false, false);
         }
 
-        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)   //TODO: OwnerID can be manager....
         {
-            throw new NotImplementedException();
+            if ((CheckIfStoreOwner(ownerID) || CheckStoreManagerAndPermissions(ownerID, Methods.SetPermissions)) && Managers.TryGetValue(managerID, out StoreManager manager))
+            {
+                if (CheckAppointedBy(manager, ownerID))
+                {
+                    foreach (int per in permissions)
+                    {
+                        manager.SetPermission(per, true);    
+                    }
+                    return new Result<bool>($"Permissions for manager ({manager.User.Email} updated successfully.\n", true, true);
+                }
+                //else failed
+                return new Result<bool>($"Can't set permissions: Manager (ID: {managerID}) was not appointed by given staff member (ID: {ownerID}).\n", false, false);
+            }
+            //else failed
+            return new Result<bool>($"Staff ID not found in store.\n", false, false);
         }
 
         public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID)
@@ -213,7 +228,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
-
         public Result<object> GetDiscountPolicyAtStore()
         {
             throw new NotImplementedException();
@@ -238,7 +252,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             return InventoryManager.GetProductReview(productID);
         }
-
+        
+        public Result<bool> RemovePermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        {
+            if ((CheckIfStoreOwner(ownerID) || CheckStoreManagerAndPermissions(ownerID, Methods.SetPermissions)) && Managers.TryGetValue(managerID, out StoreManager manager))
+            {
+                if (CheckAppointedBy(manager, ownerID))
+                {
+                    foreach (int per in permissions)
+                    {
+                        manager.SetPermission(per, false);
+                    }
+                    return new Result<bool>($"Permissions for manager ({manager.User.Email} updated successfully.\n", true, true);
+                }
+                //else failed
+                return new Result<bool>($"Can't remove permissions: Manager (ID: {managerID}) was not appointed by given staff member (ID: {ownerID}).\n", false, false);
+            }
+            //else failed
+            return new Result<bool>($"Staff ID not found in store.\n", false, false);
+        }
 
         //Getter
         public Result<Product> GetProduct(String productID)
@@ -260,6 +292,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         private Boolean CheckStoreManagerAndPermissions(String userID, Methods method)    // Check if userID is Store Manager + has certain permission
         {
             return Managers.TryGetValue(userID, out StoreManager manager) && manager.Permission.functionsBitMask[(int)method];
+        }
+
+        private Boolean CheckPermissions(StoreManager manager, Methods method)
+        {
+            return manager.Permission.functionsBitMask[(int)method];
+        }
+
+        private Boolean CheckAppointedBy(StoreManager manager, String ownerID)
+        {
+            return manager.AppointedBy.User.Id.Equals(ownerID);
         }
         #endregion
 
