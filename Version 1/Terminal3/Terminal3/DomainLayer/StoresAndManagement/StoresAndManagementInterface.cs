@@ -5,7 +5,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.DALobjects;
 using System.Collections.Concurrent;
-
+using System.Linq;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
@@ -35,8 +35,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
 
         #region User Actions
-        Result<RegisteredUser> Register(String email, String password);
-        Result<UserDAL> Login(String email, String password);
+        Result<RegisteredUserDAL> Register(String email, String password);
+        Result<RegisteredUserDAL> Login(String email, String password);
         Result<Boolean> LogOut(String email);
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin);
@@ -90,7 +90,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails)
         {
-            return StoresFacade.SearchProduct(productDetails);
+            Result<List<Product>> res= StoresFacade.SearchProduct(productDetails);
+            if (res.ExecStatus)
+            {
+                List<ProductDAL> l = new List<ProductDAL>(res.Data.Select((product) => product.GetDAL().Data));
+                return new Result<List<ProductDAL>>(res.Message, res.ExecStatus, l);
+            }
+            else
+            {
+                return new Result<List<ProductDAL>>(res.Message, res.ExecStatus, null);
+            }
+
         }
 
 
@@ -240,5 +250,42 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             bool isContains = UsersAndPermissionsFacade.SystemAdmins.ContainsKey(userID);
             return new Result<Boolean>($"is {userID} is system admin? {isContains}\n", true, isContains);
         }
+
+        Result<Dictionary<UserDAL, PermissionDAL>> IStoresAndManagementInterface.GetStoreStaff(string ownerID, string storeID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<RegisteredUserDAL> Register(string email, string password)
+        {
+            Result<RegisteredUser> res = UsersAndPermissionsFacade.Register(email, password);
+            if (res.ExecStatus)
+            {
+                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
+            }
+            else
+            {
+                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, null);
+            }
+        }
+
+        public Result<RegisteredUserDAL> Login(string email, string password)
+        {
+            Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password);
+            if (res.ExecStatus)
+            {
+                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
+            }
+            else
+            {
+                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, null);
+            }
+        }
+
+        public Result<bool> LogOut(string email)
+        {
+            return UsersAndPermissionsFacade.LogOut(email);
+        }
+
     }
 }

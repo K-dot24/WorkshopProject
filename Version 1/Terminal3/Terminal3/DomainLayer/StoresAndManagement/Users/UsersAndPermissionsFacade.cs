@@ -14,7 +14,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> AddSystemAdmin(String email); 
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
-        Result<RegisteredUser> LogOut(String email);
+        Result<Boolean> LogOut(String email);
         Result<Boolean> AddProductReview(String userID, Store store, Product product, String review);
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
@@ -189,18 +189,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public Result<RegisteredUser> LogOut(String email)
+        public Result<Boolean> LogOut(String email)
         {
             Result<RegisteredUser> searchResult = FindUserByEmail(email, RegisteredUsers);
             if (searchResult.ExecStatus)
             {
-                //User found
+                //User 
                 return searchResult.Data.LogOut();
             }
             else
             {
                 //No user if found using the given email
-                return new Result<RegisteredUser>($"There is not user using this email:{email}\n", false, null);
+                return new Result<Boolean>($"There is not user using this email:{email}\n", false, false);
 
             }
         }
