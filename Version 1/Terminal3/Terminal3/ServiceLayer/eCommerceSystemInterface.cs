@@ -54,7 +54,7 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(String userID, String storeID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
         Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID);
 
@@ -98,7 +98,7 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
         }
 
-        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string userID, string storeID)
         {
             throw new NotImplementedException();
         }
