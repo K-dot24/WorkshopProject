@@ -118,7 +118,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         [Theory()]
         [Trait("Category", "Unit")]
         [InlineData("tomer@gmail.com", "The banana was awsome")]  //user is exist in SystemAdmins
-        public void AddProductReviewTest1(String email , String review)
+        public void AddProductReviewTest1(String email, String review)
         {
             // Open store
             RegisteredUser founder = new RegisteredUser(email, "password");
@@ -192,6 +192,47 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         public void ExitSystemTestNotExist()
         {
             Assert.False(Facade.ExitSystem("0123").ExecStatus);
+        }
+
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData( 5, true , 5)]      // Success
+        [InlineData(10, false , 2)]      // Fail 2: Higher quantity than quantity in store
+        [InlineData(0, true , 0)]      // Success
+        [InlineData( -1, true , 0)]  // Success
+        public void UpdateShoppingCartTest(int quantity, Boolean expectedResult , int expectedQuantity)
+        {
+            // Open store
+            RegisteredUser founder = new RegisteredUser("tomer@gmail.com", "password");
+            Facade.RegisteredUsers.TryAdd(founder.Id, founder);
+            Store store = new Store("Testore", founder);
+
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 5, "Fruits");
+            store.InventoryManager.Products.TryAdd(product.Id, product);
+
+            // Add product to user shopping bag
+            founder.ShoppingCart.ShoppingBags.TryAdd(store.Id, new ShoppingBag(founder, store));
+            founder.ShoppingCart.ShoppingBags.TryGetValue(store.Id, out ShoppingBag bag);
+            bag.Products.TryAdd(product, 2);
+
+            Assert.Equal(expectedResult , Facade.UpdateShoppingCart(founder.Id, store.Id, product, quantity).ExecStatus);
+
+            bool res = bag.Products.TryGetValue(product, out int updatedQuantity);
+
+            if (res)
+            {
+                Assert.Equal(expectedQuantity, updatedQuantity); 
+            }
+            else if (expectedQuantity==0)
+            {
+                Assert.False(bag.Products.ContainsKey(product));
+            }
+            else
+            {
+                Assert.False(true);
+            }
+            
         }
     }
 }

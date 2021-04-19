@@ -38,6 +38,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> LogOut(String email);
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity);
+        Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin=false);
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
@@ -162,9 +163,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return StoresFacade.SetPermissions(storeID, managerID, ownerID, permissions);
         }
 
-        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string userID, string storeID)
         {
-            Result<Dictionary<IStoreStaff, Permission>> storeStaffResult = StoresFacade.GetStoreStaff(ownerID, storeID);
+            Result<Dictionary<IStoreStaff, Permission>> storeStaffResult = StoresFacade.GetStoreStaff(userID, storeID);
             if (storeStaffResult.ExecStatus)
             {
                 Dictionary<IStoreStaff, Permission> storeStaff = storeStaffResult.Data;
@@ -219,7 +220,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity)
         {
-            throw new NotImplementedException();
+            Result<Store> resStore = StoresFacade.GetStore(storeID);
+            if (resStore.ExecStatus)
+            {
+                Result<Product> resProduct = resStore.Data.GetProduct(productID);
+                if (resProduct.ExecStatus)
+                {
+                    return UsersAndPermissionsFacade.UpdateShoppingCart(userID, resStore.Data.Id, resProduct.Data, quantity);
+                }
+                //else faild
+                return new Result<Boolean>(resProduct.Message, false, false);
+            }
+            //else faild
+            return new Result<Boolean>(resStore.Message, false, false);    
+        }
+
+        public Result<ShoppingCartDAL> GetUserShoppingCart(string userID)
+        {
+            Result<ShoppingCart> res = UsersAndPermissionsFacade.GetUserShoppingCart(userID);
+            if (res.ExecStatus)
+            {
+                ShoppingCartDAL shoppingCartDAL = res.Data.GetDAL().Data;
+                return new Result<ShoppingCartDAL>("User shopping cart\n", true, shoppingCartDAL);
+            }
+            //else faild
+            return new Result<ShoppingCartDAL>(res.Message, false, null);
         }
 
         public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
@@ -322,5 +347,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             return UsersAndPermissionsFacade.GetTotalShoppingCartPrice(userID);
         }
+
+       
     }
 }
