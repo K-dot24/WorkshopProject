@@ -18,7 +18,9 @@ namespace Terminal3.ServiceLayer.Controllers
             this.StoresAndManagementInterface = storesAndManagementInterface;
         }
         #region Methods
-        public Result<UserDAL> Login(String email, String password) { throw new NotImplementedException(); }
+        public Result<UserDAL> Login(String email, String password) { 
+            return StoresAndManagementInterface.
+        }
         public Result<Boolean> LogOut(String email) { throw new NotImplementedException(); }
         public Result<Object> SearchStore(IDictionary<String, Object> details) { throw new NotImplementedException(); }
         public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails) { throw new NotImplementedException(); }

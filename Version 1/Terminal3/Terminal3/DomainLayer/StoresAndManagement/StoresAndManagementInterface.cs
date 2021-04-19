@@ -34,8 +34,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #endregion
 
         Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
-        
+
         #region User Actions
+        Result<RegisteredUser> Register(String email, String password);
+        Result<UserDAL> Login(String email, String password);
+        Result<Boolean> LogOut(String email);
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin);
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
