@@ -27,7 +27,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String ownerID, String storeID);
+        Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID, string storeID);
         #endregion
 
         Result<History> GetStorePurchaseHistory(String userID, String storeID, bool sysAdmin);
@@ -202,9 +202,5 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Store>("Store does not exists\n", false, null);
         }
 
-        Result<Dictionary<UserDAL, PermissionDAL>> IStoresFacade.GetStoreStaff(string ownerID, string storeID)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

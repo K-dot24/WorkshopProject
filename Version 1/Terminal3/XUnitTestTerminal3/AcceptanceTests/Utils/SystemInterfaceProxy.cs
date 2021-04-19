@@ -81,10 +81,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.GetStoreStaff(ownerID, storeID);
         }
 
-        public Result<int> GetTotalShoppingCartPrice(string userID)
+        public Result<double> GetTotalShoppingCartPrice(string userID)
         {
             if(Real == null)
-                return new Result<int>(true);
+                return new Result<double>(true);
 
             return Real.GetTotalShoppingCartPrice(userID);
         }
