@@ -2,11 +2,10 @@
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
-    public interface IPolicy
+    public interface IPurchasePolicy
     {
         //TODO
         Result<double> CalculatePrice(Product product, int quantity);
-        Result<double> CalculatePrice(Product product, User user);
     }
 
     /*public enum policyType : int

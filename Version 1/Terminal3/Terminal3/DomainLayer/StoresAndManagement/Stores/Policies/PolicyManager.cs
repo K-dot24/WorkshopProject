@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
@@ -9,13 +10,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
     {
     }
 
-    public class PolicyManager : IPurchasePolicy
+    public class PolicyManager : IPolicyManager
     {
         //TODO
+        public LinkedList<IDiscountPolicy> DiscountPolicies { get; }
+        public LinkedList<IPurchasePolicy> PurchasePolicies { get; }
+        public ConcurrentDictionary<Product, Tuple<LinkedList<IPurchasePolicy>, LinkedList<IDiscountPolicy>>> ProductsPolicies { get; }
 
-        public ConcurrentDictionary<Product, LinkedList<>> MyProperty { get; set; }
+        public PolicyManager()
+        {
+            DiscountPolicies = new LinkedList<IDiscountPolicy>();
+            PurchasePolicies = new LinkedList<IPurchasePolicy>();
 
-        internal double GetCurrentProductPrice(Product product, int v)
+        }
+
+        public double GetCurrentProductPrice(Product product, int quantity)
         {
             throw new NotImplementedException();
         }
