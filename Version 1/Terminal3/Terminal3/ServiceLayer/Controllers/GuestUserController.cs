@@ -7,6 +7,7 @@ using Terminal3.DomainLayer.StoresAndManagement;
 
 namespace Terminal3.ServiceLayer.Controllers
 {
+    //Basic functionality The every user can preform
     public class GuestUserController
     {
         //Properties
@@ -18,7 +19,7 @@ namespace Terminal3.ServiceLayer.Controllers
             this.StoresAndManagementInterface = storesAndManagementInterface;
         }
         #region Methods
-
+        public Result<bool> Register(string email, string password){throw new NotImplementedException();}
         public Result<Object> SearchStore(IDictionary<String, Object> details) { throw new NotImplementedException(); }
         public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails) { return StoresAndManagementInterface.SearchProduct(productDetails); }
         public Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID) { return StoresAndManagementInterface.AddProductToCart(userID, ProductID, ProductQuantity, StoreID); }   // Redundent ?
