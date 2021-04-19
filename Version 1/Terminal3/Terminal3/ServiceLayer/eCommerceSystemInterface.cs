@@ -21,12 +21,16 @@ namespace Terminal3.ServiceLayer
         //Constructor
         public ECommerceSystem()
         {
-            //TODO: call initializer
             StoresAndManagementInterface StoresAndManagement = new StoresAndManagementInterface();
             GuestUserInterface = new GuestUserController(StoresAndManagement);
             RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
             StoreStaffInterface = new StoreStaffController(StoresAndManagement);
             SystemAdminInterface = new SystemAdminController(StoresAndManagement);
+        }
+
+        public void DisplaySystem()
+        {
+            // TODO - when GUI exists then display all functions according to current user role
         }
 
         //Metohds

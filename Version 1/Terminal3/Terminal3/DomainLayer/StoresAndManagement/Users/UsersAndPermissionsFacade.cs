@@ -40,10 +40,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
             SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
             GuestUsers = new ConcurrentDictionary<String, GuestUser>();
-            
+
 
             //Add first system admin
-            //this.SystemAdmins.TryAdd("Admin@terminal3", new RegisteredUser("Admin@terminal3", "Admin"));
+            RegisteredUser defaultUser = new RegisteredUser("Admin@terminal3", "Admin");
+            this.SystemAdmins.TryAdd("Admin@terminal3", defaultUser );
+            this.RegisteredUsers.TryAdd(defaultUser.Id, defaultUser);
 
         }
         //Constructor for the initializer
@@ -53,6 +55,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.RegisteredUsers = registeredUsers;
             this.SystemAdmins = systemAdmins;
         }
+
 
         //Methods
         /// <summary>

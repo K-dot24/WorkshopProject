@@ -62,7 +62,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public StoresAndManagementInterface()
         {
-            //TODO: Change constructor if needed (initializer?)
             StoresFacade = new StoresFacade();
             UsersAndPermissionsFacade = new UsersAndPermissionsFacade();
         }
