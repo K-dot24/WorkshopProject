@@ -238,7 +238,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<bool> SetPermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
-            return system.SetPermissions(managerID, ownerID, permissions);
+            return system.SetPermissions(storeID, managerID, ownerID, permissions);
         }
 
         public Result<bool> UpdateShoppingCart(string userID, string shoppingBagID, string productID, int quantity)

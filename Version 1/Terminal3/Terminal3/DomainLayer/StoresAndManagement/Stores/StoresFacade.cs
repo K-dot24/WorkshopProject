@@ -217,6 +217,5 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
             return new Result<Store>("Store does not exists\n", false, null);
         }
-
     }
 }

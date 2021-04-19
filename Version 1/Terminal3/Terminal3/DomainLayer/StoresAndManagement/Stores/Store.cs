@@ -66,7 +66,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             History = new History();
 
             //Add founder to list of owners
-            Owners.TryAdd(founder.Email, Founder);
+            Owners.TryAdd(founder.Id, Founder);
         }
 
         //TODO: Implement all functions
@@ -127,14 +127,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
         {
-            if (!CheckIfStoreOwner(futureOwner.Email) && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new owner not already an owner + appointing owner is not a fraud
+            if (!CheckIfStoreOwner(futureOwner.Id) && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new owner not already an owner + appointing owner is not a fraud
             {
                 StoreOwner newOwner = new StoreOwner(futureOwner, this, owner);
-                Owners.TryAdd(futureOwner.Email, newOwner);
+                Owners.TryAdd(futureOwner.Id, newOwner);
 
-                if (CheckIfStoreManager(futureOwner.Email)) //remove from managers list if needed
+                if (CheckIfStoreManager(futureOwner.Id)) //remove from managers list if needed
                 {
-                    Managers.TryRemove(futureOwner.Email, out _);
+                    Managers.TryRemove(futureOwner.Id, out _);
                 }
             }
             //else failed
@@ -144,11 +144,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)
         {
-            if (!CheckIfStoreManager(futureManager.Email) && !CheckIfStoreOwner(futureManager.Email)
+            if (!CheckIfStoreManager(futureManager.Id) && !CheckIfStoreOwner(futureManager.Id)
                     && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new manager not already an owner/manager + appointing owner is not a fraud
             {
                 StoreManager newManager = new StoreManager(futureManager, this, new Permission(), owner);
-                Managers.TryAdd(futureManager.Email, newManager);
+                Managers.TryAdd(futureManager.Id, newManager);
             }
             //else failed
             return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
@@ -171,15 +171,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>($"Failed to remove user (Email: {removedManagerID}) from store management: Either not a manager or owner not found.\n", false, false);
         }
 
-        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)   //TODO: OwnerID can be manager....
         {
-            if (Owners.TryGetValue(ownerID, out StoreOwner owner) && Managers.TryGetValue(managerID, out StoreManager manager))
+            if ((CheckIfStoreOwner(ownerID) || CheckStoreManagerAndPermissions(ownerID, Methods.SetPermissions)) && Managers.TryGetValue(managerID, out StoreManager manager))
             {
-                foreach (int per in permissions)
+                if (CheckAppointedBy(manager, ownerID))
                 {
-                    manager.SetPermission(per, true);    
+                    foreach (int per in permissions)
+                    {
+                        manager.SetPermission(per, true);    
+                    }
+                    return new Result<bool>($"Permissions for manager ({manager.User.Email} updated successfully.\n", true, true);
                 }
-                return new Result<bool>($"Permissions for manager ({manager.User.Email} updated successfully.\n", true, true);
+                //else failed
+                return new Result<bool>($"Can't set permissions: Manager (ID: {managerID}) was not appointed by given staff member (ID: {ownerID}).\n", false, false);
             }
             //else failed
             return new Result<bool>($"Staff ID not found in store.\n", false, false);
@@ -250,13 +255,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         
         public Result<bool> RemovePermissions(string managerID, string ownerID, LinkedList<int> permissions)
         {
-            if (Owners.TryGetValue(ownerID, out StoreOwner owner) && Managers.TryGetValue(managerID, out StoreManager manager))
+            if ((CheckIfStoreOwner(ownerID) || CheckStoreManagerAndPermissions(ownerID, Methods.SetPermissions)) && Managers.TryGetValue(managerID, out StoreManager manager))
             {
-                foreach (int per in permissions)
+                if (CheckAppointedBy(manager, ownerID))
                 {
-                    manager.SetPermission(per, false);
+                    foreach (int per in permissions)
+                    {
+                        manager.SetPermission(per, false);
+                    }
+                    return new Result<bool>($"Permissions for manager ({manager.User.Email} updated successfully.\n", true, true);
                 }
-                return new Result<bool>($"Permissions for manager ({manager.User.Email} updated successfully.\n", true, true);
+                //else failed
+                return new Result<bool>($"Can't remove permissions: Manager (ID: {managerID}) was not appointed by given staff member (ID: {ownerID}).\n", false, false);
             }
             //else failed
             return new Result<bool>($"Staff ID not found in store.\n", false, false);
@@ -283,6 +293,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             return Managers.TryGetValue(userID, out StoreManager manager) && manager.Permission.functionsBitMask[(int)method];
         }
+
+        private Boolean CheckPermissions(StoreManager manager, Methods method)
+        {
+            return manager.Permission.functionsBitMask[(int)method];
+        }
+
+        private Boolean CheckAppointedBy(StoreManager manager, String ownerID)
+        {
+            return manager.AppointedBy.User.Id.Equals(ownerID);
+        }
         #endregion
 
         public Result<StoreDAL> GetDAL()
@@ -306,6 +326,5 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<StoreDAL>("Store DAL object", true, store);
 
         }
-
     }
 }
