@@ -259,8 +259,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
         [Theory()]
         [InlineData("tomer@gmail.com", "papi@hotmale.com", true, new bool[13] { false, false, false, false, false, false, false, true, false, false, false, false, false })]   // Success
-        [InlineData("raz@gmail.com", "papi@hotmale.com", true, new bool[13] { false, false, false, false, false, false, true, true, false, false, false, false, false })]     // Fail: manager without permissions
-        [InlineData("tomer@gmail.com", "raz@gmail.com", false, new bool[13] { true, true, true, false, false, false, false, true, false, false, false, false, false })]    // Fail: manager without permissions
+        [InlineData("raz@gmail.com", "tomer@gmail.com", false, new bool[13] { true, true, true, false, false, false, true, true, false, false, false, false, false })]     // Fail: manager without SetPermissions
+        [InlineData("tomer@gmail.com", "raz@gmail.com", false, new bool[13] { true, true, true, false, false, false, false, true, false, false, false, false, false })]    // Fail: manager tries to remove permissions of a manager not appointed by him
+        [InlineData("zoe@gmail.com", "papi@hotmail.com", false, new bool[13] { false, false, false, false, false, false, false, false, false, false, false, false, false })]    // Fail: trying to remove permissions of someone who isn't a manager
         public void RemovePermissionsTest(String managerEmail, String ownerEmail, Boolean expectedResult, bool[] pers)
         {
             // Manager with permissions 0,1,2,7
@@ -295,10 +296,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             EmailToID.TryGetValue(ownerEmail, out String ownerID);
             EmailToID.TryGetValue(managerEmail, out String managerID);
             Assert.Equal(expectedResult, Facade.RemovePermissions(TestStore.Id, managerID, ownerID, permissions).ExecStatus);
-
-            TestStore.Managers.TryGetValue(managerID, out StoreManager sm);
-            bool[] current_permissions = sm.Permission.functionsBitMask;
-            Assert.Equal(pers, current_permissions);
+            
+            if (TestStore.Managers.TryGetValue(managerID, out StoreManager sm))
+            {
+                bool[] current_permissions = sm.Permission.functionsBitMask;
+                Assert.Equal(pers, current_permissions);
+            }
         }
     }
 }
