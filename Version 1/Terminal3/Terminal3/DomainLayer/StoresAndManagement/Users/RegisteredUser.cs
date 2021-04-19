@@ -1,6 +1,9 @@
 ﻿using System;
 using Terminal3.DALobjects;
 using System.Reflection;
+using Terminal3.DomainLayer.StoresAndManagement.Stores;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -52,6 +55,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<RegisteredUser>($"{this.Email} is Logged out\n", true, this);
             }           
         }
+
+        public Result<Boolean> AddProductReview(Store store, Product product , String review)
+        {
+            if (checkIfProductPurchasedByUser(store , product))
+            {
+                product.AddProductReview(Id , review);
+                return new Result<Boolean>("The product review was added successfuly\n", true, true);
+            }
+            return new Result<Boolean>("The User did not purchase the product before, therefore can not write it a review\n", false, false);
+        }
+
+        private Boolean checkIfProductPurchasedByUser(Store store, Product product)
+        {
+            LinkedList<ShoppingBag> shoppingBags = History.ShoppingBags;
+            foreach (ShoppingBag bag in shoppingBags)
+            {
+                if (bag.Products.ContainsKey(product))  // TODO - check updated : in branch AddProductToCart the Products field in ShoppingBag is public ConcurrentDictionary<Product, int> Products 
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public Result<History> GetUserPurchaseHistory()
         {
             return new Result<History>("User history\n", true, History);
@@ -60,6 +87,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             ShoppingCartDAL SCD = this.ShoppingCart.GetDAL().Data;
             return new Result<RegisteredUserDAL>("RegisteredUser DAL object" , true , new RegisteredUserDAL(this.Id, this.Email, this.Password, this.LoggedIn , SCD));
+        }
+
+        public Result<Boolean> ExitSystem()
+        {
+            Result < RegisteredUser> res =  LogOut();
+            return new Result<Boolean>(res.Message, res.ExecStatus, res.ExecStatus);
         }
     }
 }

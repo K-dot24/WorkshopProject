@@ -1,5 +1,6 @@
 ﻿using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DALobjects;
+using System;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -18,13 +19,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             AppointedBy = appointedBy;
         }
 
-        public Result<StoreManagerDAL> GetDAL()
+        public Result<Boolean> SetPermission(int method, Boolean active)
+        {
+            return Permission.SetPermission(method, active);
+        }
+
+        public Result<Boolean> SetPermission(Methods method, Boolean active)
+        {
+            return Permission.SetPermission(method, active);
+        }
+
+        public Result<object> GetDAL()
         {
             RegisteredUserDAL user = User.GetDAL().Data;
             PermissionDAL permission = Permission.GetDAL().Data;
-            StoreOwnerDAL owner = AppointedBy.GetDAL().Data;
+            StoreOwnerDAL owner = (StoreOwnerDAL)AppointedBy.GetDAL().Data;
 
-            return new Result<StoreManagerDAL>("Store manager DAL object", true, new StoreManagerDAL(user, permission, owner));
+            return new Result<object>("Store manager DAL object", true, new StoreManagerDAL(user, permission, owner));
         }
     }
 }

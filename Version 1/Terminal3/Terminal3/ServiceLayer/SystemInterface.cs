@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer;
+using Terminal3.DALobjects;
+using System.Collections.Concurrent;
+
+
 namespace Terminal3.ServiceLayer
 {
     //For Testing 
@@ -36,7 +40,9 @@ namespace Terminal3.ServiceLayer
 
         Result<List<String>> GetUserPurchaseHistory(String userID); //List<shoppingBagID>
 
-        Result<int> GetTotalShoppingCartPrice(String userID); 
+        Result<int> GetTotalShoppingCartPrice(String userID);
+
+        Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
         #endregion
 
         #region Store related operations
@@ -47,9 +53,12 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID); 
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<String , List<int>>> GetStoreStaff(String ownerID, String storeID);
-        Result<List<String>> GetStorePurchaseHistory(String ownerID, String storeID); //List<shoppingBagID>
+        Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Dictionary<UserDAL , PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
+        Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+
         #endregion
 
 

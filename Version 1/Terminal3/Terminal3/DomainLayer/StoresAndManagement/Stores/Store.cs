@@ -24,6 +24,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Boolean> RemovePermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID);
         #endregion
 
@@ -34,8 +35,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Object> GetDiscountPolicyAtStore();
         #endregion
 
-        #region Information
-        Result<Object> GetStorePurchaseHistory();
+        #region Information        
+        Result<ConcurrentDictionary<String, String>> GetProductReview(String productID);
+        Result<History> GetStorePurchaseHistory(string ownerID,bool sysAdmin);
         #endregion
     }
     public class Store : IStoreOperations
@@ -64,7 +66,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             History = new History();
 
             //Add founder to list of owners
-            Owners.TryAdd(founder.Email, Founder);
+            Owners.TryAdd(founder.Id, Founder);
         }
 
         //TODO: Implement all functions
@@ -125,14 +127,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
         {
-            if (!CheckIfStoreOwner(futureOwner.Email) && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new owner not already an owner + appointing owner is not a fraud
+            if (!CheckIfStoreOwner(futureOwner.Id) && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new owner not already an owner + appointing owner is not a fraud
             {
                 StoreOwner newOwner = new StoreOwner(futureOwner, this, owner);
-                Owners.TryAdd(futureOwner.Email, newOwner);
+                Owners.TryAdd(futureOwner.Id, newOwner);
 
-                if (CheckIfStoreManager(futureOwner.Email)) //remove from managers list if needed
+                if (CheckIfStoreManager(futureOwner.Id)) //remove from managers list if needed
                 {
-                    Managers.TryRemove(futureOwner.Email, out _);
+                    Managers.TryRemove(futureOwner.Id, out _);
                 }
             }
             //else failed
@@ -142,11 +144,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)
         {
-            if (!CheckIfStoreManager(futureManager.Email) && !CheckIfStoreOwner(futureManager.Email)
+            if (!CheckIfStoreManager(futureManager.Id) && !CheckIfStoreOwner(futureManager.Id)
                     && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new manager not already an owner/manager + appointing owner is not a fraud
             {
                 StoreManager newManager = new StoreManager(futureManager, this, new Permission(), owner);
-                Managers.TryAdd(futureManager.Email, newManager);
+                Managers.TryAdd(futureManager.Id, newManager);
             }
             //else failed
             return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
@@ -169,14 +171,46 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>($"Failed to remove user (Email: {removedManagerID}) from store management: Either not a manager or owner not found.\n", false, false);
         }
 
-        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)   //TODO: OwnerID can be manager....
         {
-            throw new NotImplementedException();
+            if ((CheckIfStoreOwner(ownerID) || CheckStoreManagerAndPermissions(ownerID, Methods.SetPermissions)) && Managers.TryGetValue(managerID, out StoreManager manager))
+            {
+                if (CheckAppointedBy(manager, ownerID))
+                {
+                    foreach (int per in permissions)
+                    {
+                        manager.SetPermission(per, true);    
+                    }
+                    return new Result<bool>($"Permissions for manager ({manager.User.Email} updated successfully.\n", true, true);
+                }
+                //else failed
+                return new Result<bool>($"Can't set permissions: Manager (ID: {managerID}) was not appointed by given staff member (ID: {ownerID}).\n", false, false);
+            }
+            //else failed
+            return new Result<bool>($"Staff ID not found in store.\n", false, false);
         }
 
-        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID)
+        public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID)
         {
-            throw new NotImplementedException();
+            Dictionary<IStoreStaff, Permission> storeStaff = new Dictionary<IStoreStaff, Permission>();
+            Permission ownerPermission = new Permission();
+            ownerPermission.SetAllMethodesPermitted();
+
+            if(CheckStoreManagerAndPermissions(ownerID, Methods.GetStoreStaff ) || CheckIfStoreOwner(ownerID))           
+            {
+                foreach(var owner in Owners)
+                {
+                    storeStaff.Add(owner.Value, ownerPermission);
+                }
+
+                foreach (var manager in Managers)
+                {
+                    storeStaff.Add(manager.Value, manager.Value.Permission);
+                }
+
+                return new Result<Dictionary<IStoreStaff, Permission>>("Store sfaffs details\n", true, storeStaff);
+            }
+            return new Result<Dictionary<IStoreStaff, Permission>>("The given store staff does not have permission to see the stores staff members\n", false, null);
         }
 
         public Result<object> SetPurchasePolicyAtStore(IPurchasePolicy policy)
@@ -194,7 +228,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
-
         public Result<object> GetDiscountPolicyAtStore()
         {
             throw new NotImplementedException();
@@ -205,9 +238,38 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             throw new NotImplementedException();
         }
 
-        public Result<object> GetStorePurchaseHistory()
+        public Result<History> GetStorePurchaseHistory(string userID,bool sysAdmin)
         {
-            throw new NotImplementedException();
+            if(sysAdmin || CheckStoreManagerAndPermissions(userID, Methods.GetStorePurchaseHistory) || CheckIfStoreOwner(userID))
+            {
+                return new Result<History>("Store purchase history\n", true, History);
+            }
+            return new Result<History>("No permission to see store purchase history\n", false, null);
+        }
+
+
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String productID)
+        {
+            return InventoryManager.GetProductReview(productID);
+        }
+        
+        public Result<bool> RemovePermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        {
+            if ((CheckIfStoreOwner(ownerID) || CheckStoreManagerAndPermissions(ownerID, Methods.SetPermissions)) && Managers.TryGetValue(managerID, out StoreManager manager))
+            {
+                if (CheckAppointedBy(manager, ownerID))
+                {
+                    foreach (int per in permissions)
+                    {
+                        manager.SetPermission(per, false);
+                    }
+                    return new Result<bool>($"Permissions for manager ({manager.User.Email} updated successfully.\n", true, true);
+                }
+                //else failed
+                return new Result<bool>($"Can't remove permissions: Manager (ID: {managerID}) was not appointed by given staff member (ID: {ownerID}).\n", false, false);
+            }
+            //else failed
+            return new Result<bool>($"Staff ID not found in store.\n", false, false);
         }
 
         //Getter
@@ -231,20 +293,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             return Managers.TryGetValue(userID, out StoreManager manager) && manager.Permission.functionsBitMask[(int)method];
         }
+
+        private Boolean CheckPermissions(StoreManager manager, Methods method)
+        {
+            return manager.Permission.functionsBitMask[(int)method];
+        }
+
+        private Boolean CheckAppointedBy(StoreManager manager, String ownerID)
+        {
+            return manager.AppointedBy.User.Id.Equals(ownerID);
+        }
         #endregion
 
         public Result<StoreDAL> GetDAL()
         {
-            StoreOwnerDAL founder = Founder.GetDAL().Data;
+            StoreOwnerDAL founder = (StoreOwnerDAL)Founder.GetDAL().Data;
             ConcurrentDictionary<String, StoreOwnerDAL> owners = new ConcurrentDictionary<String, StoreOwnerDAL>();
             foreach (var so in Owners)
             {
-                owners.TryAdd(so.Key, so.Value.GetDAL().Data);
+                owners.TryAdd(so.Key, (StoreOwnerDAL)so.Value.GetDAL().Data);
             }
             ConcurrentDictionary<String, StoreManagerDAL> managers = new ConcurrentDictionary<String, StoreManagerDAL>();
             foreach (var sm in Managers)
             {
-                managers.TryAdd(sm.Key, sm.Value.GetDAL().Data);
+                managers.TryAdd(sm.Key, (StoreManagerDAL)sm.Value.GetDAL().Data);
             }
             // InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
             // PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?

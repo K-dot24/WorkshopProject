@@ -33,9 +33,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         #endregion
 
         #region Information
-        GetStorePurchaseHistory = 12
+        GetStorePurchaseHistory = 12,
         #endregion
 
+        AllPermissions = 777
     }
 
     public class Permission
@@ -53,6 +54,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             functionsBitMask[(int)method] = active;
             return new Result<Boolean>($"Permission for {method} set successfully to {active}\n", true, true);
+        }
+
+        public Result<Boolean> SetPermission(int method, Boolean active)
+        {
+            functionsBitMask[method] = active;
+            return new Result<Boolean>($"Permission for {(Methods)method} set successfully to {active}\n", true, true);
+        }
+
+        public Result<Boolean> SetAllMethodesPermitted()
+        {
+            for(int i = 0; i<functionsBitMask.Length; i++)
+            {
+                functionsBitMask[i] = true;
+            }
+            
+            return new Result<Boolean>("All methodes are permitted\n", true, true);
         }
 
         public Result<PermissionDAL> GetDAL()

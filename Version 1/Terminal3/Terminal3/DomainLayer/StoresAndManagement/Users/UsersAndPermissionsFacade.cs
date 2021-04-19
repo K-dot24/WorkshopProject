@@ -15,8 +15,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
         Result<RegisteredUser> LogOut(String email);
+        Result<Boolean> AddProductReview(String userID, Store store, Product product, String review);
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
+        Result<Boolean> ExitSystem(String userID);
+
     }
 
     public class UsersAndPermissionsFacade : IUsersAndPermissionsFacade
@@ -202,6 +205,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
         }
 
+        public Result<Boolean> AddProductReview(String userID, Store store, Product product , String review)
+        {
+            if(RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
+            {
+                return user.AddProductReview(store, product , review);
+            }
+            return new Result<Boolean>("User does not exists\n", false, false);
+        }
+
+
         public Result<History> GetUserPurchaseHistory(String userID)
         {
             if (RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
@@ -210,7 +223,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
             return new Result<History>("Not a registered user\n", false, null);
         }
-
 
         public Result<bool> AddProductToCart(string userID, Product product, int productQuantity, Store store)
         {
@@ -225,5 +237,26 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             //else failed
             return new Result<bool>($"User (ID: {userID}) does not exists.\n", false, false);
         }
+
+        public Result<Boolean> ExitSystem(String userID)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser gest_user))
+            {
+                Result<Boolean> res = gest_user.ExitSystem();
+                GuestUsers.Remove(userID, out GuestUser gu);
+                return res;
+            }
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser register_user))
+            {
+                Result<Boolean> res = register_user.ExitSystem();
+                return res;
+            }
+            else
+            {
+                return new Result<Boolean>("User does not exist\n", false, false);
+            }
+
+        }
+
     }
 }

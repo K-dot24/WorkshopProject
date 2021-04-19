@@ -7,11 +7,13 @@ namespace Terminal3.DALobjects
     public class UserDAL
     {
         //Properties
+        public String Id { get; }
         public ShoppingCartDAL ShoppingCart { get; }
 
         //Constructor
-        public UserDAL(ShoppingCartDAL shoppingCart)
+        public UserDAL(String id,ShoppingCartDAL shoppingCart)
         {
+            Id = id;
             ShoppingCart = shoppingCart;
         }
     }

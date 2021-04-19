@@ -46,7 +46,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<UserDAL> GetDAL()
         {
             ShoppingCartDAL shoppingCart = ShoppingCart.GetDAL().Data;
-            return new Result<UserDAL>("User DAL object", true, new UserDAL(shoppingCart));
+            return new Result<UserDAL>("User DAL object", true, new UserDAL(Id,shoppingCart));
         }
 
     }
