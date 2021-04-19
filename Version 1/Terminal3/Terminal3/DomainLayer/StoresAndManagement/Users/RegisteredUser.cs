@@ -91,8 +91,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<Boolean> ExitSystem()
         {
-            Result < RegisteredUser> res =  LogOut();
-            return new Result<Boolean>(res.Message, res.ExecStatus, res.ExecStatus);
+            return LogOut();
         }
     }
 }
