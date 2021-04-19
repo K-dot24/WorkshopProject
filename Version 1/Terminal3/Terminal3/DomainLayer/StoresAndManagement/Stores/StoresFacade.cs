@@ -27,7 +27,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
         Result<History> GetStorePurchaseHistory(String userID, String storeID, bool sysAdmin);
@@ -117,7 +117,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<List<Product>> SearchProduct(IDictionary<String, Object> searchAttributes)
         {
-            //ProductSearchAttributes searchAttributes = ObjectDictionaryMapper<ProductSearchAttributes>.GetObject(productDetails);
             List<Product> searchResult = new List<Product>();
             foreach(Store store in this.Stores.Values)
             {
