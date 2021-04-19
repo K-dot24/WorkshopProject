@@ -1,5 +1,6 @@
 ﻿using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DALobjects;
+using System;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -16,6 +17,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             Store = store;
             Permission = permission;
             AppointedBy = appointedBy;
+        }
+
+        public Result<Boolean> SetPermission(int method, Boolean active)
+        {
+            return Permission.SetPermission(method, active);
+        }
+
+        public Result<Boolean> SetPermission(Methods method, Boolean active)
+        {
+            return Permission.SetPermission(method, active);
         }
 
         public Result<object> GetDAL()

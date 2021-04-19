@@ -8,13 +8,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
     public interface IStoresFacade
     {
-        Result<StoreDAL> OpenNewStore(RegisteredUser founder, String storeName);
+        Result<Store> OpenNewStore(RegisteredUser founder, String storeName);
 
         #region Inventory Management
-        Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
+        Result<Product> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
-        Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
-        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+        Result<Product> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
+        Result<List<Product>> SearchProduct(IDictionary<String, Object> productDetails);
         Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
 
         Result<Store> GetStore(String storeID);
@@ -25,11 +25,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID, String storeID);
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID, String storeID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String ownerID, String storeID);
+        Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
+        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
-        Result<History> GetStorePurchaseHistory(String userID, String storeID, bool systemAdmin);
+        Result<History> GetStorePurchaseHistory(String userID, String storeID, bool sysAdmin);
     }
 
     public class StoresFacade : IStoresFacade
@@ -45,21 +46,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         //TODO: Implement all functions
 
         #region Inventory Management
-        public Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null)
+        public Result<Product> AddProductToStore(String userID, String storeID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
             if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
             {
-                Result<Product> res = store.AddNewProduct(userID, productName, price, initialQuantity, category, keywords);
-                if (res.ExecStatus)
-                {
-                    //TODO: DAL object - OK?
-                    return new Result<ProductDAL>(res.Message, res.ExecStatus, new ProductDAL(res.Data.Id, res.Data.Name, res.Data.Price, res.Data.Quantity, res.Data.Category));
-                }
-                //else failed
-                return new Result<ProductDAL>(res.Message, res.ExecStatus, null);
+                return store.AddNewProduct(userID, productName, price, initialQuantity, category, keywords);                
             }
             //else failed
-            return new Result<ProductDAL>($"Store ID {storeID} not found.\n", false, null);
+            return new Result<Product>($"Store ID {storeID} not found.\n", false, null);
             
         }
         
@@ -79,21 +73,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
         
-        public Result<ProductDAL> EditProductDetails(string userID, string storeID, string productID, IDictionary<String, Object> details)
+        public Result<Product> EditProductDetails(string userID, string storeID, string productID, IDictionary<String, Object> details)
         {
             if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
             {
-                Result<Product> res = store.EditProduct(userID, productID, details);
-                if (res.ExecStatus)
-                {
-                    //TODO: DAL object - OK?
-                    return new Result<ProductDAL>(res.Message, res.ExecStatus, new ProductDAL(res.Data.Id, res.Data.Name, res.Data.Price, res.Data.Quantity, res.Data.Category));
-                }
-                //else failed
-                return new Result<ProductDAL>(res.Message, res.ExecStatus, null);               
+                return store.EditProduct(userID, productID, details);          
             }
             //else failed
-            return new Result<ProductDAL>($"Store ID {storeID} not found.\n", false, null);          
+            return new Result<Product>($"Store ID {storeID} not found.\n", false, null);          
         }
         #endregion
 
@@ -128,7 +115,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
 
-        public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> searchAttributes)
+        public Result<List<Product>> SearchProduct(IDictionary<String, Object> searchAttributes)
         {
             //ProductSearchAttributes searchAttributes = ObjectDictionaryMapper<ProductSearchAttributes>.GetObject(productDetails);
             List<Product> searchResult = new List<Product>();
@@ -141,10 +128,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 }
             }
             if (searchResult.Count > 0) {
-                return new Result<List<ProductDAL>>($"{searchResult.Count } items has been found\n",true, null); //TODO: Fix with DAL
+                return new Result<List<Product>>($"{searchResult.Count } items has been found\n",true, searchResult); 
             }
             else{
-                return new Result<List<ProductDAL>>($"No has been found\n", false, null);
+                return new Result<List<Product>>($"No has been found\n", false, null);
             }
 
         }
@@ -169,18 +156,33 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<History>("Store Id does not exists\n", false, null);
         }
 
-        public Result<StoreDAL> OpenNewStore(RegisteredUser founder, string storeName)
+        public Result<Store> OpenNewStore(RegisteredUser founder, string storeName)
         {
             Store newStore = new Store(storeName, founder);
             Stores.TryAdd(newStore.Id, newStore);
 
-            //TODO: Complete with DAL object
-            return new Result<StoreDAL>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, null);
+            return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, newStore);
         }
 
-        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
+
+        public Result<bool> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions)
         {
-            throw new NotImplementedException();
+            if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
+            {
+                return store.SetPermissions(managerID, ownerID, permissions);
+            }
+            //else failed
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
+        }
+
+        public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
+        {
+            if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
+            {
+                return store.RemovePermissions(managerID, ownerID, permissions);
+            }
+            //else failed
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
 
         public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID)
@@ -200,6 +202,5 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
             return new Result<Store>("Store does not exists\n", false, null);
         }
-
     }
 }

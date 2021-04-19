@@ -195,6 +195,11 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             return system.Register(email, password);
         }
 
+        public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<bool> RemoveProductFromStore(string userID, string storeID, string productID)
         {
             return system.RemoveProductFromStore(userID, storeID, productID);
@@ -231,9 +236,9 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             throw new NotImplementedException();
         }
 
-        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        public Result<bool> SetPermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
-            return system.SetPermissions(managerID, ownerID, permissions);
+            return system.SetPermissions(storeID, managerID, ownerID, permissions);
         }
 
         public Result<bool> UpdateShoppingCart(string userID, string shoppingBagID, string productID, int quantity)
