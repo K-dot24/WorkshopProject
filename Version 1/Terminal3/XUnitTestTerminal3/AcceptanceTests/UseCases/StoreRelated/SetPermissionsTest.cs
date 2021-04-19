@@ -10,10 +10,9 @@ namespace XUnitTestTerminal3
         private string owner_id;
         private string manager_id; 
         private string store_id; 
-        public SetPermissionsTest()
+        public SetPermissionsTest() : base()
         {
             //owner
-            sut.ResetSystem();
             sut.Register("owner@gmail.com", "owner123");
             this.owner_id = sut.Login("owner@gmail.com", "owner123").Data;
             this.store_id = sut.OpenNewStore("test_store", owner_id).Data;

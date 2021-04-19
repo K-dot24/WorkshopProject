@@ -9,9 +9,8 @@ namespace XUnitTestTerminal3
     {
         private string user_id;
         private string store_id;
-        public AddStoreOwnerTest()
+        public AddStoreOwnerTest() : base()
         {
-            sut.ResetSystem();
             sut.Register("test@gmail.com", "test123");
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
             this.store_id = sut.OpenNewStore("test_store", user_id).Data;

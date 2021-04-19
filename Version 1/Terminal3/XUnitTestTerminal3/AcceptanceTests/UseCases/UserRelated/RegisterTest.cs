@@ -7,12 +7,9 @@ using Xunit;
 
 namespace XUnitTestTerminal3
 {
-    public class RegisterTest: XUnitTerminal3TestCase
-    {     
-        public RegisterTest()
-        {
-            sut.ResetSystem();
-        }
+    public class RegisterTest : XUnitTerminal3TestCase
+    {
+        public RegisterTest() : base() {}
 
         [Fact]
         [Trait("Category", "acceptance")]
