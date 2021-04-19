@@ -17,7 +17,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);
         Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
         Result<Boolean> UpdateShoppingCart(String userID, String storeID, String productID, int quantity);
-        Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
     }

@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTestTerminal3", "XUnit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal3-UnitTests", "Terminal3Tests\Terminal3-UnitTests.csproj", "{E328A82A-D91A-4173-8622-3FD2E4A5A534}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal3API", "Terminal3API\Terminal3API.csproj", "{23FCFE1B-57DD-4190-8DF4-EE071C0B3E79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal3API", "Terminal3API\Terminal3API.csproj", "{23FCFE1B-57DD-4190-8DF4-EE071C0B3E79}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
