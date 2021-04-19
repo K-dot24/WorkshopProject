@@ -224,7 +224,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (searchResult.ExecStatus)
             {
                 //User 
-                return searchResult.Data.LogOut();
+                Result<GuestUser> res = searchResult.Data.LogOut();
+                if (res.ExecStatus)
+                {
+                    GuestUsers.TryAdd(res.Data.Id, res.Data);
+                    return new Result<Boolean>($"There is not user using this email:{email}\n", true, true);
+                }
+                else
+                    return new Result<Boolean>(res.Message, false, false);
             }
             else
             {
