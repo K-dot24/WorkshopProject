@@ -45,7 +45,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             StoreManager manager2 = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
             TestStore.Managers.TryAdd(manager2.User.Email, manager2);
 
-            Assert.Equal(expectedResult, Facade.AddProductToStore(userID, TestStore.Id, productName, price, initialQuantity, category).ExecStatus);
+            Result<Product> productResult = Facade.AddProductToStore(userID, TestStore.Id, productName, price, initialQuantity, category);
+            Assert.Equal(expectedResult, productResult.ExecStatus);
+            if(productResult != null)
+                Assert.Equal(expectedResult, TestStore.InventoryManager.Products.ContainsKey(productResult.Data.Id));
         }
 
         [Theory()]
@@ -73,6 +76,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
             // Try to remove
             Assert.Equal(expectedResult, Facade.RemoveProductFromStore(userID, TestStore.Id, product.Id).ExecStatus);
+            if(expectedResult)
+                Assert.False(TestStore.InventoryManager.Products.ContainsKey(product.Id));
             // Wrong product ID
             Assert.False(Facade.RemoveProductFromStore(userID, TestStore.Id, "stam_id").ExecStatus);
             // Wrong store ID
@@ -127,6 +132,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
             RegisteredUser futureOwner = new RegisteredUser(futureOwnerEmail, "password");
             Assert.Equal(expectedResult, Facade.AddStoreOwner(futureOwner, currentlyOwnerEmail, TestStore.Id).ExecStatus);
+            Assert.Equal(expectedResult, TestStore.Owners.ContainsKey(futureOwner.Id));
             // Wrong store ID
             Assert.False(Facade.AddStoreOwner(futureOwner, currentlyOwnerEmail, "stam_id").ExecStatus);
         }
@@ -139,6 +145,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
         {
             RegisteredUser futureManager = new RegisteredUser(futureManagerEmail, "badpassword");
             Assert.Equal(expectedResult, Facade.AddStoreManager(futureManager, currentlyOwnerEmail, TestStore.Id).ExecStatus);
+            Assert.Equal(expectedResult, TestStore.Managers.ContainsKey(futureManager.Id));
         }
 
         [Theory()]
@@ -147,16 +154,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
         [InlineData("raz@gmail.com", "papi@hotmale.com", false)]    // Fail: not a manager
         public void RemoveStoreManagerTest(string removedManagerEmail, string currentlyOwnerEmail, Boolean expectedResult)
         {
-            // prepare new Store Owner
-            RegisteredUser user = new RegisteredUser("raz@gmail.com", "ClassyBougieRatchet");
-            StoreOwner newOwner = new StoreOwner(user, TestStore, TestStore.Founder);
-
             // Prepare new Store Manager, appointed by founder
             RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "SassyMoodyNasty");
+            RegisteredUser user3 = new RegisteredUser("raz@gmail.com", "SassyMoodyNasty");
+            EmailToID.TryAdd(user2.Email, user2.Id);
+            EmailToID.TryAdd(user3.Email, user3.Id);
             StoreManager manager = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
             TestStore.Managers.TryAdd(manager.User.Email, manager);
 
-            Assert.Equal(expectedResult, Facade.RemoveStoreManager(removedManagerEmail, currentlyOwnerEmail, TestStore.Id).ExecStatus);
+            EmailToID.TryGetValue(removedManagerEmail, out string removedManagerId);
+            EmailToID.TryGetValue(currentlyOwnerEmail, out string currentlyOwnerId);
+            Assert.Equal(expectedResult, Facade.RemoveStoreManager(removedManagerId, currentlyOwnerId, TestStore.Id).ExecStatus);
+            if(expectedResult)
+                Assert.False(TestStore.Managers.ContainsKey(removedManagerId));
 
         }
 
@@ -172,37 +182,42 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
             RegisteredUser user = new RegisteredUser(userID, "ManInTheMiddle");
             Assert.Equal(expectedResult, Facade.OpenNewStore(user, storeName).ExecStatus);
+            if(expectedResult)
+                Assert.Equal(expectedResult, Facade.Stores.ContainsKey(storeName));
         }
 
         [Theory()]
+        [InlineData("papi@hotmale.com", "The Testor", true)]  // Success
         [InlineData("papi@hotmale.com", "My Second Store", false)]   // Fail: Store does not exsist
-        [InlineData("tomer@gmail.com", "TOMER HAIR DESIGN", false)]  // Fail: Manager without permissions
-        public void GetStoreStaffTest1(string ownerID, string storeID , Boolean expectedResult)
+        [InlineData("tomer@gmail.com", "The Testor", false)]  // Fail: Manager without permissions
+        public void GetStoreStaffTest1(string ownerMail, string storeName , Boolean expectedResult)
         {
             RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "Why6AfraidOf7?");
             StoreManager manager = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
             TestStore.Managers.TryAdd(manager.User.Email, manager);
 
-            Result<Dictionary<IStoreStaff, Permission>> res = Facade.GetStoreStaff(ownerID, storeID);
+            Dictionary<string, string> storeIds = new Dictionary<string, string>()
+                                                               { { "My Second Store", "null" }, { TestStore.Name, TestStore.Id } };
+            EmailToID.TryAdd(user2.Email, user2.Id);
+
+            EmailToID.TryGetValue(ownerMail, out string ownerId);
+            storeIds.TryGetValue(storeName, out string storeId);
+            Result<Dictionary<IStoreStaff, Permission>> res = Facade.GetStoreStaff(ownerId, storeId);
 
             Assert.Equal(expectedResult, res.ExecStatus);
-        }
-
-        [Theory()]
-        [InlineData("papi@hotmale.com", "My Second Store", true)]   // Success : Owner
-        public void GetStoreStaffTest2(string ownerID, string storeID, Boolean expectedResult)
-        {
-            RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "Why6AfraidOf7?");
-            StoreManager manager = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
-            TestStore.Managers.TryAdd(manager.User.Email, manager);
-
-            Result<Dictionary<IStoreStaff, Permission>> res = Facade.GetStoreStaff(ownerID, TestStore.Id);
-
-            Assert.Equal(expectedResult, res.ExecStatus);
-            Assert.True(res.Data.ContainsKey(manager));
-            Assert.True(res.Data.ContainsKey(TestStore.Founder));
-
-
+            if (expectedResult)
+            {
+                Assert.True(res.Data.ContainsKey(manager));
+                Assert.True(res.Data.ContainsKey(TestStore.Founder));
+                Assert.True(res.Data.Count == 2);
+                Facade.Stores.TryGetValue(storeId, out Store store);
+                store.Managers.TryGetValue(manager.User.Id, out StoreManager actualManager);
+                Assert.Equal(actualManager, manager);
+                store.Owners.TryGetValue(TestStore.Founder.User.Id, out StoreOwner actualOwner);
+                Assert.Equal(actualOwner, TestStore.Founder);
+                Assert.True(store.Managers.Count == 1);
+                Assert.True(store.Owners.Count == 1);
+            }
         }
 
         [Theory()]
