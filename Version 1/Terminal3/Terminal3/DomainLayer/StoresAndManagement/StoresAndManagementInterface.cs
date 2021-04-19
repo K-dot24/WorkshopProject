@@ -43,7 +43,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
         Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
-        Result<int> GetTotalShoppingCartPrice(String userID);
+        Result<double> GetTotalShoppingCartPrice(String userID);
         #endregion
 
         #region System Managment
@@ -309,7 +309,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         }
 
         public Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails) { throw new NotImplementedException(); }
-        public Result<int> GetTotalShoppingCartPrice(String userID)
+        public Result<double> GetTotalShoppingCartPrice(String userID)
         {
             return UsersAndPermissionsFacade.GetTotalShoppingCartPrice(userID);
         }
