@@ -26,9 +26,9 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID) { return StoresAndManagementInterface.AddStoreManager(addedManagerID, currentlyOwnerID, storeID); }
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions) { return StoresAndManagementInterface.SetPermissions(storeID, managerID, ownerID, permissions); }
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions) { return StoresAndManagementInterface.RemovePermissions(storeID,  managerID,  ownerID,  permissions); }
-        Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID) { throw new NotImplementedException(); }
-        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID) { throw new NotImplementedException(); }
-        Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID) { throw new NotImplementedException(); }
+        Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID) { return StoresAndManagementInterface.GetStoreStaff(ownerID, storeID); }
+        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID) { return StoresAndManagementInterface.GetStorePurchaseHistory(ownerID, storeID); }
+        Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID) { return StoresAndManagementInterface.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID); }
 
         #endregion
     }
