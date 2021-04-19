@@ -161,6 +161,20 @@ namespace Terminal3.ServiceLayer
         {
             throw new NotImplementedException();
         }
+        
+        public Result<UserDAL> EnterSystem()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ExitSystem(String userID)
+        {
+            throw new NotImplementedException();
+
+            //StoresAndManagement.ExitSystem(userID);
+            ////TODO
+            //System.Environment.Exit(0);
+        }
         #endregion
 
     }
