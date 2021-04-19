@@ -7,8 +7,15 @@ using Terminal3.DomainLayer.StoresAndManagement;
 
 namespace Terminal3.ServiceLayer.Controllers
 {
+    public interface ISystemAdminInterface
+    {
+        Result<HistoryDAL> GetUserPurchaseHistory(string sysAdminID, String userID);
+        Result<HistoryDAL> GetStorePurchaseHistory(string sysAdminID, String storeId);
+        Result<RegisteredUserDAL> AddSystemAdmin(string sysAdminID, String email);
+        Result<RegisteredUserDAL> RemoveSystemAdmin(string sysAdminID, String email);
 
-    public class SystemAdminController
+    }
+    public class SystemAdminController: ISystemAdminInterface
     {
 
         //Properties
