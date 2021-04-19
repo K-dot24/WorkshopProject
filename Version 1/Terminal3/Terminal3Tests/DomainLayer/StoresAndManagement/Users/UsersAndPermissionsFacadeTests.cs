@@ -50,7 +50,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             if (expectedResult)
                 Assert.True(Facade.SystemAdmins.ContainsKey(registerResult.Data.Id), "AddSystemAdmin returned true but the user wasn't added to the admins dict");
             else
-                Assert.Empty(Facade.SystemAdmins, "AddSystemAdmin returned false but the user was added to the admins dict");
+                Assert.Empty(Facade.SystemAdmins);
         }
 
         [Theory()]
