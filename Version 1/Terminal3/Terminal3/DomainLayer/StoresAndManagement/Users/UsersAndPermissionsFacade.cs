@@ -22,6 +22,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<ShoppingCart> GetUserShoppingCart(string userID);
         Result<Boolean> ExitSystem(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
+        Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
 
 
     }
@@ -353,6 +354,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             }
 
+        }
+
+        public Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+            {
+                return guest_user.Purchase(paymentDetails , deliveryDetails);
+            }
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+            {
+                return registerd_user.Purchase(paymentDetails , deliveryDetails);
+            }
+            else
+            {
+                return new Result<ShoppingCart>("User does not exist\n", false, null);
+            }
         }
 
     }
