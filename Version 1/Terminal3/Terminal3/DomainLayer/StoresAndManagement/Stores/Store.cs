@@ -25,7 +25,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID);
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID);
+        Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String ownerID);
         #endregion
 
         #region Policies Management

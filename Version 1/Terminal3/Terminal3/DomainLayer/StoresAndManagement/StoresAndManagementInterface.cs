@@ -29,7 +29,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
         #region User Actions
@@ -38,7 +38,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> LogOut(String email);
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity);
-        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin);
+        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin=false);
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
@@ -270,11 +270,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             bool isContains = UsersAndPermissionsFacade.SystemAdmins.ContainsKey(userID);
             return new Result<Boolean>($"is {userID} is system admin? {isContains}\n", true, isContains);
-        }
-
-        Result<Dictionary<UserDAL, PermissionDAL>> IStoresAndManagementInterface.GetStoreStaff(string ownerID, string storeID)
-        {
-            throw new NotImplementedException();
         }
 
         public Result<RegisteredUserDAL> Register(string email, string password)
