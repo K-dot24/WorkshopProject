@@ -18,8 +18,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<Boolean> AddProductReview(String userID, Store store, Product product, String review);
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
+        Result<Boolean> UpdateShoppingCart(string userID, string storeID, Product product, int quantity);
+        Result<ShoppingCart> GetUserShoppingCart(string userID);
         Result<Boolean> ExitSystem(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
+
 
     }
 
@@ -215,7 +218,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<Boolean>("User does not exists\n", false, false);
         }
 
-
         public Result<History> GetUserPurchaseHistory(String userID)
         {
             if (RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
@@ -237,6 +239,39 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
             //else failed
             return new Result<bool>($"User (ID: {userID}) does not exists.\n", false, false);
+        }
+
+        public Result<Boolean> UpdateShoppingCart(string userID, string storeID, Product product, int quantity)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+            {
+                return guest_user.UpdateShoppingCart(storeID, product, quantity);
+            }
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+            {
+                return registerd_user.UpdateShoppingCart(storeID, product, quantity);
+            }
+            else
+            {
+                return new Result<Boolean>("User does not exist\n", false, false);
+            }
+
+        }
+
+        public Result<ShoppingCart> GetUserShoppingCart(string userID)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+            {
+                return guest_user.GetUserShoppingCart();
+            }
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+            {                
+                return registerd_user.GetUserShoppingCart();
+            }
+            else
+            {
+                return new Result<ShoppingCart>("User does not exist\n", false, null);
+            }
         }
 
         public Result<Boolean> ExitSystem(String userID)

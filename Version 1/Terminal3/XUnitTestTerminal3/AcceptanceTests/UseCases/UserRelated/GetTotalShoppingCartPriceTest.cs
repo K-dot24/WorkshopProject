@@ -20,7 +20,7 @@ namespace XUnitTestTerminal3
         public void GetTotalShoppingCartPriceEmpty()
         {
             List<String> shoppingBags = sut.GetUserShoppingCart(user_id).Data;
-            int price = sut.GetTotalShoppingCartPrice(user_id).Data;
+            double price = sut.GetTotalShoppingCartPrice(user_id).Data;
 
             Assert.True(price == 0);
         }
@@ -32,7 +32,7 @@ namespace XUnitTestTerminal3
             String store_id = sut.OpenNewStore("test_store", user_id).Data;
             String product_id = sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test").Data;
             sut.AddProductToCart(user_id, product_id, 2, store_id);
-            int price = sut.GetTotalShoppingCartPrice(user_id).Data;
+            double price = sut.GetTotalShoppingCartPrice(user_id).Data;
 
             Assert.True(price == 20);
         }
@@ -48,7 +48,7 @@ namespace XUnitTestTerminal3
             String product_id2 = sut.AddProductToStore(user_id, store_id, "test_product", 15, 10, "test").Data;
             sut.AddProductToCart(user_id, product_id2, 1, store_id);
 
-            int price = sut.GetTotalShoppingCartPrice(user_id).Data;
+            double price = sut.GetTotalShoppingCartPrice(user_id).Data;
 
             Assert.True(price == 25);
         }
@@ -65,7 +65,7 @@ namespace XUnitTestTerminal3
             String product_id2 = sut.AddProductToStore(user_id, store_id2, "test_product", 15, 10, "test").Data;
             sut.AddProductToCart(user_id, product_id2, 1, store_id2);
 
-            int price = sut.GetTotalShoppingCartPrice(user_id).Data;
+            double price = sut.GetTotalShoppingCartPrice(user_id).Data;
 
             Assert.True(price == 25);
         }
@@ -80,7 +80,7 @@ namespace XUnitTestTerminal3
 
             List<String> shoppingBags = sut.GetUserShoppingCart(user_id).Data;
             sut.UpdateShoppingCart(user_id, shoppingBags[0], product_id, 0);
-            int price = sut.GetTotalShoppingCartPrice(user_id).Data;
+            double price = sut.GetTotalShoppingCartPrice(user_id).Data;
 
             Assert.True(price == 0);
         }

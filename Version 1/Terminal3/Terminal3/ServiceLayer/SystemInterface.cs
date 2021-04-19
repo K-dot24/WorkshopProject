@@ -40,7 +40,7 @@ namespace Terminal3.ServiceLayer
 
         Result<List<String>> GetUserPurchaseHistory(String userID); //List<shoppingBagID>
 
-        Result<int> GetTotalShoppingCartPrice(String userID);
+        Result<double> GetTotalShoppingCartPrice(String userID);
 
         Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
         #endregion
