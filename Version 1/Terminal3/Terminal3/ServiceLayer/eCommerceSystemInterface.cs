@@ -23,7 +23,7 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> Register(String email, String password);
 
 
-        Result<UserDAL> Login(String email, String password);
+        Result<RegisteredUserDAL> Login(String email, String password);
 
         Result<Boolean> LogOut(String email);
 
@@ -36,15 +36,15 @@ namespace Terminal3.ServiceLayer
 
         Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
 
-        Result<Dictionary<String, int>> GetUserShoppingBag(String userID, String shoppingBagID); //Dictionary<pid , countity>
+        Result<Dictionary<String, int>> GetUserShoppingBag(String userID, String shoppingBagID); //Dictionary<pid , quantity>
 
-        Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity);
+        Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity); // this quantity will be the updated quantity of the product in the bag . if negitiva or zero then the product will be removed
 
         Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
 
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
 
-        Result<int> GetTotalShoppingCartPrice(String userID);
+        Result<double> GetTotalShoppingCartPrice(String userID);
         #endregion
 
         #region Store related operations
@@ -105,7 +105,7 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
         }
 
-        public Result<int> GetTotalShoppingCartPrice(string userID)
+        public Result<double> GetTotalShoppingCartPrice(string userID)
         {
             throw new NotImplementedException();
         }
@@ -125,7 +125,7 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
         }
 
-        public Result<UserDAL> Login(string email, string password)
+        public Result<RegisteredUserDAL> Login(string email, string password)
         {
             throw new NotImplementedException();
         }
@@ -175,7 +175,7 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
         }
 
-        public Result<bool> UpdateShoppingCart(string userID, string shoppingBagID, string productID, int quantity)
+        public Result<bool> UpdateShoppingCart(string userID, string storeID, string productID, int quantity)
         {
             throw new NotImplementedException();
         }

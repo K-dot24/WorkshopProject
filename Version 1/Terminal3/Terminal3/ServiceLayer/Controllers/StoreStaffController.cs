@@ -5,13 +5,13 @@ using Terminal3.DomainLayer.StoresAndManagement;
 
 namespace Terminal3.ServiceLayer.Controllers
 {
-    public class OwnerController
+    public class StoreStaffController
     {
         //Properties
         public IStoresAndManagementInterface StoresAndManagementInterface { get; }
 
         //Constructor
-        public OwnerController(IStoresAndManagementInterface storesAndManagementInterface)
+        public StoreStaffController(IStoresAndManagementInterface storesAndManagementInterface)
         {
             this.StoresAndManagementInterface = storesAndManagementInterface;
         }
