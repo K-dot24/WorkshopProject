@@ -8,10 +8,7 @@ namespace XUnitTestTerminal3
 {
     public class LoginTest: XUnitTerminal3TestCase
     {
-        public LoginTest()
-        {
-            sut.ResetSystem();
-        }
+        public LoginTest() : base() {}
 
         [Fact]
         [Trait("Category", "acceptance")]

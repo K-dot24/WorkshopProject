@@ -11,9 +11,8 @@ namespace XUnitTestTerminal3
     {
 
         private string user_id;
-        public AddProductToStoreTest()
+        public AddProductToStoreTest() : base()
         {
-            sut.ResetSystem();
             sut.Register("test@gmail.com", "test123");
         }
 

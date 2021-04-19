@@ -8,9 +8,8 @@ namespace XUnitTestTerminal3
     public class SearchStoreTest: XUnitTerminal3TestCase
     {
         private string user_id;
-        public SearchStoreTest()
+        public SearchStoreTest() : base()
         {
-            sut.ResetSystem();
             sut.Register("test@gmail.com", "test123");
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
         }

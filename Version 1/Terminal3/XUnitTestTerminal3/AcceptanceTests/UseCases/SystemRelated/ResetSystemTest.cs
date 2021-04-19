@@ -2,57 +2,59 @@
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
+using XUnitTestTerminal3.IntegrationTests;
 
 namespace XUnitTestTerminal3
 {
     public class ResetSystemTest: XUnitTerminal3TestCase
     {
         private string user_id;
-        public ResetSystemTest()
+        private string admin_id;
+
+        public ResetSystemTest() : base()
         {
+            //Admin
+            sut.Register("Admin@terminal3", "Admin");
+            this.admin_id = sut.Login("Admin@terminal3", "Admin").Data;
+
             sut.Register("test@gmail.com", "test123");
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
         }
 
         [Fact]
         [Trait("Category", "acceptance")]
-        public void ResetSystemUser()
+        public void ResetSystemAdmin()
         {
-            sut.Register("test@gmail.com", "test123");
-            sut.ResetSystem();
+            Assert.True(sut.ResetSystem(admin_id).ExecStatus);
+        }
+
+        [Fact]
+        [Trait("Category", "acceptance")]
+        public void ResetSystemNotAdmin()
+        {
+            Assert.False(sut.ResetSystem(user_id).ExecStatus);
+        }
+
+        [Fact]
+        [Trait("Category", "acceptance")]
+        public void ResetSystemLogin()
+        {
+            sut.ResetSystem(admin_id);
+            sut = Bridge.getService();
 
             Assert.False(sut.Login("test@gmail.com", "test123").ExecStatus);
         }
 
         [Fact]
         [Trait("Category", "acceptance")]
-        public void ResetSystemProduct()
+        public void ResetSystemRegidter()
         {
-            sut.Register("test@gmail.com", "test123");
-            this.user_id = sut.Login("test@gmail.com", "test123").Data;
+            sut.ResetSystem(admin_id);
+            sut = Bridge.getService();
 
-            String store_id = sut.OpenNewStore("test_store", user_id).Data;
-            String product_id = sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test").Data;
-
-            sut.ResetSystem();
-            IDictionary<String, Object> dictonary = new Dictionary<String, Object>() { { "Name", "test_product" } };
-
-            Assert.False(sut.SearchProduct(dictonary).ExecStatus);
+            Assert.True(sut.Register("test@gmail.com", "test123").ExecStatus);
         }
 
-        [Fact]
-        [Trait("Category", "acceptance")]
-        public void ResetSystemCart()
-        {
-            sut.Register("test@gmail.com", "test123");
-            this.user_id = sut.Login("test@gmail.com", "test123").Data;
 
-            String store_id = sut.OpenNewStore("test_store", user_id).Data;
-            String product_id = sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test").Data;
-            sut.AddProductToCart(user_id, product_id, 1, store_id);
-
-            sut.ResetSystem();
-            Assert.False(sut.GetUserShoppingCart(user_id).ExecStatus);
-        }
     }
 }

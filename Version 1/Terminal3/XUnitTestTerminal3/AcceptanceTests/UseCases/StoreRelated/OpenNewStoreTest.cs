@@ -10,7 +10,6 @@ namespace XUnitTestTerminal3
         private string user_id;
         public OpenNewStoreTest()
         {
-            sut.ResetSystem();
             sut.Register("test@gmail.com", "test123");
         }
 
