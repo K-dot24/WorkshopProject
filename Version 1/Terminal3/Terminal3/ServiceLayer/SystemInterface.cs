@@ -13,7 +13,7 @@ namespace Terminal3.ServiceLayer
     {
 
         #region System related operations
-        Result<Boolean> ResetSystem();
+        Result<Boolean> ResetSystem(string sysAdminID);
         #endregion
 
         #region User related operations

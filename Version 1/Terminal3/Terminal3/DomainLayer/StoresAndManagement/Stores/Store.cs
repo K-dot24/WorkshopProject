@@ -307,22 +307,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<StoreDAL> GetDAL()
         {
-            StoreOwnerDAL founder = (StoreOwnerDAL)Founder.GetDAL().Data;
-            ConcurrentDictionary<String, StoreOwnerDAL> owners = new ConcurrentDictionary<String, StoreOwnerDAL>();
+            LinkedList<String> owners = new LinkedList<String>();
+            
             foreach (var so in Owners)
             {
-                owners.TryAdd(so.Key, (StoreOwnerDAL)so.Value.GetDAL().Data);
+                owners.AddLast(so.Key);
             }
-            ConcurrentDictionary<String, StoreManagerDAL> managers = new ConcurrentDictionary<String, StoreManagerDAL>();
+
+            LinkedList<String> managers = new LinkedList<String>();
             foreach (var sm in Managers)
             {
-                managers.TryAdd(sm.Key, (StoreManagerDAL)sm.Value.GetDAL().Data);
+                managers.AddLast(sm.Key);
             }
             // InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
             // PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
             HistoryDAL history = History.GetDAL().Data;
 
-            StoreDAL store = new StoreDAL(this.Id, this.Name, founder, owners, managers, history, this.Rating, this.NumberOfRates);
+            StoreDAL store = new StoreDAL(this.Id, this.Name, Founder.User.Id, owners, managers, history, this.Rating, this.NumberOfRates);
             return new Result<StoreDAL>("Store DAL object", true, store);
 
         }
