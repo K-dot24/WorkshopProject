@@ -31,12 +31,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
-        Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
-        
         #region User Actions
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin);
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
+        Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
         #endregion
 
@@ -68,7 +67,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser founder))  // Check if userID is a registered user
             {
                 // Open store
-                return StoresFacade.OpenNewStore(founder, userID);
+                Result<Store> res = StoresFacade.OpenNewStore(founder, userID);
+                if (res.ExecStatus)
+                {
+                    return new Result<StoreDAL>(res.Message, true, res.Data.GetDAL().Data);
+                }
+                //else
+                return new Result<StoreDAL>($"Failed to open store {storeName}", false, null);
             }
             //else
             return new Result<StoreDAL>($"Failed to open store {storeName}: {userID} is not a registered user.\n", false, null);
@@ -76,17 +81,37 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
-            return StoresFacade.AddProductToStore(userID, storeID, productName, price, initialQuantity, category, keywords);
+            Result<Product> res = StoresFacade.AddProductToStore(userID, storeID, productName, price, initialQuantity, category, keywords);
+            if (res.ExecStatus)
+            {
+                return new Result<ProductDAL>(res.Message, true, res.Data.GetDAL().Data);
+            }
+            return new Result<ProductDAL>(res.Message, false, null);
         }
 
         public Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details)
         {
-            return StoresFacade.EditProductDetails(userID, storeID, productID, details);
+            Result<Product> res = StoresFacade.EditProductDetails(userID, storeID, productID, details);
+            if (res.ExecStatus)
+            {
+                return new Result<ProductDAL>(res.Message, true, res.Data.GetDAL().Data);
+            }
+            return new Result<ProductDAL>(res.Message, false, null);
         }
 
         public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails)
         {
-            return StoresFacade.SearchProduct(productDetails);
+            Result<List<Product>> res = StoresFacade.SearchProduct(productDetails);
+            List<ProductDAL> productDALs = new List<ProductDAL>();
+            if (res.ExecStatus)
+            {                
+                foreach(Product product in res.Data)
+                {
+                    productDALs.Add(product.GetDAL().Data);
+                }
+                return new Result<List<ProductDAL>>(res.Message, true, productDALs);
+            }
+            return new Result<List<ProductDAL>>(res.Message, false, null);
         }
 
 
