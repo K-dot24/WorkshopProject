@@ -11,8 +11,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface IStoresAndManagementInterface
     {
-        //TODO: FROM HERE ABOVE ONLY DAL
-
         Result<StoreDAL> OpenNewStore(String storeName, String userID);
 
         #region Inventory Management
