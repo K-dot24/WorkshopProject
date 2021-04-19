@@ -19,6 +19,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
         Result<Boolean> UpdateShoppingCart(string userID, string storeID, Product product, int quantity);
+        Result<ShoppingCartDAL> GetUserShoppingCart(string userID);
         Result<Boolean> ExitSystem(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
 
@@ -217,7 +218,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<Boolean>("User does not exists\n", false, false);
         }
 
-
         public Result<History> GetUserPurchaseHistory(String userID)
         {
             if (RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
@@ -257,6 +257,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
 
         }
+
+        public Result<ShoppingCart> GetUserShoppingCart(string userID)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+            {
+                return guest_user.GetUserShoppingCart();
+            }
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+            {                
+                return registerd_user.GetUserShoppingCart();
+            }
+            else
+            {
+                return new Result<ShoppingCart>("User does not exist\n", false, null);
+            }
+        }
+
         public Result<Boolean> ExitSystem(String userID)
         {
             if (GuestUsers.TryGetValue(userID, out GuestUser gest_user))

@@ -38,6 +38,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> LogOut(String email);
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity);
+        Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin=false);
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
@@ -233,6 +234,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<Boolean>(resStore.Message, false, false);    
         }
 
+        public Result<ShoppingCartDAL> GetUserShoppingCart(string userID)
+        {
+            Result<ShoppingCart> res = UsersAndPermissionsFacade.GetUserShoppingCart(userID);
+            if (res.ExecStatus)
+            {
+                ShoppingCartDAL shoppingCartDAL = res.Data.GetDAL().Data;
+                return new Result<ShoppingCartDAL>("User shopping cart\n", true, shoppingCartDAL);
+            }
+            //else faild
+            return new Result<ShoppingCartDAL>(res.Message, false, null);
+        }
+
         public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
             return StoresFacade.RemovePermissions(storeID, managerID, ownerID, permissions);
@@ -320,5 +333,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             return UsersAndPermissionsFacade.GetTotalShoppingCartPrice(userID);
         }
+
+       
     }
 }

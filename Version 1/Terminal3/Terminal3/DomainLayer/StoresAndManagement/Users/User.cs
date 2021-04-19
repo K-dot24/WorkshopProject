@@ -54,6 +54,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             //else faild
             return new Result<bool>(resBag.Message, false, false);
         }
+
+        public Result<ShoppingCart> GetUserShoppingCart()
+        {
+            return new Result<ShoppingCart>("User shopping cart\n", true, ShoppingCart);
+        }
+
         public Result<UserDAL> GetDAL()
         {
             ShoppingCartDAL shoppingCart = ShoppingCart.GetDAL().Data;
