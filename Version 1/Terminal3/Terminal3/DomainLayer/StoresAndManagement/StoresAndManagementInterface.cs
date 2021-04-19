@@ -34,6 +34,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         #region User Actions
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
+        Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity);
         Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin);
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
@@ -114,7 +115,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             }
             return new Result<List<ProductDAL>>(res.Message, false, null);
         }
-
 
         public Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID)
         {
@@ -211,6 +211,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
 
+        public Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity)
+        {
+
+        }
+
         public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
             return StoresFacade.RemovePermissions(storeID, managerID, ownerID, permissions);
@@ -236,7 +241,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<Boolean>(storeRes.Message, false, false);
             
         }
-
 
         public Result<Boolean> ExitSystem(String userID)
         {
