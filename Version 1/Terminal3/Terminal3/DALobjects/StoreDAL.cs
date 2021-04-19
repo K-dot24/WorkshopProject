@@ -10,9 +10,9 @@ namespace Terminal3.DALobjects
         //Properties       
         public String Id { get; }
         public String Name { get; }
-        public StoreOwnerDAL Founder { get; }
-        public ConcurrentDictionary<String, StoreOwnerDAL> Owners { get; }
-        public ConcurrentDictionary<String, StoreManagerDAL> Managers { get; }
+        public String Founder { get; }
+        public LinkedList<String> Owners { get; }
+        public LinkedList<String> Managers { get; }
         //public InventoryManager InventoryManager { get; }   //TODO - do we need a DAL calss of the Inventory Manager?
         //public PolicyManager PolicyManager { get; }         //TODO - do we need a DAL calss of the Policy Manager?
         public HistoryDAL History { get; }
@@ -20,7 +20,7 @@ namespace Terminal3.DALobjects
         public int NumberOfRates { get; private set; }
         
         //Constructor
-        public StoreDAL(string id, string name, StoreOwnerDAL founder, ConcurrentDictionary<string, StoreOwnerDAL> owners, ConcurrentDictionary<string, StoreManagerDAL> managers, HistoryDAL history, double rating, int numberOfRates)
+        public StoreDAL(string id, string name, String founder, LinkedList<String> owners, LinkedList<String> managers, HistoryDAL history, double rating, int numberOfRates)
         {
             Id = id;
             Name = name;

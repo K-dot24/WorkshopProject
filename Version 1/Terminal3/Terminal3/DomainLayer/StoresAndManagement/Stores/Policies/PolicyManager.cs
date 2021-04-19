@@ -10,9 +10,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
     public class PolicyManager : IPurchasePolicy
     {
         //TODO
-        internal double GetCurrentProductPrice(Product product, int v)
+        internal double GetCurrentProductPrice(Product product, int quantity)
         {
-            throw new NotImplementedException();
+            //TODO
+            //throw new NotImplementedException();
+            return product.Price*quantity;
         }
     }
 }

@@ -2,6 +2,7 @@
 using Terminal3.DALobjects;
 using System.Collections.Generic;
 using System.Text;
+using System.Collections.Concurrent;
 
 namespace Terminal3.DALobjects
 {
@@ -9,18 +10,20 @@ namespace Terminal3.DALobjects
     {
         //Properties
         public String Id { get; }
-        public UserDAL User { get; }
-        public StoreDAL Store { get; }
-        public LinkedList<ProductDAL> Products { get; }
+        public String UserId { get; }
+        public String StoreId { get; }
+        public ConcurrentDictionary<ProductDAL , int> Products { get; }  //<productDAL , quantity>
+        public Double TotalBagPrice { get; }
 
 
         //Constructor 
-        public ShoppingBagDAL(UserDAL user, StoreDAL store, LinkedList<ProductDAL> products)
+        public ShoppingBagDAL(String bagID , String userID, String storeID, ConcurrentDictionary<ProductDAL, int> products ,Double totalBagPrice )
         {
-            Id = user.Id;
-            User = user;
-            Store = store;
+            Id = bagID;
+            UserId = userID;
+            StoreId = storeID;
             Products = products;
+            TotalBagPrice = totalBagPrice;
         }
 
 
