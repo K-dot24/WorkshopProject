@@ -69,7 +69,7 @@ namespace Terminal3.ServiceLayer
             return GuestUserInterface.UpdateShoppingCart(userID, storeID, productID, quantity);
         }
 
-        public Result<object> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
+        public Result<ShoppingCartDAL> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
         {
             return GuestUserInterface.Purchase(userID, paymentDetails, deliveryDetails);
         }
