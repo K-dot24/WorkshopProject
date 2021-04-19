@@ -210,9 +210,9 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             throw new NotImplementedException();
         }
 
-        public Result<bool> ResetSystem()
+        public Result<bool> ResetSystem(string sysAdminID)
         {
-            return system.ResetSystem();
+            return system.ResetSystem(sysAdminID);
         }
 
         public Result<List<string>> SearchProduct(IDictionary<string, object> productDetails)
