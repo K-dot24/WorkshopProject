@@ -42,6 +42,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
+        Result<UserDAL> EnterSystem();
         Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<double> GetTotalShoppingCartPrice(String userID);
         #endregion
@@ -252,6 +253,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return UsersAndPermissionsFacade.ExitSystem(userID);
         }
 
+        public Result<UserDAL> EnterSystem()
+        {
+            Result<User> res = UsersAndPermissionsFacade.EnterSystem();
+            if (res.ExecStatus)
+            {
+                UserDAL userDAL = res.Data.GetDAL().Data;
+                return new Result<UserDAL>(res.Message, true, userDAL);
+            }
+            //else faild
+            return new Result<UserDAL>(res.Message, false, null);
+        }
+
         public Result<RegisteredUserDAL> AddSystemAdmin(string email)
         {
             Result<RegisteredUser> result =  UsersAndPermissionsFacade.AddSystemAdmin(email);
@@ -304,6 +317,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         }
 
         public Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails) { throw new NotImplementedException(); }
+       
         public Result<double> GetTotalShoppingCartPrice(String userID)
         {
             return UsersAndPermissionsFacade.GetTotalShoppingCartPrice(userID);

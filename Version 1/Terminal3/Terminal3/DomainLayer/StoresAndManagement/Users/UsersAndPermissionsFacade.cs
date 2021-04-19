@@ -169,6 +169,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns></returns>
+        public Result<RegisteredUser> Login(String email, String password , String guestId)
+        {
+            Result<RegisteredUser> searchResult = FindUserByEmail(email, RegisteredUsers);
+            if (searchResult.ExecStatus)
+            {
+                //User Found
+                Result<RegisteredUser> res = searchResult.Data.Login(password);
+                if (res.ExecStatus)
+                {
+                    //Delete relevant guest user from list 
+                    GuestUsers.TryRemove(guestId , out GuestUser guest);
+                    guest.Active = false;
+                    return res;
+                }
+                //else faild
+                return new Result<RegisteredUser>(res.Message, false, null);
+            }
+            else
+            {
+                //No user if found using the given email
+                return new Result<RegisteredUser>($"There is not user using this email:{email}\n", false, null);
+
+            }
+        }
+
         public Result<RegisteredUser> Login(String email, String password)
         {
             Result<RegisteredUser> searchResult = FindUserByEmail(email, RegisteredUsers);
@@ -257,6 +282,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<Boolean>("User does not exist\n", false, false);
             }
 
+        }
+
+        public Result<User> EnterSystem()
+        {
+            GuestUser guest = new GuestUser();
+            GuestUsers.TryAdd(guest.Id, guest);
+
+            //TODO - When adding Service Layer
+            //checkIfUserWantsToRegister();            
+            //checkIfUserWantsTologin(guest.Id);
+
+            return new Result<User>("New guest user has enterd the system\n", true, guest);
         }
 
         public Result<double> GetTotalShoppingCartPrice(String userID) {
