@@ -11,7 +11,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface IStoresAndManagementInterface
     {
-        //TODO: add all relevant functions to interface
+        //TODO: FROM HERE ABOVE ONLY DAL
 
         Result<StoreDAL> OpenNewStore(String storeName, String userID);
 
@@ -37,9 +37,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         
         #region User Actions
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
-        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
-
+        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin);
+        Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         Result<Boolean> ExitSystem(String userID);
+        #endregion
+
+        #region System Managment
+        Result<RegisteredUserDAL> AddSystemAdmin(String email);
+        Result<RegisteredUserDAL> RemoveSystemAdmin(String email);
+        Result<Boolean> isSystemAdmin(String userID);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -144,9 +150,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<Dictionary<IStoreStaffDAL, PermissionDAL>>(storeStaffResult.Message , false , null);
         }
 
-        public Result<HistoryDAL> GetStorePurchaseHistory(string userID, string storeID)
+        public Result<HistoryDAL> GetStorePurchaseHistory(string userID, string storeID, bool systemAdmin=false)
         {
-            Result<History> res = StoresFacade.GetStorePurchaseHistory(userID, storeID);
+            Result<History> res = StoresFacade.GetStorePurchaseHistory(userID, storeID, systemAdmin);
             if (res.ExecStatus)
             {
                 return new Result<HistoryDAL>("Store purchase history\n" , true ,res.Data.GetDAL().Data);
@@ -206,6 +212,26 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public Result<Boolean> ExitSystem(String userID)
         {
             return UsersAndPermissionsFacade.ExitSystem(userID);
+        }
+
+        public Result<RegisteredUserDAL> AddSystemAdmin(string email)
+        {
+            Result<RegisteredUser> result =  UsersAndPermissionsFacade.AddSystemAdmin(email);
+            if (result.ExecStatus) { return new Result<RegisteredUserDAL>(result.Message, result.ExecStatus, result.Data.GetDAL().Data); }
+            else {return new Result<RegisteredUserDAL>(result.Message, result.ExecStatus, null);}
+        }
+
+        public Result<RegisteredUserDAL> RemoveSystemAdmin(string email)
+        {
+            Result<RegisteredUser> result = UsersAndPermissionsFacade.RemoveSystemAdmin(email);
+            if (result.ExecStatus) { return new Result<RegisteredUserDAL>(result.Message, result.ExecStatus, result.Data.GetDAL().Data); }
+            else { return new Result<RegisteredUserDAL>(result.Message, result.ExecStatus, null); }
+        }
+
+        public Result<Boolean> isSystemAdmin(String userID)
+        {
+            bool isContains = UsersAndPermissionsFacade.SystemAdmins.ContainsKey(userID);
+            return new Result<Boolean>($"is {userID} is system admin? {isContains}\n", true, isContains);
         }
     }
 }

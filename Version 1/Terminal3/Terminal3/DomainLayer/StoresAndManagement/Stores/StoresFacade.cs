@@ -160,11 +160,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         #endregion
 
-        public Result<History> GetStorePurchaseHistory(string userID, string storeID)
+        public Result<History> GetStorePurchaseHistory(string userID, string storeID,bool sysAdmin)
         {
             if(Stores.TryGetValue(storeID, out Store store))
             {
-                return store.GetStorePurchaseHistory(userID);
+                return store.GetStorePurchaseHistory(userID,sysAdmin);
             }
             return new Result<History>("Store Id does not exists\n", false, null);
         }
