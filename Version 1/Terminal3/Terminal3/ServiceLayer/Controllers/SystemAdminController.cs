@@ -21,22 +21,41 @@ namespace Terminal3.ServiceLayer.Controllers
         }
 
         #region Methods
+        private bool isSystemAdmin(String userID)
+        {
+            return StoresAndManagementInterface.isSystemAdmin(userID).Data;
+        }
+
         /// <summary>
         /// return user purchase history
         /// </summary>
-        /// <param name="userID">user must be register</param>
-        public Result<HistoryDAL> getUserPurchaseHistory(String userID)
+        /// <param name="userID">ID of the requested user-user must be register</param>
+        /// <param name="sysAdminID">ID of the sys admin that request - user must be register</param>
+        public Result<HistoryDAL> GetUserPurchaseHistory(string sysAdminID ,String userID)
         {
-            throw new NotImplementedException();
+            if (isSystemAdmin(sysAdminID)) {
+                return StoresAndManagementInterface.GetUserPurchaseHistory(userID);
+            }
+            else
+            {
+                return new Result<HistoryDAL>($"user:{sysAdminID} is not system admin\n", false, null);
+            }
         }
 
         /// <summary>
         /// return store phurcase history
         /// </summary>
         /// <param name="storeId"></param>
-        public Result<HistoryDAL> getStorePurchaseHistory(string storeId)
+        public Result<HistoryDAL> GetStorePurchaseHistory(string sysAdminID, String storeId)
         {
-            throw new NotImplementedException();
+            if (isSystemAdmin(sysAdminID))
+            {
+                return StoresAndManagementInterface.GetStorePurchaseHistory(sysAdminID, storeId,true);
+            }
+            else
+            {
+                return new Result<HistoryDAL>($"user:{sysAdminID} is not system admin\n", false, null);
+            }
         }
 
         /// <summary>
@@ -46,9 +65,16 @@ namespace Terminal3.ServiceLayer.Controllers
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns>result of the operation</returns>
-        public Result<RegisteredUserDAL> AddSystemAdmin(String email)
-        {
-            throw new NotImplementedException();
+        public Result<RegisteredUserDAL> AddSystemAdmin(string sysAdminID, String email)
+        {            
+            if (isSystemAdmin(sysAdminID))
+            {
+                return  StoresAndManagementInterface.AddSystemAdmin(email);
+            }
+            else
+            {
+                return new Result<RegisteredUserDAL>($"user:{sysAdminID} is not system admin\n", false, null);
+            }
         }
 
         /// <summary>
@@ -58,9 +84,16 @@ namespace Terminal3.ServiceLayer.Controllers
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns>result of the operation</returns>
-        public Result<RegisteredUserDAL> RemoveSystemAdmin(String email)
+        public Result<RegisteredUserDAL> RemoveSystemAdmin(string sysAdminID, String email)
         {
-            throw new NotImplementedException();
+            if (isSystemAdmin(sysAdminID))
+            {
+                return StoresAndManagementInterface.RemoveSystemAdmin(email);
+            }
+            else
+            {
+                return new Result<RegisteredUserDAL>($"user:{sysAdminID} is not system admin\n", false, null);
+            }
         }
         #endregion
     }
