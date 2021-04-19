@@ -12,7 +12,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 {
     public class RealAdapter : ISystemInterface
     {
-        public IECommerceSystemInterface system = new ECommerceSystem();
+        public ECommerceSystem system = new ECommerceSystem();
 
         public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
         {
