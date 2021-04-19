@@ -175,6 +175,12 @@ namespace Terminal3.ServiceLayer
             ////TODO
             //System.Environment.Exit(0);
         }
+
+        public Result<bool> ResetSystem(String sysAdminID)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
     }
