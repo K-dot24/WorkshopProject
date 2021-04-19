@@ -29,7 +29,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
-        Result<History> GetStorePurchaseHistory(String userID, String storeID);
+        Result<History> GetStorePurchaseHistory(String userID, String storeID, bool systemAdmin);
     }
 
     public class StoresFacade : IStoresFacade
