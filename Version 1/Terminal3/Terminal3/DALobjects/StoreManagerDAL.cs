@@ -7,16 +7,16 @@ namespace Terminal3.DALobjects
     public class StoreManagerDAL : IStoreStaffDAL
     {
         //Properties
-        public RegisteredUserDAL User { get; }
+        public String UserId { get; }
         public PermissionDAL Permissions { get; }
-        public StoreOwnerDAL Owner { get; }
+        public String OwnerId { get; }
 
         //Constructor
-        public StoreManagerDAL(RegisteredUserDAL user, PermissionDAL permissions, StoreOwnerDAL owner):base(user.Id)
+        public StoreManagerDAL(String userID, PermissionDAL permissions, String ownerID):base(userID)
         {
-            User = user;
+            UserId = userID;
             Permissions = permissions;
-            Owner = owner;
+            OwnerId = ownerID;
         }
 
     }

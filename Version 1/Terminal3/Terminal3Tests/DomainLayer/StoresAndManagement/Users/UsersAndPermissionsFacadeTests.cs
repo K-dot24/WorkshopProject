@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
+using Terminal3.DALobjects;
+using System.Collections.Concurrent;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
 {
@@ -135,7 +137,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             bag.Products.TryAdd(product, 2);
 
             // Add shopping bag to history
-            founder.History.ShoppingBags.AddLast(bag);
+            founder.History.ShoppingBags.AddLast(bag.GetDAL().Data);
 
             // Add review to product 
             Facade.AddProductReview(founder.Id, store, product, review);
@@ -196,11 +198,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
 
         [Theory()]
         [Trait("Category", "Unit")]
-        [InlineData( 5, true , 5)]      // Success
-        [InlineData(10, false , 2)]      // Fail 2: Higher quantity than quantity in store
-        [InlineData(0, true , 0)]      // Success
-        [InlineData( -1, true , 0)]  // Success
-        public void UpdateShoppingCartTest(int quantity, Boolean expectedResult , int expectedQuantity)
+        [InlineData(5, true, 5)]      // Success
+        [InlineData(10, false, 2)]      // Fail 2: Higher quantity than quantity in store
+        [InlineData(0, true, 0)]      // Success
+        [InlineData(-1, true, 0)]  // Success
+        public void UpdateShoppingCartTest(int quantity, Boolean expectedResult, int expectedQuantity)
         {
             // Open store
             RegisteredUser founder = new RegisteredUser("tomer@gmail.com", "password");
@@ -216,15 +218,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             founder.ShoppingCart.ShoppingBags.TryGetValue(store.Id, out ShoppingBag bag);
             bag.Products.TryAdd(product, 2);
 
-            Assert.Equal(expectedResult , Facade.UpdateShoppingCart(founder.Id, store.Id, product, quantity).ExecStatus);
+            Assert.Equal(expectedResult, Facade.UpdateShoppingCart(founder.Id, store.Id, product, quantity).ExecStatus);
 
             bool res = bag.Products.TryGetValue(product, out int updatedQuantity);
 
             if (res)
             {
-                Assert.Equal(expectedQuantity, updatedQuantity); 
+                Assert.Equal(expectedQuantity, updatedQuantity);
             }
-            else if (expectedQuantity==0)
+            else if (expectedQuantity == 0)
             {
                 Assert.False(bag.Products.ContainsKey(product));
             }
@@ -232,7 +234,90 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             {
                 Assert.False(true);
             }
+
+        }
+
+        [Fact]
+        [Trait("Category", "Unit")]
+        public void PurchaseTest()
+        {
+            // Open store
+            RegisteredUser founder = new RegisteredUser("tomer@gmail.com", "password");
+            Facade.RegisteredUsers.TryAdd(founder.Id, founder);
+            Store store = new Store("Testore", founder);
+
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 5, "Fruits");            
+            Product product2 = new Product("Apple", 4.9, 5, "Fruits");
+            store.InventoryManager.Products.TryAdd(product.Id, product);
+            store.InventoryManager.Products.TryAdd(product2.Id, product2);
+
+            // Add product to user shopping bag
+            founder.ShoppingCart.ShoppingBags.TryAdd(store.Id, new ShoppingBag(founder, store));
+            founder.ShoppingCart.ShoppingBags.TryGetValue(store.Id, out ShoppingBag bag);
+            bag.Products.TryAdd(product, 2);
+            bag.Products.TryAdd(product2, 1);
+
+            IDictionary<String, Object> paymentDetails = new Dictionary<String , Object>();
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String , Object>();
+
+            Assert.Empty(founder.History.ShoppingBags);
+
+            Result<ShoppingCart> res = Facade.Purchase(founder.Id, paymentDetails, deliveryDetails);
+            Assert.True(res.ExecStatus);
             
+            ShoppingCart cart = res.Data;
+            Assert.Equal(16.3 ,cart.TotalCartPrice);
+
+            Assert.Single(founder.History.ShoppingBags);
+
+            // Check Historys bags
+            History history = founder.History;
+            LinkedList<ShoppingBagDAL> bagsDAL = history.ShoppingBags;
+            ShoppingBagDAL bagDAL = bagsDAL.First.Value;
+
+            Assert.Equal(16.3, bagDAL.TotalBagPrice);
+
+        }
+
+        [Fact]
+        [Trait("Category", "Unit")]
+        public void PurchaseTest2()
+        {
+            // Open store
+            RegisteredUser founder = new RegisteredUser("tomer@gmail.com", "password");
+            Facade.RegisteredUsers.TryAdd(founder.Id, founder);
+            Store store = new Store("Testore", founder);
+            Store store2 = new Store("Testore2", founder);
+
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 5, "Fruits");
+            Product product2 = new Product("Apple", 4.9, 5, "Fruits");
+            store.InventoryManager.Products.TryAdd(product.Id, product);
+            store2.InventoryManager.Products.TryAdd(product2.Id, product2);
+
+            // Add product to user shopping bag
+            founder.ShoppingCart.ShoppingBags.TryAdd(store.Id, new ShoppingBag(founder, store));
+            founder.ShoppingCart.ShoppingBags.TryGetValue(store.Id, out ShoppingBag bag);
+            bag.Products.TryAdd(product, 2);
+
+            founder.ShoppingCart.ShoppingBags.TryAdd(store2.Id, new ShoppingBag(founder, store2));
+            founder.ShoppingCart.ShoppingBags.TryGetValue(store2.Id, out ShoppingBag bag2);
+            bag2.Products.TryAdd(product2, 1);
+
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>();
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>();
+
+            Assert.Empty(founder.History.ShoppingBags);
+
+            Result<ShoppingCart> res = Facade.Purchase(founder.Id, paymentDetails, deliveryDetails);
+            Assert.True(res.ExecStatus);
+
+            ShoppingCart cart = res.Data;
+            Assert.Equal(16.3, cart.TotalCartPrice);
+
+            Assert.Equal(2 , founder.History.ShoppingBags.Count);
+
         }
     }
 }

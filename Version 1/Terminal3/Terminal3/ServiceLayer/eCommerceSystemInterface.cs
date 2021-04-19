@@ -41,7 +41,7 @@ namespace Terminal3.ServiceLayer
 
         Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity); // this quantity will be the updated quantity of the product in the bag . if negitiva or zero then the product will be removed
 
-        Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
 
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
 
@@ -136,7 +136,7 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
         }
 
-        public Result<object> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
+        public Result<ShoppingCartDAL> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
         {
             throw new NotImplementedException();
         }

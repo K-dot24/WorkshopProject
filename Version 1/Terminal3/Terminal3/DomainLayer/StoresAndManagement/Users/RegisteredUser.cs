@@ -4,6 +4,7 @@ using System.Reflection;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Terminal3.ExternalSystems;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -68,10 +69,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         private Boolean checkIfProductPurchasedByUser(Store store, Product product)
         {
-            LinkedList<ShoppingBag> shoppingBags = History.ShoppingBags;
-            foreach (ShoppingBag bag in shoppingBags)
-            {
-                if (bag.Products.ContainsKey(product))  // TODO - check updated : in branch AddProductToCart the Products field in ShoppingBag is public ConcurrentDictionary<Product, int> Products 
+            LinkedList<ShoppingBagDAL> shoppingBags = History.ShoppingBags;
+            foreach (ShoppingBagDAL bag in shoppingBags)
+            {                 
+                if (bag.Products.ContainsKey(product.GetDAL().Data))
                 {
                     return true;
                 }
@@ -92,6 +93,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<Boolean> ExitSystem()
         {
             return LogOut();
+        }
+
+        public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        {
+            Double amount = ShoppingCart.GetTotalShoppingCartPrice();
+
+            bool paymentSuccess = PaymentSystem.Pay(amount, paymentDetails);
+            bool deliverySuccess = DeliverySystem.Deliver(deliveryDetails);
+
+            if (!paymentSuccess)
+            {
+                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in payment details\n", false, null);
+
+            }
+            if (!deliverySuccess)
+            {
+                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in delivery details\n", false, null);
+            }
+
+            History.AddPurchasedShoppingCart(ShoppingCart);
+            ShoppingCart copy = new ShoppingCart(ShoppingCart);
+            ShoppingCart = new ShoppingCart();          // create new shopping cart for user
+
+            return new Result<ShoppingCart>("Users purchased shopping cart\n", true, copy);
         }
     }
 }

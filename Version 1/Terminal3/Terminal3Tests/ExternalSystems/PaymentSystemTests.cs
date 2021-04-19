@@ -11,7 +11,7 @@ namespace Terminal3.ExternalSystems.Tests
         [Fact()]
         public void PayTest()
         {
-            bool result = PaymentSystem.Pay("userID", 500.0);
+            bool result = PaymentSystem.Pay(500.0 , new Dictionary<String, Object>());
             Assert.Equal(result, result);
         }
     }

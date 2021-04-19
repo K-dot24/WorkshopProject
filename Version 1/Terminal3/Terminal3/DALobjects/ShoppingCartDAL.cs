@@ -7,14 +7,17 @@ namespace Terminal3.DALobjects
     public class ShoppingCartDAL
     {
         //Properties
-        public string ShoppingCartId { get; }
+        public String Id { get; }
         public LinkedList<ShoppingBagDAL> ShoppingBags { get; }
+        public Double TotalCartPrice { get; }
+
 
         //Constructor
-        public ShoppingCartDAL(string shoppingCartId, LinkedList<ShoppingBagDAL> shoppingBags)
+        public ShoppingCartDAL(string shoppingCartId, LinkedList<ShoppingBagDAL> shoppingBags , Double totalCartPrice)
         {
-            ShoppingCartId = shoppingCartId;
+            Id = shoppingCartId;
             ShoppingBags = shoppingBags;
+            TotalCartPrice = totalCartPrice;
         }
     }
 }
