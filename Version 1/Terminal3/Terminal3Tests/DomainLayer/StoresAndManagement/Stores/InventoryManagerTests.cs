@@ -43,7 +43,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             Assert.Equal(shouldFound,result.ExecStatus);
             if (shouldFound) { 
                 Assert.Single(result.Data);
-                Assert.Equal("Banana", result.Data[0].Name);
+                Assert.Equal(product.Name, result.Data[0].Name);
             }
 
         }
@@ -69,7 +69,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             if (shouldFound)
             {
                 Assert.Single(result.Data);
-                Assert.Equal("Banana", result.Data[0].Name);
+                Assert.Equal(product.Name, result.Data[0].Name);
             }
 
         }

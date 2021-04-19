@@ -44,16 +44,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             }
         }
-        public Result<Boolean> LogOut() {
+        public Result<GuestUser> LogOut() {
             if (!LoggedIn)
             {
                 //User already logged out
-                return new Result<Boolean>($"{this.Email} already logged out", false, false);
+                return new Result<GuestUser>($"{this.Email} already logged out", false, null);
             }
             else 
             {
                 LoggedIn = false;
-                return new Result<Boolean>($"{this.Email} is Logged out\n", true, true);
+                return new Result<GuestUser>($"{this.Email} is Logged out\n", true, new GuestUser());
             }           
         }
 
@@ -92,7 +92,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<Boolean> ExitSystem()
         {
-            return LogOut();
+            Result<GuestUser> res = LogOut();
+            if (res.ExecStatus)
+                return new Result<Boolean>("User exit successfuly", true, true);
+            else
+                return new Result<Boolean>("Can not exit", false, false);
+
         }
 
         public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)

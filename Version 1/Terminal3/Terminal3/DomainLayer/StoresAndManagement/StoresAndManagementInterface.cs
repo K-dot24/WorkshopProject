@@ -336,7 +336,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             }
         }
 
-        public Result<bool> LogOut(string email)
+        public Result<Boolean> LogOut(string email)
         {
             return UsersAndPermissionsFacade.LogOut(email);
         }

@@ -7,8 +7,22 @@ using Terminal3.DomainLayer.StoresAndManagement;
 
 namespace Terminal3.ServiceLayer.Controllers
 {
+    public interface IGuestUserInterface
+    {
+        Result<UserDAL> EnterSystem();
+        void ExitSystem(String userID);
+        Result<bool> Register(string email, string password);
+        Result<Object> SearchStore(IDictionary<String, Object> details);
+        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+        Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);
+        Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
+        Result<Boolean> UpdateShoppingCart(String userID, String storeID, String productID, int quantity);
+        Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        Result<HistoryDAL> GetUserPurchaseHistory(String userID);
+        Result<double> GetTotalShoppingCartPrice(String userID);
+    }
     //Basic functionality The every user can preform
-    public class GuestUserController
+    public class GuestUserController: IGuestUserInterface
     {
         //Properties
         public IStoresAndManagementInterface StoresAndManagementInterface { get; }
@@ -19,6 +33,14 @@ namespace Terminal3.ServiceLayer.Controllers
             this.StoresAndManagementInterface = storesAndManagementInterface;
         }
         #region Methods
+        public void ExitSystem(String userID)
+        {
+            StoresAndManagementInterface.ExitSystem(userID);
+        }
+        public Result<UserDAL> EnterSystem()
+        {
+            return StoresAndManagementInterface.EnterSystem();
+        }
         public Result<bool> Register(string email, string password){throw new NotImplementedException();}
         public Result<Object> SearchStore(IDictionary<String, Object> details) { throw new NotImplementedException(); }
         public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails) { return StoresAndManagementInterface.SearchProduct(productDetails); }

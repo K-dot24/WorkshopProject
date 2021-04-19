@@ -7,8 +7,16 @@ using Terminal3.DomainLayer.StoresAndManagement;
 
 namespace Terminal3.ServiceLayer.Controllers
 {
+    public interface ISystemAdminInterface
+    {
+        Result<HistoryDAL> GetUserPurchaseHistory(string sysAdminID, String userID);
+        Result<HistoryDAL> GetStorePurchaseHistory(string sysAdminID, String storeId);
+        Result<RegisteredUserDAL> AddSystemAdmin(string sysAdminID, String email);
+        Result<RegisteredUserDAL> RemoveSystemAdmin(string sysAdminID, String email);
+        Result<bool> ResetSystem(string sysAdminID);
 
-    public class SystemAdminController
+    }
+    public class SystemAdminController: ISystemAdminInterface
     {
 
         //Properties
@@ -95,6 +103,19 @@ namespace Terminal3.ServiceLayer.Controllers
                 return new Result<RegisteredUserDAL>($"user:{sysAdminID} is not system admin\n", false, null);
             }
         }
+
+        public Result<bool> ResetSystem(string sysAdminID) 
+        {
+            if (isSystemAdmin(sysAdminID))
+            {
+                return Service.ResetSystem();
+            }
+            else
+            {
+                return new Result<bool>($"user:{sysAdminID} is not system admin\n", false, false);
+            }
+        }
+
         #endregion
     }
 }

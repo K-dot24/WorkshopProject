@@ -39,7 +39,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             for (int i = 1; i < 6; i++)
             {
                 Store.AddRating(i);
-                expectedRate = (expectedRate + i) / (double)i;
+                expectedRate = (expectedRate*(i-1) + i) / (double)i;
                 Assert.Equal(expectedRate, Store.Rating);
 
             }
