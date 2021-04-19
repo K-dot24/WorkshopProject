@@ -177,12 +177,12 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.SearchStore(details);
         }
 
-        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        public Result<bool> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions)
         {
             if (Real == null)
                 return new Result<bool>(true);
 
-            return Real.SetPermissions(managerID, ownerID, permissions);
+            return Real.SetPermissions(storeID , managerID, ownerID, permissions);
         }
 
         public Result<bool> UpdateShoppingCart(string userID, string shoppingBagID, string productID, int quantity)
@@ -195,27 +195,34 @@ namespace XUnitTestTerminal3.IntegrationTests
 
         public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
         {
-            throw new NotImplementedException();
+            if (Real == null)
+                return new Result<bool>(true);
+
+            return Real.AddProductReview(userID, storeID, productID, review);
         }
 
         public Result<bool> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID)
         {
-            throw new NotImplementedException();
+            if (Real == null)
+                return new Result<bool>(true);
+
+            return Real.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID);
         }
 
-        Result<Dictionary<UserDAL, PermissionDAL>> ISystemInterface.GetStoreStaff(string ownerID, string storeID)
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID)
         {
-            throw new NotImplementedException();
+            if (Real == null)
+                return new Result<ConcurrentDictionary<String, String>>(true);
+
+            return Real.GetProductReview(storeID, productID);
         }
 
-        Result<HistoryDAL> ISystemInterface.GetStorePurchaseHistory(string ownerID, string storeID)
+        public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
-            throw new NotImplementedException();
-        }
+            if (Real == null)
+                return new Result<bool>(true);
 
-        public Result<ConcurrentDictionary<string, string>> GetProductReview(string storeID, string productID)
-        {
-            throw new NotImplementedException();
+            return Real.RemoveStoreManager(storeID, managerID, storeID);
         }
     }
 }

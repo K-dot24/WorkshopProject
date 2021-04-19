@@ -27,7 +27,7 @@ namespace XUnitTestTerminal3
             LinkedList<int> permission = new LinkedList<int>();
             permission.AddLast(0);
             permission.AddLast(1);
-            sut.SetPermissions(manager_id, owner_id, permission);
+            sut.SetPermissions(store_id ,manager_id, owner_id, permission);
         }
 
         [Fact]

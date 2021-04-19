@@ -55,8 +55,8 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL , PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
-        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
+        Result<Dictionary<String, List<int>>> GetStoreStaff(String ownerID, String storeID);
+        Result<List<String>> GetStorePurchaseHistory(String ownerID, String storeID); //userID to List<permissions>
         Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
 
         #endregion
