@@ -67,9 +67,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             UsersAndPermissionsFacade = new UsersAndPermissionsFacade();
         }
 
-
-        //TODO: Implement all functions
-
         // Methods
         public Result<StoreDAL> OpenNewStore(String storeName, String userID)
         {
