@@ -38,10 +38,36 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
 
         }
 
-        [Fact()]
-        public void UpdateShoppingBagTest()
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData(1,10, false)]
+        [InlineData(0,0, true)]
+        [InlineData(0,11, false)]
+        public void UpdateShoppingBagTest(int productIndex,int quantity, bool expectedResult)
         {
-            throw new NotImplementedException();
+            ShoppingBag.AddProtuctToShoppingBag(Products[0], 10);
+            Result<bool> res = ShoppingBag.UpdateShoppingBag(Products[productIndex], quantity);
+
+            Assert.Equal(expectedResult, res.ExecStatus);
+            if (expectedResult)
+            {
+                if (quantity <= 0)
+                {
+                    //Item was removed
+                    Assert.False(ShoppingBag.Products.ContainsKey(Products[productIndex]));
+                }
+                else
+                {
+                    //Item was updated
+                    Assert.True(ShoppingBag.Products.ContainsKey(Products[productIndex]));
+                    Assert.Equal(quantity, ShoppingBag.Products[Products[productIndex]]);
+                }
+            }
+            if (quantity > 10)
+            {
+                //Value not changed
+                Assert.Equal(10,ShoppingBag.Products[Products[productIndex]]);
+            }
         }
     }
 }
