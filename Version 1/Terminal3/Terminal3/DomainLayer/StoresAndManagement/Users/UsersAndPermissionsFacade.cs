@@ -19,7 +19,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
         Result<Boolean> UpdateShoppingCart(string userID, string storeID, Product product, int quantity);
-        Result<ShoppingCartDAL> GetUserShoppingCart(string userID);
+        Result<ShoppingCart> GetUserShoppingCart(string userID);
         Result<Boolean> ExitSystem(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
 

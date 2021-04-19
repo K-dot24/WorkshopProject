@@ -28,9 +28,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID, string storeID);
-
-
         Result<History> GetStorePurchaseHistory(String userID, String storeID, bool sysAdmin);
+        #endregion
     }
 
     public class StoresFacade : IStoresFacade
