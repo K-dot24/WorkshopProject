@@ -115,11 +115,6 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
         }
 
-        public Result<Dictionary<string, int>> GetUserShoppingBag(string userID, string shoppingBagID)
-        {
-            throw new NotImplementedException();
-        }
-
         public Result<ShoppingCartDAL> GetUserShoppingCart(string userID)
         {
             throw new NotImplementedException();
