@@ -22,23 +22,35 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         //Tests
         [Theory()]
         [Trait("Category", "Unit")]
-        [InlineData("tomer@gmail.com", "raz@gmail.com", true)]
-        [InlineData("tomer@gmail.com", "tomer@gmail.com", false)]
+        [InlineData("tomer@gmail.com", "raz@gmail.com", true)] //trying to register with a fresh email
+        [InlineData("tomer@gmail.com", "tomer@gmail.com", false)] //trying to register with an existing email
         public void RegisterTest(String usedEmail, String requestedEmail, Boolean expectedResult)
         {
             Assert.True(Facade.Register(usedEmail, "password").ExecStatus);
-            Assert.Equal(expectedResult, Facade.Register(requestedEmail, "password").ExecStatus);
+            Result<RegisteredUser> registerResult = Facade.Register(requestedEmail, "password");
+            Assert.Equal(expectedResult, registerResult.ExecStatus);
+
+            if (expectedResult)
+                Assert.True(Facade.RegisteredUsers.ContainsKey(registerResult.Data.Id), "Register returned true but user wasn't added to the dict");
+            else
+                Assert.Single(Facade.RegisteredUsers, "Register returned false but the user was added to the dict");
+
         }
 
         [Theory()]
         [Trait("Category", "Unit")]
-        [InlineData("tomer@gmail.com", "tomer@gmail.com", true)]
-        [InlineData("tomer@gmail.com", "raz@gmail.com", false)]
+        [InlineData("tomer@gmail.com", "tomer@gmail.com", true)]// trying to add a registered user to the system admins
+        [InlineData("tomer@gmail.com", "raz@gmail.com", false)]// trying to add an unregistered user to the system admins
         //System admin need to be registered user
         public void AddSystemAdminTest(String registeredEmail, String adminEmail, Boolean expectedResult)
         {
-            Facade.Register(registeredEmail, "password");
+            Result<RegisteredUser> registerResult = Facade.Register(registeredEmail, "password");
             Assert.Equal(expectedResult, Facade.AddSystemAdmin(adminEmail).ExecStatus);
+
+            if (expectedResult)
+                Assert.True(Facade.SystemAdmins.ContainsKey(registerResult.Data.Id), "AddSystemAdmin returned true but the user wasn't added to the admins dict");
+            else
+                Assert.Empty(Facade.SystemAdmins);
         }
 
         [Theory()]
@@ -53,7 +65,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             Facade.AddSystemAdmin(admin1);
             Facade.AddSystemAdmin(admin2);
             Assert.Equal(expectedResult, Facade.RemoveSystemAdmin(adminToRemove).ExecStatus);
-
+            if (expectedResult)
+                Assert.False(Facade.SystemAdmins.ContainsKey(adminToRemove), "RemoveSystemAdmin returned true but the user wasn't removed from the admins dict");
         }
 
         [Fact()]
@@ -62,9 +75,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         public void RemoveSystemAdminTestAtLeastOne()
         {
             String email = "tomer@gmail.com";
-            Facade.Register(email, "password");
+            Result<RegisteredUser> registerResult = Facade.Register(email, "password");
             Facade.AddSystemAdmin(email);
-            Assert.False(Facade.RemoveSystemAdmin(email).ExecStatus);
+            bool removedResultStatus = Facade.RemoveSystemAdmin(email).ExecStatus;
+            Assert.False(removedResultStatus);
+            if (!removedResultStatus)
+                Assert.True(Facade.SystemAdmins.ContainsKey(email), "RemoveSystemAdmin returned false but still removed the user from the admins dict");
 
         }
 
@@ -75,7 +91,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             String email = "tomer@gmail.com";
             String password = "password";
             Facade.Register(email, password);
-            Assert.True(Facade.Login(email, password).ExecStatus, "Fail to login");
+            Result<RegisteredUser> loginResult = Facade.Login(email, password);
+            Assert.True(loginResult.ExecStatus, "Fail to login");
+            if (loginResult.ExecStatus)
+                Assert.True(loginResult.Data.LoggedIn, "User logged in but his LoggedIn attribute hasn't changed");
             Assert.False(Facade.Login(email, password).ExecStatus, "Able to loggin twice");
         }
 
@@ -85,10 +104,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         {
             String email = "tomer@gmail.com";
             String password = "password";
-            Facade.Register(email, password);
+            RegisteredUser user = Facade.Register(email, password).Data;
             Assert.False(Facade.LogOut(email).ExecStatus, "Able to loggout twice");
-            Assert.True(Facade.Login(email, password).ExecStatus, "Not able to log in");
-            Assert.True(Facade.LogOut(email).ExecStatus, "Not able to log out");
+            Assert.False(user.LoggedIn, "Logout returned false, but the user is actually loged in");
+            Facade.Login(email, password);
+            Result<bool> guest = Facade.LogOut(email);
+            Assert.True(guest.ExecStatus, "Not able to log out");
+            Assert.False(user.LoggedIn, "Logout returned true, but the user is still loged in");
 
         }
 
@@ -98,11 +120,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         [InlineData("raz@gmail.com", 10, true, false)]      // Fail 2: Higher quantity than quantity in store
         [InlineData("zoe@gmail.com", 0, false, false)]      // Fail: Illegal quantity
         [InlineData("shaked@gmail.com", -1, false, false)]  // Fail: Illegal quantity
-        public void AddProductToCartTest(string userID, int productQuantity, Boolean expectedResult, Boolean expectedResult2)
+        public void AddProductToCartTest(string email, int productQuantity, Boolean expectedResult, Boolean expectedResult2)
         {
             // Open store
-            RegisteredUser founder = new RegisteredUser(userID, "password");
-            Facade.RegisteredUsers.TryAdd(userID, founder);
+            RegisteredUser founder = Facade.Register(email, "password").Data;
+            Assert.NotNull(founder);
             Store store = new Store("Testore", founder);
 
             // Add products to store
@@ -111,8 +133,26 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             store.InventoryManager.Products.TryAdd(product.Id, product);
             store.InventoryManager.Products.TryAdd(product2.Id, product2);
 
-            Assert.Equal(expectedResult, Facade.AddProductToCart(userID, product, productQuantity, store).ExecStatus);
-            Assert.Equal(expectedResult2, Facade.AddProductToCart(userID, product2, productQuantity, store).ExecStatus);
+            Assert.Equal(expectedResult, Facade.AddProductToCart(founder.Id, product, productQuantity, store).ExecStatus);
+            Result<ShoppingBag> getSB = founder.ShoppingCart.GetShoppingBag(store.Id);
+            if (getSB.ExecStatus)//if the bag was created
+            {
+                Assert.Equal(expectedResult, getSB.Data.Products.ContainsKey(product));
+            }
+            else//if the bag wasn't created
+            {
+                Assert.False(expectedResult);
+            }
+            Assert.Equal(expectedResult2, Facade.AddProductToCart(founder.Id, product2, productQuantity, store).ExecStatus);
+            Result<ShoppingBag> getSB2 = founder.ShoppingCart.GetShoppingBag(store.Id);
+            if (getSB.ExecStatus)//if the bag was created
+            {
+                Assert.Equal(expectedResult, getSB.Data.Products.ContainsKey(product));
+            }
+            else//if the bag wasn't created
+            {
+                Assert.False(expectedResult2);
+            }
         }
 
         [Theory()]
@@ -121,8 +161,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         public void AddProductReviewTest1(String email, String review)
         {
             // Open store
-            RegisteredUser founder = new RegisteredUser(email, "password");
-            Facade.RegisteredUsers.TryAdd(founder.Id, founder);
+            RegisteredUser founder = Facade.Register(email, "password").Data;
+            Assert.NotNull(founder);
             Store store = new Store("Testore", founder);
 
             // Add products to store
@@ -140,7 +180,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             // Add review to product 
             Facade.AddProductReview(founder.Id, store, product, review);
 
-            product.Review.TryGetValue(founder.Id, out String msg);
+            Assert.True(product.Review.TryGetValue(founder.Id, out String msg));
 
             Assert.Equal("The banana was awsome", msg);
         }
@@ -152,8 +192,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         public void AddProductReviewTest2(String email, String review)
         {
             // Open store
-            RegisteredUser founder = new RegisteredUser(email, "password");
-            Facade.RegisteredUsers.TryAdd(founder.Id, founder);
+            RegisteredUser founder = Facade.Register(email, "password").Data;
+            Assert.NotNull(founder);
             Store store = new Store("Testore", founder);
 
             // Add products to store
@@ -174,14 +214,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             Facade.ExitSystem(user.Id);
 
             Assert.False(user.Active);
+            Assert.False(Facade.GuestUsers.ContainsKey(user.Id));
         }
 
         [Fact]
         [Trait("Category", "Unit")]
-        public void ExitSystemTestResisterd()
+        public void ExitSystemTestRegistered()
         {
-            RegisteredUser user = Facade.Login("raz@gmail.com", "123").Data;
-            Facade.RegisteredUsers.TryAdd(user.Id, user);
+            string email = "igor@gmail.com";
+            string password = "pass123";
+            Facade.Register(email, password);
+            RegisteredUser user = Facade.Login("igor@gmail.com", "pass123").Data;
             Facade.ExitSystem(user.Id);
 
             Assert.False(user.LoggedIn);

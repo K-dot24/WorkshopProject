@@ -31,150 +31,157 @@ namespace Terminal3.ServiceLayer
 
         //Metohds
         #region Guest User Actions
+        public Result<UserDAL> EnterSystem()
+        {
+            return GuestUserInterface.EnterSystem();
+        }
+        public void ExitSystem(String userID)
+        {
+            GuestUserInterface.ExitSystem(userID);
+        }
         public Result<bool> Register(string email, string password)
         {
-            throw new NotImplementedException();
+            return GuestUserInterface.Register(email, password);
         }
 
         public Result<object> SearchStore(IDictionary<string, object> details)
         {
-            throw new NotImplementedException();
+            return GuestUserInterface.SearchStore(details);
         }
 
-        public Result<List<ProductDAL>> SearchProduct(IDictionary<string, object> productDetails)
+        public Result<List<ProductDAL>> SearchProduct(IDictionary<string, object> searchAttributes)
         {
-            throw new NotImplementedException();
+            return GuestUserInterface.SearchProduct(searchAttributes);
         }
 
         public Result<bool> AddProductToCart(string userID, string ProductID, int ProductQuantity, string StoreID)
         {
-            throw new NotImplementedException();
+            return GuestUserInterface.AddProductToCart(userID, ProductID, ProductQuantity, StoreID);
         }
 
         public Result<ShoppingCartDAL> GetUserShoppingCart(string userID)
         {
-            throw new NotImplementedException();
+            return GuestUserInterface.GetUserShoppingCart(userID);
         }
 
         public Result<bool> UpdateShoppingCart(string userID, string storeID, string productID, int quantity)
         {
-            throw new NotImplementedException();
+            return GuestUserInterface.UpdateShoppingCart(userID, storeID, productID, quantity);
         }
 
         public Result<object> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
         {
-            throw new NotImplementedException();
+            return GuestUserInterface.Purchase(userID, paymentDetails, deliveryDetails);
         }
 
         public Result<HistoryDAL> GetUserPurchaseHistory(string userID)
         {
-            throw new NotImplementedException();
+            return GuestUserInterface.GetUserPurchaseHistory(userID);
         }
 
         public Result<double> GetTotalShoppingCartPrice(string userID)
         {
-            throw new NotImplementedException();
+            return GuestUserInterface.GetTotalShoppingCartPrice(userID);
         }
         #endregion
 
         #region Register User Actions
         public Result<RegisteredUserDAL> Login(string email, string password)
         {
-            throw new NotImplementedException();
+            return RegisteredUserInterface.Login(email, password);
         }
 
         public Result<bool> LogOut(string email)
         {
-            throw new NotImplementedException();
+            return RegisteredUserInterface.LogOut(email);
         }
 
         public Result<StoreDAL> OpenNewStore(string storeName, string userID)
         {
-            throw new NotImplementedException();
+            return RegisteredUserInterface.OpenNewStore(storeName, userID);
         }
         #endregion
 
         #region Store Actions
         public Result<ProductDAL> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category, LinkedList<string> keywords = null)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.AddProductToStore(userID, storeID, productName, price, initialQuantity, category, keywords);
         }
 
         public Result<bool> RemoveProductFromStore(string userID, string storeID, string productID)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.RemoveProductFromStore(userID, storeID, productID);
         }
 
         public Result<ProductDAL> EditProductDetails(string userID, string storeID, string productID, IDictionary<string, object> details)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.EditProductDetails(userID,storeID,productID, details);
         }
 
         public Result<bool> AddStoreOwner(string addedOwnerID, string currentlyOwnerID, string storeID)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.AddStoreOwner(addedOwnerID, currentlyOwnerID, storeID);
         }
 
         public Result<bool> AddStoreManager(string addedManagerID, string currentlyOwnerID, string storeID)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.AddStoreManager(addedManagerID,currentlyOwnerID, storeID);
+
         }
 
         public Result<bool> SetPermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.SetPermissions(storeID, managerID, ownerID, permissions);
+
         }
 
         public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.RemovePermissions(storeID, managerID, ownerID, permissions);
+
         }
 
         public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.GetStoreStaff(ownerID, storeID);
+
         }
 
         public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.GetStorePurchaseHistory(ownerID, storeID);
+
         }
 
         public Result<bool> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID);
         }
         #endregion
 
         #region System Admin Actions
         public Result<HistoryDAL> GetUserPurchaseHistory(string sysAdminID, string userID)
         {
-            throw new NotImplementedException();
+            return SystemAdminInterface.GetUserPurchaseHistory(sysAdminID, userID);
         }
 
         public Result<RegisteredUserDAL> AddSystemAdmin(string sysAdminID, string email)
         {
-            throw new NotImplementedException();
+            return SystemAdminInterface.AddSystemAdmin(sysAdminID, email);
+
         }
 
         public Result<RegisteredUserDAL> RemoveSystemAdmin(string sysAdminID, string email)
         {
-            throw new NotImplementedException();
-        }
-        
-        public Result<UserDAL> EnterSystem()
-        {
-            throw new NotImplementedException();
+            return SystemAdminInterface.RemoveSystemAdmin(sysAdminID, email);
+
         }
 
-        public void ExitSystem(String userID)
+        public Result<bool> ResetSystem(String sysAdminID)
         {
-            throw new NotImplementedException();
-
-            //StoresAndManagement.ExitSystem(userID);
-            ////TODO
-            //System.Environment.Exit(0);
+            return SystemAdminInterface.ResetSystem(sysAdminID);
         }
+
         #endregion
 
     }

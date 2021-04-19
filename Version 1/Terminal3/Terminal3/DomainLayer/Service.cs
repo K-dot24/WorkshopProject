@@ -14,9 +14,13 @@ namespace Terminal3.DomainLayer
         {
             return Guid.NewGuid().ToString("N");
         }
-        //TODO: add function to create T-DAL object from T
-        //TODO: add function to create list of T-DAL object from list of T
-        
+
+        internal static Result<bool> ResetSystem()
+        {
+            //TODO: implement ResetSystem
+            throw new NotImplementedException();
+        }
+
     }
 
     public class Result<T>
