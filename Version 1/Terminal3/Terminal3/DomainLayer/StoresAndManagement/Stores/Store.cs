@@ -36,7 +36,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         #region Information        
         Result<ConcurrentDictionary<String, String>> GetProductReview(String productID);
-        Result<History> GetStorePurchaseHistory(string ownerID);
+        Result<History> GetStorePurchaseHistory(string ownerID,bool sysAdmin);
         #endregion
     }
     public class Store : IStoreOperations
