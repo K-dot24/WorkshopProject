@@ -15,6 +15,8 @@ namespace Terminal3.ServiceLayer
         #region System related operations
         Result<Boolean> ResetSystem();
 
+        Result<UserDAL> EnterSystem();
+
         void ExitSystem(String userID); 
 
         #endregion
@@ -22,10 +24,11 @@ namespace Terminal3.ServiceLayer
         #region User related operations
         Result<Boolean> Register(String email, String password);
 
-
         Result<RegisteredUserDAL> Login(String email, String password);
 
         Result<Boolean> LogOut(String email);
+
+
 
         //TODO: refine requirement
         Result<Object> SearchStore(IDictionary<String, Object> details);
@@ -184,11 +187,18 @@ namespace Terminal3.ServiceLayer
             throw new NotImplementedException();
         }
 
+        public Result<UserDAL> EnterSystem()
+        {
+            throw new NotImplementedException();
+        }
+
         public void ExitSystem(String userID)
         {
-            StoresAndManagement.ExitSystem(userID);
-            //TODO
-            System.Environment.Exit(0);
+            throw new NotImplementedException();
+
+            //StoresAndManagement.ExitSystem(userID);
+            ////TODO
+            //System.Environment.Exit(0);
         }
 
     }
