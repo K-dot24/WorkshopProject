@@ -101,20 +101,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         }
 
-        public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        public new Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
             Double amount = ShoppingCart.GetTotalShoppingCartPrice();
 
             bool paymentSuccess = PaymentSystem.Pay(amount, paymentDetails);
-            bool deliverySuccess = DeliverySystem.Deliver(deliveryDetails);
 
             if (!paymentSuccess)
             {
                 return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in payment details\n", false, null);
 
             }
+            
+            bool deliverySuccess = DeliverySystem.Deliver(deliveryDetails);
             if (!deliverySuccess)
             {
+                PaymentSystem.CancelTransaction(paymentDetails);
                 return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in delivery details\n", false, null);
             }
 

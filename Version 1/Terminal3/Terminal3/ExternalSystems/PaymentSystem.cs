@@ -13,5 +13,11 @@ namespace Terminal3.ExternalSystems
             //return bools[new Random().Next(0, 2)];
             return true;
         }
+
+        public static void CancelTransaction(IDictionary<String, Object> paymentDetails)
+        {
+            // Users transaction is canceled
+
+        }
     }
 }
