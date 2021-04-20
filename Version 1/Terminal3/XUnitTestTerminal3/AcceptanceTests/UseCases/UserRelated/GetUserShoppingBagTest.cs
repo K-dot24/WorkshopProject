@@ -58,7 +58,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.UseCases
             String product_id = sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test").Data;
 
             List<String> shoppingBags = sut.GetUserShoppingCart(user_id).Data;
-            Assert.False(sut.GetUserShoppingBag(user_id, shoppingBags[0]).ExecStatus);
+            Assert.False(sut.GetUserShoppingBag(user_id, store_id).ExecStatus);
         }
     }
 }
