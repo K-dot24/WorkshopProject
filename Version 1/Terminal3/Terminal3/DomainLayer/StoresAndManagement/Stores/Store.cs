@@ -67,6 +67,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
             //Add founder to list of owners
             Owners.TryAdd(founder.Id, Founder);
+
+            //TODO: Complete when policies done properly
+            //Add default policies
+            PolicyManager.SetPurchasePolicy(Purchases.BuyNow, true);
+            PolicyManager.SetDiscountPolicy(Discounts.Visible, true);
         }
 
         //TODO: Implement all functions
