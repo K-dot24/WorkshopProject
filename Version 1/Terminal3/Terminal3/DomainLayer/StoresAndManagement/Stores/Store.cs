@@ -6,6 +6,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.DALobjects;
+using System.Threading;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -168,29 +169,47 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)
         {
-            // Check new manager not already an owner/manager + appointing owner is not a fraud or the appointing user is a manager with the right permissions
-            if (!CheckIfStoreManager(futureManager.Id) && !CheckIfStoreOwner(futureManager.Id))
-            {
-                StoreManager newManager;
-                if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
-                {
-                    newManager = new StoreManager(futureManager, this, new Permission(), owner);
-                    Managers.TryAdd(futureManager.Id, newManager);
-                }
-                else if (Managers.TryGetValue(currentlyOwnerID, out StoreManager manager) && CheckStoreManagerAndPermissions(currentlyOwnerID, Methods.AddStoreManager))
-                {
-                    newManager = new StoreManager(futureManager, this, new Permission(), manager);
-                    Managers.TryAdd(futureManager.Id, newManager);
-                }
-                else
-                {
-                    return new Result<Boolean>($"Failed to add store manager because appoitend user is not an owner or manager with relevant permissions at the store\n", false, false);
-                }
 
-                return new Result<Boolean>("User successfuly added as the store manager\n", true, true);
+            try
+            {
+                Monitor.TryEnter(futureManager);
+                try
+                {
+                    // Check new manager not already an owner/manager + appointing owner is not a fraud or the appointing user is a manager with the right permissions
+                    if (!CheckIfStoreManager(futureManager.Id) && !CheckIfStoreOwner(futureManager.Id))
+                    {
+                        StoreManager newManager;
+                        if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
+                        {
+                            newManager = new StoreManager(futureManager, this, new Permission(), owner);
+                            Managers.TryAdd(futureManager.Id, newManager);
+                        }
+                        else if (Managers.TryGetValue(currentlyOwnerID, out StoreManager manager) && CheckStoreManagerAndPermissions(currentlyOwnerID, Methods.AddStoreManager))
+                        {
+                            newManager = new StoreManager(futureManager, this, new Permission(), manager);
+                            Managers.TryAdd(futureManager.Id, newManager);
+                        }
+                        else
+                        {
+                            return new Result<Boolean>($"Failed to add store manager because appoitend user is not an owner or manager with relevant permissions at the store\n", false, false);
+                        }
+
+                        return new Result<Boolean>("User successfuly added as the store manager\n", true, true);
+                    }
+                    //else failed
+                    return new Result<Boolean>($"Failed to add store manager. The user is already an manager or owner in the store.\n", false, false);
+                }
+                finally
+                {
+                    Monitor.Exit(futureManager);
+                }
             }
-            //else failed
-            return new Result<Boolean>($"Failed to add store manager. The user is already an manager or owner in the store.\n", false, false);
+            catch (SynchronizationLockException SyncEx)
+            {
+                Console.WriteLine("A SynchronizationLockException occurred. Message:");
+                Console.WriteLine(SyncEx.Message);
+                return new Result<Boolean>(SyncEx.Message, false, false);
+            }
         }
 
         public Result<bool> RemoveStoreManager(String removedManagerID, string currentlyOwnerID)

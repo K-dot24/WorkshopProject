@@ -44,9 +44,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<bool> AddStoreManager(string addedManagerID, string currentlyOwnerID, string storeID)
         {
-            Result<bool> fromSystem = system.AddStoreManager(addedManagerID, currentlyOwnerID, storeID);
-            if (fromSystem.ExecStatus)
-                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            Result<bool> fromSystem = system.AddStoreManager(addedManagerID, currentlyOwnerID, storeID);         
             return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
