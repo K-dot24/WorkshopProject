@@ -185,12 +185,12 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.SetPermissions(storeID , managerID, ownerID, permissions);
         }
 
-        public Result<bool> UpdateShoppingCart(string userID, string storeID, string productID, int quantity)
+        public Result<bool> UpdateShoppingCart(string userID, string storeId, string productID, int quantity)
         {
             if (Real == null)
                 return new Result<bool>(true);
 
-            return Real.UpdateShoppingCart(userID, storeID, productID, quantity);
+            return Real.UpdateShoppingCart(userID, storeId, productID, quantity);
         }
 
         public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)

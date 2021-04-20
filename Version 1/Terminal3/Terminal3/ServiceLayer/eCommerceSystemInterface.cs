@@ -69,9 +69,9 @@ namespace Terminal3.ServiceLayer
             return GuestUserInterface.GetUserShoppingCart(userID);
         }
 
-        public Result<bool> UpdateShoppingCart(string userID, string storeID, string productID, int quantity)
+        public Result<bool> UpdateShoppingCart(string userID, string shoppingBagID, string productID, int quantity)
         {
-            return GuestUserInterface.UpdateShoppingCart(userID, storeID, productID, quantity);
+            return GuestUserInterface.UpdateShoppingCart(userID, shoppingBagID, productID, quantity);
         }
 
         public Result<ShoppingCartDAL> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)

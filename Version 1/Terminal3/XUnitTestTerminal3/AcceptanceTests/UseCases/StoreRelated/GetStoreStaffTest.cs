@@ -48,9 +48,9 @@ namespace XUnitTestTerminal3
             Dictionary<String, List<int>> storeStaff = sut.GetStoreStaff(owner_id, store_id).Data;
 
             List<int> manager_per;
-            storeStaff.TryGetValue(owner_id, out manager_per);
+            storeStaff.TryGetValue(manager_id, out manager_per);
             Assert.True(storeStaff.ContainsKey(this.manager_id));
-            Assert.True(manager_per[0] == 0 && manager_per[1] == 1);
+            Assert.True(manager_per.Count == 3 && manager_per[0] == 0 && manager_per[1] == 1);
         }
     }
 }

@@ -148,7 +148,25 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<Dictionary<string, int>> GetUserShoppingBag(string userID, string shoppingBagID)
         {
-            throw new NotImplementedException();
+            ShoppingCartDAL shoppingCart = system.GetUserShoppingCart(userID).Data;
+            if (shoppingCart == null)
+                return new Result<Dictionary<string, int>>("Failed to find the shopping cart", false, null);
+            foreach(ShoppingBagDAL shoppingBag in shoppingCart.ShoppingBags)
+            {
+                if(shoppingBag.Id == shoppingBagID)
+                    return new Result<Dictionary<string, int>>("", true, MakeDictionaryFromProdactsDAL(shoppingBag.Products));
+            }
+            return new Result<Dictionary<string, int>>("Failed to find the shopping bag", false, null);
+        }
+
+        private Dictionary<string, int> MakeDictionaryFromProdactsDAL(ConcurrentDictionary<ProductDAL, int> dictionary)
+        {
+            Dictionary<string, int> result = new Dictionary<string, int>();
+            foreach(var pair in dictionary)
+            {
+                result.TryAdd(pair.Key.Id, pair.Value);
+            }
+            return result;
         }
 
         public Result<List<string>> GetUserShoppingCart(string userID)
