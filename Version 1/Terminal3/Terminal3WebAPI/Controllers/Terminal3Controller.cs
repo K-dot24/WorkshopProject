@@ -10,7 +10,7 @@ namespace Terminal3WebAPI.Controllers
 {
     public class Terminal3Controller : ApiController
     {
-        public ECommerceSystem system = new ECommerceSystem(); 
+        public ECommerceSystem system = new ECommerceSystem();
 
         // GET: api/Terminal3
         public IEnumerable<string> Get()
@@ -25,14 +25,14 @@ namespace Terminal3WebAPI.Controllers
         }
 
         // POST: api/Terminal3
-        public void Post([FromBody]string value)
+        public void Post([FromBody] string value)
         {
         }
 
-      /*  // PUT: api/Terminal3/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }*/
+        /*  // PUT: api/Terminal3/5
+          public void Put(int id, [FromBody]string value)
+          {
+          }*/
 
         // DELETE: api/Terminal3/5
         public void Delete(int id)
