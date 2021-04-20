@@ -13,7 +13,7 @@ jobs:
         with: 
           dotnet-version: '2.1.x' 
       - name: Build
-        run: dotnet build ./Version1/Terminal3/Terminal3.sln --no-restore
+        run: dotnet build ../Version1/Terminal3/Terminal3.sln --no-restore
       
   unittests:      
     needs: build
@@ -28,7 +28,7 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Unit Tests
-      run: dotnet test ./Version1/Terminal3/Terminal3Tests/Terminal3-UnitTests.csproj        
+      run: dotnet test ../Version1/Terminal3/Terminal3Tests/Terminal3-UnitTests.csproj        
  
   regression:  
     needs: unittests 
