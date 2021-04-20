@@ -153,12 +153,12 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.RemoveProductFromStore(userID, storeID, productID);
         }
 
-        public Result<bool> ResetSystem()
+        public Result<bool> ResetSystem(string sysAdminID)
         {
             if (Real == null)
                 return new Result<bool>(true);
 
-            return Real.ResetSystem();
+            return Real.ResetSystem(sysAdminID);
         }
 
         public Result<List<string>> SearchProduct(IDictionary<string, object> productDetails)

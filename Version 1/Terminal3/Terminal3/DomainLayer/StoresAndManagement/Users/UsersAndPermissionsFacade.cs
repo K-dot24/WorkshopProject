@@ -22,6 +22,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<ShoppingCart> GetUserShoppingCart(string userID);
         Result<Boolean> ExitSystem(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
+        Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
 
 
     }
@@ -39,10 +40,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
             SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
             GuestUsers = new ConcurrentDictionary<String, GuestUser>();
-            
+
 
             //Add first system admin
-            //this.SystemAdmins.TryAdd("Admin@terminal3", new RegisteredUser("Admin@terminal3", "Admin"));
+            RegisteredUser defaultUser = new RegisteredUser("Admin@terminal3", "Admin");
+            this.SystemAdmins.TryAdd("Admin@terminal3", defaultUser );
+            this.RegisteredUsers.TryAdd(defaultUser.Id, defaultUser);
 
         }
         //Constructor for the initializer
@@ -52,6 +55,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.RegisteredUsers = registeredUsers;
             this.SystemAdmins = systemAdmins;
         }
+
 
         //Methods
         /// <summary>
@@ -224,7 +228,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (searchResult.ExecStatus)
             {
                 //User 
-                return searchResult.Data.LogOut();
+                Result<GuestUser> res = searchResult.Data.LogOut();
+                if (res.ExecStatus)
+                {
+                    GuestUsers.TryAdd(res.Data.Id, res.Data);
+                    return new Result<Boolean>($"There is not user using this email:{email}\n", true, true);
+                }
+                else
+                    return new Result<Boolean>(res.Message, false, false);
             }
             else
             {
@@ -346,6 +357,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             }
 
+        }
+
+        public Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+            {
+                return guest_user.Purchase(paymentDetails , deliveryDetails);
+            }
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+            {
+                return registerd_user.Purchase(paymentDetails , deliveryDetails);
+            }
+            else
+            {
+                return new Result<ShoppingCart>("User does not exist\n", false, null);
+            }
         }
 
     }

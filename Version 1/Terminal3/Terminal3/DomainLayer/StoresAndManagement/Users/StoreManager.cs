@@ -31,11 +31,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<object> GetDAL()
         {
-            RegisteredUserDAL user = User.GetDAL().Data;
             PermissionDAL permission = Permission.GetDAL().Data;
-            StoreOwnerDAL owner = (StoreOwnerDAL)AppointedBy.GetDAL().Data;
 
-            return new Result<object>("Store manager DAL object", true, new StoreManagerDAL(user, permission, owner));
+            return new Result<object>("Store manager DAL object", true, new StoreManagerDAL(User.Id, permission, AppointedBy.User.Id));
         }
     }
 }

@@ -60,7 +60,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public double GetCurrentProductPrice(Product product, int quantity)
         {
-            throw new NotImplementedException();
+            //TODO
+            //throw new NotImplementedException();
+            return product.Price*quantity;
         }
     }
 }

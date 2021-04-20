@@ -44,7 +44,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
         Result<UserDAL> EnterSystem();
-        Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<double> GetTotalShoppingCartPrice(String userID);
         #endregion
 
@@ -62,13 +62,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public StoresAndManagementInterface()
         {
-            //TODO: Change constructor if needed (initializer?)
             StoresFacade = new StoresFacade();
             UsersAndPermissionsFacade = new UsersAndPermissionsFacade();
         }
-
-
-        //TODO: Implement all functions
 
         // Methods
         public Result<StoreDAL> OpenNewStore(String storeName, String userID)
@@ -336,12 +332,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             }
         }
 
-        public Result<bool> LogOut(string email)
+        public Result<Boolean> LogOut(string email)
         {
             return UsersAndPermissionsFacade.LogOut(email);
         }
 
-        public Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails) { throw new NotImplementedException(); }
+        public Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        {
+            Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails);
+            if (res.ExecStatus)
+            {
+                ShoppingCart purchasedCart = res.Data;
+                ConcurrentDictionary<String, ShoppingBag> purchasedBags = purchasedCart.ShoppingBags;
+                foreach(var bag in purchasedBags)
+                {
+                    Store store = StoresFacade.GetStore(bag.Key).Data;
+                    store.History.AddPurchasedShoppingBag(bag.Value);
+                }
+            }
+            //else faild
+            return new Result<ShoppingCartDAL>(res.Message, false, null);
+        }
        
         public Result<double> GetTotalShoppingCartPrice(String userID)
         {

@@ -12,7 +12,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 {
     public class RealAdapter : ISystemInterface
     {
-        public IECommerceSystemInterface system = new ECommerceSystem();
+        public ECommerceSystem system = new ECommerceSystem();
 
         public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
         {
@@ -210,9 +210,9 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             throw new NotImplementedException();
         }
 
-        public Result<bool> ResetSystem()
+        public Result<bool> ResetSystem(string sysAdminID)
         {
-            return system.ResetSystem();
+            return system.ResetSystem(sysAdminID);
         }
 
         public Result<List<string>> SearchProduct(IDictionary<string, object> productDetails)

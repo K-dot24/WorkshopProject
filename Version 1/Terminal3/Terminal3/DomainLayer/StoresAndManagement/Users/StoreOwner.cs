@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DALobjects;
+using System;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -22,24 +23,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
 
         public Result<object> GetDAL()
-        {
-            RegisteredUserDAL user = User.GetDAL().Data;
-            StoreDAL store = Store.GetDAL().Data;
-            StoreOwnerDAL owner = (StoreOwnerDAL)AppointedBy.GetDAL().Data;            
-            LinkedList<StoreOwnerDAL> storeOwners = new LinkedList<StoreOwnerDAL>();
-            LinkedList<StoreManagerDAL> storeManagers = new LinkedList<StoreManagerDAL>();
+        {           
+            LinkedList<String> storeOwners = new LinkedList<String>();
+            LinkedList<String> storeManagers = new LinkedList<String>();
 
             foreach (StoreOwner so in StoreOwners)
             {
-                storeOwners.AddLast((StoreOwnerDAL)so.GetDAL().Data);
+                storeOwners.AddLast(so.User.Id);
             }
 
             foreach (StoreManager sm in StoreManagers)
             {
-                storeManagers.AddLast((StoreManagerDAL)sm.GetDAL().Data);
+                storeManagers.AddLast(sm.User.Id);
             }
             
-            return new Result<object>("Store owner DAL object", true, new StoreOwnerDAL(user, store, owner, storeOwners, storeManagers));
+            return new Result<object>("Store owner DAL object", true, new StoreOwnerDAL(User.Id, Store.Id, AppointedBy.User.Id, storeOwners, storeManagers));
         }
     }
 }
