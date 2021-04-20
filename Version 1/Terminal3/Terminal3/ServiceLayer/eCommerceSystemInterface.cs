@@ -43,7 +43,7 @@ namespace Terminal3.ServiceLayer
         {
             GuestUserInterface.ExitSystem(userID);
         }
-        public Result<bool> Register(string email, string password)
+        public Result<RegisteredUserDAL> Register(string email, string password)
         {
             return GuestUserInterface.Register(email, password);
         }

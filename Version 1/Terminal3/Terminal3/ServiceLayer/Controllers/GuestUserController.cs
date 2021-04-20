@@ -11,7 +11,7 @@ namespace Terminal3.ServiceLayer.Controllers
     {
         Result<UserDAL> EnterSystem();
         void ExitSystem(String userID);
-        Result<bool> Register(string email, string password);
+        Result<RegisteredUserDAL> Register(string email, string password);
         Result<Object> SearchStore(IDictionary<String, Object> details);
         Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
         Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);
@@ -41,11 +41,11 @@ namespace Terminal3.ServiceLayer.Controllers
         {
             return StoresAndManagementInterface.EnterSystem();
         }
-        public Result<bool> Register(string email, string password){throw new NotImplementedException();}
+        public Result<RegisteredUserDAL> Register(string email, string password){return StoresAndManagementInterface.Register(email,password); }
         public Result<Object> SearchStore(IDictionary<String, Object> details) { throw new NotImplementedException(); }
         public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails) { return StoresAndManagementInterface.SearchProduct(productDetails); }
         public Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID) { return StoresAndManagementInterface.AddProductToCart(userID, ProductID, ProductQuantity, StoreID); }   // Redundent ?
-        public Result<ShoppingCartDAL> GetUserShoppingCart(String userID) { return GetUserShoppingCart(userID); }
+        public Result<ShoppingCartDAL> GetUserShoppingCart(String userID) { return StoresAndManagementInterface.GetUserShoppingCart(userID); }
         public Result<Boolean> UpdateShoppingCart(String userID, String storeID, String productID, int quantity) { return StoresAndManagementInterface.UpdateShoppingCart(userID, storeID, productID, quantity); }
         public Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
