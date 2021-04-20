@@ -43,9 +43,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
 
         public Boolean[] functionsBitMask { get; }
+        public bool isOwner { get; }
 
-        public Permission()
+        public Permission(bool isOwner=false)
         {
+            this.isOwner = isOwner;
             functionsBitMask = new Boolean[13];
             functionsBitMask[(int)Methods.GetStoreStaff] = true;    //requierment 4.5
         }
@@ -74,7 +76,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<PermissionDAL> GetDAL()
         {
-            return new Result<PermissionDAL>("Permission DAL object", true, new PermissionDAL(this.functionsBitMask));
+            return new Result<PermissionDAL>("Permission DAL object", true, new PermissionDAL(this.functionsBitMask,isOwner));
         }
 
     }

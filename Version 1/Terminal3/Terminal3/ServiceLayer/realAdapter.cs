@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Terminal3.DALobjects;
 using Terminal3.DomainLayer;
+using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.ServiceLayer;
 
 
@@ -96,11 +97,15 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
                 foreach (PermissionDAL permission in fromSystem.Data.Values)
                 {
                     List<int> permissionList = new List<int>();
-                    for (int i = 0; i < permission.functionsBitMask.Length; i++)
+                    if (permission.isOwner) { permissionList.Add((int)Methods.AllPermissions); }
+                    else
                     {
-                        if (permission.functionsBitMask[i]) { permissionList.Add(i); }
+                        for (int i = 0; i < permission.functionsBitMask.Length; i++)
+                        {
+                            if (permission.functionsBitMask[i]) { permissionList.Add(i); }
+                        }
                     }
-                    userPermisions.Add(permissionList);
+                    userPermisions.Add(permissionList); 
                 }
                 Dictionary<string, List<int>> dic = new Dictionary<string, List<int>>();
 

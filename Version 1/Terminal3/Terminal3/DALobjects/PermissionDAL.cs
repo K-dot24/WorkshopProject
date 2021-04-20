@@ -8,10 +8,12 @@ namespace Terminal3.DALobjects
     {
         //Properties
         public Boolean[] functionsBitMask { get; }
+        public bool isOwner { get; }
 
         //Constructor
-        public PermissionDAL(bool[] functionsBitMask)
+        public PermissionDAL(bool[] functionsBitMask, bool isOwner=false)
         {
+            this.isOwner = isOwner;
             this.functionsBitMask = functionsBitMask;
         }
     }
