@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DALobjects;
@@ -43,12 +44,12 @@ namespace Terminal3.ServiceLayer
         {
             GuestUserInterface.ExitSystem(userID);
         }
-        public Result<bool> Register(string email, string password)
+        public Result<RegisteredUserDAL> Register(string email, string password)
         {
             return GuestUserInterface.Register(email, password);
         }
 
-        public Result<object> SearchStore(IDictionary<string, object> details)
+        public Result<List<StoreDAL>> SearchStore(IDictionary<string, object> details)
         {
             return GuestUserInterface.SearchStore(details);
         }
@@ -87,6 +88,9 @@ namespace Terminal3.ServiceLayer
         {
             return GuestUserInterface.GetTotalShoppingCartPrice(userID);
         }
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID) {
+            return GuestUserInterface.GetProductReview(storeID, productID);
+        }
         #endregion
 
         #region Register User Actions
@@ -103,6 +107,9 @@ namespace Terminal3.ServiceLayer
         public Result<StoreDAL> OpenNewStore(string storeName, string userID)
         {
             return RegisteredUserInterface.OpenNewStore(storeName, userID);
+        }
+        public Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review) {
+            return RegisteredUserInterface.AddProductReview(userID, storeID, productID, review);
         }
         #endregion
 

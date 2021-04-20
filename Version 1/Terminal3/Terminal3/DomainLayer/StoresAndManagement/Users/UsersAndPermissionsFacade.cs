@@ -44,7 +44,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             //Add first system admin
             RegisteredUser defaultUser = new RegisteredUser("Admin@terminal3", "Admin");
-            this.SystemAdmins.TryAdd("Admin@terminal3", defaultUser );
+            this.SystemAdmins.TryAdd(defaultUser.Id, defaultUser );
             this.RegisteredUsers.TryAdd(defaultUser.Id, defaultUser);
 
         }
@@ -70,7 +70,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (isUniqueEmail(email))
             {
                 RegisteredUser newUser = new RegisteredUser(email, password);
-                this.RegisteredUsers.TryAdd(email, newUser);
+                this.RegisteredUsers.TryAdd(newUser.Id, newUser);
                 return new Result<RegisteredUser>($"{email} is registered as new user", true, newUser);
             }
             else {
@@ -91,7 +91,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             //registered user has been found
             if (searchResult.ExecStatus)
             {
-                this.SystemAdmins.TryAdd(email, searchResult.Data);
+                this.SystemAdmins.TryAdd(searchResult.Data.Id, searchResult.Data);
                 return new Result<RegisteredUser>($"{email} has been added as system admin\n", true, searchResult.Data);
             }
             else
@@ -119,7 +119,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 //Check the constrain for at least one system admin
                 if (this.SystemAdmins.Count > 1)
                 {
-                    this.SystemAdmins.TryRemove(email, out removedUser);
+                    this.SystemAdmins.TryRemove(searchResult.Data.Id, out removedUser);
                     return new Result<RegisteredUser>($"{removedUser.Email} has been removed as system admin\n", true, removedUser);
                 }
 
@@ -147,7 +147,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// </returns>
         private bool isUniqueEmail(string email)
         {
-            return !RegisteredUsers.ContainsKey(email);
+           foreach(RegisteredUser registerUser in RegisteredUsers.Values)
+            {
+                if (registerUser.Email.Equals(email))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
@@ -158,15 +165,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// <returns></returns>
         private Result<RegisteredUser> FindUserByEmail(String email, ConcurrentDictionary<String, RegisteredUser> table)
         {
-            RegisteredUser requestedUser;
-            if (table.TryGetValue(email, out requestedUser)) 
+            foreach (RegisteredUser registeredUser in table.Values)
             {
-                return new Result<RegisteredUser>($"found user with email:{email}\n",true, requestedUser);
+                if (registeredUser.Email.Equals(email))
+                {
+                    return new Result<RegisteredUser>($"found user with email:{email}\n", true, registeredUser);
+                }
             }
-            else
-            {
-                return new Result<RegisteredUser>($"could not find user with email:{email}\n", false, null);
-            } 
+
+            return new Result<RegisteredUser>($"could not find user with email:{email}\n", false, null);
         }
 
         /// <summary>

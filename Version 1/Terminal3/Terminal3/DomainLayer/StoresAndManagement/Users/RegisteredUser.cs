@@ -71,11 +71,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             LinkedList<ShoppingBagDAL> shoppingBags = History.ShoppingBags;
             foreach (ShoppingBagDAL bag in shoppingBags)
-            {                 
-                if (bag.Products.ContainsKey(product.GetDAL().Data))
+            {             
+                foreach(ProductDAL productInHistory in bag.Products.Keys)
                 {
-                    return true;
+                    if (productInHistory.Id.Equals(product.Id)) { return true; }
                 }
+
             }
             return false;
         }

@@ -85,7 +85,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             else
             {
                 this.NumberOfRates = NumberOfRates + 1;
-                Rating = (Rating + rate) / NumberOfRates;
+                //Rating = (Rating + rate) / NumberOfRates;
+                Rating = (Rating *(NumberOfRates-1)+rate) / NumberOfRates;
+
                 return new Result<Double>($"Store {Name} rate is: {Rating}\n", true, Rating);
             }
         }
@@ -132,19 +134,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
         {
+            Result<Boolean> returnResult;
             if (!CheckIfStoreOwner(futureOwner.Id) && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new owner not already an owner + appointing owner is not a fraud
             {
                 StoreOwner newOwner = new StoreOwner(futureOwner, this, owner);
                 Owners.TryAdd(futureOwner.Id, newOwner);
-
+                returnResult = new Result<Boolean>($"Succeded to add store owner ${futureOwner.Email}: Appointing owner (ID: {currentlyOwnerID}).\n", true, true);
                 if (CheckIfStoreManager(futureOwner.Id)) //remove from managers list if needed
                 {
                     Managers.TryRemove(futureOwner.Id, out _);
                 }
             }
-            //else failed
-            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
-                $"is not an owner at ${this.Name}.\n", false, false);
+            else
+                returnResult = new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
+                    $"is not an owner at ${this.Name}.\n", false, false);
+            return returnResult;
         }
 
         public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)
@@ -154,9 +158,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             {
                 StoreManager newManager = new StoreManager(futureManager, this, new Permission(), owner);
                 Managers.TryAdd(futureManager.Id, newManager);
-            }
-            //else failed
-            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
+                return new Result<Boolean>($"Succeded to add store manager ${futureManager.Email}, Appointing owner (Id: ${currentlyOwnerID}).\n", true, true);
+            }  
+            return new Result<Boolean>($"Failed to add store manager: Appointing owner (Email: {currentlyOwnerID}) " +
                 $"is not an owner at ${this.Name}.\n", false, false);
         }
 

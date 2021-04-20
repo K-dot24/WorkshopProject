@@ -14,6 +14,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
     {
         public ECommerceSystem system = new ECommerceSystem();
 
+        //TODO
         public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
         {
             throw new NotImplementedException();
@@ -53,11 +54,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             return new Result<string>("", fromSystem.ExecStatus, fromSystem.Data.Id);
         }
 
-        public Result<ConcurrentDictionary<string, string>> GetProductReview(string storeID, string productID)
-        {
-            throw new NotImplementedException();
-        }
-
+        //TODO
         public Result<List<String>> GetStorePurchaseHistory(String ownerID, String storeID)
         {
             Result<HistoryDAL> fromSystem = system.GetStorePurchaseHistory(ownerID, storeID);
@@ -112,6 +109,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             return system.GetTotalShoppingCartPrice(userID);
         }
 
+        //TODO
         public Result<List<string>> GetUserPurchaseHistory(string userID)
         {
             Result<HistoryDAL> fromSystem = system.GetUserPurchaseHistory(userID);
@@ -184,15 +182,25 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             }
         }
 
-        public Result<object> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
+        //TODO
+        public Result<List<String>> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
         {
-            throw new NotImplementedException();
+            Result<ShoppingCartDAL> fromSystem = system.Purchase(userID, paymentDetails, deliveryDetails);
+            if (fromSystem.ExecStatus)
+            {
+                List<string> bagsIDS = new List<string>();
+                foreach (ShoppingBagDAL dal in fromSystem.Data.ShoppingBags) { bagsIDS.Add(dal.Id); }
+                return new Result<List<string>>("", fromSystem.ExecStatus, bagsIDS);
+
+            }
+            else
+                return new Result<List<string>>(fromSystem.Message, fromSystem.ExecStatus, null);
 
         }
 
         public Result<bool> Register(string email, string password)
         {
-            return system.Register(email, password);
+            return new Result<bool>(system.Register(email, password).ExecStatus) ;
         }
 
         public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
@@ -203,11 +211,6 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
         public Result<bool> RemoveProductFromStore(string userID, string storeID, string productID)
         {
             return system.RemoveProductFromStore(userID, storeID, productID);
-        }
-
-        public Result<bool> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID)
-        {
-            throw new NotImplementedException();
         }
 
         public Result<bool> ResetSystem(string sysAdminID)
@@ -222,7 +225,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             {
                 List<string> productIDS = new List<string>();
                 foreach (ProductDAL dal in fromSystem.Data) { productIDS.Add(dal.Id); }
-                 return new Result<List<string>>("", fromSystem.ExecStatus, productIDS);
+                return new Result<List<string>>("", fromSystem.ExecStatus, productIDS);
 
             }
             else
@@ -231,11 +234,18 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             }
         }
 
-        public Result<object> SearchStore(IDictionary<string, object> details)
+        public Result<List<String>> SearchStore(IDictionary<string, object> details)
         {
-            throw new NotImplementedException();
+            Result<List<StoreDAL>> fromSystem = system.SearchStore(details);
+            if (fromSystem.ExecStatus) { 
+                List<string> storesNames = new List<string>();
+                foreach (StoreDAL dal in fromSystem.Data) { storesNames.Add(dal.Name); }
+                return new Result<List<String>>(fromSystem.Message, fromSystem.ExecStatus, storesNames);
+            }
+            else
+                return new Result<List<String>>("", fromSystem.ExecStatus, null);
         }
-
+         
         public Result<bool> SetPermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
             return system.SetPermissions(storeID, managerID, ownerID, permissions);
