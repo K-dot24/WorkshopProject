@@ -1,0 +1,48 @@
+name: Terminal3
+
+on: [push]
+
+jobs:
+  build:
+    name:  Build
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      
+  unittests:      
+    needs: build
+    name:  Unit Testing
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Unit Tests
+      run: dotnet test ./Version1/Terminal3/Terminal3Tests/Terminal3-UnitTests.csproj        
+ 
+  regression:  
+    needs: unittests 
+    name: Regression
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Regression tests 
+      run: dotnet build --configuration Release --no-restore
