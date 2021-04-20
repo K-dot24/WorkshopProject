@@ -48,7 +48,7 @@ namespace XUnitTestTerminal3
 
         [Fact]
         [Trait("Category", "concurrency")]
-        public void PurchaseLastProduct()
+        public void RemoveProduct()
         {
 
             Thread thread1 = new Thread(() => ThreadWork(kfir_id));
