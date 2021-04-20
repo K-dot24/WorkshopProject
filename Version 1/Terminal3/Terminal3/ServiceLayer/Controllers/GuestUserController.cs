@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DALobjects;
@@ -20,6 +21,8 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
+        Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+
     }
     //Basic functionality The every user can preform
     public class GuestUserController: IGuestUserInterface
@@ -53,6 +56,10 @@ namespace Terminal3.ServiceLayer.Controllers
         }
         public Result<HistoryDAL> GetUserPurchaseHistory(String userID) { return StoresAndManagementInterface.GetUserPurchaseHistory(userID); }
         public Result<double> GetTotalShoppingCartPrice(String userID) { return StoresAndManagementInterface.GetTotalShoppingCartPrice(userID); }
+        public Result<ConcurrentDictionary<string, string>> GetProductReview(string storeID, string productID)
+        {
+            return StoresAndManagementInterface.GetProductReview(storeID, productID);
+        }
         #endregion
 
     }
