@@ -111,13 +111,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         public Result<Product> RemoveProduct(String userID, String productID)
         {
-            if (CheckIfStoreOwner(userID) || CheckStoreManagerAndPermissions(userID, Methods.RemoveProduct))
+            try
             {
-                return InventoryManager.RemoveProduct(productID);
+                Monitor.TryEnter(productID);
+                try
+                {
+                    if (CheckIfStoreOwner(userID) || CheckStoreManagerAndPermissions(userID, Methods.RemoveProduct))
+                    {
+                        return InventoryManager.RemoveProduct(productID);
+                    }
+                    else
+                    {
+                        return new Result<Product>($"{userID} does not have permissions to remove products from {this.Name}\n", false, null);
+                    }
+                }
+                finally
+                {
+                    Monitor.Exit(productID);
+                }
             }
-            else
+            catch (SynchronizationLockException SyncEx)
             {
-                return new Result<Product>($"{userID} does not have permissions to remove products from {this.Name}\n", false, null);
+                Console.WriteLine("A SynchronizationLockException occurred. Message:");
+                Console.WriteLine(SyncEx.Message);
+                return new Result<Product>(SyncEx.Message, false, null);
             }
         }
         public Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details)
@@ -135,36 +152,53 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
         {
-            // Check new owner not already an owner + appointing owner is not a fraud or the appointing user is a manager with the right permissions
-            if (!CheckIfStoreOwner(futureOwner.Id)) 
+            try
             {
-                StoreOwner newOwner;
-                if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
+                Monitor.TryEnter(futureOwner);
+                try
                 {
-                    newOwner = new StoreOwner(futureOwner, this, owner);
-                    Owners.TryAdd(futureOwner.Id, newOwner);    
-                }
-                else if(Managers.TryGetValue(currentlyOwnerID , out StoreManager manager) && CheckStoreManagerAndPermissions(currentlyOwnerID, Methods.AddStoreOwner))
-                {
-                    newOwner = new StoreOwner(futureOwner, this, manager);
-                    Owners.TryAdd(futureOwner.Id, newOwner);
-                }
-                else
-                {
-                    return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
-                        $"is not an owner at ${this.Name}.\n", false, false);
-                }
+                    // Check new owner not already an owner + appointing owner is not a fraud or the appointing user is a manager with the right permissions
+                    if (!CheckIfStoreOwner(futureOwner.Id))
+                    {
+                        StoreOwner newOwner;
+                        if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
+                        {
+                            newOwner = new StoreOwner(futureOwner, this, owner);
+                            Owners.TryAdd(futureOwner.Id, newOwner);
+                        }
+                        else if (Managers.TryGetValue(currentlyOwnerID, out StoreManager manager) && CheckStoreManagerAndPermissions(currentlyOwnerID, Methods.AddStoreOwner))
+                        {
+                            newOwner = new StoreOwner(futureOwner, this, manager);
+                            Owners.TryAdd(futureOwner.Id, newOwner);
+                        }
+                        else
+                        {
+                            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
+                                $"is not an owner at ${this.Name}.\n", false, false);
+                        }
 
 
-                if (CheckIfStoreManager(futureOwner.Id)) //remove from managers list if needed
-                {
-                    Managers.TryRemove(futureOwner.Id, out _);
-                }
+                        if (CheckIfStoreManager(futureOwner.Id)) //remove from managers list if needed
+                        {
+                            Managers.TryRemove(futureOwner.Id, out _);
+                        }
 
-                return new Result<Boolean>("User successfuly added as the store owner\n", true, true);
+                        return new Result<Boolean>("User successfuly added as the store owner\n", true, true);
+                    }
+                    //else failed
+                    return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}). The user is already an owner.\n", false, false);
+                }
+                finally
+                {
+                    Monitor.Exit(futureOwner);
+                }
             }
-            //else failed
-            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}). The user is already an owner.\n", false, false);
+            catch (SynchronizationLockException SyncEx)
+            {
+                Console.WriteLine("A SynchronizationLockException occurred. Message:");
+                Console.WriteLine(SyncEx.Message);
+                return new Result<Boolean>(SyncEx.Message, false, false);
+            }
         }
 
         public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)

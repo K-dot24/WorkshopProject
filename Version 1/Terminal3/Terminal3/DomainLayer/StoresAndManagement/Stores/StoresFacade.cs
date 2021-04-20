@@ -57,19 +57,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         
         public Result<Boolean> RemoveProductFromStore(string userID, string storeID, string productID)
-        {
-            if (Stores.TryGetValue(storeID, out Store store))
-            {
-                Result<Product> res = store.RemoveProduct(userID, productID);
-                if (res.ExecStatus)
+        {           
+                if (Stores.TryGetValue(storeID, out Store store))
                 {
-                    return new Result<Boolean>(res.Message, res.ExecStatus, true);
+                    Result<Product> res = store.RemoveProduct(userID, productID);
+                    if (res.ExecStatus)
+                    {
+                        return new Result<Boolean>(res.Message, res.ExecStatus, true);
+                    }
+                    //else failed
+                    return new Result<Boolean>(res.Message, res.ExecStatus, false);
                 }
                 //else failed
-                return new Result<Boolean>(res.Message, res.ExecStatus, false);               
-            }
-            //else failed
-            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
+                return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);           
         }
         
         public Result<Product> EditProductDetails(string userID, string storeID, string productID, IDictionary<String, Object> details)

@@ -7,7 +7,7 @@ using Xunit;
 
 namespace XUnitTestTerminal3
 {
-    public class AddStoreManagerConcurrencyTest : XUnitTerminal3TestCase
+    public class AddStoreOwnerConcurrencyTest : XUnitTerminal3TestCase
     {
         private string kfir_id;
         private string igor_id;
@@ -16,7 +16,7 @@ namespace XUnitTestTerminal3
         private string random_id;
         private string store_id;
         private BlockingCollection<bool> results;
-        public AddStoreManagerConcurrencyTest() : base()
+        public AddStoreOwnerConcurrencyTest() : base()
         {
             sut.Register("kfir@gmail.com", "test1");
             sut.Register("igor@gmail.com", "test12");
@@ -29,28 +29,22 @@ namespace XUnitTestTerminal3
             this.shlomot_id = sut.Login("shlomot@gmail.com", "test").Data;
             this.random_id = sut.Login("random@gmail.com", "test123").Data;
             this.store_id = sut.OpenNewStore("test_store", kfir_id).Data;
-            sut.AddStoreManager(igor_id, kfir_id, store_id);
-            sut.AddStoreManager(hit_id, kfir_id, store_id);
-            sut.AddStoreManager(shlomot_id, kfir_id, store_id);
-            LinkedList<int> permission = new LinkedList<int>();
-            permission.AddLast(4);
-            sut.SetPermissions(store_id, igor_id, kfir_id, permission);
-            sut.SetPermissions(store_id, hit_id, kfir_id, permission);
-            sut.SetPermissions(store_id, shlomot_id, kfir_id, permission);
+            sut.AddStoreOwner(igor_id, kfir_id, store_id);
+            sut.AddStoreOwner(hit_id, kfir_id, store_id);
+            sut.AddStoreOwner(shlomot_id, kfir_id, store_id);
             results = new BlockingCollection<bool>();
         }
 
-        internal void ThreadWork(string manager_id)
+        internal void ThreadWork(string owner_id)
         {
-            Terminal3.DomainLayer.Result<bool> result = sut.AddStoreManager(random_id, manager_id, store_id);
+            Terminal3.DomainLayer.Result<bool> result = sut.AddStoreOwner(random_id, owner_id, store_id);
             results.TryAdd(result.ExecStatus);
-        }
+        }        
 
         [Fact]
         [Trait("Category", "concurrency")]
-        public void AddStoreManager()
+        public void AddStoreOwner()
         {
-
             Thread thread1 = new Thread(() => ThreadWork(kfir_id));
             Thread thread2 = new Thread(() => ThreadWork(igor_id));
             Thread thread3 = new Thread(() => ThreadWork(hit_id));
@@ -72,8 +66,8 @@ namespace XUnitTestTerminal3
                 if (result)
                     count++;
             }
-            Assert.True(count == 1, count+" succeded out of "+results.Count);
+            Assert.True(count == 1, count + " succeded out of " + results.Count);
         }
-    }
 
+    }
 }
