@@ -24,7 +24,7 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> LogOut(String email);
 
         //TODO: refine requirement
-        Result<Object> SearchStore(IDictionary<String, Object> details);
+        Result<List<String>> SearchStore(IDictionary<String, Object> details); // store name
 
         Result<List<String>> SearchProduct(IDictionary<String, Object> productDetails); //list<pid>
         
@@ -36,7 +36,7 @@ namespace Terminal3.ServiceLayer
         
         Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID , String productID , int quantity);
 
-        Result<Object> Purchase(String userID , IDictionary<String, Object> paymentDetails , IDictionary<String, Object> deliveryDetails);
+        Result<List<String>> Purchase(String userID , IDictionary<String, Object> paymentDetails , IDictionary<String, Object> deliveryDetails); //List<ShoppingBagID>
 
         Result<List<String>> GetUserPurchaseHistory(String userID); //List<shoppingBagID>
 
@@ -52,12 +52,9 @@ namespace Terminal3.ServiceLayer
         Result<String> EditProductDetails(String userID, String storeID , String productID, IDictionary<String, Object> details); //TODO
         Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID); 
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<String, List<int>>> GetStoreStaff(String ownerID, String storeID);
         Result<List<String>> GetStorePurchaseHistory(String ownerID, String storeID); //userID to List<permissions>
-        Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
 
         #endregion
 
