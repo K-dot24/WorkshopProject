@@ -129,10 +129,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.OpenNewStore(storeName, userID);
         }
 
-        public Result<object> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
+        public Result<String> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
         {
             if (Real == null)
-                return new Result<object>(true);
+                return new Result<String>(true);
 
             return Real.Purchase(userID, paymentDetails, deliveryDetails);
         }
@@ -169,10 +169,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.SearchProduct(productDetails);
         }
 
-        public Result<object> SearchStore(IDictionary<string, object> details)
+        public Result<String> SearchStore(IDictionary<string, object> details)
         {
             if (Real == null)
-                return new Result<object>(true);
+                return new Result<String>(true);
 
             return Real.SearchStore(details);
         }
@@ -201,28 +201,6 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.AddProductReview(userID, storeID, productID, review);
         }
 
-        public Result<bool> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID)
-        {
-            if (Real == null)
-                return new Result<bool>(true);
 
-            return Real.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID);
-        }
-
-        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID)
-        {
-            if (Real == null)
-                return new Result<ConcurrentDictionary<String, String>>(true);
-
-            return Real.GetProductReview(storeID, productID);
-        }
-
-        public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
-        {
-            if (Real == null)
-                return new Result<bool>(true);
-
-            return Real.RemoveStoreManager(storeID, managerID, storeID);
-        }
     }
 }

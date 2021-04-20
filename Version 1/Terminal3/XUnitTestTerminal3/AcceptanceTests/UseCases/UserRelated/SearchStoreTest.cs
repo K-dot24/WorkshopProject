@@ -20,8 +20,10 @@ namespace XUnitTestTerminal3
         {
             string store_id = sut.OpenNewStore("test_store", user_id).Data;
             IDictionary<String, Object> dictonary = new Dictionary<String, Object>() {{ "Name", "test_store" }};
+            String store_name = sut.SearchStore(dictonary).Data;
 
             Assert.True(sut.SearchStore(dictonary).ExecStatus);
+            Assert.True(store_name.Equals("test_store"));
         }
 
 

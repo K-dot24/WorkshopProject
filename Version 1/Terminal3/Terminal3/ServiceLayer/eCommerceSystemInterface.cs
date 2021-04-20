@@ -48,7 +48,7 @@ namespace Terminal3.ServiceLayer
             return GuestUserInterface.Register(email, password);
         }
 
-        public Result<object> SearchStore(IDictionary<string, object> details)
+        public Result<StoreDAL> SearchStore(IDictionary<string, object> details)
         {
             return GuestUserInterface.SearchStore(details);
         }
