@@ -7,15 +7,14 @@ jobs:
     name:  Build
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-      uses: actions/setup-dotnet@v2.1.0
-      with:
-        dotnet-version: ${{ matrix.dotnet-version }}
-    - name: Install dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
+      - uses: actions/checkout@main
+      - uses: actions/setup-dotnet@v1
+        with: 
+          dotnet-version: '2.1.x' 
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
       
   unittests:      
     needs: build
@@ -24,7 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-      uses: actions/setup-dotnet@v2.1.0
+      uses: actions/setup-dotnet@v2.1.x
       with:
         dotnet-version: ${{ matrix.dotnet-version }}
     - name: Install dependencies
@@ -39,7 +38,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-      uses: actions/setup-dotnet@v2.1.0
+      uses: actions/setup-dotnet@v2.1.x
       with:
         dotnet-version: ${{ matrix.dotnet-version }}
     - name: Install dependencies
