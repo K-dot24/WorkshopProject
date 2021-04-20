@@ -80,7 +80,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             else
             {
                 this.NumberOfRates = NumberOfRates + 1;
-                Rating = (Rating + rate) / NumberOfRates;
+                //Rating = (Rating + rate) / NumberOfRates;
+                Rating = (Rating *(NumberOfRates-1)+rate) / NumberOfRates;
+
                 return new Result<Double>($"Store {Name} rate is: {Rating}\n", true, Rating);
             }
         }
