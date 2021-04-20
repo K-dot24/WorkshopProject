@@ -8,7 +8,7 @@ using XUnitTestTerminal3.AcceptanceTests.Utils;
 
 namespace Terminal3.ServiceLayer
 {   
-    //System Real interface with DAL
+    //./System Real interface with DAL
     public interface IECommerceSystemInterface
     {
 
