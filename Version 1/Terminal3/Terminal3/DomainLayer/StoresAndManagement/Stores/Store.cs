@@ -231,7 +231,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string userID)
         {
             Dictionary<IStoreStaff, Permission> storeStaff = new Dictionary<IStoreStaff, Permission>();
-            Permission ownerPermission = new Permission();
+            Permission ownerPermission = new Permission(isOwner:true);
             ownerPermission.SetAllMethodesPermitted();
 
             if(CheckStoreManagerAndPermissions(userID, Methods.GetStoreStaff ) || CheckIfStoreOwner(userID))           
