@@ -12,7 +12,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<UserDAL> EnterSystem();
         void ExitSystem(String userID);
         Result<RegisteredUserDAL> Register(string email, string password);
-        Result<StoreDAL> SearchStore(IDictionary<String, Object> details);
+        Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details);
         Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
         Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);
         Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
@@ -42,7 +42,7 @@ namespace Terminal3.ServiceLayer.Controllers
             return StoresAndManagementInterface.EnterSystem();
         }
         public Result<RegisteredUserDAL> Register(string email, string password){return StoresAndManagementInterface.Register(email,password); }
-        public Result<StoreDAL> SearchStore(IDictionary<String, Object> details) { return StoresAndManagement.SearchStore(details); }
+        public Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details) { return StoresAndManagementInterface.SearchStore(details); }
         public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails) { return StoresAndManagementInterface.SearchProduct(productDetails); }
         public Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID) { return StoresAndManagementInterface.AddProductToCart(userID, ProductID, ProductQuantity, StoreID); }   // Redundent ?
         public Result<ShoppingCartDAL> GetUserShoppingCart(String userID) { return StoresAndManagementInterface.GetUserShoppingCart(userID); }
