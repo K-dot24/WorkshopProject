@@ -192,7 +192,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<bool> Register(string email, string password)
         {
-            return system.Register(email, password);
+            return new Result<bool>(system.Register(email, password).ExecStatus) ;
         }
 
         public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
