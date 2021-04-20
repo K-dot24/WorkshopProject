@@ -37,7 +37,7 @@ namespace XUnitTestTerminal3
 
             List<int> owner_per;
             storeStaff.TryGetValue(owner_id, out owner_per);
-
+            Assert.True(storeStaff.ContainsKey(this.owner_id));
             Assert.True(owner_per[0] == 777);
         }
 
@@ -49,8 +49,8 @@ namespace XUnitTestTerminal3
 
             List<int> manager_per;
             storeStaff.TryGetValue(owner_id, out manager_per);
-
-            Assert.True(manager_per.Count == 2 && manager_per[0] == 0 && manager_per[1] == 1);
+            Assert.True(storeStaff.ContainsKey(this.manager_id));
+            Assert.True(manager_per[0] == 0 && manager_per[1] == 1);
         }
     }
 }

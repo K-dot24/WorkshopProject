@@ -51,7 +51,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (resBag.ExecStatus)
             {
                 ShoppingBag bag = resBag.Data;
-                return bag.UpdateShoppingBag(product, quantity);
+                Result<bool> res = bag.UpdateShoppingBag(product, quantity);
+                if (!bag.Products.ContainsKey(product))                   
+                    ShoppingCart.ShoppingBags.TryRemove(storeID, out _);
+                return res;
             }
             //else faild
             return new Result<bool>(resBag.Message, false, false);

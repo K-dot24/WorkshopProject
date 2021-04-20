@@ -22,7 +22,10 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<bool> AddProductToCart(string userID, string ProductID, int ProductQuantity, string StoreID)
         {
-            return system.AddProductToCart(userID, ProductID, ProductQuantity, StoreID);
+            Result<bool> fromSystem = system.AddProductToCart(userID, ProductID, ProductQuantity, StoreID);
+            if (fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
         public Result<string> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category)
@@ -40,18 +43,26 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<bool> AddStoreManager(string addedManagerID, string currentlyOwnerID, string storeID)
         {
-            return system.AddStoreManager(addedManagerID, currentlyOwnerID, storeID);
+            Result<bool> fromSystem = system.AddStoreManager(addedManagerID, currentlyOwnerID, storeID);
+            if (fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
         public Result<bool> AddStoreOwner(string addedOwnerID, string currentlyOwnerID, string storeID)
         {
-            return system.AddStoreOwner(addedOwnerID, currentlyOwnerID, storeID);
+            Result <bool> fromSystem = system.AddStoreOwner(addedOwnerID, currentlyOwnerID, storeID);
+            if (fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
         public Result<string> EditProductDetails(string userID, string storeID, string productID, IDictionary<string, object> details)
         {
             Result<ProductDAL> fromSystem = system.EditProductDetails(userID, storeID, productID, details);
-            return new Result<string>("", fromSystem.ExecStatus, fromSystem.Data.Id);
+            if(fromSystem.ExecStatus)
+                return new Result<string>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.Data.Id);
+            return new Result<string>(fromSystem.Message, fromSystem.ExecStatus, null);
         }
 
         //TODO
@@ -106,7 +117,10 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<double> GetTotalShoppingCartPrice(string userID)
         {
-            return system.GetTotalShoppingCartPrice(userID);
+            Result<double> fromSystem = system.GetTotalShoppingCartPrice(userID);
+            if (fromSystem.ExecStatus)
+                return new Result<double>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.Data);
+            return new Result<double>(fromSystem.Message, fromSystem.ExecStatus, -1.0);
         }
 
         //TODO
@@ -166,7 +180,10 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<bool> LogOut(string email)
         {
-            return system.LogOut(email);
+            Result<bool> fromSystem = system.LogOut(email);
+            if (fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
         public Result<string> OpenNewStore(string storeName, string userID)
@@ -200,7 +217,10 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<bool> Register(string email, string password)
         {
-            return new Result<bool>(system.Register(email, password).ExecStatus) ;
+            Result<bool> fromSystem = new Result<bool>(system.Register(email, password).ExecStatus) ;
+            if (fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
         public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
@@ -210,12 +230,18 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<bool> RemoveProductFromStore(string userID, string storeID, string productID)
         {
-            return system.RemoveProductFromStore(userID, storeID, productID);
+            Result <bool> fromSystem = system.RemoveProductFromStore(userID, storeID, productID);
+            if (fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
         public Result<bool> ResetSystem(string sysAdminID)
         {
-            return system.ResetSystem(sysAdminID);
+            Result<bool> fromSystem = system.ResetSystem(sysAdminID);
+            if (fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
         public Result<List<string>> SearchProduct(IDictionary<string, object> productDetails)
@@ -248,12 +274,18 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
          
         public Result<bool> SetPermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
-            return system.SetPermissions(storeID, managerID, ownerID, permissions);
+            Result<bool> fromSystem = system.SetPermissions(storeID, managerID, ownerID, permissions);
+            if (fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
-        public Result<bool> UpdateShoppingCart(string userID, string shoppingBagID, string productID, int quantity)
+        public Result<bool> UpdateShoppingCart(string userID, string storeID, string productID, int quantity)
         {
-            return system.UpdateShoppingCart(userID, shoppingBagID, productID, quantity);
+            Result<bool> fromSystem = system.UpdateShoppingCart(userID, storeID, productID, quantity);
+            if (fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
     }
