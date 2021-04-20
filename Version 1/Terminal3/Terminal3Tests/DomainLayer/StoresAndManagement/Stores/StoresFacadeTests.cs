@@ -381,13 +381,54 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             }
         }
 
-        [Fact()]
+        [Theory()]
         [Trait("category","Unit")]
-        public void SearchProductTestByAttributes(string attribute ,string name, double rating, bool expectedResult)
+        [InlineData("Tes",true)]
+        [InlineData("NONO",false)]
+        public void SearchProductTestByName(string name,bool expectedResult)
         {
-            IDictionary<String, Object> attributes = new Dictionary<string, object>() { {"name", name }, {"rating", rating } };
+            IDictionary<String, Object> attributes = new Dictionary<string, object>() { {"name", name }};
             TestStore.AddRating(4.0);
             Result<List<Store>> result = Facade.SearchStore(attributes);
+            Assert.Equal(expectedResult, result.ExecStatus);
+            if (expectedResult)
+            {
+                Assert.Contains(name, result.Data[0].Name);
+            }
+        }
+        [Theory()]
+        [Trait("category", "Unit")]
+        [InlineData(4.0, true)]
+        [InlineData(4.1, false)]
+        [InlineData(3.9, true)]
+        public void SearchProductTestByRating(double rating, bool expectedResult)
+        {
+            IDictionary<String, Object> attributes = new Dictionary<string, object>() { { "rating", rating} };
+            TestStore.AddRating(4.0);
+            Result<List<Store>> result = Facade.SearchStore(attributes);
+            Assert.Equal(expectedResult, result.ExecStatus);
+            if (expectedResult)
+            {
+                Assert.True(result.Data[0].Rating>=rating);
+            }
+        }
+        [Theory()]
+        [Trait("category", "Unit")]
+        [InlineData("Tes",4.0, true)]
+        [InlineData("Tes" ,3.9, true)]
+        [InlineData("Tes",4.1, false)]
+        [InlineData("NONO",4.0, false)]
+        [InlineData("NONO" ,3.9, false)]
+        public void SearchProductTestByNameAndRating(string name,double rating, bool expectedResult)
+        {
+            IDictionary<String, Object> attributes = new Dictionary<string, object>() { { "rating", rating }, { "name", name } };
+            TestStore.AddRating(4.0);
+            Result<List<Store>> result = Facade.SearchStore(attributes);
+            Assert.Equal(expectedResult, result.ExecStatus);
+            if (expectedResult)
+            {
+                Assert.True(result.Data[0].Rating >= rating);
+            }
         }
     }
 }
