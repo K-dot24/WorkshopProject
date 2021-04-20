@@ -1,6 +1,10 @@
 ﻿using System;
 using Terminal3.DALobjects;
 using System.Reflection;
+using Terminal3.DomainLayer.StoresAndManagement.Stores;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using Terminal3.ExternalSystems;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -40,18 +44,43 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             }
         }
-        public Result<RegisteredUser> LogOut() {
+        public Result<GuestUser> LogOut() {
             if (!LoggedIn)
             {
                 //User already logged out
-                return new Result<RegisteredUser>($"{this.Email} already logged out", false, null);
+                return new Result<GuestUser>($"{this.Email} already logged out", false, null);
             }
             else 
             {
                 LoggedIn = false;
-                return new Result<RegisteredUser>($"{this.Email} is Logged out\n", true, this);
+                return new Result<GuestUser>($"{this.Email} is Logged out\n", true, new GuestUser());
             }           
         }
+
+        public Result<Boolean> AddProductReview(Store store, Product product , String review)
+        {
+            if (checkIfProductPurchasedByUser(store , product))
+            {
+                product.AddProductReview(Id , review);
+                return new Result<Boolean>("The product review was added successfuly\n", true, true);
+            }
+            return new Result<Boolean>("The User did not purchase the product before, therefore can not write it a review\n", false, false);
+        }
+
+        private Boolean checkIfProductPurchasedByUser(Store store, Product product)
+        {
+            LinkedList<ShoppingBagDAL> shoppingBags = History.ShoppingBags;
+            foreach (ShoppingBagDAL bag in shoppingBags)
+            {             
+                foreach(ProductDAL productInHistory in bag.Products.Keys)
+                {
+                    if (productInHistory.Id.Equals(product.Id)) { return true; }
+                }
+
+            }
+            return false;
+        }
+
         public Result<History> GetUserPurchaseHistory()
         {
             return new Result<History>("User history\n", true, History);
@@ -64,8 +93,38 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<Boolean> ExitSystem()
         {
-            Result < RegisteredUser> res =  LogOut();
-            return new Result<Boolean>(res.Message, res.ExecStatus, res.ExecStatus);
+            Result<GuestUser> res = LogOut();
+            if (res.ExecStatus)
+                return new Result<Boolean>("User exit successfuly", true, true);
+            else
+                return new Result<Boolean>("Can not exit", false, false);
+
+        }
+
+        public new Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        {
+            Double amount = ShoppingCart.GetTotalShoppingCartPrice();
+
+            bool paymentSuccess = PaymentSystem.Pay(amount, paymentDetails);
+
+            if (!paymentSuccess)
+            {
+                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in payment details\n", false, null);
+
+            }
+            
+            bool deliverySuccess = DeliverySystem.Deliver(deliveryDetails);
+            if (!deliverySuccess)
+            {
+                PaymentSystem.CancelTransaction(paymentDetails);
+                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in delivery details\n", false, null);
+            }
+
+            History.AddPurchasedShoppingCart(ShoppingCart);
+            ShoppingCart copy = new ShoppingCart(ShoppingCart);
+            ShoppingCart = new ShoppingCart();          // create new shopping cart for user
+
+            return new Result<ShoppingCart>("Users purchased shopping cart\n", true, copy);
         }
     }
 }

@@ -8,13 +8,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
     public class ShoppingCart
     {
-        public string ShoppingCartId { get; }
-        public ConcurrentDictionary<String, ShoppingBag> ShoppingBags { get; }  // <StoreID, ShoppingBag>
+        public string Id { get; set; }
+        public ConcurrentDictionary<String, ShoppingBag> ShoppingBags { get; set; }  // <StoreID, ShoppingBag>
+        public Double TotalCartPrice { get; set; }
 
         public ShoppingCart()
         {
-            ShoppingCartId = Service.GenerateId();
+            Id = Service.GenerateId();
             ShoppingBags = new ConcurrentDictionary<string, ShoppingBag>();
+            TotalCartPrice = 0;
+        }
+
+        public ShoppingCart(ShoppingCart original)
+        {
+            Id = original.Id;
+            ShoppingBags = original.ShoppingBags;
+            TotalCartPrice = original.TotalCartPrice;
         }
 
         public Result<ShoppingBag> GetShoppingBag(string storeID)
@@ -40,8 +49,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             {
                 SBD.AddLast(sb.Value.GetDAL().Data);
             }
-            return new Result<ShoppingCartDAL>("shopping cart DAL object", true, new ShoppingCartDAL(ShoppingCartId, SBD));
+            return new Result<ShoppingCartDAL>("shopping cart DAL object", true, new ShoppingCartDAL(Id, SBD , TotalCartPrice));
 
+        }
+
+        public Double GetTotalShoppingCartPrice()
+        {
+            Double sum=0;
+            foreach(ShoppingBag bag in ShoppingBags.Values)
+            {
+                sum = sum + bag.GetTotalPrice();
+            }
+            TotalCartPrice = sum;
+            return sum;
         }
     }
 }

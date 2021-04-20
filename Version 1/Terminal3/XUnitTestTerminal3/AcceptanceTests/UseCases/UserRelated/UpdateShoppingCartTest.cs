@@ -8,9 +8,8 @@ namespace XUnitTestTerminal3
     public class UpdateShoppingCartTest: XUnitTerminal3TestCase
     {
         private string user_id;
-        public UpdateShoppingCartTest()
+        public UpdateShoppingCartTest() : base()
         {
-            sut.ResetSystem();
             sut.Register("test@gmail.com", "test123");
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
         }

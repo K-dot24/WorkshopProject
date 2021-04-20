@@ -5,12 +5,11 @@ using Xunit;
 
 namespace XUnitTestTerminal3
 {
-    public class GetUserShoppingCartTest: XUnitTerminal3TestCase
+    public class GetUserShoppingCartTest : XUnitTerminal3TestCase
     {
         private string user_id;
-        public GetUserShoppingCartTest()
+        public GetUserShoppingCartTest() : base()
         {
-            sut.ResetSystem();
             sut.Register("test@gmail.com", "test123");
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
         }
@@ -19,7 +18,7 @@ namespace XUnitTestTerminal3
         [Trait("Category", "acceptance")]
         public void GetUserShoppingCartEmpty()
         {
-            List<String> shoppingBags = sut.GetUserShoppingCart(user_id).Data; 
+            List<String> shoppingBags = sut.GetUserShoppingCart(user_id).Data;
 
             Assert.True(shoppingBags.Count == 0);
         }
@@ -29,8 +28,8 @@ namespace XUnitTestTerminal3
         public void GetUserShoppingCartNotEmpty()
         {
             String store_id = sut.OpenNewStore("test_store", user_id).Data;
-            String product_id  = sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test").Data;
-            sut.AddProductToCart(user_id, product_id, 1, store_id); 
+            String product_id = sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test").Data;
+            sut.AddProductToCart(user_id, product_id, 1, store_id);
             List<String> shoppingBags = sut.GetUserShoppingCart(user_id).Data;
 
             Assert.True(shoppingBags.Count == 1);
@@ -61,3 +60,4 @@ namespace XUnitTestTerminal3
             Assert.True(shoppingBags.Count == 0);
         }
     }
+}

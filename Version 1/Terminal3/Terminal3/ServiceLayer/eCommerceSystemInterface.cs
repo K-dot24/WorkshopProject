@@ -1,195 +1,199 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DALobjects;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
+using Terminal3.ServiceLayer.Controllers;
 using XUnitTestTerminal3.AcceptanceTests.Utils;
 
 namespace Terminal3.ServiceLayer
 {   
-    //./System Real interface with DAL
-    public interface IECommerceSystemInterface
+    //try git action
+    public class ECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface
     {
+        //Properties
+        public IGuestUserInterface GuestUserInterface { get; }
+        public IRegisteredUserInterface RegisteredUserInterface { get; }
+        public IStoreStaffInterface StoreStaffInterface { get; }
+        public ISystemAdminInterface SystemAdminInterface { get; }
 
-        #region System related operations
-        Result<Boolean> ResetSystem();
-
-        void ExitSystem(String userID); 
-
-        #endregion
-
-        #region User related operations
-        Result<Boolean> Register(String email, String password);
-
-
-        Result<UserDAL> Login(String email, String password);
-
-        Result<Boolean> LogOut(String email);
-
-        //TODO: refine requirement
-        Result<Object> SearchStore(IDictionary<String, Object> details);
-
-        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
-
-        Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);   // Redundent ?
-
-        Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
-
-        Result<Dictionary<String, int>> GetUserShoppingBag(String userID, String shoppingBagID); //Dictionary<pid , countity>
-
-        Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity);
-
-        Result<Object> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
-
-        Result<HistoryDAL> GetUserPurchaseHistory(String userID);
-
-        Result<int> GetTotalShoppingCartPrice(String userID);
-        #endregion
-
-        #region Store related operations
-        Result<StoreDAL> OpenNewStore(String storeName, String userID);
-        Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category);
-        Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
-        Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
-        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
-        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID);
-        Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID);
-
-        #endregion
-    }
-    public class ECommerceSystem : IECommerceSystemInterface
-    {
-        public IStoresAndManagementInterface StoresAndManagement { get; }
+        //Constructor
         public ECommerceSystem()
         {
-            StoresAndManagement = new StoresAndManagementInterface(); 
+            StoresAndManagementInterface StoresAndManagement = new StoresAndManagementInterface();
+            GuestUserInterface = new GuestUserController(StoresAndManagement);
+            RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
+            StoreStaffInterface = new StoreStaffController(StoresAndManagement);
+            SystemAdminInterface = new SystemAdminController(StoresAndManagement);
+        }
+
+        public void DisplaySystem()
+        {
+            // TODO - when GUI exists then display all functions according to current user role
+        }
+
+        //Metohds
+        #region Guest User Actions
+        public Result<UserDAL> EnterSystem()
+        {
+            return GuestUserInterface.EnterSystem();
+        }
+        public void ExitSystem(String userID)
+        {
+            GuestUserInterface.ExitSystem(userID);
+        }
+        public Result<RegisteredUserDAL> Register(string email, string password)
+        {
+            return GuestUserInterface.Register(email, password);
+        }
+
+        public Result<List<StoreDAL>> SearchStore(IDictionary<string, object> details)
+        {
+            return GuestUserInterface.SearchStore(details);
+        }
+
+        public Result<List<ProductDAL>> SearchProduct(IDictionary<string, object> searchAttributes)
+        {
+            return GuestUserInterface.SearchProduct(searchAttributes);
         }
 
         public Result<bool> AddProductToCart(string userID, string ProductID, int ProductQuantity, string StoreID)
         {
-            throw new NotImplementedException();
-        }
-
-        public Result<ProductDAL> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<bool> AddStoreManager(string addedManagerID, string currentlyOwnerID, string storeID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<bool> AddStoreOwner(string addedOwnerID, string currentlyOwnerID, string storeID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<ProductDAL> EditProductDetails(string userID, string storeID, string productID, IDictionary<string, object> details)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Dictionary<UserDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<int> GetTotalShoppingCartPrice(string userID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<HistoryDAL> GetUserPurchaseHistory(string userID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Dictionary<string, int>> GetUserShoppingBag(string userID, string shoppingBagID)
-        {
-            throw new NotImplementedException();
+            return GuestUserInterface.AddProductToCart(userID, ProductID, ProductQuantity, StoreID);
         }
 
         public Result<ShoppingCartDAL> GetUserShoppingCart(string userID)
         {
-            throw new NotImplementedException();
+            return GuestUserInterface.GetUserShoppingCart(userID);
         }
 
-        public Result<UserDAL> Login(string email, string password)
+        public Result<bool> UpdateShoppingCart(string userID, string storeID, string productID, int quantity)
         {
-            throw new NotImplementedException();
+            return GuestUserInterface.UpdateShoppingCart(userID, storeID, productID, quantity);
+        }
+
+        public Result<ShoppingCartDAL> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
+        {
+            return GuestUserInterface.Purchase(userID, paymentDetails, deliveryDetails);
+        }
+
+        public Result<HistoryDAL> GetUserPurchaseHistory(string userID)
+        {
+            return GuestUserInterface.GetUserPurchaseHistory(userID);
+        }
+
+        public Result<double> GetTotalShoppingCartPrice(string userID)
+        {
+            return GuestUserInterface.GetTotalShoppingCartPrice(userID);
+        }
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID) {
+            return GuestUserInterface.GetProductReview(storeID, productID);
+        }
+        #endregion
+
+        #region Register User Actions
+        public Result<RegisteredUserDAL> Login(string email, string password)
+        {
+            return RegisteredUserInterface.Login(email, password);
         }
 
         public Result<bool> LogOut(string email)
         {
-            throw new NotImplementedException();
+            return RegisteredUserInterface.LogOut(email);
         }
 
         public Result<StoreDAL> OpenNewStore(string storeName, string userID)
         {
-            throw new NotImplementedException();
+            return RegisteredUserInterface.OpenNewStore(storeName, userID);
         }
-
-        public Result<object> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
-        {
-            throw new NotImplementedException();
+        public Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review) {
+            return RegisteredUserInterface.AddProductReview(userID, storeID, productID, review);
         }
+        #endregion
 
-        public Result<bool> Register(string email, string password)
+        #region Store Actions
+        public Result<ProductDAL> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category, LinkedList<string> keywords = null)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.AddProductToStore(userID, storeID, productName, price, initialQuantity, category, keywords);
         }
 
         public Result<bool> RemoveProductFromStore(string userID, string storeID, string productID)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.RemoveProductFromStore(userID, storeID, productID);
         }
 
-        public Result<bool> ResetSystem()
+        public Result<ProductDAL> EditProductDetails(string userID, string storeID, string productID, IDictionary<string, object> details)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.EditProductDetails(userID,storeID,productID, details);
         }
 
-        public Result<List<ProductDAL>> SearchProduct(IDictionary<string, object> productDetails)
+        public Result<bool> AddStoreOwner(string addedOwnerID, string currentlyOwnerID, string storeID)
         {
-            throw new NotImplementedException();
+            return StoreStaffInterface.AddStoreOwner(addedOwnerID, currentlyOwnerID, storeID);
         }
 
-        public Result<object> SearchStore(IDictionary<string, object> details)
+        public Result<bool> AddStoreManager(string addedManagerID, string currentlyOwnerID, string storeID)
         {
-            throw new NotImplementedException();
-        }
-
-        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<bool> UpdateShoppingCart(string userID, string shoppingBagID, string productID, int quantity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID)
-        {
-            throw new NotImplementedException();
+            return StoreStaffInterface.AddStoreManager(addedManagerID,currentlyOwnerID, storeID);
 
         }
-        public void ExitSystem(String userID)
+
+        public Result<bool> SetPermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
-            StoresAndManagement.ExitSystem(userID);
-            //TODO
-            System.Environment.Exit(0);
+            return StoreStaffInterface.SetPermissions(storeID, managerID, ownerID, permissions);
+
         }
+
+        public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
+        {
+            return StoreStaffInterface.RemovePermissions(storeID, managerID, ownerID, permissions);
+
+        }
+
+        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        {
+            return StoreStaffInterface.GetStoreStaff(ownerID, storeID);
+
+        }
+
+        public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
+        {
+            return StoreStaffInterface.GetStorePurchaseHistory(ownerID, storeID);
+
+        }
+
+        public Result<bool> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID)
+        {
+            return StoreStaffInterface.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID);
+        }
+        #endregion
+
+        #region System Admin Actions
+        public Result<HistoryDAL> GetUserPurchaseHistory(string sysAdminID, string userID)
+        {
+            return SystemAdminInterface.GetUserPurchaseHistory(sysAdminID, userID);
+        }
+
+        public Result<RegisteredUserDAL> AddSystemAdmin(string sysAdminID, string email)
+        {
+            return SystemAdminInterface.AddSystemAdmin(sysAdminID, email);
+
+        }
+
+        public Result<RegisteredUserDAL> RemoveSystemAdmin(string sysAdminID, string email)
+        {
+            return SystemAdminInterface.RemoveSystemAdmin(sysAdminID, email);
+
+        }
+
+        public Result<bool> ResetSystem(String sysAdminID)
+        {
+            return SystemAdminInterface.ResetSystem(sysAdminID);
+        }
+
+        #endregion
 
     }
 }

@@ -14,10 +14,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> AddSystemAdmin(String email); 
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
-        Result<RegisteredUser> LogOut(String email);
+        Result<Boolean> LogOut(String email);
+        Result<Boolean> AddProductReview(String userID, Store store, Product product, String review);
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
+        Result<Boolean> UpdateShoppingCart(string userID, string storeID, Product product, int quantity);
+        Result<ShoppingCart> GetUserShoppingCart(string userID);
         Result<Boolean> ExitSystem(String userID);
+        Result<double> GetTotalShoppingCartPrice(String userID);
+        Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+
 
     }
 
@@ -34,10 +40,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
             SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
             GuestUsers = new ConcurrentDictionary<String, GuestUser>();
-            
+
 
             //Add first system admin
-            //this.SystemAdmins.TryAdd("Admin@terminal3", new RegisteredUser("Admin@terminal3", "Admin"));
+            RegisteredUser defaultUser = new RegisteredUser("Admin@terminal3", "Admin");
+            this.SystemAdmins.TryAdd(defaultUser.Id, defaultUser );
+            this.RegisteredUsers.TryAdd(defaultUser.Id, defaultUser);
 
         }
         //Constructor for the initializer
@@ -47,6 +55,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.RegisteredUsers = registeredUsers;
             this.SystemAdmins = systemAdmins;
         }
+
 
         //Methods
         /// <summary>
@@ -61,7 +70,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (isUniqueEmail(email))
             {
                 RegisteredUser newUser = new RegisteredUser(email, password);
-                this.RegisteredUsers.TryAdd(email, newUser);
+                this.RegisteredUsers.TryAdd(newUser.Id, newUser);
                 return new Result<RegisteredUser>($"{email} is registered as new user", true, newUser);
             }
             else {
@@ -82,7 +91,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             //registered user has been found
             if (searchResult.ExecStatus)
             {
-                this.SystemAdmins.TryAdd(email, searchResult.Data);
+                this.SystemAdmins.TryAdd(searchResult.Data.Id, searchResult.Data);
                 return new Result<RegisteredUser>($"{email} has been added as system admin\n", true, searchResult.Data);
             }
             else
@@ -110,7 +119,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 //Check the constrain for at least one system admin
                 if (this.SystemAdmins.Count > 1)
                 {
-                    this.SystemAdmins.TryRemove(email, out removedUser);
+                    this.SystemAdmins.TryRemove(searchResult.Data.Id, out removedUser);
                     return new Result<RegisteredUser>($"{removedUser.Email} has been removed as system admin\n", true, removedUser);
                 }
 
@@ -138,7 +147,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// </returns>
         private bool isUniqueEmail(string email)
         {
-            return !RegisteredUsers.ContainsKey(email);
+           foreach(RegisteredUser registerUser in RegisteredUsers.Values)
+            {
+                if (registerUser.Email.Equals(email))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
@@ -149,15 +165,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// <returns></returns>
         private Result<RegisteredUser> FindUserByEmail(String email, ConcurrentDictionary<String, RegisteredUser> table)
         {
-            RegisteredUser requestedUser;
-            if (table.TryGetValue(email, out requestedUser)) 
+            foreach (RegisteredUser registeredUser in table.Values)
             {
-                return new Result<RegisteredUser>($"found user with email:{email}\n",true, requestedUser);
+                if (registeredUser.Email.Equals(email))
+                {
+                    return new Result<RegisteredUser>($"found user with email:{email}\n", true, registeredUser);
+                }
             }
-            else
-            {
-                return new Result<RegisteredUser>($"could not find user with email:{email}\n", false, null);
-            } 
+
+            return new Result<RegisteredUser>($"could not find user with email:{email}\n", false, null);
         }
 
         /// <summary>
@@ -167,6 +183,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns></returns>
+        public Result<RegisteredUser> Login(String email, String password , String guestId)
+        {
+            Result<RegisteredUser> searchResult = FindUserByEmail(email, RegisteredUsers);
+            if (searchResult.ExecStatus)
+            {
+                //User Found
+                Result<RegisteredUser> res = searchResult.Data.Login(password);
+                if (res.ExecStatus)
+                {
+                    //Delete relevant guest user from list 
+                    GuestUsers.TryRemove(guestId , out GuestUser guest);
+                    guest.Active = false;
+                    return res;
+                }
+                //else faild
+                return new Result<RegisteredUser>(res.Message, false, null);
+            }
+            else
+            {
+                //No user if found using the given email
+                return new Result<RegisteredUser>($"There is not user using this email:{email}\n", false, null);
+
+            }
+        }
+
         public Result<RegisteredUser> Login(String email, String password)
         {
             Result<RegisteredUser> searchResult = FindUserByEmail(email, RegisteredUsers);
@@ -188,20 +229,36 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public Result<RegisteredUser> LogOut(String email)
+        public Result<Boolean> LogOut(String email)
         {
             Result<RegisteredUser> searchResult = FindUserByEmail(email, RegisteredUsers);
             if (searchResult.ExecStatus)
             {
-                //User found
-                return searchResult.Data.LogOut();
+                //User 
+                Result<GuestUser> res = searchResult.Data.LogOut();
+                if (res.ExecStatus)
+                {
+                    GuestUsers.TryAdd(res.Data.Id, res.Data);
+                    return new Result<Boolean>($"There is not user using this email:{email}\n", true, true);
+                }
+                else
+                    return new Result<Boolean>(res.Message, false, false);
             }
             else
             {
                 //No user if found using the given email
-                return new Result<RegisteredUser>($"There is not user using this email:{email}\n", false, null);
+                return new Result<Boolean>($"There is not user using this email:{email}\n", false, false);
 
             }
+        }
+
+        public Result<Boolean> AddProductReview(String userID, Store store, Product product , String review)
+        {
+            if(RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
+            {
+                return user.AddProductReview(store, product , review);
+            }
+            return new Result<Boolean>("User does not exists\n", false, false);
         }
 
         public Result<History> GetUserPurchaseHistory(String userID)
@@ -227,6 +284,39 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<bool>($"User (ID: {userID}) does not exists.\n", false, false);
         }
 
+        public Result<Boolean> UpdateShoppingCart(string userID, string storeID, Product product, int quantity)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+            {
+                return guest_user.UpdateShoppingCart(storeID, product, quantity);
+            }
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+            {
+                return registerd_user.UpdateShoppingCart(storeID, product, quantity);
+            }
+            else
+            {
+                return new Result<Boolean>("User does not exist\n", false, false);
+            }
+
+        }
+
+        public Result<ShoppingCart> GetUserShoppingCart(string userID)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+            {
+                return guest_user.GetUserShoppingCart();
+            }
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+            {                
+                return registerd_user.GetUserShoppingCart();
+            }
+            else
+            {
+                return new Result<ShoppingCart>("User does not exist\n", false, null);
+            }
+        }
+
         public Result<Boolean> ExitSystem(String userID)
         {
             if (GuestUsers.TryGetValue(userID, out GuestUser gest_user))
@@ -245,6 +335,51 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<Boolean>("User does not exist\n", false, false);
             }
 
+        }
+
+        public Result<User> EnterSystem()
+        {
+            GuestUser guest = new GuestUser();
+            GuestUsers.TryAdd(guest.Id, guest);
+
+            //TODO - When adding Service Layer
+            //checkIfUserWantsToRegister();            
+            //checkIfUserWantsTologin(guest.Id);
+
+            return new Result<User>("New guest user has enterd the system\n", true, guest);
+        }
+
+        public Result<double> GetTotalShoppingCartPrice(String userID) {
+
+            if (RegisteredUsers.ContainsKey(userID))
+            {
+                //User Found
+                Double TotalPrice = RegisteredUsers[userID].ShoppingCart.GetTotalShoppingCartPrice();
+                return new Result<double>($"Total price of current shoppinh cart is: {TotalPrice}", true, TotalPrice);
+            }
+            else
+            {
+                //No user if found using the given email
+                return new Result<double>($"There is no suck user with ID:{userID}\n", false, -1);
+
+            }
+
+        }
+
+        public Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+            {
+                return guest_user.Purchase(paymentDetails , deliveryDetails);
+            }
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+            {
+                return registerd_user.Purchase(paymentDetails , deliveryDetails);
+            }
+            else
+            {
+                return new Result<ShoppingCart>("User does not exist\n", false, null);
+            }
         }
 
     }

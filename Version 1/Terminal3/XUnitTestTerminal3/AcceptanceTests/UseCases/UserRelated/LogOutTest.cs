@@ -8,9 +8,8 @@ namespace XUnitTestTerminal3
 {
     public class LogOutTest: XUnitTerminal3TestCase
     {
-        public LogOutTest()
+        public LogOutTest() : base()
         {
-            sut.ResetSystem();
             sut.Register("test@gmail.com", "test123");
         }
 
@@ -19,14 +18,14 @@ namespace XUnitTestTerminal3
         public void LogOut()
         {            
             sut.Login("test@gmail.com", "test123");
-            Assert.True(sut.LogOut("test@gmail.com", "test123").ExecStatus);
+            Assert.True(sut.LogOut("test@gmail.com").ExecStatus);
         }
 
         [Fact]
         [Trait("Category", "acceptance")]
         public void LogOutWithoutLogin()
         {
-            Assert.False(sut.LogOut("test@gmail.com", "test123").ExecStatus);
+            Assert.False(sut.LogOut("test@gmail.com").ExecStatus);
         }
     }
 }

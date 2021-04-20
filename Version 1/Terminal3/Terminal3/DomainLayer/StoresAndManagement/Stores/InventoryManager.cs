@@ -11,6 +11,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Product> RemoveProduct(String productID);
         Result<Product> EditProduct(String productID, IDictionary<String, Object> details);
+        Result<ConcurrentDictionary<String, String>> GetProductReview(String productID);
     }
 
     public class InventoryManager : IInventoryManager
@@ -32,6 +33,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
             Product newProduct = new Product(productName, price, initialQuantity, category, keywords);
+            Products.TryAdd(newProduct.Id, newProduct);
             return new Result<Product>($"Product {newProduct.Name} was created successfully. ID: {newProduct.Id}\n", true, newProduct);
         }
 
@@ -50,9 +52,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             if (Products.TryGetValue(productID, out Product toEdit))
             {
                 ObjectDictionaryMapper<Product>.SetPropertyValue(toEdit, details);
+                return new Result<Product>($"Succeded to edit product (ID: {productID}).\n", true, toEdit);
             }
             //else failed
-            return new Result<Product>($"Faild to edit product (ID: {productID}): Product not found.\n", false, null);
+            return new Result<Product>($"Failed to edit product (ID: {productID}): Product not found.\n", false, null);
         }
 
         public Result<List<Product>> SearchProduct(Double StoreRating, IDictionary<String,Object> searchAttributes)
@@ -72,6 +75,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 return new Result<List<Product>>($"No item has been found\n", false, null);
             }
         }
+
+        public Result<ConcurrentDictionary<String, String>> GetProductReview(String productID)
+        {
+            if(Products.TryGetValue(productID , out Product product))
+            {
+                return product.GetProductReview();
+            }
+            return new Result<ConcurrentDictionary<string, string>>("Product does not exists in the store\n", false, null);
+
+        }
+
         /// <summary>
         ///  Filter out product if its not meet the search criteria
         /// </summary>

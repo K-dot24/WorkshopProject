@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DALobjects;
+using System;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -8,11 +9,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public RegisteredUser User { get; }
         public Store Store { get; }
-        public StoreOwner AppointedBy { get; }
+        public IStoreStaff AppointedBy { get; }
         public LinkedList<StoreManager> StoreManagers { get; }
         public LinkedList<StoreOwner> StoreOwners { get; }
 
-        public StoreOwner(RegisteredUser user, Store store, StoreOwner appointedBy)
+        public StoreOwner(RegisteredUser user, Store store, IStoreStaff appointedBy)
         {
             User = user;
             Store = store;
@@ -21,25 +22,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             StoreOwners = new LinkedList<StoreOwner>();
         }
 
-        public Result<StoreOwnerDAL> GetDAL()
-        {
-            RegisteredUserDAL user = User.GetDAL().Data;
-            StoreDAL store = Store.GetDAL().Data;
-            StoreOwnerDAL owner = AppointedBy.GetDAL().Data;            
-            LinkedList<StoreOwnerDAL> storeOwners = new LinkedList<StoreOwnerDAL>();
-            LinkedList<StoreManagerDAL> storeManagers = new LinkedList<StoreManagerDAL>();
+        public Result<object> GetDAL()
+        {           
+            LinkedList<String> storeOwners = new LinkedList<String>();
+            LinkedList<String> storeManagers = new LinkedList<String>();
 
             foreach (StoreOwner so in StoreOwners)
             {
-                storeOwners.AddLast(so.GetDAL().Data);
+                storeOwners.AddLast(so.User.Id);
             }
 
             foreach (StoreManager sm in StoreManagers)
             {
-                storeManagers.AddLast(sm.GetDAL().Data);
+                storeManagers.AddLast(sm.User.Id);
             }
             
-            return new Result<StoreOwnerDAL>("Store owner DAL object", true, new StoreOwnerDAL(user, store, owner, storeOwners, storeManagers));
+            return new Result<object>("Store owner DAL object", true, new StoreOwnerDAL(User.Id, Store.Id, AppointedBy.GetId(), storeOwners, storeManagers));
+        }
+
+        public string GetId()
+        {
+            return User.Id;
         }
     }
 }

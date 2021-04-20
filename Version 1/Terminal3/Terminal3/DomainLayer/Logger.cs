@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Terminal3.DomainLayer
 {
-    public class Logger
+    public static class Logger
     {
 
         private static readonly log4net.ILog InfoLogger = log4net.LogManager.GetLogger("InfoLogger");
@@ -18,6 +18,7 @@ namespace Terminal3.DomainLayer
             IsInitiated = true;
         }
         
+        //for action in the system
         public static void LogInfo(String msg)
         {
             if (!IsInitiated)
@@ -25,6 +26,7 @@ namespace Terminal3.DomainLayer
             InfoLogger.Info(msg);
         }
 
+        //for error and failed action
         public static void LogError(String msg)
         {
             if (!IsInitiated)

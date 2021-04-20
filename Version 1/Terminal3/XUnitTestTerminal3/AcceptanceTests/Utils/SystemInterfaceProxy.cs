@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DALobjects;
@@ -80,10 +81,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.GetStoreStaff(ownerID, storeID);
         }
 
-        public Result<int> GetTotalShoppingCartPrice(string userID)
+        public Result<double> GetTotalShoppingCartPrice(string userID)
         {
             if(Real == null)
-                return new Result<int>(true);
+                return new Result<double>(true);
 
             return Real.GetTotalShoppingCartPrice(userID);
         }
@@ -128,10 +129,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.OpenNewStore(storeName, userID);
         }
 
-        public Result<object> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
+        public Result<List<String>> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
         {
             if (Real == null)
-                return new Result<object>(true);
+                return new Result<List<String>>(true);                
 
             return Real.Purchase(userID, paymentDetails, deliveryDetails);
         }
@@ -152,12 +153,12 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.RemoveProductFromStore(userID, storeID, productID);
         }
 
-        public Result<bool> ResetSystem()
+        public Result<bool> ResetSystem(string sysAdminID)
         {
             if (Real == null)
                 return new Result<bool>(true);
 
-            return Real.ResetSystem();
+            return Real.ResetSystem(sysAdminID);
         }
 
         public Result<List<string>> SearchProduct(IDictionary<string, object> productDetails)
@@ -168,20 +169,20 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.SearchProduct(productDetails);
         }
 
-        public Result<object> SearchStore(IDictionary<string, object> details)
+        public Result<List<String>> SearchStore(IDictionary<string, object> details)
         {
             if (Real == null)
-                return new Result<object>(true);
+                return new Result<List<String>>(true);
 
             return Real.SearchStore(details);
         }
 
-        public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)
+        public Result<bool> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions)
         {
             if (Real == null)
                 return new Result<bool>(true);
 
-            return Real.SetPermissions(managerID, ownerID, permissions);
+            return Real.SetPermissions(storeID , managerID, ownerID, permissions);
         }
 
         public Result<bool> UpdateShoppingCart(string userID, string shoppingBagID, string productID, int quantity)
@@ -191,6 +192,15 @@ namespace XUnitTestTerminal3.IntegrationTests
 
             return Real.UpdateShoppingCart(userID, shoppingBagID, productID, quantity);
         }
+
+        public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
+        {
+            if (Real == null)
+                return new Result<bool>(true);
+
+            return Real.AddProductReview(userID, storeID, productID, review);
+        }
+
 
     }
 }
