@@ -41,7 +41,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.UseCases
             sut.AddProductToCart(user_id, product_id, 10, store_id);
 
             List<String> shoppingBags = sut.GetUserShoppingCart(user_id).Data;
-            sut.UpdateShoppingCart(user_id, shoppingBags[0], product_id, 5);
+            sut.UpdateShoppingCart(user_id, store_id, product_id, 5);
             Dictionary<String, int> pids = sut.GetUserShoppingBag(user_id, shoppingBags[0]).Data;
 
             int quantity;

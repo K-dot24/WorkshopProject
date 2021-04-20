@@ -17,7 +17,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
         Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);
         Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
-        Result<Boolean> UpdateShoppingCart(String userID, String storeID, String productID, int quantity);
+        Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity);
         Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
@@ -49,7 +49,7 @@ namespace Terminal3.ServiceLayer.Controllers
         public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails) { return StoresAndManagementInterface.SearchProduct(productDetails); }
         public Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID) { return StoresAndManagementInterface.AddProductToCart(userID, ProductID, ProductQuantity, StoreID); }   // Redundent ?
         public Result<ShoppingCartDAL> GetUserShoppingCart(String userID) { return StoresAndManagementInterface.GetUserShoppingCart(userID); }
-        public Result<Boolean> UpdateShoppingCart(String userID, String storeID, String productID, int quantity) { return StoresAndManagementInterface.UpdateShoppingCart(userID, storeID, productID, quantity); }
+        public Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity) { return StoresAndManagementInterface.UpdateShoppingCart(userID, shoppingBagID, productID, quantity); }
         public Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
             return StoresAndManagementInterface.Purchase(userID, paymentDetails, deliveryDetails);
