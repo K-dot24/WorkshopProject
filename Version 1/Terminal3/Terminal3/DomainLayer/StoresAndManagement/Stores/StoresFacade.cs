@@ -239,7 +239,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     case "name":
                         if (!store.Name.ToLower().Contains(((string)value).ToLower())) { result = false; }
                         break;
-                    case "storerating":
+                    case "rating":
                         if (store.Rating < (Double)value) { result = false; }
                         break;
                 }

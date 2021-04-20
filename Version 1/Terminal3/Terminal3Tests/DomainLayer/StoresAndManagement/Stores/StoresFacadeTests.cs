@@ -47,7 +47,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
             Result<Product> productResult = Facade.AddProductToStore(userID, TestStore.Id, productName, price, initialQuantity, category);
             Assert.Equal(expectedResult, productResult.ExecStatus);
-            if(productResult != null)
+            if (productResult != null)
                 Assert.Equal(expectedResult, TestStore.InventoryManager.Products.ContainsKey(productResult.Data.Id));
         }
 
@@ -76,7 +76,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
             // Try to remove
             Assert.Equal(expectedResult, Facade.RemoveProductFromStore(userID, TestStore.Id, product.Id).ExecStatus);
-            if(expectedResult)
+            if (expectedResult)
                 Assert.False(TestStore.InventoryManager.Products.ContainsKey(product.Id));
             // Wrong product ID
             Assert.False(Facade.RemoveProductFromStore(userID, TestStore.Id, "stam_id").ExecStatus);
@@ -165,7 +165,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             EmailToID.TryGetValue(removedManagerEmail, out string removedManagerId);
             EmailToID.TryGetValue(currentlyOwnerEmail, out string currentlyOwnerId);
             Assert.Equal(expectedResult, Facade.RemoveStoreManager(removedManagerId, currentlyOwnerId, TestStore.Id).ExecStatus);
-            if(expectedResult)
+            if (expectedResult)
                 Assert.False(TestStore.Managers.ContainsKey(removedManagerId));
 
         }
@@ -182,7 +182,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
             RegisteredUser user = new RegisteredUser(userID, "ManInTheMiddle");
             Assert.Equal(expectedResult, Facade.OpenNewStore(user, storeName).ExecStatus);
-            if(expectedResult)
+            if (expectedResult)
                 Assert.Equal(expectedResult, Facade.Stores.ContainsKey(storeName));
         }
 
@@ -190,7 +190,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
         [InlineData("papi@hotmale.com", "The Testor", true)]  // Success
         [InlineData("papi@hotmale.com", "My Second Store", false)]   // Fail: Store does not exsist
         [InlineData("tomer@gmail.com", "The Testor", false)]  // Fail: Manager without permissions
-        public void GetStoreStaffTest1(string ownerMail, string storeName , Boolean expectedResult)
+        public void GetStoreStaffTest1(string ownerMail, string storeName, Boolean expectedResult)
         {
             RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "Why6AfraidOf7?");
             StoreManager manager = new StoreManager(user2, TestStore, new Permission(), TestStore.Founder);
@@ -296,12 +296,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             EmailToID.TryGetValue(ownerEmail, out String ownerID);
             EmailToID.TryGetValue(managerEmail, out String managerID);
             Assert.Equal(expectedResult, Facade.RemovePermissions(TestStore.Id, managerID, ownerID, permissions).ExecStatus);
-            
+
             if (TestStore.Managers.TryGetValue(managerID, out StoreManager sm))
             {
                 bool[] current_permissions = sm.Permission.functionsBitMask;
                 Assert.Equal(pers, current_permissions);
             }
+        }
+
+        [Fact()]
+        [Trait("category","Unit")]
+        public void SearchProductTestByAttributes(string attribute ,string name, double rating, bool expectedResult)
+        {
+            IDictionary<String, Object> attributes = new Dictionary<string, object>() { {"name", name }, {"rating", rating } };
+            TestStore.AddRating(4.0);
+            Result<List<Store>> result = Facade.SearchStore(attributes);
         }
     }
 }
