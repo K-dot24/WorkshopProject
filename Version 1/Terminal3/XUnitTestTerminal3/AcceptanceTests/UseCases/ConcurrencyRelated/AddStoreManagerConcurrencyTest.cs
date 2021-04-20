@@ -36,7 +36,7 @@ namespace XUnitTestTerminal3
         }
 
         [Fact]
-        [Trait("Category", "concurrency")]
+        [Trait("Category", "concurrency")]       
         public void AddStoreManager()
         {
             
