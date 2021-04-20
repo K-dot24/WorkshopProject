@@ -6,6 +6,7 @@ using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using System.Linq;
+using Terminal3.DALobjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Tests
 {
@@ -292,13 +293,91 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
         }
 
 
-
         [Fact()]
         public void PurchaseTest()
         {
-            throw new NotImplementedException();
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 5, "Fruits");
+            Product product2 = new Product("Apple", 4.9, 5, "Fruits");
+            TestStore.InventoryManager.Products.TryAdd(product.Id, product);
+            TestStore.InventoryManager.Products.TryAdd(product2.Id, product2);
+
+            // Add product to user shopping bag
+            Facade.AddProductToCart(RegisteredUser.Id, product.Id, 2, TestStore.Id);
+            Facade.AddProductToCart(RegisteredUser.Id, product2.Id, 1, TestStore.Id);
+
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>();
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>();
+
+            // The bag is not purchased yet
+            Assert.Empty(RegisteredUser.History.ShoppingBags);
+
+            Result<ShoppingCartDAL> res = Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
+            Assert.True(res.ExecStatus);
+
+            ShoppingCartDAL cart = res.Data;
+            Assert.Equal(16.3, cart.TotalCartPrice);
+
+            Assert.Single(RegisteredUser.History.ShoppingBags);
+
+            // Check User Historys bags
+            History history = RegisteredUser.History;
+            LinkedList<ShoppingBagDAL> bagsDAL = history.ShoppingBags;
+            ShoppingBagDAL bagDAL = bagsDAL.First.Value;
+
+            Assert.Equal(16.3, bagDAL.TotalBagPrice);
+
+            //Check Store History
+            History storeHistory = TestStore.History;
+            LinkedList<ShoppingBagDAL> storeBagsDAL = storeHistory.ShoppingBags;
+            ShoppingBagDAL storeBagDAL = storeBagsDAL.First.Value;
+
+            Assert.Equal(16.3, storeBagDAL.TotalBagPrice);
         }
 
+        [Fact()]
+        public void PurchaseTest2()
+        {
+            // Open another store
+            Store store2 = new Store("Testore2", Founder);
+            StoresFacade.Stores.TryAdd(store2.Id, store2);
 
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 5, "Fruits");
+            Product product2 = new Product("Apple", 4.9, 5, "Fruits");
+            TestStore.InventoryManager.Products.TryAdd(product.Id, product);
+            store2.InventoryManager.Products.TryAdd(product2.Id, product2);
+
+            // Add product to user shopping bag
+            Facade.AddProductToCart(RegisteredUser.Id, product.Id, 2, TestStore.Id);
+            Facade.AddProductToCart(RegisteredUser.Id, product2.Id, 1, store2.Id);
+
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>();
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>();
+
+            // The bag is not purchased yet
+            Assert.Empty(RegisteredUser.History.ShoppingBags);
+
+            Result<ShoppingCartDAL> res = Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
+            Assert.True(res.ExecStatus);
+
+            ShoppingCartDAL cart = res.Data;
+            Assert.Equal(16.3, cart.TotalCartPrice);
+
+            Assert.Equal(2, RegisteredUser.History.ShoppingBags.Count);
+
+            //Check Stores History
+            History storeHistory = TestStore.History;
+            LinkedList<ShoppingBagDAL> storeBagsDAL = storeHistory.ShoppingBags;
+            ShoppingBagDAL storeBagDAL = storeBagsDAL.First.Value;
+
+            Assert.Equal(11.4, storeBagDAL.TotalBagPrice);
+
+            History store2History = store2.History;
+            LinkedList<ShoppingBagDAL> store2BagsDAL = store2History.ShoppingBags;
+            ShoppingBagDAL store2BagDAL = store2BagsDAL.First.Value;
+
+            Assert.Equal(4.9, store2BagDAL.TotalBagPrice);
+        }
     }
 }

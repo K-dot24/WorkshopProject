@@ -365,6 +365,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                     Store store = StoresFacade.GetStore(bag.Key).Data;
                     store.History.AddPurchasedShoppingBag(bag.Value);
                 }
+                return new Result<ShoppingCartDAL>(res.Message, true, res.Data.GetDAL().Data);
             }
             //else faild
             return new Result<ShoppingCartDAL>(res.Message, false, null);
