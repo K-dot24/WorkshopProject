@@ -18,9 +18,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
         Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+        Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details);
         Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
-
-
         #endregion
 
         #region Staff Management
@@ -102,6 +101,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 return new Result<ProductDAL>(res.Message, true, res.Data.GetDAL().Data);
             }
             return new Result<ProductDAL>(res.Message, false, null);
+        }
+
+        public Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details)
+        {
+            Result<List<Store>> res = StoresFacade.SearchStore(details);
+            List<StoreDAL> storeDALs = new List<StoreDAL>();
+            if (res.ExecStatus)
+            {
+                foreach (Store store in res.Data)
+                {
+                    storeDALs.Add(store.GetDAL().Data);
+                }
+                return new Result<List<StoreDAL>>(res.Message, true, storeDALs);
+            }
+            return new Result<List<StoreDAL>>(res.Message, false, null);
         }
 
         public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails)

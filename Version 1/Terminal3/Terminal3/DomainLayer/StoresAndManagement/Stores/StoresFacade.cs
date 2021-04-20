@@ -16,7 +16,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Product> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
         Result<List<Product>> SearchProduct(IDictionary<String, Object> productDetails);
         Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
-
+        Result<List<Store>> SearchStore(IDictionary<String, Object> details);
         Result<Store> GetStore(String storeID);
 
         #endregion
@@ -126,12 +126,32 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 }
             }
             if (searchResult.Count > 0) {
-                return new Result<List<Product>>($"{searchResult.Count } items has been found\n",true, searchResult); 
+                return new Result<List<Product>>($"{searchResult.Count } products have been found\n",true, searchResult); 
             }
             else{
-                return new Result<List<Product>>($"No has been found\n", false, null);
+                return new Result<List<Product>>($"No products have been found\n", false, null);
             }
 
+        }
+
+        public Result<List<Store>> SearchStore(IDictionary<String, Object> details)
+        {
+            List<Store> searchResult = new List<Store>();
+            foreach(Store store in Stores.Values)
+            {
+                if (checkStoreAttributes(store,details))
+                {
+                    searchResult.Add(store);
+                }
+            }
+            if (searchResult.Count > 0)
+            {
+                return new Result<List<Store>>($"{searchResult.Count } stores have been found\n", true, searchResult);
+            }
+            else
+            {
+                return new Result<List<Store>>($"No stores have been found\n", false, null);
+            }
         }
 
         public Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string userID, string storeID)
@@ -201,5 +221,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Store>("Store does not exists\n", false, null);
         }
 
+        /// <summary>
+        ///  Filter out product if its not meet the search criteria
+        /// </summary>
+        /// <param name="store"></param>
+        /// <param name="searchAttributes"></param>
+        /// <returns></returns>
+        internal bool checkStoreAttributes(Store store, IDictionary<String, Object> searchAttributes)
+        {
+            Boolean result = true;
+            ICollection<String> properties = searchAttributes.Keys;
+            foreach (string property in properties)
+            {
+                var value = searchAttributes[property];
+                switch (property.ToLower())
+                {
+                    case "name":
+                        if (!store.Name.ToLower().Contains(((string)value).ToLower())) { result = false; }
+                        break;
+                    case "storerating":
+                        if (store.Rating < (Double)value) { result = false; }
+                        break;
+                }
+            }
+            return result;
+        }
     }
 }
