@@ -12,10 +12,8 @@ jobs:
       - uses: actions/setup-dotnet@v1.7.2
         with: 
           dotnet-version: '2.1.x' 
-      - name: Install dependencies
-        run: dotnet restore
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build ./Version1/Terminal3/Terminal3.sln --no-restore
       
   unittests:      
     needs: build
