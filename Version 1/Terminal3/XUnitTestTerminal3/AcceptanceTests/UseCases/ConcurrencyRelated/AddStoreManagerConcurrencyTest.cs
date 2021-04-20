@@ -36,17 +36,33 @@ namespace XUnitTestTerminal3
         }
 
         [Fact]
-        [Trait("Category", "concurrency")]       
+        [Trait("Category", "concurrency")]
+        [InlineData()]
+        [InlineData()]
+        [InlineData()]
+        [InlineData()]
+        [InlineData()]
+        [InlineData()]
+        [InlineData()]
+        [InlineData()]
+        [InlineData()]
+        [InlineData()]
         public void AddStoreManager()
         {
-            
+
             Thread thread1 = new Thread(() => ThreadWork(kfir_id));
             Thread thread2 = new Thread(() => ThreadWork(igor_id));
+            Thread thread3 = new Thread(() => ThreadWork(kfir_id));
+            Thread thread4 = new Thread(() => ThreadWork(igor_id));
             thread1.Start();
             thread2.Start();
+            thread3.Start();
+            thread4.Start();
 
             thread1.Join();
             thread2.Join();
+            thread3.Join();
+            thread4.Join();
 
             int count = 0;
             foreach (bool result in results)
