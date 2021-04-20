@@ -18,9 +18,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
         Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
         Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+        Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details);
         Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
-
-
         #endregion
 
         #region Staff Management
@@ -72,7 +71,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser founder))  // Check if userID is a registered user
             {
                 // Open store
-                Result<Store> res = StoresFacade.OpenNewStore(founder, userID);
+                Result<Store> res = StoresFacade.OpenNewStore(founder, storeName);
                 if (res.ExecStatus)
                 {
                     return new Result<StoreDAL>(res.Message, true, res.Data.GetDAL().Data);
@@ -104,6 +103,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<ProductDAL>(res.Message, false, null);
         }
 
+        public Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details)
+        {
+            Result<List<Store>> res = StoresFacade.SearchStore(details);
+            List<StoreDAL> storeDALs = new List<StoreDAL>();
+            if (res.ExecStatus)
+            {
+                foreach (Store store in res.Data)
+                {
+                    storeDALs.Add(store.GetDAL().Data);
+                }
+                return new Result<List<StoreDAL>>(res.Message, true, storeDALs);
+            }
+            return new Result<List<StoreDAL>>(res.Message, false, null);
+        }
+
         public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails)
         {
             Result<List<Product>> res = StoresFacade.SearchProduct(productDetails);
@@ -133,7 +147,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(addedManagerID, out RegisteredUser futureManager))  // Check if addedManagerID is a registered user
             {
-                return StoresFacade.AddStoreOwner(futureManager, currentlyOwnerID, storeID);
+                return StoresFacade.AddStoreManager(futureManager, currentlyOwnerID, storeID);
             }
             //else
             return new Result<Boolean>($"Failed to appoint store manager: {addedManagerID} is not a registered user.\n", false, false);
@@ -199,8 +213,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         
         public Result<Boolean> AddProductToCart(string userID, string productID, int productQuantity, string storeID)
         {
-            if (StoresFacade.Stores.TryGetValue(storeID, out Store store))  // Check if store exists
+            Result<Store> resStore = StoresFacade.GetStore(storeID);
+            if (resStore.ExecStatus)    // Check if store exists
             {
+                Store store = resStore.Data;
                 Result<Product> searchProductRes = store.GetProduct(productID);
                 if (searchProductRes.ExecStatus)    // Check if product exists in store
                 {
@@ -258,7 +274,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<Store> storeRes = StoresFacade.GetStore(storeID);
             if (storeRes.ExecStatus)
             {                
-                Result<Product> productRes = storeRes.Data.GetProduct(productID);   // TODO - check updated :function exists in branch - AddProductToCart 
+                Result<Product> productRes = storeRes.Data.GetProduct(productID);    
                 if (productRes.ExecStatus)
                 {
                     return UsersAndPermissionsFacade.AddProductReview(userID, storeRes.Data, productRes.Data , review);
@@ -349,6 +365,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                     Store store = StoresFacade.GetStore(bag.Key).Data;
                     store.History.AddPurchasedShoppingBag(bag.Value);
                 }
+                return new Result<ShoppingCartDAL>(res.Message, true, res.Data.GetDAL().Data);
             }
             //else faild
             return new Result<ShoppingCartDAL>(res.Message, false, null);

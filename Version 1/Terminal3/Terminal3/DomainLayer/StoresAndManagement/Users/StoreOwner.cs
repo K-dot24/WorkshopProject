@@ -9,11 +9,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public RegisteredUser User { get; }
         public Store Store { get; }
-        public StoreOwner AppointedBy { get; }
+        public IStoreStaff AppointedBy { get; }
         public LinkedList<StoreManager> StoreManagers { get; }
         public LinkedList<StoreOwner> StoreOwners { get; }
 
-        public StoreOwner(RegisteredUser user, Store store, StoreOwner appointedBy)
+        public StoreOwner(RegisteredUser user, Store store, IStoreStaff appointedBy)
         {
             User = user;
             Store = store;
@@ -37,7 +37,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 storeManagers.AddLast(sm.User.Id);
             }
             
-            return new Result<object>("Store owner DAL object", true, new StoreOwnerDAL(User.Id, Store.Id, AppointedBy.User.Id, storeOwners, storeManagers));
+            return new Result<object>("Store owner DAL object", true, new StoreOwnerDAL(User.Id, Store.Id, AppointedBy.GetId(), storeOwners, storeManagers));
+        }
+
+        public string GetId()
+        {
+            return User.Id;
         }
     }
 }

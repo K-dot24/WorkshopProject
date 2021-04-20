@@ -67,6 +67,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
             //Add founder to list of owners
             Owners.TryAdd(founder.Id, Founder);
+
+            //TODO: Complete when policies done properly
+            //Add default policies
+            PolicyManager.SetPurchasePolicy(Purchases.BuyNow, true);
+            PolicyManager.SetDiscountPolicy(Discounts.Visible, true);
         }
 
         //TODO: Implement all functions
@@ -80,7 +85,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             else
             {
                 this.NumberOfRates = NumberOfRates + 1;
-                Rating = (Rating + rate) / NumberOfRates;
+                //Rating = (Rating + rate) / NumberOfRates;
+                Rating = (Rating *(NumberOfRates-1)+rate) / NumberOfRates;
+
                 return new Result<Double>($"Store {Name} rate is: {Rating}\n", true, Rating);
             }
         }
@@ -127,32 +134,63 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
         {
-            if (!CheckIfStoreOwner(futureOwner.Id) && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new owner not already an owner + appointing owner is not a fraud
+            // Check new owner not already an owner + appointing owner is not a fraud or the appointing user is a manager with the right permissions
+            if (!CheckIfStoreOwner(futureOwner.Id)) 
             {
-                StoreOwner newOwner = new StoreOwner(futureOwner, this, owner);
-                Owners.TryAdd(futureOwner.Id, newOwner);
+                StoreOwner newOwner;
+                if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
+                {
+                    newOwner = new StoreOwner(futureOwner, this, owner);
+                    Owners.TryAdd(futureOwner.Id, newOwner);    
+                }
+                else if(Managers.TryGetValue(currentlyOwnerID , out StoreManager manager) && CheckStoreManagerAndPermissions(currentlyOwnerID, Methods.AddStoreOwner))
+                {
+                    newOwner = new StoreOwner(futureOwner, this, manager);
+                    Owners.TryAdd(futureOwner.Id, newOwner);
+                }
+                else
+                {
+                    return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
+                        $"is not an owner at ${this.Name}.\n", false, false);
+                }
+
 
                 if (CheckIfStoreManager(futureOwner.Id)) //remove from managers list if needed
                 {
                     Managers.TryRemove(futureOwner.Id, out _);
                 }
+
+                return new Result<Boolean>("User successfuly added as the store owner\n", true, true);
             }
             //else failed
-            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
-                $"is not an owner at ${this.Name}.\n", false, false);
+            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}). The user is already an owner.\n", false, false);
         }
 
         public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)
         {
-            if (!CheckIfStoreManager(futureManager.Id) && !CheckIfStoreOwner(futureManager.Id)
-                    && Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner)) // Check new manager not already an owner/manager + appointing owner is not a fraud
+            // Check new manager not already an owner/manager + appointing owner is not a fraud or the appointing user is a manager with the right permissions
+            if (!CheckIfStoreManager(futureManager.Id) && !CheckIfStoreOwner(futureManager.Id))
             {
-                StoreManager newManager = new StoreManager(futureManager, this, new Permission(), owner);
-                Managers.TryAdd(futureManager.Id, newManager);
+                StoreManager newManager;
+                if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
+                {
+                    newManager = new StoreManager(futureManager, this, new Permission(), owner);
+                    Managers.TryAdd(futureManager.Id, newManager);
+                }
+                else if (Managers.TryGetValue(currentlyOwnerID, out StoreManager manager) && CheckStoreManagerAndPermissions(currentlyOwnerID, Methods.AddStoreManager))
+                {
+                    newManager = new StoreManager(futureManager, this, new Permission(), manager);
+                    Managers.TryAdd(futureManager.Id, newManager);
+                }
+                else
+                {
+                    return new Result<Boolean>($"Failed to add store manager because appoitend user is not an owner or manager with relevant permissions at the store\n", false, false);
+                }
+
+                return new Result<Boolean>("User successfuly added as the store manager\n", true, true);
             }
             //else failed
-            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
-                $"is not an owner at ${this.Name}.\n", false, false);
+            return new Result<Boolean>($"Failed to add store manager. The user is already an manager or owner in the store.\n", false, false);
         }
 
         public Result<bool> RemoveStoreManager(String removedManagerID, string currentlyOwnerID)
@@ -301,7 +339,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         private Boolean CheckAppointedBy(StoreManager manager, String ownerID)
         {
-            return manager.AppointedBy.User.Id.Equals(ownerID);
+            return manager.AppointedBy.GetId().Equals(ownerID);
         }
         #endregion
 

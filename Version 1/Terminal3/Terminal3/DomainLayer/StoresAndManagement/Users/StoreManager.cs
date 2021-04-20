@@ -8,10 +8,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public RegisteredUser User { get; }
         public Permission Permission { get; }
-        public StoreOwner AppointedBy { get; }
+        public IStoreStaff AppointedBy { get; }
         public Store Store { get; }
 
-        public StoreManager(RegisteredUser user, Store store, Permission permission , StoreOwner appointedBy)
+        public StoreManager(RegisteredUser user, Store store, Permission permission , IStoreStaff appointedBy)
         {
             User = user;
             Store = store;
@@ -33,7 +33,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             PermissionDAL permission = Permission.GetDAL().Data;
 
-            return new Result<object>("Store manager DAL object", true, new StoreManagerDAL(User.Id, permission, AppointedBy.User.Id));
+            return new Result<object>("Store manager DAL object", true, new StoreManagerDAL(User.Id, permission, AppointedBy.GetId()));
+        }
+
+        public String GetId()
+        {
+            return User.Id;
         }
     }
 }

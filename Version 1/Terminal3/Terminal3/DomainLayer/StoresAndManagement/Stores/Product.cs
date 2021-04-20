@@ -21,7 +21,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, String> Review { get; set; }    //<userID , usersReview>
 
         //Constructor
-        public Product(String name, Double price, int quantity , String category, [System.Runtime.InteropServices.OptionalAttribute]LinkedList<String> Keywords)
+        public Product(String name, Double price, int quantity , String category, [OptionalAttribute]LinkedList<String> Keywords)
         {
             Id = Service.GenerateId();
             Name = name;
@@ -29,6 +29,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Quantity = quantity;
             Category = category;
             if (Keywords == null) { this.Keywords = new LinkedList<String>(); }
+            else { this.Keywords = Keywords; }
             Review = new ConcurrentDictionary<string, string>();
         }       
 
