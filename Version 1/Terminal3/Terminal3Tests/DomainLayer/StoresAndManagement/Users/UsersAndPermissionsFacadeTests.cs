@@ -50,9 +50,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             Assert.Equal(expectedResult, Facade.AddSystemAdmin(adminEmail).ExecStatus);
 
             if (expectedResult)
-                Assert.True(Facade.SystemAdmins.ContainsKey(registerResult.Data.Id), "AddSystemAdmin returned true but the user wasn't added to the admins dict");
+                Assert.True(Facade.SystemAdmins.ContainsKey(registerResult.Data.Email), "AddSystemAdmin returned true but the user wasn't added to the admins dict");
             else
-                Assert.Empty(Facade.SystemAdmins);
+                Assert.True(Facade.SystemAdmins.Count==1);
         }
 
         [Theory()]
@@ -76,8 +76,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         //at least one system admin in the system test
         public void RemoveSystemAdminTestAtLeastOne()
         {
-            String email = "tomer@gmail.com";
-            Result<RegisteredUser> registerResult = Facade.Register(email, "password");
+            String email = "Admin@terminal3"; //default admin
             Facade.AddSystemAdmin(email);
             bool removedResultStatus = Facade.RemoveSystemAdmin(email).ExecStatus;
             Assert.False(removedResultStatus);
