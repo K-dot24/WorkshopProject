@@ -25,20 +25,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         Discreet = 2
     }
 
+    
+
     public class PolicyManager : IPolicyManager
     {
-        //TODO
+        private const int PURCHASE_SIZE = 4;
+        private const int DISCOUNT_SIZE = 3;
+
+        //TODO: Complete properly
+
         public bool[] DiscountPolicies { get; }
         public bool[] PurchasePolicies { get; }
-        /*public ConcurrentDictionary<Product, IPurchasePolicy> ProductsPurchasePolicies { get; }
-        public ConcurrentDictionary<Product, IDiscountPolicy> ProductsDiscountPolicies { get; }*/
 
         public PolicyManager()
         {
-            DiscountPolicies = new bool[3];
-            PurchasePolicies = new bool[4];
-            /*ProductsPurchasePolicies = new ConcurrentDictionary<Product, IPurchasePolicy>();
-            ProductsDiscountPolicies = new ConcurrentDictionary<Product, IDiscountPolicy>();*/
+            DiscountPolicies = new bool[DISCOUNT_SIZE];
+            PurchasePolicies = new bool[PURCHASE_SIZE];
         }
 
         public Result<Boolean> SetDiscountPolicy(Discounts policy, Boolean active)
@@ -53,14 +55,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return new Result<bool>($"Purchase policy was set to {active}.\n", true, true);
         }
 
-/*        public Result<Boolean> AddNewPurchasePolicyToProduct(Product product, IPurchasePolicy policy)
-        {
-            throw new NotImplementedException();
-        }*/
 
         public double GetCurrentProductPrice(Product product, int quantity)
         {
-            //TODO
             //throw new NotImplementedException();
             return product.Price*quantity;
         }

@@ -5,7 +5,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 {
     public class BuyNow : IPurchasePolicy
     {
-        //TODO
+        //TODO: Complete properly
 
         public Double BuyNowPrice { get; }
 

@@ -3,15 +3,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 {
     public interface IPurchasePolicy
     {
-        //TODO
+        //TODO: Complete properly
+
         Result<double> CalculatePrice(Product product, int quantity);
     }
-
-    /*public enum policyType : int
-    {
-        Auction = 0 ,
-        BuyNow = 1,
-        Lottery = 2 ,
-        Offer = 3
-    }*/
 }

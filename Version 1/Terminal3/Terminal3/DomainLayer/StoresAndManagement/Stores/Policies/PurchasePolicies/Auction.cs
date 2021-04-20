@@ -1,7 +1,25 @@
-﻿namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
+﻿using System;
+
+namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
     public class Auction : IPurchasePolicy
     {
-        //TODO
+        //TODO: Complete properly
+
+        public DateTime ClosingTime { get; }
+        public Double StartingPrice { get; }
+        public Tuple<Double, String> LastOffer { get; }    // Customer offer <price, UserID>
+
+        public Auction(DateTime closingTime, Double startingPrice)
+        {
+            ClosingTime = closingTime;
+            StartingPrice = startingPrice;
+            LastOffer = new Tuple<Double, String>(-1, null);
+        }
+
+        public Result<double> CalculatePrice(Product product, int quantity)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

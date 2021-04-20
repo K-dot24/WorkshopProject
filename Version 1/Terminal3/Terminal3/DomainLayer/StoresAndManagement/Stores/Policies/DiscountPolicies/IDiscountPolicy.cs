@@ -1,9 +1,13 @@
-﻿using Terminal3.DomainLayer.StoresAndManagement.Users;
+﻿using System;
+using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
     public interface IDiscountPolicy
     {
-        Result<double> CalculatePrice(Product product, User user);
+        //TODO: Complete properly
+
+        Result<Double> CalculatePrice(Product product, User user, int quantity, String code);
+        Result<Boolean> CheckIfEligible(User user);
     }
 }
