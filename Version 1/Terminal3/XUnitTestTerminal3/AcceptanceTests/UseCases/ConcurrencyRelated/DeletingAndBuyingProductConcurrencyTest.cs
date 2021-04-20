@@ -40,16 +40,6 @@ namespace XUnitTestTerminal3
 
         [Fact]
         [Trait("Category", "concurrency")]
-        [InlineData()]
-        [InlineData()]
-        [InlineData()]
-        [InlineData()]
-        [InlineData()]
-        [InlineData()]
-        [InlineData()]
-        [InlineData()]
-        [InlineData()]
-        [InlineData()]
         public void DeleteAndBuy()
         {
             Thread threadOwner = new Thread(() => ThreadOwner());
