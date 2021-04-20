@@ -8,9 +8,8 @@ namespace XUnitTestTerminal3
 {
     public class LogOutTest: XUnitTerminal3TestCase
     {
-        public LogOutTest()
+        public LogOutTest() : base()
         {
-            sut.ResetSystem();
             sut.Register("test@gmail.com", "test123");
         }
 

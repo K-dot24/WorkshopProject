@@ -7,18 +7,18 @@ namespace Terminal3.DALobjects
     public class StoreOwnerDAL : IStoreStaffDAL
     {
         //Properties
-        public RegisteredUserDAL User { get; }
-        public StoreDAL Store { get; }
-        public StoreOwnerDAL Owner { get; }
-        public LinkedList<StoreOwnerDAL> StoreOwners { get; }
-        public LinkedList<StoreManagerDAL> StoreManager { get; }
+        public String UserId { get; }
+        public String StoreId { get; }
+        public String OwnerId { get; }
+        public LinkedList<String> StoreOwners { get; }
+        public LinkedList<String> StoreManager { get; }
 
         //Constructor
-        public StoreOwnerDAL(RegisteredUserDAL user, StoreDAL store, StoreOwnerDAL owner, LinkedList<StoreOwnerDAL> storeOwners, LinkedList<StoreManagerDAL> storeManager):base(user.Id)
+        public StoreOwnerDAL(String userID, String storeID, String ownerID, LinkedList<String> storeOwners, LinkedList<String> storeManager):base(userID)
         {
-            User = user;
-            Store = store;
-            Owner = owner;
+            UserId = userID;
+            StoreId = storeID;
+            OwnerId = ownerID;
             StoreOwners = storeOwners;
             StoreManager = storeManager;
         }

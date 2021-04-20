@@ -9,7 +9,7 @@ using XUnitTestTerminal3.AcceptanceTests.Utils;
 
 namespace Terminal3.ServiceLayer
 {   
-
+    //try git action
     public class ECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface
     {
         //Properties
@@ -21,12 +21,16 @@ namespace Terminal3.ServiceLayer
         //Constructor
         public ECommerceSystem()
         {
-            //TODO: call initializer
             StoresAndManagementInterface StoresAndManagement = new StoresAndManagementInterface();
             GuestUserInterface = new GuestUserController(StoresAndManagement);
             RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
             StoreStaffInterface = new StoreStaffController(StoresAndManagement);
             SystemAdminInterface = new SystemAdminController(StoresAndManagement);
+        }
+
+        public void DisplaySystem()
+        {
+            // TODO - when GUI exists then display all functions according to current user role
         }
 
         //Metohds
@@ -69,7 +73,7 @@ namespace Terminal3.ServiceLayer
             return GuestUserInterface.UpdateShoppingCart(userID, storeID, productID, quantity);
         }
 
-        public Result<object> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
+        public Result<ShoppingCartDAL> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
         {
             return GuestUserInterface.Purchase(userID, paymentDetails, deliveryDetails);
         }

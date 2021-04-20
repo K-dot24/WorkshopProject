@@ -13,6 +13,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public User User { get; }
         public Store Store { get; }
         public ConcurrentDictionary<Product, int> Products { get; }     // <Product, Quantity>
+        public Double TotalBagPrice { get; set; }
 
         public ShoppingBag(User user , Store store)
         {
@@ -20,6 +21,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             User = user;
             Store = store;
             Products = new ConcurrentDictionary<Product, int>();
+            TotalBagPrice = 0;
         }
 
         public Result<bool> AddProtuctToShoppingBag(Product product, int quantity)
@@ -64,15 +66,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
         public Result<ShoppingBagDAL> GetDAL()
         {
-            RegisteredUserDAL user = (RegisteredUserDAL)User.GetDAL().Data;
-            StoreDAL store = Store.GetDAL().Data;
-            LinkedList<ProductDAL> products = new LinkedList<ProductDAL>();
+            ConcurrentDictionary<ProductDAL, int> products = new ConcurrentDictionary<ProductDAL, int>();
             foreach (var p in Products)
             {
-                products.AddLast(p.Key.GetDAL().Data);
+                products.TryAdd(p.Key.GetDAL().Data, p.Value);                    
             }
-
-            return new Result<ShoppingBagDAL>("Shopping bag DAL object", true, new ShoppingBagDAL(user, store, products));
+            return new Result<ShoppingBagDAL>("Shopping bag DAL object", true, new ShoppingBagDAL(Id , User.Id, Store.Id, products , TotalBagPrice));
         }
 
         internal double GetTotalPrice()
@@ -82,6 +81,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             {
                 sum = sum + (Store.PolicyManager.GetCurrentProductPrice(product, Products[product]));
             }
+            TotalBagPrice = sum;
             return sum;
         }
     }

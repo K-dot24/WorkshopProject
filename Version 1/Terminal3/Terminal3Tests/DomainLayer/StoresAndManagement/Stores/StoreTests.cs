@@ -16,6 +16,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
         {
             Store = new Store("TestStore", new Users.RegisteredUser("test@store", "password"));
         }
+
         [Theory()]
         [Trait("Category", "Unit")]
         [InlineData(0.0, false, null)]
@@ -39,10 +40,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             for (int i = 1; i < 6; i++)
             {
                 Store.AddRating(i);
-                expectedRate = (expectedRate*(i-1) + i) / (double)i;
+                expectedRate = (expectedRate * (i - 1) + i) / (double)i;
                 Assert.Equal(expectedRate, Store.Rating);
 
             }
         }
-    }
+
+     }
 }

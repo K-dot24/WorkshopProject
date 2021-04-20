@@ -8,9 +8,8 @@ namespace XUnitTestTerminal3.AcceptanceTests.UseCases
     public class GetUserShoppingBagTest: XUnitTerminal3TestCase
     {
         private string user_id;
-        public GetUserShoppingBagTest()
+        public GetUserShoppingBagTest() : base()
         {
-            sut.ResetSystem();
             sut.Register("test@gmail.com", "test123");
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
         }
