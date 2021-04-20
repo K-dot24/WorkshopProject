@@ -9,7 +9,7 @@ using XUnitTestTerminal3.AcceptanceTests.Utils;
 
 namespace Terminal3.ServiceLayer
 {   
-
+    //try git action
     public class ECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface
     {
         //Properties
