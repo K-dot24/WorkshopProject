@@ -24,7 +24,7 @@ namespace Terminal3.ServiceLayer
         Result<Boolean> LogOut(String email);
 
         //TODO: refine requirement
-        Result<String> SearchStore(IDictionary<String, Object> details); // store name
+        Result<List<String>> SearchStore(IDictionary<String, Object> details); // store name
 
         Result<List<String>> SearchProduct(IDictionary<String, Object> productDetails); //list<pid>
         

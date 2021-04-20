@@ -129,10 +129,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.OpenNewStore(storeName, userID);
         }
 
-        public Result<String> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
+        public Result<List<String>> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
         {
             if (Real == null)
-                return new Result<String>(true);
+                return new Result<List<String>>(true);                
 
             return Real.Purchase(userID, paymentDetails, deliveryDetails);
         }
@@ -169,10 +169,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.SearchProduct(productDetails);
         }
 
-        public Result<String> SearchStore(IDictionary<string, object> details)
+        public Result<List<String>> SearchStore(IDictionary<string, object> details)
         {
             if (Real == null)
-                return new Result<String>(true);
+                return new Result<List<String>>(true);
 
             return Real.SearchStore(details);
         }

@@ -234,15 +234,18 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             }
         }
 
-        public Result<String> SearchStore(IDictionary<string, object> details)
+        public Result<List<String>> SearchStore(IDictionary<string, object> details)
         {
-            Result<StoreDAL> fromSystem = system.SearchStore(details);
-            if (fromSystem.ExecStatus)
-                return new Result<string>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.Data.Name);
+            Result<List<StoreDAL>> fromSystem = system.SearchStore(details);
+            if (fromSystem.ExecStatus) { 
+                List<string> storesNames = new List<string>();
+                foreach (StoreDAL dal in fromSystem.Data) { storesNames.Add(dal.Name); }
+                return new Result<List<String>>(fromSystem.Message, fromSystem.ExecStatus, storesNames);
+            }
             else
-                return new Result<String>("", fromSystem.ExecStatus, null);
+                return new Result<List<String>>("", fromSystem.ExecStatus, null);
         }
-
+         
         public Result<bool> SetPermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
             return system.SetPermissions(storeID, managerID, ownerID, permissions);
