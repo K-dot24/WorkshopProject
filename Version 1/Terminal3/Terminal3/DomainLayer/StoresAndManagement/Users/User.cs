@@ -64,6 +64,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
+            if (ShoppingCart.ShoppingBags.IsEmpty)
+            {
+                return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
+            }
+
             Double amount = ShoppingCart.GetTotalShoppingCartPrice();
 
             bool paymentSuccess = PaymentSystem.Pay(amount, paymentDetails);
