@@ -35,7 +35,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             if (expectedResult)
                 Assert.True(Facade.RegisteredUsers.ContainsKey(registerResult.Data.Id), "Register returned true but user wasn't added to the dict");
             else
-                Assert.Single(Facade.RegisteredUsers, "Register returned false but the user was added to the dict");
+                Assert.True(Facade.RegisteredUsers.Count==2, "Register returned false but the user was added to the dict");
 
         }
 
@@ -52,7 +52,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             if (expectedResult)
                 Assert.True(Facade.SystemAdmins.ContainsKey(registerResult.Data.Id), "AddSystemAdmin returned true but the user wasn't added to the admins dict");
             else
-                Assert.Empty(Facade.SystemAdmins);
+                Assert.Single(Facade.SystemAdmins);
         }
 
         [Theory()]
@@ -76,14 +76,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         //at least one system admin in the system test
         public void RemoveSystemAdminTestAtLeastOne()
         {
-            String email = "tomer@gmail.com";
-            Result<RegisteredUser> registerResult = Facade.Register(email, "password");
-            Facade.AddSystemAdmin(email);
-            bool removedResultStatus = Facade.RemoveSystemAdmin(email).ExecStatus;
+            String defaultEmail = "Admin@terminal3";
+            bool removedResultStatus = Facade.RemoveSystemAdmin(defaultEmail).ExecStatus;
             Assert.False(removedResultStatus);
-            if (!removedResultStatus)
-                Assert.True(Facade.SystemAdmins.ContainsKey(email), "RemoveSystemAdmin returned false but still removed the user from the admins dict");
-
         }
 
         [Fact()]
