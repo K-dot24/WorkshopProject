@@ -142,9 +142,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             }
             Assert.Equal(expectedResult2, Facade.AddProductToCart(founder.Id, product2, productQuantity, store).ExecStatus);
             Result<ShoppingBag> getSB2 = founder.ShoppingCart.GetShoppingBag(store.Id);
-            if (getSB.ExecStatus)//if the bag was created
+            if (getSB2.ExecStatus)//if the bag was created
             {
-                Assert.Equal(expectedResult, getSB.Data.Products.ContainsKey(product));
+                Assert.Equal(expectedResult, getSB2.Data.Products.ContainsKey(product));
             }
             else//if the bag wasn't created
             {
