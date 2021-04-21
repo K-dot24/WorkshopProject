@@ -14,10 +14,10 @@ namespace Terminal3.ServiceLayer
     public class ECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface
     {
         //Properties
-        public IGuestUserInterface GuestUserInterface { get; }
-        public IRegisteredUserInterface RegisteredUserInterface { get; }
-        public IStoreStaffInterface StoreStaffInterface { get; }
-        public ISystemAdminInterface SystemAdminInterface { get; }
+        public IGuestUserInterface GuestUserInterface { get; set; }
+        public IRegisteredUserInterface RegisteredUserInterface { get; set; }
+        public IStoreStaffInterface StoreStaffInterface { get; set;  }
+        public ISystemAdminInterface SystemAdminInterface { get; set; }
 
         //Constructor
         public ECommerceSystem()
@@ -190,7 +190,16 @@ namespace Terminal3.ServiceLayer
 
         public Result<bool> ResetSystem(String sysAdminID)
         {
-            return SystemAdminInterface.ResetSystem(sysAdminID);
+            Result<Boolean> res = SystemAdminInterface.ResetSystem(sysAdminID);
+            if (res.ExecStatus)
+            {
+                StoresAndManagementInterface StoresAndManagement = new StoresAndManagementInterface();
+                GuestUserInterface = new GuestUserController(StoresAndManagement);
+                RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
+                StoreStaffInterface = new StoreStaffController(StoresAndManagement);
+                SystemAdminInterface = new SystemAdminController(StoresAndManagement);
+            }
+            return res;            
         }
 
         #endregion
