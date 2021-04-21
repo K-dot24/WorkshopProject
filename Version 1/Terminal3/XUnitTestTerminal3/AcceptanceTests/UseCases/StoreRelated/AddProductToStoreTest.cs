@@ -32,7 +32,7 @@ namespace XUnitTestTerminal3
         [Trait("Category", "acceptance")]
         public void AddProductToStoreNoStore()
         {
-            this.user_id = sut.Login("test@gmail.com", "0123").Data;
+            this.user_id = sut.Login("test@gmail.com", "test123").Data;
             sut.OpenNewStore("test_store", user_id);
             sut.AddProductToStore(user_id, "0123", "test_product", 10, 10, "test");
 
@@ -45,7 +45,7 @@ namespace XUnitTestTerminal3
         [Trait("Category", "acceptance")]
         public void AddProductToStoreNoUser()
         {
-            this.user_id = sut.Login("test@gmail.com", "0123").Data;
+            this.user_id = sut.Login("test@gmail.com", "test123").Data;
             string store_id = sut.OpenNewStore("test_store", user_id).Data;
             sut.AddProductToStore("0123", store_id, "test_product", 10, 10, "test");
 

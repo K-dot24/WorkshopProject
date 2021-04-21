@@ -53,14 +53,14 @@ namespace XUnitTestTerminal3
 
         [Fact]
         [Trait("Category", "acceptance")]
-        public void AddStoreOwnerAlreadyOwner()
+        public void AddStoreOwnerAlreadyOwnerAtAnotherStore()
         {
             sut.Register("newOwner@gmail.com", "newOwner123");
             string newOwnerID = sut.Login("newOwner@gmail.com", "newOwner123").Data;
             sut.OpenNewStore("newOwner_store", newOwnerID);
 
 
-            Assert.False(sut.AddStoreOwner(newOwnerID, user_id, store_id).ExecStatus);
+            Assert.True(sut.AddStoreOwner(newOwnerID, user_id, store_id).ExecStatus);
         }
 
     }

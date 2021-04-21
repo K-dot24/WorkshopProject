@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal3-UnitTests", "Term
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal3-IntegrationTests", "Terminal3-IntegrationTests\Terminal3-IntegrationTests.csproj", "{C6EFB33A-FB00-4229-822C-381218177CA5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal3WebAPI", "WebApplication3\Terminal3WebAPI.csproj", "{53112A7E-AD8E-459C-9337-2A317630C408}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{C6EFB33A-FB00-4229-822C-381218177CA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6EFB33A-FB00-4229-822C-381218177CA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6EFB33A-FB00-4229-822C-381218177CA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53112A7E-AD8E-459C-9337-2A317630C408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53112A7E-AD8E-459C-9337-2A317630C408}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53112A7E-AD8E-459C-9337-2A317630C408}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53112A7E-AD8E-459C-9337-2A317630C408}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
