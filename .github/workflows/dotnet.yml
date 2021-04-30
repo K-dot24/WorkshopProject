@@ -1,6 +1,9 @@
 name: Terminal3
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -8,41 +11,30 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@main
-      
       - uses: actions/setup-dotnet@v1.7.2
         with: 
           dotnet-version: '2.1.x' 
-      - name: Install dependencies
-        run: dotnet restore
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build '.\Version 1\Terminal3\Terminal3\Terminal3.csproj'
       
   unittests:      
     needs: build
-    name:  Unit Testing
+    name:  Unit Tests
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core SDK '2.1.x'
-      uses: actions/setup-dotnet@v1.7.2
       with:
         dotnet-version: '2.1.x'
-    - name: Install dependencies
-      run: dotnet restore
     - name: Unit Tests
-      run: dotnet test ./Version1/Terminal3/Terminal3Tests/Terminal3-UnitTests.csproj        
+      run: dotnet test '.\Version 1\Terminal3\Terminal3Tests\Terminal3-UnitTests.csproj'       
  
   regression:  
     needs: unittests 
-    name: Regression
+    name: Integration Tests
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core SDK '2.1.x'
-      uses: actions/setup-dotnet@v1.7.2
       with:
         dotnet-version: '2.1.x'
-    - name: Install dependencies
-      run: dotnet restore
-    - name: Regression tests 
-      run: dotnet build --configuration Release --no-restore
+    - name: Integration Tests
+      run: dotnet test '.\Version 1\Terminal3\Terminal3-IntegrationTests\Terminal3-IntegrationTests.csproj'

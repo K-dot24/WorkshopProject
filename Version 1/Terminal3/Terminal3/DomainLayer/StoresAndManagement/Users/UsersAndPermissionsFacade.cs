@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using Terminal3.DALobjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 
@@ -33,6 +34,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public ConcurrentDictionary<String,RegisteredUser> RegisteredUsers { get; }
         public ConcurrentDictionary<String, RegisteredUser> SystemAdmins { get; }
         public ConcurrentDictionary<String, GuestUser> GuestUsers { get; }
+
+        private readonly object my_lock = new object();
 
         //Constructor
         public UsersAndPermissionsFacade()
@@ -67,14 +70,32 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// <returns>Result object hold the execStatus</returns>
         public Result<RegisteredUser> Register(String email, String password)
         {
-            if (isUniqueEmail(email))
+            try
             {
-                RegisteredUser newUser = new RegisteredUser(email, password);
-                this.RegisteredUsers.TryAdd(newUser.Id, newUser);
-                return new Result<RegisteredUser>($"{email} is registered as new user", true, newUser);
+                Monitor.TryEnter(my_lock);
+                try
+                {
+                    if (isUniqueEmail(email))
+                    {
+                        RegisteredUser newUser = new RegisteredUser(email, password);
+                        this.RegisteredUsers.TryAdd(newUser.Id, newUser);
+                        return new Result<RegisteredUser>($"{email} is registered as new user", true, newUser);
+                    }
+                    else
+                    {
+                        return new Result<RegisteredUser>($"{email} is aleady in user\n Please use different email", false, null);
+                    }
+                }
+                finally
+                {
+                    Monitor.Exit(my_lock);
+                }
             }
-            else {
-                return new Result<RegisteredUser>($"{email} is aleady in user\n Please use different email", false,null);
+            catch (SynchronizationLockException SyncEx)
+            {
+                Console.WriteLine("A SynchronizationLockException occurred. Message:");
+                Console.WriteLine(SyncEx.Message);
+                return new Result<RegisteredUser>(SyncEx.Message, false, null);
             }
         }
 

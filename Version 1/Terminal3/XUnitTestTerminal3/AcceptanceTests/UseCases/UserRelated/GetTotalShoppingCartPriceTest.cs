@@ -78,7 +78,7 @@ namespace XUnitTestTerminal3
             sut.AddProductToCart(user_id, product_id, 1, store_id);
 
             List<String> shoppingBags = sut.GetUserShoppingCart(user_id).Data;
-            sut.UpdateShoppingCart(user_id, shoppingBags[0], product_id, 0);
+            sut.UpdateShoppingCart(user_id, store_id, product_id, 0);
             double price = sut.GetTotalShoppingCartPrice(user_id).Data;
 
             Assert.True(price == 0);

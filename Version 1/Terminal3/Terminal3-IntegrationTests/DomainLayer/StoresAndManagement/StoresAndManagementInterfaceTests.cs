@@ -240,19 +240,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
 
             // Check bag
             RegisteredUser.ShoppingCart.ShoppingBags.TryGetValue(TestStore.Id, out ShoppingBag bag);
-            bool res = bag.Products.TryGetValue(product, out int updatedQuantity);
+            bool res;
+            int updatedQuantity;
+            if (bag != null)
+                res = bag.Products.TryGetValue(product, out updatedQuantity);
+            else
+            {
+                res = false;
+                updatedQuantity = 0;
+            }
+
 
             if (res)
             {
                 Assert.Equal(expectedQuantity, updatedQuantity);
             }
-            else if (expectedQuantity == 0)
+            else if (expectedQuantity == 0 && bag!=null)
             {
                 Assert.False(bag.Products.ContainsKey(product));
             }
             else
             {
-                Assert.False(true);
+                Assert.Empty(RegisteredUser.ShoppingCart.ShoppingBags);
             }
 
         }

@@ -39,9 +39,9 @@ namespace XUnitTestTerminal3
         [Trait("Category", "acceptance")]
         public void RemoveProductFromStoreSNotExist()
         {
-            string product_id = sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test").Data;
-
-            Assert.False(sut.RemoveProductFromStore(user_id, store_id, product_id).ExecStatus);
+            //string product_id = sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test").Data;
+            
+            Assert.False(sut.RemoveProductFromStore(user_id, store_id, "0123").ExecStatus);
         }
     }
 }
