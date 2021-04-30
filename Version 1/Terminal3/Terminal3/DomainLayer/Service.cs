@@ -17,8 +17,8 @@ namespace Terminal3.DomainLayer
 
         internal static Result<bool> ResetSystem()
         {
-            return new Result<Boolean>("The system has been reseted and cleard\n", true, true);
-            
+            //TODO: implement ResetSystem
+            throw new NotImplementedException();
         }
 
     }
