@@ -18,6 +18,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Product> RemoveProduct(String userID, String productID);
         Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details);
+        Result<Boolean> UpdateInventory(ShoppingBag bag);
         #endregion
 
         #region Staff Management
@@ -148,6 +149,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 return new Result<Product>($"{userID} does not have permissions to edit products' information in {this.Name}\n", false, null);
             }
         }
+        public Result<bool> UpdateInventory(ShoppingBag bag)
+        {
+            ConcurrentDictionary<Product, int> product_quantity = bag.Products;     // <Product, Quantity user bought>
+            foreach(var product in product_quantity)
+            {
+                product.Key.Quantity = product.Key.Quantity - product.Value;
+            }
+
+            return new Result<bool>("Store inventory updated successuly\n", true, true);
+
+    }
         #endregion
 
         public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
@@ -418,5 +430,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<StoreDAL>("Store DAL object", true, store);
 
         }
+        
     }
 }

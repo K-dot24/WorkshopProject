@@ -13,7 +13,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public String Id { get; }
         public String Name { get; set; }
         public Double Price { get; set; }
-        public int Quantity { get; set; }
+        public int Quantity { get; set; }       // product quantity in store
         public String Category { get; set; }
         public Double Rating { get; set; }
         public int NumberOfRates { get; set; }

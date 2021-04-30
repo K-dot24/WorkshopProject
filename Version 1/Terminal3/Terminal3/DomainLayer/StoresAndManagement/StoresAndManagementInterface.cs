@@ -355,6 +355,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
+            // TODO - lock products ?
             Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails);
             if (res.ExecStatus)
             {
@@ -363,6 +364,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 foreach(var bag in purchasedBags)
                 {
                     Store store = StoresFacade.GetStore(bag.Key).Data;
+                    store.UpdateInventory(bag.Value);
                     store.History.AddPurchasedShoppingBag(bag.Value);
                 }
                 return new Result<ShoppingCartDAL>(res.Message, true, res.Data.GetDAL().Data);
