@@ -9,7 +9,7 @@ using Terminal3.ServiceLayer;
 
 namespace WebApplication3.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class Terminal3Controller : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace WebApplication3.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            return new string[] { "value1", "value3" };
         }
 
         // GET api/<Terminal3Controller>/5
