@@ -12,12 +12,12 @@ namespace Terminal3.ServiceLayer.ServiceObjects
         public String Id { get; }
         public String UserId { get; }
         public String StoreId { get; }
-        public ConcurrentDictionary<ProductService , int> Products { get; }  //<productDAL , quantity>
+        public IDictionary<ProductService , int> Products { get; }  //<productDAL , quantity>
         public Double TotalBagPrice { get; }
 
 
         //Constructor 
-        public ShoppingBagService(String bagID , String userID, String storeID, ConcurrentDictionary<ProductService, int> products ,Double totalBagPrice )
+        public ShoppingBagService(String bagID , String userID, String storeID, IDictionary<ProductService, int> products ,Double totalBagPrice )
         {
             Id = bagID;
             UserId = userID;

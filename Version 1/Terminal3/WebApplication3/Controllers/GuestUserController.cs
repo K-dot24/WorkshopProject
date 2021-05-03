@@ -20,64 +20,78 @@ namespace Terminal3WebAPI.Controllers
         public ECommerceSystem mySystem = new ECommerceSystem();
 
 
-        #region old methods
-
-        // GET api/<GuestUserController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<GuestUserController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<GuestUserController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<GuestUserController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
-        #endregion
-
+        /// <summary>
+        /// Get welcome page of the system
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public string EnterSystem() { return "Welcome to Terminal3 system"; }
 
+        /// <summary>
+        /// Signal the system that the user is exited
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
         [Route("ExitSystem/{userID:int}")]
         [HttpGet]
         public string ExitSystem(int userID) { return $"user {userID} Exit system"; }
 
+        /// <summary>
+        /// Register new user to the system
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [Route("Register")]
         [HttpPost]
-        public RegisteredUserService Register([FromBody] User user) 
+        public Result<RegisteredUserService> Register([FromBody] User user) 
         {
-            Result<RegisteredUserService> res = mySystem.Register(user.Email, user.Password);
-            if (res.ExecStatus) { return res.Data; }
-            else { return null; }
+            Result<RegisteredUserService> res =  mySystem.Register(user.Email, user.Password);
+            if (res.ExecStatus)
+            {
+                res.Data.ShoppingCart = null;
+            }
+            return res;
         }
 
+        /// <summary>
+        /// search store by attributes
+        /// {name: someName, rating:someRating}
+        /// </summary>
+        /// <param name="storeDetails"></param>
+        /// <returns></returns>
         [Route("SearchStore")]
         [HttpGet]
-        public List<StoreService> SearchStore([FromBody] IDictionary<string, object> details)
+        public Result<List<StoreService>> SearchStore([FromBody] IDictionary<string, object> storeDetails)
         {
-            Result<List<StoreService>> res = mySystem.SearchStore(details);
-            return res.ExecStatus ? res.Data : null;
+            return mySystem.SearchStore(storeDetails);
         }
-        //Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
-        //Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);
+
+        /// <summary>
+        /// Search product by attributes
+        /// {name,category,lowprice,highprice,productrating,storerating,keywords}
+        /// </summary>
+        /// <param name="productDetails"></param>
+        /// <returns></returns>
+        [Route("SearchProduct")]
+        [HttpGet]
+        public Result<List<ProductService>> SearchProduct(IDictionary<string, object> productDetails)
+        {
+            return mySystem.SearchProduct(productDetails);
+        }
+
+        [Route("AddProductToCart")]
+        [HttpPost]
+        public Result<Boolean> AddProductToCart([FromBody] ProductToCart productToCart)
+        {
+            return mySystem.AddProductToCart(productToCart.userID, productToCart.ProductID, productToCart.ProductQuantity, productToCart.StoreID);
+        }
+
         //Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
         //Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity);
         //Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         //Result<HistoryDAL> GetUserPurchaseHistory(String userID);
         //Result<double> GetTotalShoppingCartPrice(String userID);
         //Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+
     }
 }

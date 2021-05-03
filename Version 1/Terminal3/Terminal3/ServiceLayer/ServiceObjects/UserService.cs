@@ -8,7 +8,7 @@ namespace Terminal3.ServiceLayer.ServiceObjects
     {
         //Properties
         public String Id { get; }
-        public ShoppingCartService ShoppingCart { get; }
+        public ShoppingCartService ShoppingCart { get; set; }
 
         //Constructor
         public UserService(String id,ShoppingCartService shoppingCart)

@@ -144,22 +144,22 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             }
         }
 
-        public Result<Dictionary<string, int>> GetUserShoppingBag(string userID, string shoppingBagID)
+        public Result<IDictionary<string, int>> GetUserShoppingBag(string userID, string shoppingBagID)
         {
             ShoppingCartService shoppingCart = system.GetUserShoppingCart(userID).Data;
             if (shoppingCart == null)
-                return new Result<Dictionary<string, int>>("Failed to find the shopping cart", false, null);
+                return new Result<IDictionary<string, int>>("Failed to find the shopping cart", false, null);
             foreach(ShoppingBagService shoppingBag in shoppingCart.ShoppingBags)
             {
                 if(shoppingBag.Id == shoppingBagID)
-                    return new Result<Dictionary<string, int>>("", true, MakeDictionaryFromProdactsDAL(shoppingBag.Products));
+                    return new Result<IDictionary<string, int>>("", true, MakeDictionaryFromProdactsDAL(shoppingBag.Products));
             }
-            return new Result<Dictionary<string, int>>("Failed to find the shopping bag", false, null);
+            return new Result<IDictionary<string, int>>("Failed to find the shopping bag", false, null);
         }
 
-        private Dictionary<string, int> MakeDictionaryFromProdactsDAL(ConcurrentDictionary<ProductService, int> dictionary)
+        private IDictionary<string, int> MakeDictionaryFromProdactsDAL(IDictionary<ProductService, int> dictionary)
         {
-            Dictionary<string, int> result = new Dictionary<string, int>();
+            IDictionary<string, int> result = new Dictionary<string, int>();
             foreach(var pair in dictionary)
             {
                 result.TryAdd(pair.Key.Id, pair.Value);

@@ -32,7 +32,7 @@ namespace Terminal3.ServiceLayer
 
         Result<List<String>> GetUserShoppingCart(String userID); //LinkedList<ShoppingBagID> 
 
-        Result<Dictionary<String, int>> GetUserShoppingBag(String userID, String shoppingBagID); //Dictionary<pid , countity>
+        Result<IDictionary<String, int>> GetUserShoppingBag(String userID, String shoppingBagID); //Dictionary<pid , countity>
 
         Result<Boolean> UpdateShoppingCart(String userID, String storeId , String productID , int quantity);
 
