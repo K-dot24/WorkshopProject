@@ -8,8 +8,6 @@ using Terminal3.ServiceLayer;
 using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3WebAPI.Models;
 
-
-
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Terminal3WebAPI.Controllers
@@ -33,9 +31,9 @@ namespace Terminal3WebAPI.Controllers
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        [Route("ExitSystem/{userID:int}")]
+        [Route("ExitSystem/{userID}")]
         [HttpGet]
-        public string ExitSystem(int userID) { return $"user {userID} Exit system"; }
+        public void ExitSystem(string userID) { mySystem.ExitSystem(userID); }
 
         /// <summary>
         /// Register new user to the system
