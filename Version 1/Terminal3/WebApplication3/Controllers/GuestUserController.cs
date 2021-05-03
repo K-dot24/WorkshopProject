@@ -16,7 +16,14 @@ namespace Terminal3WebAPI.Controllers
     [ApiController]
     public class GuestUserController : ControllerBase
     {
-        public ECommerceSystem mySystem = new ECommerceSystem();
+        private readonly IECommerceSystem mySystem;
+
+        public GuestUserController(IECommerceSystem system)
+        {
+            this.mySystem = system;
+        }
+
+
 
 
         /// <summary>

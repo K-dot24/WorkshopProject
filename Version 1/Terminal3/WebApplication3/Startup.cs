@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
+using Terminal3.ServiceLayer;
 
 namespace WebApplication3
 {
@@ -25,7 +26,9 @@ namespace WebApplication3
         {
             services.AddControllers();
             services.AddSwaggerGen();
-
+            
+            //Dependency injection 
+            services.AddSingleton<IECommerceSystem, ECommerceSystem>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

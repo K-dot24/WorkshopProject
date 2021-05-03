@@ -10,8 +10,10 @@ using XUnitTestTerminal3.AcceptanceTests.Utils;
 
 namespace Terminal3.ServiceLayer
 {   
+    public interface IECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface
+    { }
     //try git action
-    public class ECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface
+    public class ECommerceSystem : IECommerceSystem
     {
         //Properties
         public IGuestUserInterface GuestUserInterface { get; set; }
