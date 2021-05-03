@@ -21,7 +21,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<HistoryService> GetUserPurchaseHistory(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
-        Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+        Result<List<Tuple<String, String>>> GetProductReview(String storeID, String productID);
 
     }
     //Basic functionality The every user can preform
@@ -56,7 +56,7 @@ namespace Terminal3.ServiceLayer.Controllers
         }
         public Result<HistoryService> GetUserPurchaseHistory(String userID) { return StoresAndManagementInterface.GetUserPurchaseHistory(userID); }
         public Result<double> GetTotalShoppingCartPrice(String userID) { return StoresAndManagementInterface.GetTotalShoppingCartPrice(userID); }
-        public Result<ConcurrentDictionary<string, string>> GetProductReview(string storeID, string productID)
+        public Result<List<Tuple<string, string>>> GetProductReview(string storeID, string productID)
         {
             return StoresAndManagementInterface.GetProductReview(storeID, productID);
         }

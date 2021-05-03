@@ -12,7 +12,7 @@ namespace Terminal3.ServiceLayer.ServiceObjects
         public String Id { get; }
         public String UserId { get; }
         public String StoreId { get; }
-        public IDictionary<ProductService , int> Products { get; }  //<productDAL , quantity>
+        public LinkedList<Tuple< ProductService , int>> Products { get; }  //<productDAL , quantity>
         public Double TotalBagPrice { get; }
 
 
@@ -22,7 +22,10 @@ namespace Terminal3.ServiceLayer.ServiceObjects
             Id = bagID;
             UserId = userID;
             StoreId = storeID;
-            Products = products;
+            Products = new LinkedList<Tuple<ProductService, int>>();
+            foreach (ProductService product in products.Keys) {
+                Products.AddFirst(new Tuple<ProductService, int>(product, products[product])); 
+            }
             TotalBagPrice = totalBagPrice;
         }
 

@@ -88,7 +88,7 @@ namespace Terminal3.ServiceLayer
         {
             return GuestUserInterface.GetTotalShoppingCartPrice(userID);
         }
-        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID) {
+        public Result<List<Tuple<String, String>>> GetProductReview(String storeID, String productID) {
             return GuestUserInterface.GetProductReview(storeID, productID);
         }
         #endregion
@@ -152,7 +152,7 @@ namespace Terminal3.ServiceLayer
 
         }
 
-        public Result<Dictionary<IStoreStaffService, PermissionService>> GetStoreStaff(string ownerID, string storeID)
+        public Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(string ownerID, string storeID)
         {
             return StoreStaffInterface.GetStoreStaff(ownerID, storeID);
 

@@ -19,7 +19,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<ProductService> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
         Result<List<ProductService>> SearchProduct(IDictionary<String, Object> productDetails);
         Result<List<StoreService>> SearchStore(IDictionary<String, Object> details);
-        Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+        Result<List<Tuple<string, string>>> GetProductReview(String storeID, String productID);
         #endregion
 
         #region Staff Management
@@ -28,7 +28,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<IStoreStaffService, PermissionService>> GetStoreStaff(String ownerID, String storeID);
+        Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
         #region User Actions
@@ -173,22 +173,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return StoresFacade.SetPermissions(storeID, managerID, ownerID, permissions);
         }
 
-        public Result<Dictionary<IStoreStaffService, PermissionService>> GetStoreStaff(string userID, string storeID)
+        public Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(string userID, string storeID)
         {
             Result<Dictionary<IStoreStaff, Permission>> storeStaffResult = StoresFacade.GetStoreStaff(userID, storeID);
             if (storeStaffResult.ExecStatus)
             {
                 Dictionary<IStoreStaff, Permission> storeStaff = storeStaffResult.Data;
-                Dictionary<IStoreStaffService, PermissionService> storeStaffDAL = new Dictionary<IStoreStaffService, PermissionService>();
+                List<Tuple<IStoreStaffService, PermissionService>> storeStaffDAL = new List<Tuple<IStoreStaffService, PermissionService>>();
 
                 foreach (var user in storeStaff)
                 {
-                    storeStaffDAL.Add((IStoreStaffService)user.Key.GetDAL().Data, user.Value.GetDAL().Data);
+                    storeStaffDAL.Add( new Tuple<IStoreStaffService, PermissionService>((IStoreStaffService)user.Key.GetDAL().Data, user.Value.GetDAL().Data));
                 }
-                return new Result<Dictionary<IStoreStaffService, PermissionService>>(storeStaffResult.Message, true, storeStaffDAL);
+                return new Result<List<Tuple<IStoreStaffService, PermissionService>>>(storeStaffResult.Message, true, storeStaffDAL);
             }
 
-            return new Result<Dictionary<IStoreStaffService, PermissionService>>(storeStaffResult.Message , false , null);
+            return new Result<List<Tuple<IStoreStaffService, PermissionService>>>(storeStaffResult.Message , false , null);
         }
 
         public Result<HistoryService> GetStorePurchaseHistory(string userID, string storeID, bool systemAdmin=false)
@@ -264,9 +264,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return StoresFacade.RemovePermissions(storeID, managerID, ownerID, permissions);
         }
        
-        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID)
+        public Result<List<Tuple<string, string>>> GetProductReview(String storeID, String productID)
         {
-            return StoresFacade.GetProductReview(storeID, productID);
+            Result<ConcurrentDictionary<string,string>> res = StoresFacade.GetProductReview(storeID, productID);
+            List<Tuple<string, string>> converted = new List<Tuple<string, string>>();
+            if (res.Data != null)
+            {
+                foreach (string userId in res.Data.Keys)
+                {
+                    converted.Add(new Tuple<string, string>(userId, res.Data[userId]));
+                }
+            }
+            return new Result<List<Tuple<string, string>>>(res.Message,res.ExecStatus,converted) ;
         }
 
         public Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review)

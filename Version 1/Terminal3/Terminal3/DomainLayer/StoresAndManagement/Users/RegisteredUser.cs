@@ -72,8 +72,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             LinkedList<ShoppingBagService> shoppingBags = History.ShoppingBags;
             foreach (ShoppingBagService bag in shoppingBags)
             {             
-                foreach(ProductService productInHistory in bag.Products.Keys)
+                foreach(Tuple<ProductService,int> productQuantity in bag.Products)
                 {
+                    ProductService productInHistory = productQuantity.Item1;
                     if (productInHistory.Id.Equals(product.Id)) { return true; }
                 }
 
