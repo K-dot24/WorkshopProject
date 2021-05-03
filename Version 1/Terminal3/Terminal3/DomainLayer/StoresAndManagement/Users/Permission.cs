@@ -74,9 +74,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<Boolean>("All methodes are permitted\n", true, true);
         }
 
-        public Result<PermissionDAL> GetDAL()
+        public Result<PermissionService> GetDAL()
         {
-            return new Result<PermissionDAL>("Permission DAL object", true, new PermissionDAL(this.functionsBitMask,isOwner));
+            return new Result<PermissionService>("Permission DAL object", true, new PermissionService(this.functionsBitMask,isOwner));
         }
 
     }

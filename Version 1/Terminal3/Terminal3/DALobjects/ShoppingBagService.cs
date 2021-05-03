@@ -6,18 +6,18 @@ using System.Collections.Concurrent;
 
 namespace Terminal3.DALobjects
 {
-    public class ShoppingBagDAL
+    public class ShoppingBagService
     {
         //Properties
         public String Id { get; }
         public String UserId { get; }
         public String StoreId { get; }
-        public ConcurrentDictionary<ProductDAL , int> Products { get; }  //<productDAL , quantity>
+        public ConcurrentDictionary<ProductService , int> Products { get; }  //<productDAL , quantity>
         public Double TotalBagPrice { get; }
 
 
         //Constructor 
-        public ShoppingBagDAL(String bagID , String userID, String storeID, ConcurrentDictionary<ProductDAL, int> products ,Double totalBagPrice )
+        public ShoppingBagService(String bagID , String userID, String storeID, ConcurrentDictionary<ProductService, int> products ,Double totalBagPrice )
         {
             Id = bagID;
             UserId = userID;
