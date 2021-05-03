@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Terminal3.DALobjects
 {
-    public class StoreOwnerDAL : IStoreStaffDAL
+    public class StoreOwnerService : IStoreStaffService
     {
         //Properties
         public String UserId { get; }
@@ -14,7 +14,7 @@ namespace Terminal3.DALobjects
         public LinkedList<String> StoreManager { get; }
 
         //Constructor
-        public StoreOwnerDAL(String userID, String storeID, String ownerID, LinkedList<String> storeOwners, LinkedList<String> storeManager):base(userID)
+        public StoreOwnerService(String userID, String storeID, String ownerID, LinkedList<String> storeOwners, LinkedList<String> storeManager):base(userID)
         {
             UserId = userID;
             StoreId = storeID;

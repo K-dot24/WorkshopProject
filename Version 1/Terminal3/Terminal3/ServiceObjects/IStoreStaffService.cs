@@ -4,11 +4,11 @@ using System.Text;
 
 namespace Terminal3.DALobjects
 {
-    public class IStoreStaffDAL
+    public class IStoreStaffService
     {
         public String Id { get; }
 
-        public IStoreStaffDAL(string id)
+        public IStoreStaffService(string id)
         {
             Id = id;
         }

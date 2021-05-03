@@ -4,14 +4,14 @@ using System.Text;
 
 namespace Terminal3.DALobjects
 {
-    public class UserDAL
+    public class UserService
     {
         //Properties
         public String Id { get; }
-        public ShoppingCartDAL ShoppingCart { get; }
+        public ShoppingCartService ShoppingCart { get; }
 
         //Constructor
-        public UserDAL(String id,ShoppingCartDAL shoppingCart)
+        public UserService(String id,ShoppingCartService shoppingCart)
         {
             Id = id;
             ShoppingCart = shoppingCart;

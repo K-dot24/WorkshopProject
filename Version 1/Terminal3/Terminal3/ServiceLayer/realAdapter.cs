@@ -31,7 +31,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<string> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category)
         {
-            Result<ProductDAL> fromSystem = system.AddProductToStore(userID, storeID, productName, price, initialQuantity, category);
+            Result<ProductService> fromSystem = system.AddProductToStore(userID, storeID, productName, price, initialQuantity, category);
             if (fromSystem.ExecStatus)
             {
                 return new Result<string>("", fromSystem.ExecStatus, fromSystem.Data.Id);
@@ -58,7 +58,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<string> EditProductDetails(string userID, string storeID, string productID, IDictionary<string, object> details)
         {
-            Result<ProductDAL> fromSystem = system.EditProductDetails(userID, storeID, productID, details);
+            Result<ProductService> fromSystem = system.EditProductDetails(userID, storeID, productID, details);
             if(fromSystem.ExecStatus)
                 return new Result<string>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.Data.Id);
             return new Result<string>(fromSystem.Message, fromSystem.ExecStatus, null);
@@ -67,13 +67,13 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
         //TODO
         public Result<List<String>> GetStorePurchaseHistory(String ownerID, String storeID)
         {
-            Result<HistoryDAL> fromSystem = system.GetStorePurchaseHistory(ownerID, storeID);
+            Result<HistoryService> fromSystem = system.GetStorePurchaseHistory(ownerID, storeID);
             if (fromSystem.ExecStatus)
             {
                 //List<string> Ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
-                List<ShoppingBagDAL> ShoppingBags = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags);
+                List<ShoppingBagService> ShoppingBags = new List<ShoppingBagService>(fromSystem.Data.ShoppingBags);
                 List<string> Ids = new List<string>();
-                foreach (ShoppingBagDAL dal in ShoppingBags) { Ids.Add(dal.Id); }
+                foreach (ShoppingBagService dal in ShoppingBags) { Ids.Add(dal.Id); }
                 return new Result<List<string>>("", fromSystem.ExecStatus, Ids);
             }
             else
@@ -84,15 +84,15 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<Dictionary<String, List<int>>> GetStoreStaff(String ownerID, String storeID)
         {
-            Result<Dictionary<IStoreStaffDAL, PermissionDAL>> fromSystem = system.GetStoreStaff(ownerID, storeID);
+            Result<Dictionary<IStoreStaffService, PermissionService>> fromSystem = system.GetStoreStaff(ownerID, storeID);
             if (fromSystem.ExecStatus)
             {
                 // List<string> userIDS = (new List<IStoreStaffDAL>(fromSystem.Data.Keys)).Select(userdal => userdal.Id)
-                List<IStoreStaffDAL> StoreStaffDals = new List<IStoreStaffDAL>(fromSystem.Data.Keys);
+                List<IStoreStaffService> StoreStaffDals = new List<IStoreStaffService>(fromSystem.Data.Keys);
                 List<string> userIDS = new List<string>();
-                foreach (IStoreStaffDAL dal in StoreStaffDals) { userIDS.Add(dal.Id); }
+                foreach (IStoreStaffService dal in StoreStaffDals) { userIDS.Add(dal.Id); }
                 List<List<int>> userPermisions = new List<List<int>>();
-                foreach (PermissionDAL permission in fromSystem.Data.Values)
+                foreach (PermissionService permission in fromSystem.Data.Values)
                 {
                     List<int> permissionList = new List<int>();
                     if (permission.isOwner) { permissionList.Add((int)Methods.AllPermissions); }
@@ -129,13 +129,13 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
         //TODO
         public Result<List<string>> GetUserPurchaseHistory(string userID)
         {
-            Result<HistoryDAL> fromSystem = system.GetUserPurchaseHistory(userID);
+            Result<HistoryService> fromSystem = system.GetUserPurchaseHistory(userID);
             if (fromSystem.ExecStatus)
             {
                 //List<string> Ids = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
-                List<ShoppingBagDAL> ShoppingBags = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags);
+                List<ShoppingBagService> ShoppingBags = new List<ShoppingBagService>(fromSystem.Data.ShoppingBags);
                 List<string> Ids = new List<string>();
-                foreach (ShoppingBagDAL dal in ShoppingBags) { Ids.Add(dal.Id); }
+                foreach (ShoppingBagService dal in ShoppingBags) { Ids.Add(dal.Id); }
                 return new Result<List<string>>("", fromSystem.ExecStatus, Ids);
             }
             else
@@ -146,10 +146,10 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<Dictionary<string, int>> GetUserShoppingBag(string userID, string shoppingBagID)
         {
-            ShoppingCartDAL shoppingCart = system.GetUserShoppingCart(userID).Data;
+            ShoppingCartService shoppingCart = system.GetUserShoppingCart(userID).Data;
             if (shoppingCart == null)
                 return new Result<Dictionary<string, int>>("Failed to find the shopping cart", false, null);
-            foreach(ShoppingBagDAL shoppingBag in shoppingCart.ShoppingBags)
+            foreach(ShoppingBagService shoppingBag in shoppingCart.ShoppingBags)
             {
                 if(shoppingBag.Id == shoppingBagID)
                     return new Result<Dictionary<string, int>>("", true, MakeDictionaryFromProdactsDAL(shoppingBag.Products));
@@ -157,7 +157,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             return new Result<Dictionary<string, int>>("Failed to find the shopping bag", false, null);
         }
 
-        private Dictionary<string, int> MakeDictionaryFromProdactsDAL(ConcurrentDictionary<ProductDAL, int> dictionary)
+        private Dictionary<string, int> MakeDictionaryFromProdactsDAL(ConcurrentDictionary<ProductService, int> dictionary)
         {
             Dictionary<string, int> result = new Dictionary<string, int>();
             foreach(var pair in dictionary)
@@ -169,13 +169,13 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<List<string>> GetUserShoppingCart(string userID)
         {
-            Result<ShoppingCartDAL> fromSystem = system.GetUserShoppingCart(userID);
+            Result<ShoppingCartService> fromSystem = system.GetUserShoppingCart(userID);
             if (fromSystem.ExecStatus)
             {
                 //List<string> shoppingBagsIds = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags).ForEach(bag => bag.Id);
-                List<ShoppingBagDAL> ShoppingBags = new List<ShoppingBagDAL>(fromSystem.Data.ShoppingBags);
+                List<ShoppingBagService> ShoppingBags = new List<ShoppingBagService>(fromSystem.Data.ShoppingBags);
                 List<string> Ids = new List<string>();
-                foreach (ShoppingBagDAL dal in ShoppingBags) { Ids.Add(dal.Id); }
+                foreach (ShoppingBagService dal in ShoppingBags) { Ids.Add(dal.Id); }
                 return new Result<List<string>>("", fromSystem.ExecStatus, Ids);
 
             }
@@ -188,7 +188,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<string> Login(string email, string password)
         {
-            Result<RegisteredUserDAL> fromSystem = system.Login(email, password);
+            Result<RegisteredUserService> fromSystem = system.Login(email, password);
             if (fromSystem.ExecStatus)
             {
                 return new Result<string>("", fromSystem.ExecStatus, fromSystem.Data.Id);
@@ -209,7 +209,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<string> OpenNewStore(string storeName, string userID)
         {
-            Result<StoreDAL> fromSystem = system.OpenNewStore(storeName, userID);
+            Result<StoreService> fromSystem = system.OpenNewStore(storeName, userID);
             if (fromSystem.ExecStatus)
             {
                 return new Result<string>("", fromSystem.ExecStatus, fromSystem.Data.Id);
@@ -223,11 +223,11 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
         //TODO
         public Result<List<String>> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
         {
-            Result<ShoppingCartDAL> fromSystem = system.Purchase(userID, paymentDetails, deliveryDetails);
+            Result<ShoppingCartService> fromSystem = system.Purchase(userID, paymentDetails, deliveryDetails);
             if (fromSystem.ExecStatus)
             {
                 List<string> bagsIDS = new List<string>();
-                foreach (ShoppingBagDAL dal in fromSystem.Data.ShoppingBags) { bagsIDS.Add(dal.Id); }
+                foreach (ShoppingBagService dal in fromSystem.Data.ShoppingBags) { bagsIDS.Add(dal.Id); }
                 return new Result<List<string>>("", fromSystem.ExecStatus, bagsIDS);
 
             }
@@ -267,11 +267,11 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<List<string>> SearchProduct(IDictionary<string, object> productDetails)
         {
-            Result<List<ProductDAL>> fromSystem = system.SearchProduct(productDetails);
+            Result<List<ProductService>> fromSystem = system.SearchProduct(productDetails);
             if (fromSystem.ExecStatus)
             {
                 List<string> productIDS = new List<string>();
-                foreach (ProductDAL dal in fromSystem.Data) { productIDS.Add(dal.Id); }
+                foreach (ProductService dal in fromSystem.Data) { productIDS.Add(dal.Id); }
                 return new Result<List<string>>("", fromSystem.ExecStatus, productIDS);
 
             }
@@ -283,10 +283,10 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<List<String>> SearchStore(IDictionary<string, object> details)
         {
-            Result<List<StoreDAL>> fromSystem = system.SearchStore(details);
+            Result<List<StoreService>> fromSystem = system.SearchStore(details);
             if (fromSystem.ExecStatus) { 
                 List<string> storesNames = new List<string>();
-                foreach (StoreDAL dal in fromSystem.Data) { storesNames.Add(dal.Name); }
+                foreach (StoreService dal in fromSystem.Data) { storesNames.Add(dal.Name); }
                 return new Result<List<String>>(fromSystem.Message, fromSystem.ExecStatus, storesNames);
             }
             else

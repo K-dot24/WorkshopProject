@@ -64,14 +64,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             //else faild
             return new Result<Boolean>($"You did not add the product {product.Name} to this shopping bag. Therefore attempt to update shopping bag faild\n", false, false);
         }
-        public Result<ShoppingBagDAL> GetDAL()
+        public Result<ShoppingBagService> GetDAL()
         {
-            ConcurrentDictionary<ProductDAL, int> products = new ConcurrentDictionary<ProductDAL, int>();
+            ConcurrentDictionary<ProductService, int> products = new ConcurrentDictionary<ProductService, int>();
             foreach (var p in Products)
             {
                 products.TryAdd(p.Key.GetDAL().Data, p.Value);                    
             }
-            return new Result<ShoppingBagDAL>("Shopping bag DAL object", true, new ShoppingBagDAL(Id , User.Id, Store.Id, products , TotalBagPrice));
+            return new Result<ShoppingBagService>("Shopping bag DAL object", true, new ShoppingBagService(Id , User.Id, Store.Id, products , TotalBagPrice));
         }
 
         internal double GetTotalPrice()

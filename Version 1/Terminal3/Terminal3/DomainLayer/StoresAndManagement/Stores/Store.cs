@@ -408,7 +408,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         #endregion
 
-        public Result<StoreDAL> GetDAL()
+        public Result<StoreService> GetDAL()
         {
             LinkedList<String> owners = new LinkedList<String>();
             
@@ -424,10 +424,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
             // InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
             // PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
-            HistoryDAL history = History.GetDAL().Data;
+            HistoryService history = History.GetDAL().Data;
 
-            StoreDAL store = new StoreDAL(this.Id, this.Name, Founder.User.Id, owners, managers, history, this.Rating, this.NumberOfRates);
-            return new Result<StoreDAL>("Store DAL object", true, store);
+            StoreService store = new StoreService(this.Id, this.Name, Founder.User.Id, owners, managers, history, this.Rating, this.NumberOfRates);
+            return new Result<StoreService>("Store DAL object", true, store);
 
         }
         

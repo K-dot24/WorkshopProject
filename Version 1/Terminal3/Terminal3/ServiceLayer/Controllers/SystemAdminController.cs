@@ -9,10 +9,10 @@ namespace Terminal3.ServiceLayer.Controllers
 {
     public interface ISystemAdminInterface
     {
-        Result<HistoryDAL> GetUserPurchaseHistory(string sysAdminID, String userID);
-        Result<HistoryDAL> GetStorePurchaseHistory(string sysAdminID, String storeId);
-        Result<RegisteredUserDAL> AddSystemAdmin(string sysAdminID, String email);
-        Result<RegisteredUserDAL> RemoveSystemAdmin(string sysAdminID, String email);
+        Result<HistoryService> GetUserPurchaseHistory(string sysAdminID, String userID);
+        Result<HistoryService> GetStorePurchaseHistory(string sysAdminID, String storeId);
+        Result<RegisteredUserService> AddSystemAdmin(string sysAdminID, String email);
+        Result<RegisteredUserService> RemoveSystemAdmin(string sysAdminID, String email);
         Result<bool> ResetSystem(string sysAdminID);
 
     }
@@ -39,14 +39,14 @@ namespace Terminal3.ServiceLayer.Controllers
         /// </summary>
         /// <param name="userID">ID of the requested user-user must be register</param>
         /// <param name="sysAdminID">ID of the sys admin that request - user must be register</param>
-        public Result<HistoryDAL> GetUserPurchaseHistory(string sysAdminID ,String userID)
+        public Result<HistoryService> GetUserPurchaseHistory(string sysAdminID ,String userID)
         {
             if (isSystemAdmin(sysAdminID)) {
                 return StoresAndManagementInterface.GetUserPurchaseHistory(userID);
             }
             else
             {
-                return new Result<HistoryDAL>($"user:{sysAdminID} is not system admin\n", false, null);
+                return new Result<HistoryService>($"user:{sysAdminID} is not system admin\n", false, null);
             }
         }
 
@@ -54,7 +54,7 @@ namespace Terminal3.ServiceLayer.Controllers
         /// return store phurcase history
         /// </summary>
         /// <param name="storeId"></param>
-        public Result<HistoryDAL> GetStorePurchaseHistory(string sysAdminID, String storeId)
+        public Result<HistoryService> GetStorePurchaseHistory(string sysAdminID, String storeId)
         {
             if (isSystemAdmin(sysAdminID))
             {
@@ -62,7 +62,7 @@ namespace Terminal3.ServiceLayer.Controllers
             }
             else
             {
-                return new Result<HistoryDAL>($"user:{sysAdminID} is not system admin\n", false, null);
+                return new Result<HistoryService>($"user:{sysAdminID} is not system admin\n", false, null);
             }
         }
 
@@ -73,7 +73,7 @@ namespace Terminal3.ServiceLayer.Controllers
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns>result of the operation</returns>
-        public Result<RegisteredUserDAL> AddSystemAdmin(string sysAdminID, String email)
+        public Result<RegisteredUserService> AddSystemAdmin(string sysAdminID, String email)
         {            
             if (isSystemAdmin(sysAdminID))
             {
@@ -81,7 +81,7 @@ namespace Terminal3.ServiceLayer.Controllers
             }
             else
             {
-                return new Result<RegisteredUserDAL>($"user:{sysAdminID} is not system admin\n", false, null);
+                return new Result<RegisteredUserService>($"user:{sysAdminID} is not system admin\n", false, null);
             }
         }
 
@@ -92,7 +92,7 @@ namespace Terminal3.ServiceLayer.Controllers
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns>result of the operation</returns>
-        public Result<RegisteredUserDAL> RemoveSystemAdmin(string sysAdminID, String email)
+        public Result<RegisteredUserService> RemoveSystemAdmin(string sysAdminID, String email)
         {
             if (isSystemAdmin(sysAdminID))
             {
@@ -100,7 +100,7 @@ namespace Terminal3.ServiceLayer.Controllers
             }
             else
             {
-                return new Result<RegisteredUserDAL>($"user:{sysAdminID} is not system admin\n", false, null);
+                return new Result<RegisteredUserService>($"user:{sysAdminID} is not system admin\n", false, null);
             }
         }
 

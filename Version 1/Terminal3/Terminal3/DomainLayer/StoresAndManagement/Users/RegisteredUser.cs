@@ -69,10 +69,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         private Boolean checkIfProductPurchasedByUser(Store store, Product product)
         {
-            LinkedList<ShoppingBagDAL> shoppingBags = History.ShoppingBags;
-            foreach (ShoppingBagDAL bag in shoppingBags)
+            LinkedList<ShoppingBagService> shoppingBags = History.ShoppingBags;
+            foreach (ShoppingBagService bag in shoppingBags)
             {             
-                foreach(ProductDAL productInHistory in bag.Products.Keys)
+                foreach(ProductService productInHistory in bag.Products.Keys)
                 {
                     if (productInHistory.Id.Equals(product.Id)) { return true; }
                 }
@@ -85,10 +85,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             return new Result<History>("User history\n", true, History);
         }
-        public Result<RegisteredUserDAL> GetDAL()
+        public Result<RegisteredUserService> GetDAL()
         {
-            ShoppingCartDAL SCD = this.ShoppingCart.GetDAL().Data;
-            return new Result<RegisteredUserDAL>("RegisteredUser DAL object" , true , new RegisteredUserDAL(this.Id, this.Email, this.Password, this.LoggedIn , SCD));
+            ShoppingCartService SCD = this.ShoppingCart.GetDAL().Data;
+            return new Result<RegisteredUserService>("RegisteredUser DAL object" , true , new RegisteredUserService(this.Id, this.Email, this.Password, this.LoggedIn , SCD));
         }
 
         public Result<Boolean> ExitSystem()

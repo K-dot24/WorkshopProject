@@ -37,8 +37,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 storeManagers.AddLast(sm.User.Id);
             }
             if(AppointedBy != null)
-                return new Result<object>("Store owner DAL object", true, new StoreOwnerDAL(User.Id, Store.Id, AppointedBy.GetId(), storeOwners, storeManagers));
-            return new Result<object>("Store owner DAL object", true, new StoreOwnerDAL(User.Id, Store.Id, null, storeOwners, storeManagers));
+                return new Result<object>("Store owner DAL object", true, new StoreOwnerService(User.Id, Store.Id, AppointedBy.GetId(), storeOwners, storeManagers));
+            return new Result<object>("Store owner DAL object", true, new StoreOwnerService(User.Id, Store.Id, null, storeOwners, storeManagers));
         }
 
         public string GetId()
