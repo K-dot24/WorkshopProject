@@ -9,9 +9,9 @@ namespace Terminal3.ServiceLayer.Controllers
 {
     public interface IRegisteredUserInterface
     {
-        Result<RegisteredUserDAL> Login(String email, String password);
+        Result<RegisteredUserService> Login(String email, String password);
         Result<Boolean> LogOut(String email);
-        Result<StoreDAL> OpenNewStore(String storeName, String userID);
+        Result<StoreService> OpenNewStore(String storeName, String userID);
         Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
     }
 
@@ -23,11 +23,11 @@ namespace Terminal3.ServiceLayer.Controllers
         public RegisteredUserController(IStoresAndManagementInterface storesAndManagementInterface):base(storesAndManagementInterface){}
         
         #region Methods
-        public Result<RegisteredUserDAL> Login(String email, String password) {
+        public Result<RegisteredUserService> Login(String email, String password) {
             return StoresAndManagementInterface.Login(email,password);
         }
         public Result<Boolean> LogOut(String email) { return StoresAndManagementInterface.LogOut(email); }
-        public Result<StoreDAL> OpenNewStore(String storeName, String userID) { return StoresAndManagementInterface.OpenNewStore(storeName, userID); }
+        public Result<StoreService> OpenNewStore(String storeName, String userID) { return StoresAndManagementInterface.OpenNewStore(storeName, userID); }
         public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
         {
             return StoresAndManagementInterface.AddProductReview(userID, storeID, productID, review);

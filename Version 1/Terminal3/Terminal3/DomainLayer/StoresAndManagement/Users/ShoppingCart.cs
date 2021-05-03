@@ -42,14 +42,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<Boolean>("Shopping bag added to cart.\n", true, true);
         }
 
-        public Result<ShoppingCartDAL> GetDAL()
+        public Result<ShoppingCartService> GetDAL()
         {
-            LinkedList<ShoppingBagDAL> SBD = new LinkedList<ShoppingBagDAL>();
+            LinkedList<ShoppingBagService> SBD = new LinkedList<ShoppingBagService>();
             foreach (var sb in ShoppingBags)
             {
                 SBD.AddLast(sb.Value.GetDAL().Data);
             }
-            return new Result<ShoppingCartDAL>("shopping cart DAL object", true, new ShoppingCartDAL(Id, SBD , TotalCartPrice));
+            return new Result<ShoppingCartService>("shopping cart DAL object", true, new ShoppingCartService(Id, SBD , TotalCartPrice));
 
         }
 

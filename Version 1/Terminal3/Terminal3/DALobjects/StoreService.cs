@@ -5,7 +5,7 @@ using System.Collections.Concurrent;
 
 namespace Terminal3.DALobjects
 {
-    public class StoreDAL
+    public class StoreService
     {
         //Properties       
         public String Id { get; }
@@ -15,12 +15,12 @@ namespace Terminal3.DALobjects
         public LinkedList<String> Managers { get; }
         //public InventoryManager InventoryManager { get; }   //TODO - do we need a DAL calss of the Inventory Manager?
         //public PolicyManager PolicyManager { get; }         //TODO - do we need a DAL calss of the Policy Manager?
-        public HistoryDAL History { get; }
+        public HistoryService History { get; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
         
         //Constructor
-        public StoreDAL(string id, string name, String founder, LinkedList<String> owners, LinkedList<String> managers, HistoryDAL history, double rating, int numberOfRates)
+        public StoreService(string id, string name, String founder, LinkedList<String> owners, LinkedList<String> managers, HistoryService history, double rating, int numberOfRates)
         {
             Id = id;
             Name = name;
