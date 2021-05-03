@@ -9,6 +9,7 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3WebAPI.Models;
 
 
+
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Terminal3WebAPI.Controllers
@@ -43,14 +44,15 @@ namespace Terminal3WebAPI.Controllers
         /// <returns></returns>
         [Route("Register")]
         [HttpPost]
-        public Result<RegisteredUserService> Register([FromBody] User user) 
+        public IActionResult Register([FromBody] User user) 
         {
             Result<RegisteredUserService> res =  mySystem.Register(user.Email, user.Password);
             if (res.ExecStatus)
             {
-                res.Data.ShoppingCart = null;
+                //res.Data.ShoppingCart = null;
+
             }
-            return res;
+            return Ok(res);
         }
 
         /// <summary>
@@ -86,7 +88,14 @@ namespace Terminal3WebAPI.Controllers
             return mySystem.AddProductToCart(productToCart.userID, productToCart.ProductID, productToCart.ProductQuantity, productToCart.StoreID);
         }
 
-        //Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
+        [Route("GetUserShoppingCart/{userID}")]
+        [HttpGet]
+        public IActionResult GetUserShoppingCart(String userID)
+        {
+            Result<ShoppingCartService> res = mySystem.GetUserShoppingCart(userID);
+            return Ok(res);
+        }
+
         //Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity);
         //Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         //Result<HistoryDAL> GetUserPurchaseHistory(String userID);
