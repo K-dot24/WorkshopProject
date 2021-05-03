@@ -51,7 +51,11 @@ namespace Terminal3WebAPI.Controllers
 
         [Route("Register")]
         [HttpPost]
-        public string Register(string email, string password) { return $"{email} register succesfuly"; }
+        public string Register(string email, string password) 
+        {
+            Console.WriteLine("asda");
+            return $"{email} register succesfuly"; 
+        }
         //Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details);
         //Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
         //Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);
