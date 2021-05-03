@@ -1,5 +1,5 @@
 ﻿using Terminal3.DomainLayer.StoresAndManagement.Stores;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users

@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users

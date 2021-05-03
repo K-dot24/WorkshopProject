@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 

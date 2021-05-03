@@ -1,5 +1,5 @@
 ﻿using System;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System.Reflection;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using System.Collections.Concurrent;
@@ -88,7 +88,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<RegisteredUserService> GetDAL()
         {
             ShoppingCartService SCD = this.ShoppingCart.GetDAL().Data;
-            return new Result<RegisteredUserService>("RegisteredUser DAL object" , true , new RegisteredUserService(this.Id, this.Email, this.Password, this.LoggedIn , SCD));
+            return new Result<RegisteredUserService>("RegisteredUser DAL object" , true , new RegisteredUserService(this.Id, this.Email, this.LoggedIn , SCD));
         }
 
         public Result<Boolean> ExitSystem()

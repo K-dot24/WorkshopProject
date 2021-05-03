@@ -3,6 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Terminal3.DomainLayer;
+using Terminal3.ServiceLayer;
+using Terminal3.ServiceLayer.ServiceObjects;
+using Terminal3WebAPI.Models;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -12,7 +17,8 @@ namespace Terminal3WebAPI.Controllers
     [ApiController]
     public class GuestUserController : ControllerBase
     {
-        static String controllerRoute = "api/[controller]";
+        public ECommerceSystem mySystem = new ECommerceSystem();
+
 
         #region old methods
 
@@ -51,12 +57,20 @@ namespace Terminal3WebAPI.Controllers
 
         [Route("Register")]
         [HttpPost]
-        public string Register(string email, string password) 
+        public RegisteredUserService Register([FromBody] User user) 
         {
-            Console.WriteLine("asda");
-            return $"{email} register succesfuly"; 
+            Result<RegisteredUserService> res = mySystem.Register(user.Email, user.Password);
+            if (res.ExecStatus) { return res.Data; }
+            else { return null; }
         }
-        //Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details);
+
+        [Route("SearchStore")]
+        [HttpGet]
+        public List<StoreService> SearchStore([FromBody] IDictionary<string, object> details)
+        {
+            Result<List<StoreService>> res = mySystem.SearchStore(details);
+            return res.ExecStatus ? res.Data : null;
+        }
         //Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
         //Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);
         //Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
