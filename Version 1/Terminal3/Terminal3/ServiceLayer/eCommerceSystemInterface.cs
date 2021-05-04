@@ -19,7 +19,7 @@ namespace Terminal3.ServiceLayer
         public IGuestUserInterface GuestUserInterface { get; set; }
         public IRegisteredUserInterface RegisteredUserInterface { get; set; }
         public IStoreStaffInterface StoreStaffInterface { get; set;  }
-        public ISystemAdminInterface SystemAdminInterface { get; set; }
+        public SystemAdminController SystemAdminInterface { get; set; }
 
         //Constructor
         public ECommerceSystem()
@@ -160,9 +160,10 @@ namespace Terminal3.ServiceLayer
 
         }
 
-        public Result<HistoryService> GetStorePurchaseHistory(string ownerID, string storeID)
+        public Result<HistoryService> GetStorePurchaseHistory(string ownerID, string storeID,Boolean isSysAdmin=false)
         {
-            return StoreStaffInterface.GetStorePurchaseHistory(ownerID, storeID);
+            return !isSysAdmin ? StoreStaffInterface.GetStorePurchaseHistory(ownerID, storeID) :
+                                SystemAdminInterface.GetStorePurchaseHistory(ownerID, storeID);
 
         }
 

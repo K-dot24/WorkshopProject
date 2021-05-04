@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 
 namespace Terminal3WebAPI.Models
 {
-    public class GetProductReviewModel
+    public class EditProductDetailsModel
     {
+        public String userID { get; set; } = "";
         public String storeID { get; set; } = "";
         public String productID { get; set; } = "";
+        public IDictionary<String, Object> details { get; set; } = null;
     }
 }

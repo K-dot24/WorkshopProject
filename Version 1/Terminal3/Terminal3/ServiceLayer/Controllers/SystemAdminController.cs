@@ -10,7 +10,6 @@ namespace Terminal3.ServiceLayer.Controllers
     public interface ISystemAdminInterface
     {
         Result<HistoryService> GetUserPurchaseHistory(string sysAdminID, String userID);
-        Result<HistoryService> GetStorePurchaseHistory(string sysAdminID, String storeId);
         Result<RegisteredUserService> AddSystemAdmin(string sysAdminID, String email);
         Result<RegisteredUserService> RemoveSystemAdmin(string sysAdminID, String email);
         Result<bool> ResetSystem(string sysAdminID);

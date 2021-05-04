@@ -17,13 +17,16 @@ namespace Terminal3WebAPI.Controllers
     [ApiController]
     public class GuestUserController : ControllerBase
     {
+        //Fields
         private readonly IECommerceSystem system;
 
+        //Constructor
         public GuestUserController(IECommerceSystem system)
         {
             this.system = system;
         }
 
+        #region End-Points
         /// <summary>
         /// Get welcome page of the system
         /// </summary>
@@ -38,10 +41,10 @@ namespace Terminal3WebAPI.Controllers
         /// </summary>
         /// <param name="userID"> string of the userID - need to be in the body of the request</param>
         /// <returns></returns>
-        [Route("ExitSystem")]
-        //[Route("ExitSystem/{userID}")]
+        //[Route("ExitSystem")]
+        [Route("ExitSystem/{userID}")]
         [HttpGet]
-        public IActionResult ExitSystem([FromBody]string userID) {
+        public IActionResult ExitSystem(string userID) {
             system.ExitSystem(userID);
             return Ok();
         }
@@ -49,6 +52,11 @@ namespace Terminal3WebAPI.Controllers
         /// <summary>
         /// Register new user to the system
         /// </summary>
+        /// Template of valid JSON:
+        /// {
+        ///     "Email":"string",
+        ///     "Password":"string"
+        /// }
         /// <param name="user"></param>
         /// <returns></returns>
         [Route("Register")]
@@ -68,9 +76,14 @@ namespace Terminal3WebAPI.Controllers
 
         /// <summary>
         /// search store by attributes
-        /// {name: someName, rating:someRating}
+        /// Template of valid JSON
+        /// {
+        ///     "Name":"string",
+        ///     "rating":double
+        /// }
+        /// NOTE: fields are optionals
         /// </summary>
-        /// <param name="storeDetails">{name: someName, rating:someRating}</param>
+        /// <param name="storeDetails"></param>
         [Route("SearchStore")]
         [HttpGet]
         public IActionResult SearchStore([FromBody] IDictionary<string, object> storeDetails)
@@ -83,7 +96,17 @@ namespace Terminal3WebAPI.Controllers
 
         /// <summary>
         /// Search product by attributes
-        /// {name,category,lowprice,highprice,productrating,storerating,keywords}
+        /// Template of valid JSON:
+        /// {
+        ///     "Name":"string",
+        ///     "Category":"string",
+        ///     "Lowprice":double,
+        ///     "Highprice":double,
+        ///     "Productrating":double,
+        ///     "Storerating":double,
+        ///     "Keywords":["string","string"]
+        /// }
+        /// NOTE: fields are optionals
         /// </summary>
         /// <param name="productDetails"></param>
         /// <returns></returns>
@@ -98,6 +121,13 @@ namespace Terminal3WebAPI.Controllers
 
         /// <summary>
         /// Adding product to user's cart
+        /// Template of valid JSON:
+        /// {
+        ///     "userID":"string",
+        ///     "ProductID":"string",
+        ///     "ProductQuantity":int,
+        ///     "StoreID":"string"
+        /// }
         /// </summary>
         /// <param name="productToCart"></param>
         [Route("AddProductToCart")]
@@ -113,10 +143,10 @@ namespace Terminal3WebAPI.Controllers
         /// Return the user's shopping cart
         /// </summary>
         /// <param name="userID">string of the user's ID</param>
-        [Route("GetUserShoppingCart")]
-        //[Route("GetUserShoppingCart/{userID}")]
+        //[Route("GetUserShoppingCart")]
+        [Route("GetUserShoppingCart/{userID}")]
         [HttpGet]
-        public IActionResult GetUserShoppingCart([FromBody]String userID)
+        public IActionResult GetUserShoppingCart(String userID)
         {
             Result<ShoppingCartService> result = system.GetUserShoppingCart(userID);
             if (result.ExecStatus) { return Ok(result); }
@@ -125,6 +155,13 @@ namespace Terminal3WebAPI.Controllers
 
         /// <summary>
         /// Updates the user's shopping cart with the current quantity of a product
+        /// Template of valid JSON:
+        /// {
+        ///     "userID":"string",
+        ///     "shoppingBagID":"string",
+        ///     "productID":"string",
+        ///     "quantity":int
+        /// }
         /// </summary>
         /// <param name="details">identifier of the user,shop,product and its new quantity</param>
         [Route("UpdateShoppingCart")]
@@ -138,6 +175,14 @@ namespace Terminal3WebAPI.Controllers
 
         /// <summary>
         /// Preform purchase operation on the user shopping cart
+        /// Template of valid JSON:
+        /// {
+        ///     "userID":"string",
+        ///     "paymentDetails":{NOT IMPLEMENTED
+        ///                         }
+        ///     "deliveryDetails":{NOT IMPLEMENTED
+        ///                         }
+        /// }
         /// </summary>
         /// <param name="purchaseDetails">userID, paymant and delivery details</param>
         [Route("Purchase")]
@@ -153,10 +198,10 @@ namespace Terminal3WebAPI.Controllers
         /// Retrive the user purchase history
         /// </summary>
         /// <param name="userID">string of the userID - need to be in the body of the request</param>
-        [Route("GetUserPurchaseHistory")]
-        //[Route("GetUserPurchaseHistory/{userID}")]
+        //[Route("GetUserPurchaseHistory")]
+        [Route("GetUserPurchaseHistory/{userID}")]
         [HttpGet]
-        public IActionResult GetUserPurchaseHistory([FromBody] String userID)
+        public IActionResult GetUserPurchaseHistory(String userID)
         {
             Result<HistoryService> result = system.GetUserPurchaseHistory(userID);
             if (result.ExecStatus) { return Ok(result); }
@@ -167,10 +212,9 @@ namespace Terminal3WebAPI.Controllers
         /// Return the total amount of the user's shopping cart
         /// </summary>
         /// <param name="userID"></param>
-        /// <returns></returns>
-        [Route("GetTotalShoppingCartPrice")]
+        [Route("GetTotalShoppingCartPrice/{userID}")]
         [HttpGet]
-        public IActionResult GetTotalShoppingCartPrice([FromBody] String userID)
+        public IActionResult GetTotalShoppingCartPrice( String userID)
         {
             Result<double> result = system.GetTotalShoppingCartPrice(userID);
             if (result.ExecStatus) { return Ok(result); }
@@ -180,15 +224,16 @@ namespace Terminal3WebAPI.Controllers
         /// <summary>
         /// Returns all the reviews on a specific product
         /// </summary>
-        /// <param name="details">identifier of the store and the product</param>
-        [Route("GetProductReview")]
+        /// <param name="storeID">identifier of the store</param>
+        /// <param name="productID">identifier of the product</param>
+        [Route("GetProductReview/{storeID}/{productID}")]
         [HttpGet]
-        public IActionResult GetProductReview([FromBody]GetProductReviewModel details)
+        public IActionResult GetProductReview(string storeID, string productID)
         {
-            Result<List<Tuple<String, String>>> result = system.GetProductReview(details.storeID, details.productID);
+            Result<List<Tuple<String, String>>> result = system.GetProductReview(storeID,productID);
             if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result); }
         }
-
+        #endregion
     }
 }

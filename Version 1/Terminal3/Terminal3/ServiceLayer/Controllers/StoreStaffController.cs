@@ -17,7 +17,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID);
-        Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID);
+        Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID,Boolean isSystemAdmin=false);
         Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID);
 
     }
@@ -41,7 +41,7 @@ namespace Terminal3.ServiceLayer.Controllers
         public Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions) { return StoresAndManagementInterface.SetPermissions(storeID, managerID, ownerID, permissions); }
         public Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions) { return StoresAndManagementInterface.RemovePermissions(storeID,  managerID,  ownerID,  permissions); }
         public Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID) { return StoresAndManagementInterface.GetStoreStaff(ownerID, storeID); }
-        public Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID) { return StoresAndManagementInterface.GetStorePurchaseHistory(ownerID, storeID); }
+        public Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID, Boolean isSystemAdmin = false) { return StoresAndManagementInterface.GetStorePurchaseHistory(ownerID, storeID); }
         public Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID) { return StoresAndManagementInterface.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID); }
 
         #endregion
