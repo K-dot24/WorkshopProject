@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.ServiceLayer.Controllers;
@@ -10,14 +10,16 @@ using XUnitTestTerminal3.AcceptanceTests.Utils;
 
 namespace Terminal3.ServiceLayer
 {   
+    public interface IECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface
+    { }
     //try git action
-    public class ECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface
+    public class ECommerceSystem : IECommerceSystem
     {
         //Properties
         public IGuestUserInterface GuestUserInterface { get; set; }
         public IRegisteredUserInterface RegisteredUserInterface { get; set; }
         public IStoreStaffInterface StoreStaffInterface { get; set;  }
-        public ISystemAdminInterface SystemAdminInterface { get; set; }
+        public SystemAdminController SystemAdminInterface { get; set; }
 
         //Constructor
         public ECommerceSystem()
@@ -88,7 +90,7 @@ namespace Terminal3.ServiceLayer
         {
             return GuestUserInterface.GetTotalShoppingCartPrice(userID);
         }
-        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID) {
+        public Result<List<Tuple<String, String>>> GetProductReview(String storeID, String productID) {
             return GuestUserInterface.GetProductReview(storeID, productID);
         }
         #endregion
@@ -108,7 +110,7 @@ namespace Terminal3.ServiceLayer
         {
             return RegisteredUserInterface.OpenNewStore(storeName, userID);
         }
-        public Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review) {
+        public Result<ProductService> AddProductReview(String userID, String storeID, String productID, String review) {
             return RegisteredUserInterface.AddProductReview(userID, storeID, productID, review);
         }
         #endregion
@@ -152,15 +154,16 @@ namespace Terminal3.ServiceLayer
 
         }
 
-        public Result<Dictionary<IStoreStaffService, PermissionService>> GetStoreStaff(string ownerID, string storeID)
+        public Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(string ownerID, string storeID)
         {
             return StoreStaffInterface.GetStoreStaff(ownerID, storeID);
 
         }
 
-        public Result<HistoryService> GetStorePurchaseHistory(string ownerID, string storeID)
+        public Result<HistoryService> GetStorePurchaseHistory(string ownerID, string storeID,Boolean isSysAdmin=false)
         {
-            return StoreStaffInterface.GetStorePurchaseHistory(ownerID, storeID);
+            return !isSysAdmin ? StoreStaffInterface.GetStorePurchaseHistory(ownerID, storeID) :
+                                SystemAdminInterface.GetStorePurchaseHistory(ownerID, storeID);
 
         }
 

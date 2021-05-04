@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System;
 using System.Collections.Concurrent;
 

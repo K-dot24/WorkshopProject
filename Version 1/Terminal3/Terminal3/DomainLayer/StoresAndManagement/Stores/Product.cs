@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Terminal3.DALobjects;
 using System.Collections.Concurrent;
-
+using Terminal3.ServiceLayer.ServiceObjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {

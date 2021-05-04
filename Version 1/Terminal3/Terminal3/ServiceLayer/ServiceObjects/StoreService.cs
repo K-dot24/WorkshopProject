@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.Concurrent;
 
-namespace Terminal3.DALobjects
+namespace Terminal3.ServiceLayer.ServiceObjects
 {
     public class StoreService
     {

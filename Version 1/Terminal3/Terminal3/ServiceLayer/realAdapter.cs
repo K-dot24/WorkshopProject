@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.ServiceLayer;
@@ -84,15 +84,23 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<Dictionary<String, List<int>>> GetStoreStaff(String ownerID, String storeID)
         {
-            Result<Dictionary<IStoreStaffService, PermissionService>> fromSystem = system.GetStoreStaff(ownerID, storeID);
+            Result<List<Tuple<IStoreStaffService, PermissionService>>> fromSystem = system.GetStoreStaff(ownerID, storeID);
+            //Result<Dictionary<IStoreStaffService, PermissionService>> fromSystem = system.GetStoreStaff(ownerID, storeID);
             if (fromSystem.ExecStatus)
             {
                 // List<string> userIDS = (new List<IStoreStaffDAL>(fromSystem.Data.Keys)).Select(userdal => userdal.Id)
-                List<IStoreStaffService> StoreStaffDals = new List<IStoreStaffService>(fromSystem.Data.Keys);
+                //List<IStoreStaffService> StoreStaffDals = new List<IStoreStaffService>(fromSystem.Data.Keys);
+                List<IStoreStaffService> StoreStaffDals = new List<IStoreStaffService>();
+                List<PermissionService> values = new List<PermissionService>();
+                foreach (Tuple<IStoreStaffService,PermissionService> tuple in fromSystem.Data)
+                {
+                    StoreStaffDals.Add(tuple.Item1);
+                    values.Add(tuple.Item2);
+                }
                 List<string> userIDS = new List<string>();
                 foreach (IStoreStaffService dal in StoreStaffDals) { userIDS.Add(dal.Id); }
                 List<List<int>> userPermisions = new List<List<int>>();
-                foreach (PermissionService permission in fromSystem.Data.Values)
+                foreach (PermissionService permission in values)
                 {
                     List<int> permissionList = new List<int>();
                     if (permission.isOwner) { permissionList.Add((int)Methods.AllPermissions); }
@@ -148,21 +156,21 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
         {
             ShoppingCartService shoppingCart = system.GetUserShoppingCart(userID).Data;
             if (shoppingCart == null)
-                return new Result<Dictionary<string, int>>("Failed to find the shopping cart", false, null);
+                return new Result<Dictionary< string, int>>("Failed to find the shopping cart", false, null);
             foreach(ShoppingBagService shoppingBag in shoppingCart.ShoppingBags)
             {
                 if(shoppingBag.Id == shoppingBagID)
-                    return new Result<Dictionary<string, int>>("", true, MakeDictionaryFromProdactsDAL(shoppingBag.Products));
+                    return new Result<Dictionary<string, int>>("", true, ConvertObjectToID(shoppingBag.Products));
             }
             return new Result<Dictionary<string, int>>("Failed to find the shopping bag", false, null);
         }
 
-        private Dictionary<string, int> MakeDictionaryFromProdactsDAL(ConcurrentDictionary<ProductService, int> dictionary)
+        private Dictionary<string, int> ConvertObjectToID(LinkedList<Tuple<ProductService, int>> list)
         {
-            Dictionary<string, int> result = new Dictionary<string, int>();
-            foreach(var pair in dictionary)
+            Dictionary<string, int>  result = new Dictionary<string, int>();
+            foreach(Tuple<ProductService,int> pair in list)
             {
-                result.TryAdd(pair.Key.Id, pair.Value);
+                result.Add(pair.Item1.Id,pair.Item2);
             }
             return result;
         }

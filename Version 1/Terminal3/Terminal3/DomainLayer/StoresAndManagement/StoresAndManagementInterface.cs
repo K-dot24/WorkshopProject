@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System.Collections.Concurrent;
 using System.Linq;
 
@@ -19,7 +19,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<ProductService> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
         Result<List<ProductService>> SearchProduct(IDictionary<String, Object> productDetails);
         Result<List<StoreService>> SearchStore(IDictionary<String, Object> details);
-        Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+        Result<List<Tuple<string, string>>> GetProductReview(String storeID, String productID);
         #endregion
 
         #region Staff Management
@@ -28,7 +28,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<IStoreStaffService, PermissionService>> GetStoreStaff(String ownerID, String storeID);
+        Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
         #region User Actions
@@ -40,7 +40,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<ShoppingCartService> GetUserShoppingCart(String userID);
         Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin=false);
         Result<HistoryService> GetUserPurchaseHistory(String userID);
-        Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
+        Result<ProductService> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
         Result<UserService> EnterSystem();
         Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
@@ -173,22 +173,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return StoresFacade.SetPermissions(storeID, managerID, ownerID, permissions);
         }
 
-        public Result<Dictionary<IStoreStaffService, PermissionService>> GetStoreStaff(string userID, string storeID)
+        public Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(string userID, string storeID)
         {
             Result<Dictionary<IStoreStaff, Permission>> storeStaffResult = StoresFacade.GetStoreStaff(userID, storeID);
             if (storeStaffResult.ExecStatus)
             {
                 Dictionary<IStoreStaff, Permission> storeStaff = storeStaffResult.Data;
-                Dictionary<IStoreStaffService, PermissionService> storeStaffDAL = new Dictionary<IStoreStaffService, PermissionService>();
+                List<Tuple<IStoreStaffService, PermissionService>> storeStaffDAL = new List<Tuple<IStoreStaffService, PermissionService>>();
 
                 foreach (var user in storeStaff)
                 {
-                    storeStaffDAL.Add((IStoreStaffService)user.Key.GetDAL().Data, user.Value.GetDAL().Data);
+                    storeStaffDAL.Add( new Tuple<IStoreStaffService, PermissionService>((IStoreStaffService)user.Key.GetDAL().Data, user.Value.GetDAL().Data));
                 }
-                return new Result<Dictionary<IStoreStaffService, PermissionService>>(storeStaffResult.Message, true, storeStaffDAL);
+                return new Result<List<Tuple<IStoreStaffService, PermissionService>>>(storeStaffResult.Message, true, storeStaffDAL);
             }
 
-            return new Result<Dictionary<IStoreStaffService, PermissionService>>(storeStaffResult.Message , false , null);
+            return new Result<List<Tuple<IStoreStaffService, PermissionService>>>(storeStaffResult.Message , false , null);
         }
 
         public Result<HistoryService> GetStorePurchaseHistory(string userID, string storeID, bool systemAdmin=false)
@@ -264,12 +264,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return StoresFacade.RemovePermissions(storeID, managerID, ownerID, permissions);
         }
        
-        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID)
+        public Result<List<Tuple<string, string>>> GetProductReview(String storeID, String productID)
         {
-            return StoresFacade.GetProductReview(storeID, productID);
+            Result<ConcurrentDictionary<string,string>> res = StoresFacade.GetProductReview(storeID, productID);
+            List<Tuple<string, string>> converted = new List<Tuple<string, string>>();
+            if (res.Data != null)
+            {
+                foreach (string userId in res.Data.Keys)
+                {
+                    converted.Add(new Tuple<string, string>(userId, res.Data[userId]));
+                }
+            }
+            return new Result<List<Tuple<string, string>>>(res.Message,res.ExecStatus,converted) ;
         }
 
-        public Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review)
+        public Result<ProductService> AddProductReview(String userID, String storeID, String productID , String review)
         {
             Result<Store> storeRes = StoresFacade.GetStore(storeID);
             if (storeRes.ExecStatus)
@@ -277,11 +286,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 Result<Product> productRes = storeRes.Data.GetProduct(productID);    
                 if (productRes.ExecStatus)
                 {
-                    return UsersAndPermissionsFacade.AddProductReview(userID, storeRes.Data, productRes.Data , review);
+                    Result<Product> result =  UsersAndPermissionsFacade.AddProductReview(userID, storeRes.Data, productRes.Data , review);
+                    return result.ExecStatus ? new Result<ProductService>(result.Message, result.ExecStatus, result.Data.GetDAL().Data) :
+                        new Result<ProductService>(result.Message, result.ExecStatus,null);
                 }
-                return new Result<Boolean>(productRes.Message, false, false);                
+                return new Result<ProductService>(productRes.Message, false, null);                
             }
-            return new Result<Boolean>(storeRes.Message, false, false);
+            return new Result<ProductService>(storeRes.Message, false, null);
             
         }
 
