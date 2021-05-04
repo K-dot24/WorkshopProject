@@ -8,39 +8,43 @@ using Terminal3.ServiceLayer;
 using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3WebAPI.Models;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Terminal3WebAPI.Controllers
 {
+    /// <summary>
+    /// API controller for all the guest user functunality
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class GuestUserController : ControllerBase
     {
-        private readonly IECommerceSystem mySystem;
+        private readonly IECommerceSystem system;
 
         public GuestUserController(IECommerceSystem system)
         {
-            this.mySystem = system;
+            this.system = system;
         }
-
-
-
 
         /// <summary>
         /// Get welcome page of the system
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public string EnterSystem() { return "Welcome to Terminal3 system"; }
+        public IActionResult EnterSystem() {
+            return Ok("Welcome to Terminal3 system");
+        }
 
         /// <summary>
         /// Signal the system that the user is exited
         /// </summary>
-        /// <param name="userID"></param>
+        /// <param name="userID"> string of the userID - need to be in the body of the request</param>
         /// <returns></returns>
-        [Route("ExitSystem/{userID}")]
+        [Route("ExitSystem")]
+        //[Route("ExitSystem/{userID}")]
         [HttpGet]
-        public void ExitSystem(string userID) { mySystem.ExitSystem(userID); }
+        public IActionResult ExitSystem([FromBody]string userID) {
+            system.ExitSystem(userID);
+            return Ok();
+        }
 
         /// <summary>
         /// Register new user to the system
@@ -51,13 +55,15 @@ namespace Terminal3WebAPI.Controllers
         [HttpPost]
         public IActionResult Register([FromBody] User user) 
         {
-            Result<RegisteredUserService> res =  mySystem.Register(user.Email, user.Password);
-            if (res.ExecStatus)
+            Result<RegisteredUserService> result =  system.Register(user.Email, user.Password);
+            if (result.ExecStatus) 
             {
-                //res.Data.ShoppingCart = null;
-
+                return Created("api/registeruser/Login", result);
             }
-            return Ok(res);
+            else
+            {
+                return BadRequest(result);
+            }
         }
 
         /// <summary>
@@ -68,9 +74,12 @@ namespace Terminal3WebAPI.Controllers
         /// <returns></returns>
         [Route("SearchStore")]
         [HttpGet]
-        public Result<List<StoreService>> SearchStore([FromBody] IDictionary<string, object> storeDetails)
+        public IActionResult SearchStore([FromBody] IDictionary<string, object> storeDetails)
         {
-            return mySystem.SearchStore(storeDetails);
+            Result<List<StoreService>> result = system.SearchStore(storeDetails);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result); }
+            //return system.SearchStore(storeDetails);
         }
 
         /// <summary>
@@ -81,31 +90,106 @@ namespace Terminal3WebAPI.Controllers
         /// <returns></returns>
         [Route("SearchProduct")]
         [HttpGet]
-        public Result<List<ProductService>> SearchProduct(IDictionary<string, object> productDetails)
+        public IActionResult SearchProduct([FromBody] IDictionary<string, object> productDetails)
         {
-            return mySystem.SearchProduct(productDetails);
+            Result < List < ProductService >> result = system.SearchProduct(productDetails);
+            if (result.ExecStatus) { return Ok(result); } 
+            else { return BadRequest(result); }
         }
 
+        /// <summary>
+        /// Adding product to user's cart
+        /// </summary>
+        /// <param name="productToCart"></param>
         [Route("AddProductToCart")]
         [HttpPost]
-        public Result<Boolean> AddProductToCart([FromBody] ProductToCart productToCart)
+        public IActionResult AddProductToCart([FromBody] ProductToCart productToCart)
         {
-            return mySystem.AddProductToCart(productToCart.userID, productToCart.ProductID, productToCart.ProductQuantity, productToCart.StoreID);
+            Result < Boolean > result = system.AddProductToCart(productToCart.userID, productToCart.ProductID, productToCart.ProductQuantity, productToCart.StoreID);
+            if (result.ExecStatus) { return Created($"GetUserShoppingCart/{productToCart.userID}", result); }
+            else { return BadRequest(result); } 
         }
 
-        [Route("GetUserShoppingCart/{userID}")]
+        /// <summary>
+        /// Return the user's shopping cart
+        /// </summary>
+        /// <param name="userID">string of the user's ID</param>
+        [Route("GetUserShoppingCart")]
+        //[Route("GetUserShoppingCart/{userID}")]
         [HttpGet]
-        public IActionResult GetUserShoppingCart(String userID)
+        public IActionResult GetUserShoppingCart([FromBody]String userID)
         {
-            Result<ShoppingCartService> res = mySystem.GetUserShoppingCart(userID);
-            return Ok(res);
+            Result<ShoppingCartService> result = system.GetUserShoppingCart(userID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result); }
         }
 
-        //Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity);
-        //Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
-        //Result<HistoryDAL> GetUserPurchaseHistory(String userID);
-        //Result<double> GetTotalShoppingCartPrice(String userID);
-        //Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+        /// <summary>
+        /// Updates the user's shopping cart with the current quantity of a product
+        /// </summary>
+        /// <param name="details">identifier of the user,shop,product and its new quantity</param>
+        [Route("UpdateShoppingCart")]
+        [HttpPut]
+        public IActionResult UpdateShoppingCart([FromBody] UpdateShoppingCartModel details)
+        {
+            Result<Boolean> result = system.UpdateShoppingCart(details.userID, details.shoppingBagID, details.productID, details.quantity);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result); }
+        }
+
+        /// <summary>
+        /// Preform purchase operation on the user shopping cart
+        /// </summary>
+        /// <param name="purchaseDetails">userID, paymant and delivery details</param>
+        [Route("Purchase")]
+        [HttpPut]
+        public IActionResult Purchase([FromBody] PurchaseModel purchaseDetails)
+        {
+            Result<ShoppingCartService> result = system.Purchase(purchaseDetails.userID, purchaseDetails.paymentDetails, purchaseDetails.deliveryDetails);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result); }
+        }
+
+        /// <summary>
+        /// Retrive the user purchase history
+        /// </summary>
+        /// <param name="userID">string of the userID - need to be in the body of the request</param>
+        [Route("GetUserPurchaseHistory")]
+        //[Route("GetUserPurchaseHistory/{userID}")]
+        [HttpGet]
+        public IActionResult GetUserPurchaseHistory([FromBody] String userID)
+        {
+            Result<HistoryService> result = system.GetUserPurchaseHistory(userID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result); }
+        }
+
+        /// <summary>
+        /// Return the total amount of the user's shopping cart
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        [Route("GetTotalShoppingCartPrice")]
+        [HttpGet]
+        public IActionResult GetTotalShoppingCartPrice([FromBody] String userID)
+        {
+            Result<double> result = system.GetTotalShoppingCartPrice(userID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result); }
+        }
+
+        /// <summary>
+        /// Returns all the reviews on a specific product
+        /// </summary>
+        /// <param name="details">identifier of the store and the product</param>
+        [Route("GetProductReview")]
+        [HttpGet]
+        public IActionResult GetProductReview([FromBody]GetProductReviewModel details)
+        {
+            Result<List<Tuple<String, String>>> result = system.GetProductReview(details.storeID, details.productID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result); }
+        }
 
     }
 }
