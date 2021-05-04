@@ -10,7 +10,7 @@ using XUnitTestTerminal3.AcceptanceTests.Utils;
 
 namespace Terminal3.ServiceLayer
 {   
-    public interface IECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface
+    public interface IECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface, IDataController
     { }
     //try git action
     public class ECommerceSystem : IECommerceSystem
@@ -20,6 +20,7 @@ namespace Terminal3.ServiceLayer
         public IRegisteredUserInterface RegisteredUserInterface { get; set; }
         public IStoreStaffInterface StoreStaffInterface { get; set;  }
         public SystemAdminController SystemAdminInterface { get; set; }
+        public IDataController DataController{ get; set; }
 
         //Constructor
         public ECommerceSystem()
@@ -29,6 +30,7 @@ namespace Terminal3.ServiceLayer
             RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
             StoreStaffInterface = new StoreStaffController(StoresAndManagement);
             SystemAdminInterface = new SystemAdminController(StoresAndManagement);
+            DataController = new DataController(StoresAndManagement);
         }
 
         public void DisplaySystem()
@@ -207,5 +209,15 @@ namespace Terminal3.ServiceLayer
 
         #endregion
 
+        #region Data to display 
+        public List<StoreService> GetAllStoresToDisplay()
+        {
+            return DataController.GetAllStoresToDisplay();
+        }
+        public List<ProductService> GetAllProductByStoreIDToDisplay(string storeID)
+        {
+            return DataController.GetAllProductByStoreIDToDisplay(storeID);
+        }
+        #endregion
     }
 }

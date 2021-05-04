@@ -52,6 +52,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<RegisteredUserService> RemoveSystemAdmin(String email);
         Result<Boolean> isSystemAdmin(String userID);
         #endregion
+
+        #region Display data
+        List<StoreService> GetAllStoresToDisplay();
+        List<ProductService> GetAllProductByStoreIDToDisplay(string storeID);
+        #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
     {
@@ -389,6 +394,36 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return UsersAndPermissionsFacade.GetTotalShoppingCartPrice(userID);
         }
 
-       
+        public List<StoreService> GetAllStoresToDisplay()
+        {
+            List<Store> stores = new List<Store>(StoresFacade.Stores.Values);
+            List<StoreService> storesService = new List<StoreService>();
+            foreach (Store store in stores)
+            {
+                StoreService storeService = store.GetDAL().Data;
+
+                //clearing out unnecessary data 
+                storeService.Founder = null;
+                storeService.Owners = null;
+                storeService.Managers = null;
+                storeService.History = null;
+
+                storesService.Add(storeService);
+            }
+            return storesService;
+        }
+        public List<ProductService> GetAllProductByStoreIDToDisplay(string storeID)
+        {
+            Store store = StoresFacade.Stores[storeID];
+            List<Product> products = new List<Product>(store.InventoryManager.Products.Values);
+            List<ProductService> productsService = new List<ProductService>();
+            foreach (Product product  in products)
+            {
+                ProductService productService = product.GetDAL().Data;
+                productsService.Add(productService);
+            }
+            return productsService;
+        }
+
     }
 }
