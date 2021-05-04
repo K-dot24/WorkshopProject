@@ -44,7 +44,7 @@ namespace Terminal3WebAPI.Controllers
         {
             Result<RegisteredUserService> result = system.Login(data.Email, data.Password);
             if (result.ExecStatus) { return Ok(result.Data.Id); }
-            else { return BadRequest(result.Data); }
+            else { return BadRequest(result.Message); }
 
         }
         /// <summary>
