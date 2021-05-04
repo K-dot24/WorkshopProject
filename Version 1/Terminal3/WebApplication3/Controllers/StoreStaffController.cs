@@ -30,8 +30,18 @@ namespace Terminal3WebAPI.Controllers
         #region End-Points
         /// <summary>
         /// Add product to store
+        /// Template of valid JSON:
+        /// {
+        ///     "userID":"string",
+        ///     "storeID":"string",
+        ///     "productName":"string,
+        ///     "price":double,
+        ///     "initialQuantity":int,
+        ///     "category":"string",
+        ///     "keywords":["string","string"],
+        /// }
         /// </summary>
-        /// <param name="data">userID,storeID,productName,price,initialQuantity,category,keywords packed in model</param>
+        /// <param name="data"></param>
         [Route("AddProductToStore")]
         [HttpPost]
         public IActionResult AddProductToStore([FromBody] AddProductToStoreModel data)
@@ -65,19 +75,20 @@ namespace Terminal3WebAPI.Controllers
         /// Edit product details
         /// Template of valid JSON:
         /// {
-        ///     "userID":"1",
-        ///     "storeID:"1",
-        ///     "productID":"1",
+        ///     "userID":"string",
+        ///     "storeID:"string",
+        ///     "productID":"string",
         ///     "details": {
-        ///                     "Name":"samplename",
-        ///                     "Price":10.0,
-        ///                     "Quantity":12,
-        ///                     "Category":"Fruit",
-        ///                     "Keywords":["word1","word2"...]
+        ///                     "Name":"string",
+        ///                     "Price":double,
+        ///                     "Quantity":int,
+        ///                     "Category":"string",
+        ///                     "Keywords":["string","string"...]
         ///                 }
         /// }
+        /// NOTE: all fields in "detalis" values are optionals
         /// </summary>
-        /// <param name="data">json object hold [userID,storeID,productID,dict of details]</param>
+        /// <param name="data"></param>
         /// <returns></returns>
         [Route("EditProductDetails")]
         [HttpPut]
@@ -87,6 +98,18 @@ namespace Terminal3WebAPI.Controllers
             if (result.ExecStatus) { return Ok(result.Message); }
             else { return BadRequest(result.Message); }
         }
+
+        /// <summary>
+        /// Add new store owner to a given store
+        /// Template of valid JSON:
+        /// {
+        ///     "addedOwnerID":"string",
+        ///     "currentlyOwnerID:"string",
+        ///     "storeID":"string"
+        /// }
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [Route("AddStoreOwner")]
         [HttpPost]
         public IActionResult AddStoreOwner([FromBody] AddStoreOwnerModel data)
@@ -95,13 +118,107 @@ namespace Terminal3WebAPI.Controllers
             if (result.ExecStatus) { return Created("", result.Message); }
             else { return BadRequest(result.Message); }
         }
-        //public Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
-        //public Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        //public Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        //public Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID);
-        //public Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID, Boolean isSystemAdmin = false);
-        //public Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID);
+        /// <summary>
+        /// Adding new store manager to a given store
+        /// Template of valid JSON:
+        /// {
+        ///     "addedManagerID":"string",
+        ///     "currentlyOwnerID:"string",
+        ///     "storeID":"string"
+        /// }
+        /// </summary>
+        /// <param name="data"></param>
+        [Route("AddStoreManager")]
+        [HttpPost]
+        public IActionResult AddStoreManager([FromBody] AddStoreManagerModel data)
+        {
+            Result<Boolean> result = system.AddStoreManager(data.addedManagerID, data.currentlyOwnerID, data.storeID);
+            if (result.ExecStatus) { return Created("", result.Message); }
+            else { return BadRequest(result.Message); }
+        }
+        /// <summary>
+        /// Setting new set of permissions to manager
+        /// Template of valid JSON:
+        /// {
+        ///     "storeID":"string",
+        ///     "managerID:"string",
+        ///     "ownerID":"string",
+        ///     "permissions":[int,int,int...]
+        /// }
+        /// </summary>
+        /// <param name="data"></param>
+        public IActionResult SetPermissions([FromBody] SetPermissionsModel data)
+        {
+            Result<Boolean> result = system.SetPermissions(data.storeID,data.managerID,data.ownerID,data.permissions);
+            if (result.ExecStatus) { return Created("", result.Message); }
+            else { return BadRequest(result.Message); }
+        }
 
+        /// <summary>
+        /// removing set of permissions to manager
+        /// Template of valid JSON:
+        /// {
+        ///     "storeID":"string",
+        ///     "managerID:"string",
+        ///     "ownerID":"string",
+        ///     "permissions":[int,int,int...]
+        /// }
+        /// </summary>
+        /// <param name="data"></param>
+        [Route("RemovePermissions")]
+        [HttpPut]
+        public IActionResult RemovePermissions([FromBody] SetPermissionsModel data)
+        {
+            Result<Boolean> result = system.RemovePermissions(data.storeID, data.managerID, data.ownerID, data.permissions);
+            if (result.ExecStatus) { return Ok(result.Message); }
+            else { return BadRequest(result.Message); }
+        }
+
+        /// <summary>
+        /// Return list of pair, each pair hold details about the store staff and its permissions
+        /// </summary>
+        /// <param name="ownerID">ID of the owner who request to preform the operation</param>
+        /// <param name="storeID">storeID</param>
+        /// <returns></returns>
+        [Route("GetStoreStaff/{ownerID}/{storeID}")]
+        [HttpGet]
+        public IActionResult GetStoreStaff(String ownerID, String storeID)
+        {
+            Result<List<Tuple<IStoreStaffService, PermissionService>>> result = system.GetStoreStaff(ownerID, storeID);
+            if (result.ExecStatus) { return Ok(result.Data); }
+            else { return BadRequest(result.Message); }
+        }
+
+        /// <summary>
+        /// Returns in-store purchase history
+        /// </summary>
+        /// <param name="ownerID">ownerID</param>
+        /// <param name="storeID">ID of the store to get the purchase history</param>
+        /// <returns></returns>
+        [Route("GetStorePurchaseHistory/{sysAdminID}/{storeId}")]
+        [HttpGet]
+        public IActionResult GetStorePurchaseHistory(String ownerID, String storeID)
+        {
+            Result<HistoryService> result = system.GetStorePurchaseHistory(ownerID, storeID, false);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        /// <summary>
+        /// Removing excisting store manager by an owner
+        /// </summary>
+        /// <param name="storeID">StoreID</param>
+        /// <param name="currentlyOwnerID">OwnerID</param>
+        /// <param name="removedManagerID">ID of the manager to be removed</param>
+        /// <returns></returns>
+        [Route("RemoveStoreManager/{storeID}/{currentlyOwnerID}/{removedManagerID}")]
+        [HttpDelete]
+        public IActionResult RemoveStoreManager(string storeID, string currentlyOwnerID, string removedManagerID)
+        {
+            Result<Boolean> result = system.RemoveStoreManager(removedManagerID,currentlyOwnerID,storeID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
         #endregion
     }
 }
