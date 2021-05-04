@@ -12,5 +12,4 @@
     <ProjectReference Include="..\Terminal3\Terminal3.csproj" />
   </ItemGroup>
 
-
 </Project>

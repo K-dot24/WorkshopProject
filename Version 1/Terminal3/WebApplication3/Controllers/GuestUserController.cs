@@ -58,11 +58,11 @@ namespace Terminal3WebAPI.Controllers
             Result<RegisteredUserService> result =  system.Register(user.Email, user.Password);
             if (result.ExecStatus) 
             {
-                return Created("api/registeruser/Login", result);
+                return Created("api/registeruser/Login", result.Data.Id);
             }
             else
             {
-                return BadRequest(result);
+                return BadRequest(result.Message);
             }
         }
 
@@ -70,8 +70,7 @@ namespace Terminal3WebAPI.Controllers
         /// search store by attributes
         /// {name: someName, rating:someRating}
         /// </summary>
-        /// <param name="storeDetails"></param>
-        /// <returns></returns>
+        /// <param name="storeDetails">{name: someName, rating:someRating}</param>
         [Route("SearchStore")]
         [HttpGet]
         public IActionResult SearchStore([FromBody] IDictionary<string, object> storeDetails)
@@ -106,8 +105,8 @@ namespace Terminal3WebAPI.Controllers
         public IActionResult AddProductToCart([FromBody] ProductToCart productToCart)
         {
             Result < Boolean > result = system.AddProductToCart(productToCart.userID, productToCart.ProductID, productToCart.ProductQuantity, productToCart.StoreID);
-            if (result.ExecStatus) { return Created($"GetUserShoppingCart/{productToCart.userID}", result); }
-            else { return BadRequest(result); } 
+            if (result.ExecStatus) { return Created($"GetUserShoppingCart/{productToCart.userID}",null); }
+            else { return BadRequest(result.Message); } 
         }
 
         /// <summary>
