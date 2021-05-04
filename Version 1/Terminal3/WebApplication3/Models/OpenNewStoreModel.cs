@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace Terminal3WebAPI.Models
 {
-    public class User
+    public class OpenNewStoreModel
     {
-        public String Email { get; set; } = "";
-        public String Password { get; set; } = "";
-
+        public String storeName { get; set; } = "";
+        public String userID { get; set; } = "";
     }
 }

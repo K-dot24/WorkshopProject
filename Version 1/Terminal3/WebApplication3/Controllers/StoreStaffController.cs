@@ -147,6 +147,8 @@ namespace Terminal3WebAPI.Controllers
         /// }
         /// </summary>
         /// <param name="data"></param>
+        [Route("SetPermissions")]
+        [HttpPut]
         public IActionResult SetPermissions([FromBody] SetPermissionsModel data)
         {
             Result<Boolean> result = system.SetPermissions(data.storeID,data.managerID,data.ownerID,data.permissions);

@@ -57,14 +57,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }           
         }
 
-        public Result<Boolean> AddProductReview(Store store, Product product , String review)
+        public Result<Product> AddProductReview(Store store, Product product , String review)
         {
             if (checkIfProductPurchasedByUser(store , product))
             {
                 product.AddProductReview(Id , review);
-                return new Result<Boolean>("The product review was added successfuly\n", true, true);
+                return new Result<Product>("The product review was added successfuly\n", true, product);
             }
-            return new Result<Boolean>("The User did not purchase the product before, therefore can not write it a review\n", false, false);
+            return new Result<Product>("The User did not purchase the product before, therefore can not write it a review\n", false, null);
         }
 
         private Boolean checkIfProductPurchasedByUser(Store store, Product product)

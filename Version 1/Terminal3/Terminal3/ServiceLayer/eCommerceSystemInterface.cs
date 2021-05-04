@@ -110,7 +110,7 @@ namespace Terminal3.ServiceLayer
         {
             return RegisteredUserInterface.OpenNewStore(storeName, userID);
         }
-        public Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review) {
+        public Result<ProductService> AddProductReview(String userID, String storeID, String productID, String review) {
             return RegisteredUserInterface.AddProductReview(userID, storeID, productID, review);
         }
         #endregion

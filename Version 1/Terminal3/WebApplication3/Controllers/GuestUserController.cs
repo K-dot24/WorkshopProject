@@ -57,16 +57,16 @@ namespace Terminal3WebAPI.Controllers
         ///     "Email":"string",
         ///     "Password":"string"
         /// }
-        /// <param name="user"></param>
+        /// <param name="data"></param>
         /// <returns></returns>
         [Route("Register")]
         [HttpPost]
-        public IActionResult Register([FromBody] User user) 
+        public IActionResult Register([FromBody] CredentialsModel data) 
         {
-            Result<RegisteredUserService> result =  system.Register(user.Email, user.Password);
+            Result<RegisteredUserService> result =  system.Register(data.Email, data.Password);
             if (result.ExecStatus) 
             {
-                return Created("api/registeruser/Login", result.Data.Id);
+                return Created("api/RegisteredUser/Login", result.Data.Id);
             }
             else
             {

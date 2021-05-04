@@ -40,7 +40,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<ShoppingCartService> GetUserShoppingCart(String userID);
         Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin=false);
         Result<HistoryService> GetUserPurchaseHistory(String userID);
-        Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
+        Result<ProductService> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
         Result<UserService> EnterSystem();
         Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
@@ -278,7 +278,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<List<Tuple<string, string>>>(res.Message,res.ExecStatus,converted) ;
         }
 
-        public Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review)
+        public Result<ProductService> AddProductReview(String userID, String storeID, String productID , String review)
         {
             Result<Store> storeRes = StoresFacade.GetStore(storeID);
             if (storeRes.ExecStatus)
@@ -286,11 +286,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 Result<Product> productRes = storeRes.Data.GetProduct(productID);    
                 if (productRes.ExecStatus)
                 {
-                    return UsersAndPermissionsFacade.AddProductReview(userID, storeRes.Data, productRes.Data , review);
+                    Result<Product> result =  UsersAndPermissionsFacade.AddProductReview(userID, storeRes.Data, productRes.Data , review);
+                    return result.ExecStatus ? new Result<ProductService>(result.Message, result.ExecStatus, result.Data.GetDAL().Data) :
+                        new Result<ProductService>(result.Message, result.ExecStatus,null);
                 }
-                return new Result<Boolean>(productRes.Message, false, false);                
+                return new Result<ProductService>(productRes.Message, false, null);                
             }
-            return new Result<Boolean>(storeRes.Message, false, false);
+            return new Result<ProductService>(storeRes.Message, false, null);
             
         }
 
