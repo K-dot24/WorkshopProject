@@ -37,6 +37,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         public bool[] DiscountPolicies { get; }
         public bool[] PurchasePolicies { get; }
 
+        public DiscountAddition Discounts { get; }
+
         public PolicyManager()
         {
             DiscountPolicies = new bool[DISCOUNT_SIZE];
@@ -60,6 +62,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         {
             //throw new NotImplementedException();
             return product.Price*quantity;
+        }
+
+        public Result<Double> CalculatebagPrice(ConcurrentDictionary<Product, int> products, string code = "")
+        {
+            Result<Dictionary<Product, Double>> discountsResult = Discounts.CalculateDiscount(products, code);
+            if (!discountsResult.ExecStatus)
+                return new Result<Double>("Failed to calculate the bag price", false, 0);
+
+            Dictionary<Product, Double> discounts = discountsResult.Data;
+            Double price = 0;
+            foreach(KeyValuePair<Product, int> entry in products)
+            {
+                if (discounts.ContainsKey(entry.Key))
+                    price += entry.Key.Price * entry.Value * (100 - discounts[entry.Key]) / 100;
+                else
+                    price += entry.Key.Price * entry.Value;
+            }
+
+            return new Result<double>("", true, price);
         }
     }
 }
