@@ -6,7 +6,7 @@ using Terminal3.ServiceLayer;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 
 namespace XUnitTestTerminal3
 {

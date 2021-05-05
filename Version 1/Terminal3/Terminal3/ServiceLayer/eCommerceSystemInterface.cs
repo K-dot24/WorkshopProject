@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.ServiceLayer.Controllers;
@@ -10,14 +10,17 @@ using XUnitTestTerminal3.AcceptanceTests.Utils;
 
 namespace Terminal3.ServiceLayer
 {   
+    public interface IECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface, IDataController
+    { }
     //try git action
-    public class ECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface
+    public class ECommerceSystem : IECommerceSystem
     {
         //Properties
         public IGuestUserInterface GuestUserInterface { get; set; }
         public IRegisteredUserInterface RegisteredUserInterface { get; set; }
         public IStoreStaffInterface StoreStaffInterface { get; set;  }
-        public ISystemAdminInterface SystemAdminInterface { get; set; }
+        public SystemAdminController SystemAdminInterface { get; set; }
+        public IDataController DataController{ get; set; }
 
         //Constructor
         public ECommerceSystem()
@@ -27,6 +30,7 @@ namespace Terminal3.ServiceLayer
             RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
             StoreStaffInterface = new StoreStaffController(StoresAndManagement);
             SystemAdminInterface = new SystemAdminController(StoresAndManagement);
+            DataController = new DataController(StoresAndManagement);
         }
 
         public void DisplaySystem()
@@ -36,7 +40,7 @@ namespace Terminal3.ServiceLayer
 
         //Metohds
         #region Guest User Actions
-        public Result<UserDAL> EnterSystem()
+        public Result<UserService> EnterSystem()
         {
             return GuestUserInterface.EnterSystem();
         }
@@ -44,17 +48,17 @@ namespace Terminal3.ServiceLayer
         {
             GuestUserInterface.ExitSystem(userID);
         }
-        public Result<RegisteredUserDAL> Register(string email, string password)
+        public Result<RegisteredUserService> Register(string email, string password)
         {
             return GuestUserInterface.Register(email, password);
         }
 
-        public Result<List<StoreDAL>> SearchStore(IDictionary<string, object> details)
+        public Result<List<StoreService>> SearchStore(IDictionary<string, object> details)
         {
             return GuestUserInterface.SearchStore(details);
         }
 
-        public Result<List<ProductDAL>> SearchProduct(IDictionary<string, object> searchAttributes)
+        public Result<List<ProductService>> SearchProduct(IDictionary<string, object> searchAttributes)
         {
             return GuestUserInterface.SearchProduct(searchAttributes);
         }
@@ -64,7 +68,7 @@ namespace Terminal3.ServiceLayer
             return GuestUserInterface.AddProductToCart(userID, ProductID, ProductQuantity, StoreID);
         }
 
-        public Result<ShoppingCartDAL> GetUserShoppingCart(string userID)
+        public Result<ShoppingCartService> GetUserShoppingCart(string userID)
         {
             return GuestUserInterface.GetUserShoppingCart(userID);
         }
@@ -74,12 +78,12 @@ namespace Terminal3.ServiceLayer
             return GuestUserInterface.UpdateShoppingCart(userID, shoppingBagID, productID, quantity);
         }
 
-        public Result<ShoppingCartDAL> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
+        public Result<ShoppingCartService> Purchase(string userID, IDictionary<string, object> paymentDetails, IDictionary<string, object> deliveryDetails)
         {
             return GuestUserInterface.Purchase(userID, paymentDetails, deliveryDetails);
         }
 
-        public Result<HistoryDAL> GetUserPurchaseHistory(string userID)
+        public Result<HistoryService> GetUserPurchaseHistory(string userID)
         {
             return GuestUserInterface.GetUserPurchaseHistory(userID);
         }
@@ -88,13 +92,13 @@ namespace Terminal3.ServiceLayer
         {
             return GuestUserInterface.GetTotalShoppingCartPrice(userID);
         }
-        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID) {
+        public Result<List<Tuple<String, String>>> GetProductReview(String storeID, String productID) {
             return GuestUserInterface.GetProductReview(storeID, productID);
         }
         #endregion
 
         #region Register User Actions
-        public Result<RegisteredUserDAL> Login(string email, string password)
+        public Result<RegisteredUserService> Login(string email, string password)
         {
             return RegisteredUserInterface.Login(email, password);
         }
@@ -104,17 +108,17 @@ namespace Terminal3.ServiceLayer
             return RegisteredUserInterface.LogOut(email);
         }
 
-        public Result<StoreDAL> OpenNewStore(string storeName, string userID)
+        public Result<StoreService> OpenNewStore(string storeName, string userID)
         {
             return RegisteredUserInterface.OpenNewStore(storeName, userID);
         }
-        public Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review) {
+        public Result<ProductService> AddProductReview(String userID, String storeID, String productID, String review) {
             return RegisteredUserInterface.AddProductReview(userID, storeID, productID, review);
         }
         #endregion
 
         #region Store Actions
-        public Result<ProductDAL> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category, LinkedList<string> keywords = null)
+        public Result<ProductService> AddProductToStore(string userID, string storeID, string productName, double price, int initialQuantity, string category, LinkedList<string> keywords = null)
         {
             return StoreStaffInterface.AddProductToStore(userID, storeID, productName, price, initialQuantity, category, keywords);
         }
@@ -124,7 +128,7 @@ namespace Terminal3.ServiceLayer
             return StoreStaffInterface.RemoveProductFromStore(userID, storeID, productID);
         }
 
-        public Result<ProductDAL> EditProductDetails(string userID, string storeID, string productID, IDictionary<string, object> details)
+        public Result<ProductService> EditProductDetails(string userID, string storeID, string productID, IDictionary<string, object> details)
         {
             return StoreStaffInterface.EditProductDetails(userID,storeID,productID, details);
         }
@@ -152,15 +156,16 @@ namespace Terminal3.ServiceLayer
 
         }
 
-        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string ownerID, string storeID)
+        public Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(string ownerID, string storeID)
         {
             return StoreStaffInterface.GetStoreStaff(ownerID, storeID);
 
         }
 
-        public Result<HistoryDAL> GetStorePurchaseHistory(string ownerID, string storeID)
+        public Result<HistoryService> GetStorePurchaseHistory(string ownerID, string storeID,Boolean isSysAdmin=false)
         {
-            return StoreStaffInterface.GetStorePurchaseHistory(ownerID, storeID);
+            return !isSysAdmin ? StoreStaffInterface.GetStorePurchaseHistory(ownerID, storeID) :
+                                SystemAdminInterface.GetStorePurchaseHistory(ownerID, storeID);
 
         }
 
@@ -171,18 +176,18 @@ namespace Terminal3.ServiceLayer
         #endregion
 
         #region System Admin Actions
-        public Result<HistoryDAL> GetUserPurchaseHistory(string sysAdminID, string userID)
+        public Result<HistoryService> GetUserPurchaseHistory(string sysAdminID, string userID)
         {
             return SystemAdminInterface.GetUserPurchaseHistory(sysAdminID, userID);
         }
 
-        public Result<RegisteredUserDAL> AddSystemAdmin(string sysAdminID, string email)
+        public Result<RegisteredUserService> AddSystemAdmin(string sysAdminID, string email)
         {
             return SystemAdminInterface.AddSystemAdmin(sysAdminID, email);
 
         }
 
-        public Result<RegisteredUserDAL> RemoveSystemAdmin(string sysAdminID, string email)
+        public Result<RegisteredUserService> RemoveSystemAdmin(string sysAdminID, string email)
         {
             return SystemAdminInterface.RemoveSystemAdmin(sysAdminID, email);
 
@@ -204,5 +209,15 @@ namespace Terminal3.ServiceLayer
 
         #endregion
 
+        #region Data to display 
+        public List<StoreService> GetAllStoresToDisplay()
+        {
+            return DataController.GetAllStoresToDisplay();
+        }
+        public List<ProductService> GetAllProductByStoreIDToDisplay(string storeID)
+        {
+            return DataController.GetAllProductByStoreIDToDisplay(storeID);
+        }
+        #endregion
     }
 }

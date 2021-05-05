@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ExternalSystems;
 
@@ -85,6 +86,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
+
+            // TODO - lock products so no two users buy a product simultaneously - the lock needs to be fromt the StoresAndManadement inerface
+
             if (ShoppingCart.ShoppingBags.IsEmpty)
             {
                 return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
@@ -101,18 +105,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             return result;
         }
-
+     
         private Boolean isValidCartQuantity()
         {
             ConcurrentDictionary<String, ShoppingBag> ShoppingBags = ShoppingCart.ShoppingBags;
 
-            foreach (var bag in ShoppingBags)
+            foreach(var bag in ShoppingBags)
             {
                 ConcurrentDictionary<Product, int> Products = bag.Value.Products;
 
-                foreach (var product in Products)
+                foreach(var product in Products)
                 {
-                    if (product.Key.Quantity < product.Value)
+                    if(product.Key.Quantity < product.Value)
                     {
                         return false;
                     }
@@ -121,10 +125,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return true;
         }
 
-        public Result<UserDAL> GetDAL()
+        public Result<UserService> GetDAL()
         {
-            ShoppingCartDAL shoppingCart = ShoppingCart.GetDAL().Data;
-            return new Result<UserDAL>("User DAL object", true, new UserDAL(Id,shoppingCart));
+            ShoppingCartService shoppingCart = ShoppingCart.GetDAL().Data;
+            return new Result<UserService>("User DAL object", true, new UserService(Id,shoppingCart));
         }
 
 

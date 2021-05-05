@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System.Collections.Concurrent;
 using System.Linq;
 
@@ -11,15 +11,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface IStoresAndManagementInterface
     {
-        Result<StoreDAL> OpenNewStore(String storeName, String userID);
+        Result<StoreService> OpenNewStore(String storeName, String userID);
 
         #region Inventory Management
-        Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
+        Result<ProductService> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
-        Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
-        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
-        Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details);
-        Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+        Result<ProductService> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details);
+        Result<List<ProductService>> SearchProduct(IDictionary<String, Object> productDetails);
+        Result<List<StoreService>> SearchStore(IDictionary<String, Object> details);
+        Result<List<Tuple<string, string>>> GetProductReview(String storeID, String productID);
         #endregion
 
         #region Staff Management
@@ -28,29 +28,34 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
-        Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(String ownerID, String storeID);
+        Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID);
         #endregion
 
         #region User Actions
-        Result<RegisteredUserDAL> Register(String email, String password);
-        Result<RegisteredUserDAL> Login(String email, String password);
+        Result<RegisteredUserService> Register(String email, String password);
+        Result<RegisteredUserService> Login(String email, String password);
         Result<Boolean> LogOut(String email);
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity);
-        Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
-        Result<HistoryDAL> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin=false);
-        Result<HistoryDAL> GetUserPurchaseHistory(String userID);
-        Result<Boolean> AddProductReview(String userID, String storeID, String productID, String review);
+        Result<ShoppingCartService> GetUserShoppingCart(String userID);
+        Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID, bool systemAdmin=false);
+        Result<HistoryService> GetUserPurchaseHistory(String userID);
+        Result<ProductService> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
-        Result<UserDAL> EnterSystem();
-        Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        Result<UserService> EnterSystem();
+        Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<double> GetTotalShoppingCartPrice(String userID);
         #endregion
 
         #region System Managment
-        Result<RegisteredUserDAL> AddSystemAdmin(String email);
-        Result<RegisteredUserDAL> RemoveSystemAdmin(String email);
+        Result<RegisteredUserService> AddSystemAdmin(String email);
+        Result<RegisteredUserService> RemoveSystemAdmin(String email);
         Result<Boolean> isSystemAdmin(String userID);
+        #endregion
+
+        #region Display data
+        List<StoreService> GetAllStoresToDisplay();
+        List<ProductService> GetAllProductByStoreIDToDisplay(string storeID);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -66,7 +71,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         }
 
         // Methods
-        public Result<StoreDAL> OpenNewStore(String storeName, String userID)
+        public Result<StoreService> OpenNewStore(String storeName, String userID)
         {
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser founder))  // Check if userID is a registered user
             {
@@ -74,63 +79,63 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 Result<Store> res = StoresFacade.OpenNewStore(founder, storeName);
                 if (res.ExecStatus)
                 {
-                    return new Result<StoreDAL>(res.Message, true, res.Data.GetDAL().Data);
+                    return new Result<StoreService>(res.Message, true, res.Data.GetDAL().Data);
                 }
                 //else
-                return new Result<StoreDAL>($"Failed to open store {storeName}", false, null);
+                return new Result<StoreService>($"Failed to open store {storeName}", false, null);
             }
             //else
-            return new Result<StoreDAL>($"Failed to open store {storeName}: {userID} is not a registered user.\n", false, null);
+            return new Result<StoreService>($"Failed to open store {storeName}: {userID} is not a registered user.\n", false, null);
         }
 
-        public Result<ProductDAL> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null)
+        public Result<ProductService> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
             Result<Product> res = StoresFacade.AddProductToStore(userID, storeID, productName, price, initialQuantity, category, keywords);
             if (res.ExecStatus)
             {
-                return new Result<ProductDAL>(res.Message, true, res.Data.GetDAL().Data);
+                return new Result<ProductService>(res.Message, true, res.Data.GetDAL().Data);
             }
-            return new Result<ProductDAL>(res.Message, false, null);
+            return new Result<ProductService>(res.Message, false, null);
         }
 
-        public Result<ProductDAL> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details)
+        public Result<ProductService> EditProductDetails(String userID, String storeID, String productID, IDictionary<String, Object> details)
         {
             Result<Product> res = StoresFacade.EditProductDetails(userID, storeID, productID, details);
             if (res.ExecStatus)
             {
-                return new Result<ProductDAL>(res.Message, true, res.Data.GetDAL().Data);
+                return new Result<ProductService>(res.Message, true, res.Data.GetDAL().Data);
             }
-            return new Result<ProductDAL>(res.Message, false, null);
+            return new Result<ProductService>(res.Message, false, null);
         }
 
-        public Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details)
+        public Result<List<StoreService>> SearchStore(IDictionary<String, Object> details)
         {
             Result<List<Store>> res = StoresFacade.SearchStore(details);
-            List<StoreDAL> storeDALs = new List<StoreDAL>();
+            List<StoreService> storeDALs = new List<StoreService>();
             if (res.ExecStatus)
             {
                 foreach (Store store in res.Data)
                 {
                     storeDALs.Add(store.GetDAL().Data);
                 }
-                return new Result<List<StoreDAL>>(res.Message, true, storeDALs);
+                return new Result<List<StoreService>>(res.Message, true, storeDALs);
             }
-            return new Result<List<StoreDAL>>(res.Message, false, null);
+            return new Result<List<StoreService>>(res.Message, false, null);
         }
 
-        public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails)
+        public Result<List<ProductService>> SearchProduct(IDictionary<String, Object> productDetails)
         {
             Result<List<Product>> res = StoresFacade.SearchProduct(productDetails);
-            List<ProductDAL> productDALs = new List<ProductDAL>();
+            List<ProductService> productDALs = new List<ProductService>();
             if (res.ExecStatus)
             {                
                 foreach(Product product in res.Data)
                 {
                     productDALs.Add(product.GetDAL().Data);
                 }
-                return new Result<List<ProductDAL>>(res.Message, true, productDALs);
+                return new Result<List<ProductService>>(res.Message, true, productDALs);
             }
-            return new Result<List<ProductDAL>>(res.Message, false, null);
+            return new Result<List<ProductService>>(res.Message, false, null);
         }
 
         public Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID)
@@ -173,42 +178,42 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return StoresFacade.SetPermissions(storeID, managerID, ownerID, permissions);
         }
 
-        public Result<Dictionary<IStoreStaffDAL, PermissionDAL>> GetStoreStaff(string userID, string storeID)
+        public Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(string userID, string storeID)
         {
             Result<Dictionary<IStoreStaff, Permission>> storeStaffResult = StoresFacade.GetStoreStaff(userID, storeID);
             if (storeStaffResult.ExecStatus)
             {
                 Dictionary<IStoreStaff, Permission> storeStaff = storeStaffResult.Data;
-                Dictionary<IStoreStaffDAL, PermissionDAL> storeStaffDAL = new Dictionary<IStoreStaffDAL, PermissionDAL>();
+                List<Tuple<IStoreStaffService, PermissionService>> storeStaffDAL = new List<Tuple<IStoreStaffService, PermissionService>>();
 
                 foreach (var user in storeStaff)
                 {
-                    storeStaffDAL.Add((IStoreStaffDAL)user.Key.GetDAL().Data, user.Value.GetDAL().Data);
+                    storeStaffDAL.Add( new Tuple<IStoreStaffService, PermissionService>((IStoreStaffService)user.Key.GetDAL().Data, user.Value.GetDAL().Data));
                 }
-                return new Result<Dictionary<IStoreStaffDAL, PermissionDAL>>(storeStaffResult.Message, true, storeStaffDAL);
+                return new Result<List<Tuple<IStoreStaffService, PermissionService>>>(storeStaffResult.Message, true, storeStaffDAL);
             }
 
-            return new Result<Dictionary<IStoreStaffDAL, PermissionDAL>>(storeStaffResult.Message , false , null);
+            return new Result<List<Tuple<IStoreStaffService, PermissionService>>>(storeStaffResult.Message , false , null);
         }
 
-        public Result<HistoryDAL> GetStorePurchaseHistory(string userID, string storeID, bool systemAdmin=false)
+        public Result<HistoryService> GetStorePurchaseHistory(string userID, string storeID, bool systemAdmin=false)
         {
             Result<History> res = StoresFacade.GetStorePurchaseHistory(userID, storeID, systemAdmin);
             if (res.ExecStatus)
             {
-                return new Result<HistoryDAL>("Store purchase history\n" , true ,res.Data.GetDAL().Data);
+                return new Result<HistoryService>("Store purchase history\n" , true ,res.Data.GetDAL().Data);
             }
-            return new Result<HistoryDAL>(res.Message, false, null);
+            return new Result<HistoryService>(res.Message, false, null);
         }
 
-        public Result<HistoryDAL> GetUserPurchaseHistory(String userID)
+        public Result<HistoryService> GetUserPurchaseHistory(String userID)
         {
             Result<History> res = UsersAndPermissionsFacade.GetUserPurchaseHistory(userID);
             if (res.ExecStatus)
             {
-                return new Result<HistoryDAL>(res.Message , true , res.Data.GetDAL().Data);
+                return new Result<HistoryService>(res.Message , true , res.Data.GetDAL().Data);
             }
-            return new Result<HistoryDAL>(res.Message, false, null);
+            return new Result<HistoryService>(res.Message, false, null);
         }
         
         public Result<Boolean> AddProductToCart(string userID, string productID, int productQuantity, string storeID)
@@ -247,16 +252,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<Boolean>(resStore.Message, false, false);    
         }
 
-        public Result<ShoppingCartDAL> GetUserShoppingCart(string userID)
+        public Result<ShoppingCartService> GetUserShoppingCart(string userID)
         {
             Result<ShoppingCart> res = UsersAndPermissionsFacade.GetUserShoppingCart(userID);
             if (res.ExecStatus)
             {
-                ShoppingCartDAL shoppingCartDAL = res.Data.GetDAL().Data;
-                return new Result<ShoppingCartDAL>("User shopping cart\n", true, shoppingCartDAL);
+                ShoppingCartService shoppingCartDAL = res.Data.GetDAL().Data;
+                return new Result<ShoppingCartService>("User shopping cart\n", true, shoppingCartDAL);
             }
             //else faild
-            return new Result<ShoppingCartDAL>(res.Message, false, null);
+            return new Result<ShoppingCartService>(res.Message, false, null);
         }
 
         public Result<bool> RemovePermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
@@ -264,12 +269,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return StoresFacade.RemovePermissions(storeID, managerID, ownerID, permissions);
         }
        
-        public Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID)
+        public Result<List<Tuple<string, string>>> GetProductReview(String storeID, String productID)
         {
-            return StoresFacade.GetProductReview(storeID, productID);
+            Result<ConcurrentDictionary<string,string>> res = StoresFacade.GetProductReview(storeID, productID);
+            List<Tuple<string, string>> converted = new List<Tuple<string, string>>();
+            if (res.Data != null)
+            {
+                foreach (string userId in res.Data.Keys)
+                {
+                    converted.Add(new Tuple<string, string>(userId, res.Data[userId]));
+                }
+            }
+            return new Result<List<Tuple<string, string>>>(res.Message,res.ExecStatus,converted) ;
         }
 
-        public Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review)
+        public Result<ProductService> AddProductReview(String userID, String storeID, String productID , String review)
         {
             Result<Store> storeRes = StoresFacade.GetStore(storeID);
             if (storeRes.ExecStatus)
@@ -277,11 +291,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 Result<Product> productRes = storeRes.Data.GetProduct(productID);    
                 if (productRes.ExecStatus)
                 {
-                    return UsersAndPermissionsFacade.AddProductReview(userID, storeRes.Data, productRes.Data , review);
+                    Result<Product> result =  UsersAndPermissionsFacade.AddProductReview(userID, storeRes.Data, productRes.Data , review);
+                    return result.ExecStatus ? new Result<ProductService>(result.Message, result.ExecStatus, result.Data.GetDAL().Data) :
+                        new Result<ProductService>(result.Message, result.ExecStatus,null);
                 }
-                return new Result<Boolean>(productRes.Message, false, false);                
+                return new Result<ProductService>(productRes.Message, false, null);                
             }
-            return new Result<Boolean>(storeRes.Message, false, false);
+            return new Result<ProductService>(storeRes.Message, false, null);
             
         }
 
@@ -290,30 +306,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return UsersAndPermissionsFacade.ExitSystem(userID);
         }
 
-        public Result<UserDAL> EnterSystem()
+        public Result<UserService> EnterSystem()
         {
             Result<User> res = UsersAndPermissionsFacade.EnterSystem();
             if (res.ExecStatus)
             {
-                UserDAL userDAL = res.Data.GetDAL().Data;
-                return new Result<UserDAL>(res.Message, true, userDAL);
+                UserService userDAL = res.Data.GetDAL().Data;
+                return new Result<UserService>(res.Message, true, userDAL);
             }
             //else faild
-            return new Result<UserDAL>(res.Message, false, null);
+            return new Result<UserService>(res.Message, false, null);
         }
 
-        public Result<RegisteredUserDAL> AddSystemAdmin(string email)
+        public Result<RegisteredUserService> AddSystemAdmin(string email)
         {
             Result<RegisteredUser> result =  UsersAndPermissionsFacade.AddSystemAdmin(email);
-            if (result.ExecStatus) { return new Result<RegisteredUserDAL>(result.Message, result.ExecStatus, result.Data.GetDAL().Data); }
-            else {return new Result<RegisteredUserDAL>(result.Message, result.ExecStatus, null);}
+            if (result.ExecStatus) { return new Result<RegisteredUserService>(result.Message, result.ExecStatus, result.Data.GetDAL().Data); }
+            else {return new Result<RegisteredUserService>(result.Message, result.ExecStatus, null);}
         }
 
-        public Result<RegisteredUserDAL> RemoveSystemAdmin(string email)
+        public Result<RegisteredUserService> RemoveSystemAdmin(string email)
         {
             Result<RegisteredUser> result = UsersAndPermissionsFacade.RemoveSystemAdmin(email);
-            if (result.ExecStatus) { return new Result<RegisteredUserDAL>(result.Message, result.ExecStatus, result.Data.GetDAL().Data); }
-            else { return new Result<RegisteredUserDAL>(result.Message, result.ExecStatus, null); }
+            if (result.ExecStatus) { return new Result<RegisteredUserService>(result.Message, result.ExecStatus, result.Data.GetDAL().Data); }
+            else { return new Result<RegisteredUserService>(result.Message, result.ExecStatus, null); }
         }
 
         public Result<Boolean> isSystemAdmin(String userID)
@@ -322,29 +338,29 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<Boolean>($"is {userID} is system admin? {isContains}\n", true, isContains);
         }
 
-        public Result<RegisteredUserDAL> Register(string email, string password)
+        public Result<RegisteredUserService> Register(string email, string password)
         {
             Result<RegisteredUser> res = UsersAndPermissionsFacade.Register(email, password);
             if (res.ExecStatus)
             {
-                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
+                return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
             }
             else
             {
-                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, null);
+                return new Result<RegisteredUserService>(res.Message, res.ExecStatus, null);
             }
         }
 
-        public Result<RegisteredUserDAL> Login(string email, string password)
+        public Result<RegisteredUserService> Login(string email, string password)
         {
             Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password);
             if (res.ExecStatus)
             {
-                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
+                return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
             }
             else
             {
-                return new Result<RegisteredUserDAL>(res.Message, res.ExecStatus, null);
+                return new Result<RegisteredUserService>(res.Message, res.ExecStatus, null);
             }
         }
 
@@ -353,8 +369,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return UsersAndPermissionsFacade.LogOut(email);
         }
 
-        public Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        public Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
+            // TODO - lock products ?
             Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails);
             if (res.Data != null)
             {
@@ -366,10 +383,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                     store.UpdateInventory(bag.Value);
                     store.History.AddPurchasedShoppingBag(bag.Value);
                 }
-                return new Result<ShoppingCartDAL>(res.Message, true, res.Data.GetDAL().Data);
+                return new Result<ShoppingCartService>(res.Message, true, res.Data.GetDAL().Data);
             }
+
             //else failed
-            return new Result<ShoppingCartDAL>(res.Message, false, null);
+            return new Result<ShoppingCartService>(res.Message, false, null);
         }
        
         public Result<double> GetTotalShoppingCartPrice(String userID)
@@ -377,6 +395,36 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return UsersAndPermissionsFacade.GetTotalShoppingCartPrice(userID);
         }
 
-       
+        public List<StoreService> GetAllStoresToDisplay()
+        {
+            List<Store> stores = new List<Store>(StoresFacade.Stores.Values);
+            List<StoreService> storesService = new List<StoreService>();
+            foreach (Store store in stores)
+            {
+                StoreService storeService = store.GetDAL().Data;
+
+                //clearing out unnecessary data 
+                storeService.Founder = null;
+                storeService.Owners = null;
+                storeService.Managers = null;
+                storeService.History = null;
+
+                storesService.Add(storeService);
+            }
+            return storesService;
+        }
+        public List<ProductService> GetAllProductByStoreIDToDisplay(string storeID)
+        {
+            Store store = StoresFacade.Stores[storeID];
+            List<Product> products = new List<Product>(store.InventoryManager.Products.Values);
+            List<ProductService> productsService = new List<ProductService>();
+            foreach (Product product  in products)
+            {
+                ProductService productService = product.GetDAL().Data;
+                productsService.Add(productService);
+            }
+            return productsService;
+        }
+
     }
 }

@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Terminal3.DALobjects
+namespace Terminal3.ServiceLayer.ServiceObjects
 {
-    public class IStoreStaffDAL
+    public class IStoreStaffService
     {
         public String Id { get; }
 
-        public IStoreStaffDAL(string id)
+        public IStoreStaffService(string id)
         {
             Id = id;
         }
