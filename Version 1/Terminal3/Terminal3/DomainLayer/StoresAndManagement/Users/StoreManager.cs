@@ -1,6 +1,7 @@
 ﻿using Terminal3.DomainLayer.StoresAndManagement.Stores;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System;
+using System.Collections.Generic;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -16,7 +17,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             User = user;
             Store = store;
             Permission = permission;
-            AppointedBy = appointedBy;
         }
 
         public Result<Boolean> SetPermission(int method, Boolean active)
@@ -31,14 +31,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<object> GetDAL()
         {
-            PermissionDAL permission = Permission.GetDAL().Data;
+            PermissionService permission = Permission.GetDAL().Data;
 
-            return new Result<object>("Store manager DAL object", true, new StoreManagerDAL(User.Id, permission, AppointedBy.GetId()));
+            return new Result<object>("Store manager DAL object", true, new StoreManagerService(User.Id, permission, AppointedBy.GetId()));
         }
 
         public String GetId()
         {
             return User.Id;
+        }
+
+        public Result<Boolean> Update(Notification notification)
+        {
+            return User.Update(notification);
         }
     }
 }

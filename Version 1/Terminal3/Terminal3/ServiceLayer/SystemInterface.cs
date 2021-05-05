@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System.Collections.Concurrent;
 
 
@@ -32,7 +32,7 @@ namespace Terminal3.ServiceLayer
 
         Result<List<String>> GetUserShoppingCart(String userID); //LinkedList<ShoppingBagID> 
 
-        Result<Dictionary<String, int>> GetUserShoppingBag(String userID, String shoppingBagID); //Dictionary<pid , countity>
+        Result<Dictionary<string, int>> GetUserShoppingBag(String userID, String shoppingBagID); //Dictionary<pid , countity>
 
         Result<Boolean> UpdateShoppingCart(String userID, String storeId , String productID , int quantity);
 

@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Terminal3.DALobjects
+namespace Terminal3.ServiceLayer.ServiceObjects
 {
-    public class PermissionDAL
+    public class PermissionService
     {
         //Properties
         public Boolean[] functionsBitMask { get; }
         public bool isOwner { get; }
 
         //Constructor
-        public PermissionDAL(bool[] functionsBitMask, bool isOwner=false)
+        public PermissionService(bool[] functionsBitMask, bool isOwner=false)
         {
             this.isOwner = isOwner;
             this.functionsBitMask = functionsBitMask;

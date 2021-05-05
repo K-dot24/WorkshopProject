@@ -5,7 +5,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System.Threading;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
@@ -18,6 +18,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Product> RemoveProduct(String userID, String productID);
         Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details);
+        Result<Boolean> UpdateInventory(ShoppingBag bag);
         #endregion
 
         #region Staff Management
@@ -53,6 +54,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public History History { get; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
+        public NotificationManager NotificationManager { get; set; }
 
         //Constructors
         public Store(String name, RegisteredUser founder)
@@ -102,7 +104,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (CheckIfStoreOwner(userID) || CheckStoreManagerAndPermissions(userID, Methods.AddNewProduct))
             {
-                return InventoryManager.AddNewProduct(productName, price, initialQuantity, category, keywords);
+                Result<Product> res = InventoryManager.AddNewProduct(productName, price, initialQuantity, category, keywords);
+                if (res.ExecStatus)
+                {
+                    res.Data.NotificationManager = this.NotificationManager;                    
+                }
+                return res;
             }
             else
             {
@@ -148,6 +155,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 return new Result<Product>($"{userID} does not have permissions to edit products' information in {this.Name}\n", false, null);
             }
         }
+        public Result<bool> UpdateInventory(ShoppingBag bag)
+        {
+            ConcurrentDictionary<Product, int> product_quantity = bag.Products;     // <Product, Quantity user bought>
+            foreach(var product in product_quantity)
+            {
+                product.Key.UpdatePurchasedProductQuantity(product.Value);
+            }
+
+            return new Result<bool>("Store inventory updated successuly\n", true, true);
+
+    }
         #endregion
 
         public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
@@ -363,6 +381,48 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>($"Staff ID not found in store.\n", false, false);
         }
 
+        //TODO - DELETE??
+        #region Notification
+        public Result<bool> notifyStoreClosed() //TODO - add the function CloseStore and add there the call to the notification 
+        {
+            String msg = $"Event : Store Closed\nStore Id : {Id}\n";
+            Notification notification = new Notification(msg, true);
+            notify(notification);
+            return new Result<bool>($"All staff members are notified that store {Id} is closed\n", true, true);
+
+        }
+
+        public Result<bool> notifyStoreOpened()
+        {
+            String msg = $"Event : Store Opened\nStore Id : {Id}\n";
+            Notification notification = new Notification(msg, true);
+            notify(notification);
+            return new Result<bool>($"All staff members are notified that store {Id} is opened\n", true, true);
+        }
+
+        public Result<bool> notifyOwnerSubscriptionRemoved(string ownerID)  //TODO - add the function and add there the call to the notification 
+        {
+            String msg = $"Event : Owner Subscription Removed\nStore Id : {Id}\nOwner Id : {ownerID}";
+            Notification notification = new Notification(msg, true);
+            notify(notification);
+            return new Result<bool>($"All staff members are notified that owner ({ownerID}) subscriptoin as store owner ({Id}) has been removed\n", true, true);
+        }
+
+        private void notify(Notification notification)
+        {
+            foreach (var owner in Owners)
+            {
+                owner.Value.Update(notification);
+            }
+
+            foreach (var manager in Managers)
+            {
+                manager.Value.Update(notification);
+            }
+        }
+        #endregion Notification
+
+
         //Getter
         public Result<Product> GetProduct(String productID)
         {
@@ -396,7 +456,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         #endregion
 
-        public Result<StoreDAL> GetDAL()
+        public Result<StoreService> GetDAL()
         {
             LinkedList<String> owners = new LinkedList<String>();
             
@@ -412,11 +472,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
             // InventoryManagerDAL inventoryManager = InventoryManager.GetDAL().Data;  //TODO?
             // PolicyManagerDAL policyManager = PolicyManager.GetDAL().Data;   //TODO?
-            HistoryDAL history = History.GetDAL().Data;
+            HistoryService history = History.GetDAL().Data;
 
-            StoreDAL store = new StoreDAL(this.Id, this.Name, Founder.User.Id, owners, managers, history, this.Rating, this.NumberOfRates);
-            return new Result<StoreDAL>("Store DAL object", true, store);
+            StoreService store = new StoreService(this.Id, this.Name, Founder.User.Id, owners, managers, history, this.Rating, this.NumberOfRates);
+            return new Result<StoreService>("Store DAL object", true, store);
 
         }
+        
     }
 }

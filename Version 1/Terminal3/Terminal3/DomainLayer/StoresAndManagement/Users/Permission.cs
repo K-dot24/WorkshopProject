@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
@@ -74,9 +74,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<Boolean>("All methodes are permitted\n", true, true);
         }
 
-        public Result<PermissionDAL> GetDAL()
+        public Result<PermissionService> GetDAL()
         {
-            return new Result<PermissionDAL>("Permission DAL object", true, new PermissionDAL(this.functionsBitMask,isOwner));
+            return new Result<PermissionService>("Permission DAL object", true, new PermissionService(this.functionsBitMask,isOwner));
         }
 
     }
