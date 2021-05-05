@@ -9,6 +9,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 {
     public interface IPolicyManager
     {
+        double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
+        Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
     }
 
     public enum Purchases : int
@@ -39,7 +41,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         public bool[] PurchasePolicies { get; }
 
         public DiscountAddition Discounts { get; }
-
+        public BuyNow Policies { get; }
         public PolicyManager()
         {
             DiscountPolicies = new bool[DISCOUNT_SIZE];
@@ -65,7 +67,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return product.Price*quantity;
         }
 
-        internal double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
+        public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
         {
             Result<Dictionary<Product, Double>> discountsResult = Discounts.CalculateDiscount(products, discountCode);
             if (!discountsResult.ExecStatus)
@@ -83,9 +85,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
             return price;
         }
-        internal Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)
+        public Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)
         {
-            throw new NotImplementedException();
+            return Policies.IsConditionMet(products, user);
         }
     }
 }
