@@ -26,6 +26,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);        
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID);
@@ -166,6 +167,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             }
             //else
             return new Result<Boolean>($"Failed to remove store manager: {removedManagerID} is not a registered user.\n", false, false);
+        }
+
+        public Result<Boolean> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID)
+        {
+            if (UsersAndPermissionsFacade.RegisteredUsers.ContainsKey(removedOwnerID))  // Check if addedOwnerID is a registered user
+            {
+                return StoresFacade.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID);
+            }
+            //else
+            return new Result<Boolean>($"Failed to remove store owner: {removedOwnerID} is not a registered user.\n", false, false);
+
         }
 
         public Result<bool> RemoveProductFromStore(String userID, String storeID, String productID)

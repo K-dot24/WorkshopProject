@@ -173,6 +173,11 @@ namespace Terminal3.ServiceLayer
         {
             return StoreStaffInterface.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID);
         }
+
+        public Result<bool> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID)
+        {
+            return StoreStaffInterface.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID);
+        }
         #endregion
 
         #region System Admin Actions
