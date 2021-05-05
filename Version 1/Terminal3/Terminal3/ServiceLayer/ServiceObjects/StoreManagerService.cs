@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Terminal3.DALobjects
+namespace Terminal3.ServiceLayer.ServiceObjects
 {
-    public class StoreManagerDAL : IStoreStaffDAL
+    public class StoreManagerService : IStoreStaffService
     {
         //Properties
         public String UserId { get; }
-        public PermissionDAL Permissions { get; }
+        public PermissionService Permissions { get; }
         public String OwnerId { get; }
 
         //Constructor
-        public StoreManagerDAL(String userID, PermissionDAL permissions, String ownerID):base(userID)
+        public StoreManagerService(String userID, PermissionService permissions, String ownerID):base(userID)
         {
             UserId = userID;
             Permissions = permissions;

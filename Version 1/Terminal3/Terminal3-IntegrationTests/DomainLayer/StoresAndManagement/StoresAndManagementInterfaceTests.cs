@@ -6,7 +6,7 @@ using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using System.Linq;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Tests
 {
@@ -321,25 +321,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
             // The bag is not purchased yet
             Assert.Empty(RegisteredUser.History.ShoppingBags);
 
-            Result<ShoppingCartDAL> res = Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
+            Result<ShoppingCartService> res = Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
             Assert.True(res.ExecStatus);
 
-            ShoppingCartDAL cart = res.Data;
+            ShoppingCartService cart = res.Data;
             Assert.Equal(16.3, cart.TotalCartPrice);
 
             Assert.Single(RegisteredUser.History.ShoppingBags);
 
             // Check User Historys bags
             History history = RegisteredUser.History;
-            LinkedList<ShoppingBagDAL> bagsDAL = history.ShoppingBags;
-            ShoppingBagDAL bagDAL = bagsDAL.First.Value;
+            LinkedList<ShoppingBagService> bagsDAL = history.ShoppingBags;
+            ShoppingBagService bagDAL = bagsDAL.First.Value;
 
             Assert.Equal(16.3, bagDAL.TotalBagPrice);
 
             //Check Store History
             History storeHistory = TestStore.History;
-            LinkedList<ShoppingBagDAL> storeBagsDAL = storeHistory.ShoppingBags;
-            ShoppingBagDAL storeBagDAL = storeBagsDAL.First.Value;
+            LinkedList<ShoppingBagService> storeBagsDAL = storeHistory.ShoppingBags;
+            ShoppingBagService storeBagDAL = storeBagsDAL.First.Value;
 
             Assert.Equal(16.3, storeBagDAL.TotalBagPrice);
         }
@@ -367,24 +367,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
             // The bag is not purchased yet
             Assert.Empty(RegisteredUser.History.ShoppingBags);
 
-            Result<ShoppingCartDAL> res = Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
+            Result<ShoppingCartService> res = Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
             Assert.True(res.ExecStatus);
 
-            ShoppingCartDAL cart = res.Data;
+            ShoppingCartService cart = res.Data;
             Assert.Equal(16.3, cart.TotalCartPrice);
 
             Assert.Equal(2, RegisteredUser.History.ShoppingBags.Count);
 
             //Check Stores History
             History storeHistory = TestStore.History;
-            LinkedList<ShoppingBagDAL> storeBagsDAL = storeHistory.ShoppingBags;
-            ShoppingBagDAL storeBagDAL = storeBagsDAL.First.Value;
+            LinkedList<ShoppingBagService> storeBagsDAL = storeHistory.ShoppingBags;
+            ShoppingBagService storeBagDAL = storeBagsDAL.First.Value;
 
             Assert.Equal(11.4, storeBagDAL.TotalBagPrice);
 
             History store2History = store2.History;
-            LinkedList<ShoppingBagDAL> store2BagsDAL = store2History.ShoppingBags;
-            ShoppingBagDAL store2BagDAL = store2BagsDAL.First.Value;
+            LinkedList<ShoppingBagService> store2BagsDAL = store2History.ShoppingBags;
+            ShoppingBagService store2BagDAL = store2BagsDAL.First.Value;
 
             Assert.Equal(4.9, store2BagDAL.TotalBagPrice);
         }

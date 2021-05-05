@@ -1,5 +1,5 @@
 ﻿using System;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System.Reflection;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using System.Collections.Concurrent;
@@ -62,23 +62,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }           
         }
 
-        public Result<Boolean> AddProductReview(Store store, Product product , String review)
+        public Result<Product> AddProductReview(Store store, Product product , String review)
         {
             if (checkIfProductPurchasedByUser(store , product))
             {
                 product.AddProductReview(Id , review);
-                return new Result<Boolean>("The product review was added successfuly\n", true, true);
+                return new Result<Product>("The product review was added successfuly\n", true, product);
             }
-            return new Result<Boolean>("The User did not purchase the product before, therefore can not write it a review\n", false, false);
+            return new Result<Product>("The User did not purchase the product before, therefore can not write it a review\n", false, null);
         }
 
         private Boolean checkIfProductPurchasedByUser(Store store, Product product)
         {
-            LinkedList<ShoppingBagDAL> shoppingBags = History.ShoppingBags;
-            foreach (ShoppingBagDAL bag in shoppingBags)
+            LinkedList<ShoppingBagService> shoppingBags = History.ShoppingBags;
+            foreach (ShoppingBagService bag in shoppingBags)
             {             
-                foreach(ProductDAL productInHistory in bag.Products.Keys)
+                foreach(Tuple<ProductService,int> productQuantity in bag.Products)
                 {
+                    ProductService productInHistory = productQuantity.Item1;
                     if (productInHistory.Id.Equals(product.Id)) { return true; }
                 }
 
@@ -90,10 +91,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             return new Result<History>("User history\n", true, History);
         }
-        public Result<RegisteredUserDAL> GetDAL()
+        public Result<RegisteredUserService> GetDAL()
         {
-            ShoppingCartDAL SCD = this.ShoppingCart.GetDAL().Data;
-            return new Result<RegisteredUserDAL>("RegisteredUser DAL object" , true , new RegisteredUserDAL(this.Id, this.Email, this.Password, this.LoggedIn , SCD));
+            ShoppingCartService SCD = this.ShoppingCart.GetDAL().Data;
+            return new Result<RegisteredUserService>("RegisteredUser DAL object" , true , new RegisteredUserService(this.Id, this.Email, this.LoggedIn , SCD));
         }
 
         public Result<Boolean> ExitSystem()

@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 
@@ -10,18 +10,18 @@ namespace Terminal3.ServiceLayer.Controllers
 {
     public interface IGuestUserInterface
     {
-        Result<UserDAL> EnterSystem();
+        Result<UserService> EnterSystem();
         void ExitSystem(String userID);
-        Result<RegisteredUserDAL> Register(string email, string password);
-        Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details);
-        Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails);
+        Result<RegisteredUserService> Register(string email, string password);
+        Result<List<StoreService>> SearchStore(IDictionary<String, Object> details);
+        Result<List<ProductService>> SearchProduct(IDictionary<String, Object> productDetails);
         Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);
-        Result<ShoppingCartDAL> GetUserShoppingCart(String userID);
+        Result<ShoppingCartService> GetUserShoppingCart(String userID);
         Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity);
-        Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
-        Result<HistoryDAL> GetUserPurchaseHistory(String userID);
+        Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        Result<HistoryService> GetUserPurchaseHistory(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
-        Result<ConcurrentDictionary<String, String>> GetProductReview(String storeID, String productID);
+        Result<List<Tuple<String, String>>> GetProductReview(String storeID, String productID);
 
     }
     //Basic functionality The every user can preform
@@ -40,23 +40,23 @@ namespace Terminal3.ServiceLayer.Controllers
         {
             StoresAndManagementInterface.ExitSystem(userID);
         }
-        public Result<UserDAL> EnterSystem()
+        public Result<UserService> EnterSystem()
         {
             return StoresAndManagementInterface.EnterSystem();
         }
-        public Result<RegisteredUserDAL> Register(string email, string password){return StoresAndManagementInterface.Register(email,password); }
-        public Result<List<StoreDAL>> SearchStore(IDictionary<String, Object> details) { return StoresAndManagementInterface.SearchStore(details); }
-        public Result<List<ProductDAL>> SearchProduct(IDictionary<String, Object> productDetails) { return StoresAndManagementInterface.SearchProduct(productDetails); }
+        public Result<RegisteredUserService> Register(string email, string password){return StoresAndManagementInterface.Register(email,password); }
+        public Result<List<StoreService>> SearchStore(IDictionary<String, Object> details) { return StoresAndManagementInterface.SearchStore(details); }
+        public Result<List<ProductService>> SearchProduct(IDictionary<String, Object> productDetails) { return StoresAndManagementInterface.SearchProduct(productDetails); }
         public Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID) { return StoresAndManagementInterface.AddProductToCart(userID, ProductID, ProductQuantity, StoreID); }   // Redundent ?
-        public Result<ShoppingCartDAL> GetUserShoppingCart(String userID) { return StoresAndManagementInterface.GetUserShoppingCart(userID); }
+        public Result<ShoppingCartService> GetUserShoppingCart(String userID) { return StoresAndManagementInterface.GetUserShoppingCart(userID); }
         public Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity) { return StoresAndManagementInterface.UpdateShoppingCart(userID, shoppingBagID, productID, quantity); }
-        public Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        public Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
             return StoresAndManagementInterface.Purchase(userID, paymentDetails, deliveryDetails);
         }
-        public Result<HistoryDAL> GetUserPurchaseHistory(String userID) { return StoresAndManagementInterface.GetUserPurchaseHistory(userID); }
+        public Result<HistoryService> GetUserPurchaseHistory(String userID) { return StoresAndManagementInterface.GetUserPurchaseHistory(userID); }
         public Result<double> GetTotalShoppingCartPrice(String userID) { return StoresAndManagementInterface.GetTotalShoppingCartPrice(userID); }
-        public Result<ConcurrentDictionary<string, string>> GetProductReview(string storeID, string productID)
+        public Result<List<Tuple<string, string>>> GetProductReview(string storeID, string productID)
         {
             return StoresAndManagementInterface.GetProductReview(storeID, productID);
         }

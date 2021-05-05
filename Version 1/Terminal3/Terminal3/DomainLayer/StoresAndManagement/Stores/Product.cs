@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Terminal3.DALobjects;
 using System.Collections.Concurrent;
-
+using Terminal3.ServiceLayer.ServiceObjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -66,9 +65,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Boolean>("The product review was added successfuly\n", true, true);
         }
 
-        public Result<ProductDAL> GetDAL()
+        public Result<ProductService> GetDAL()
         {
-            return new Result<ProductDAL>("Product DAL object", true, new ProductDAL(this.Id, this.Name, this.Price, this.Quantity, this.Category));
+            return new Result<ProductService>("Product DAL object", true, new ProductService(this.Id, this.Name, this.Price, this.Quantity, this.Category));
         }
 
         public Result<Boolean> UpdatePurchasedProductQuantity(int quantity)

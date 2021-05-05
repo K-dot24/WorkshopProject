@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ExternalSystems;
 
@@ -144,10 +144,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
 
 
-        public Result<UserDAL> GetDAL()
+        public Result<UserService> GetDAL()
         {
-            ShoppingCartDAL shoppingCart = ShoppingCart.GetDAL().Data;
-            return new Result<UserDAL>("User DAL object", true, new UserDAL(Id,shoppingCart));
+            ShoppingCartService shoppingCart = ShoppingCart.GetDAL().Data;
+            return new Result<UserService>("User DAL object", true, new UserService(Id,shoppingCart));
         }
 
 

@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
@@ -16,7 +16,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
         Result<Boolean> LogOut(String email);
-        Result<Boolean> AddProductReview(String userID, Store store, Product product, String review);
+        Result<Product> AddProductReview(String userID, Store store, Product product, String review);
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
         Result<Boolean> UpdateShoppingCart(string userID, string storeID, Product product, int quantity);
@@ -273,13 +273,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
         }
 
-        public Result<Boolean> AddProductReview(String userID, Store store, Product product , String review)
+        public Result<Product> AddProductReview(String userID, Store store, Product product , String review)
         {
             if(RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
             {
                 return user.AddProductReview(store, product , review);
             }
-            return new Result<Boolean>("User does not exists\n", false, false);
+            return new Result<Product>("User does not exists\n", false, null);
         }
 
         public Result<History> GetUserPurchaseHistory(String userID)

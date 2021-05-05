@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System.Collections.Concurrent;
 using System;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
@@ -9,14 +9,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
     public class History
     {
-        public LinkedList<ShoppingBagDAL> ShoppingBags { get; }
+        public LinkedList<ShoppingBagService> ShoppingBags { get; }
 
         public History()
         {
-            ShoppingBags = new LinkedList<ShoppingBagDAL>();
+            ShoppingBags = new LinkedList<ShoppingBagService>();
         }
 
-        public History(LinkedList<ShoppingBagDAL> shoppingBags)
+        public History(LinkedList<ShoppingBagService> shoppingBags)
         {
             this.ShoppingBags = shoppingBags;
         }
@@ -37,9 +37,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             ShoppingBags.AddLast(shoppingBag.GetDAL().Data);
         }
 
-        public Result<HistoryDAL> GetDAL()
+        public Result<HistoryService> GetDAL()
         {
-            return new Result<HistoryDAL>("History DAL object", true, new HistoryDAL(ShoppingBags));
+            return new Result<HistoryService>("History DAL object", true, new HistoryService(ShoppingBags));
         }
     }
 }
