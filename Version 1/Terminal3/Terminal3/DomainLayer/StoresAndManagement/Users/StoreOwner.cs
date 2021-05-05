@@ -45,5 +45,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             return User.Id;
         }
+
+        public Result<Boolean> Update(Notification notification)
+        {
+            return User.Update(notification);
+        }
     }
 }

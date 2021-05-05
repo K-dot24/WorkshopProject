@@ -15,6 +15,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public String Password { get; }
         public Boolean LoggedIn { get; set; }
         public History History { get; set; }
+        public LinkedList<Notification> PendingNotification { get; }
+        public NotificationCenter NotificationCenter {get;}     
 
         //Constructor
         public RegisteredUser(String email , String password) : base()
@@ -23,6 +25,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.Password = password;
             this.LoggedIn = false;
             this.History = new History();
+            this.PendingNotification = new LinkedList<Notification>();
+            this.NotificationCenter = NotificationCenter.GetInstance();
         }
 
         //Methods
@@ -35,6 +39,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             {
                 //Correct paswword
                 LoggedIn = true;
+                DisplayPendingNotifications();
                 return new Result<RegisteredUser>($"{this.Email} is Logged in\n", true, this);
             }
             else
@@ -126,6 +131,41 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             ShoppingCart = new ShoppingCart();          // create new shopping cart for user
 
             return new Result<ShoppingCart>("Users purchased shopping cart\n", true, copy);
+        }
+    
+        public Result<Boolean> Update(Notification notification)
+        {
+            if (LoggedIn)
+            {
+                NotificationCenter.notifyNotificationServer(notification);
+                return new Result<Boolean>("User is LoggedIn , therefor displaying the notification\n", true, true);
+            }
+            PendingNotification.AddLast(notification);
+            return new Result<Boolean>("User not logged in , therefore the notification is added to pending list\n", false, false);
+        }    
+
+        private void DisplayPendingNotifications()
+        {
+            foreach(Notification notification in PendingNotification)
+            {
+                if (!notification.isOpened)
+                {
+                    NotificationCenter.notifyNotificationServer(notification);
+                }
+            }
+
+            RemoveOpenedNotifications();
+        }
+
+        private void RemoveOpenedNotifications()
+        {
+            foreach (Notification notification in PendingNotification)
+            {
+                if (notification.isOpened)
+                {
+                    PendingNotification.Remove(notification);
+                }
+            }
         }
     }
 }
