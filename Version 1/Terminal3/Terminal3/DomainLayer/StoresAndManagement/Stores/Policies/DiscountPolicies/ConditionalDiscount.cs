@@ -1,29 +1,30 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
-    public class ConditionalDiscount : VisibleDiscount
+    public class ConditionalDiscount : IDiscountPolicy
     {
-        //TODO: Complete properly
 
-        public int ConditionalQuantity { get; }
+        public IDiscountCondition Condition { get; }
+        public IDiscountPolicy Discount { get; }
 
-        public ConditionalDiscount(double precentege, DateTime expirationDate, int conditionalQuantity) : base(precentege, expirationDate)
+        public ConditionalDiscount(IDiscountPolicy discount, IDiscountCondition condition)
         {
-            ConditionalQuantity = conditionalQuantity;
+            Condition = condition;
+            Discount = discount;
         }
 
-        public new Result<Double> CalculatePrice(Product product, User user, int quantity, String code)
+        public Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
         {
-            //TODO: Add check if user is eligible?
-            if (quantity >= ConditionalQuantity)
+            Result<bool> isEligible = Condition.isConditionMet(products);
+            if (isEligible.ExecStatus && isEligible.Data)
             {
-                return base.CalculatePrice(product, user, quantity, code);
+                return Discount.CalculateDiscount(products);
             }
-            //else
-            return new Result<Double>($"Discount for {product.Name} is over.\n", false, product.Price * quantity);     //return -1 ?
+            return new Result<Dictionary<Product, Double>>("", true, new Dictionary<Product, Double>());
         }
-
     }
 }

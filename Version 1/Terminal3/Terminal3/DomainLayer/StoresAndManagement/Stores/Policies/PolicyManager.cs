@@ -38,6 +38,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         public bool[] DiscountPolicies { get; }
         public bool[] PurchasePolicies { get; }
 
+        public DiscountAddition Discounts { get; }
+
         public PolicyManager()
         {
             DiscountPolicies = new bool[DISCOUNT_SIZE];
@@ -63,11 +65,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return product.Price*quantity;
         }
 
-        internal double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode)
+        internal double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
         {
-            throw new NotImplementedException();
-        }
+            Result<Dictionary<Product, Double>> discountsResult = Discounts.CalculateDiscount(products, discountCode);
+            if (!discountsResult.ExecStatus)
+                return 0;
 
+            Dictionary<Product, Double> discounts = discountsResult.Data;
+            Double price = 0;
+            foreach (KeyValuePair<Product, int> entry in products)
+            {
+                if (discounts.ContainsKey(entry.Key))
+                    price += entry.Key.Price * entry.Value * (100 - discounts[entry.Key]) / 100;
+                else
+                    price += entry.Key.Price * entry.Value;
+            }
+
+            return price;
+        }
         internal Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)
         {
             throw new NotImplementedException();

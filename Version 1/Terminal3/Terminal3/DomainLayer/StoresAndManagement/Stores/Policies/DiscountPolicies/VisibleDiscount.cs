@@ -1,38 +1,43 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
     public class VisibleDiscount : IDiscountPolicy
     {
-        //TODO: Complete properly
 
-        public Double Precentege { get; }   // 0-100
         public DateTime ExpirationDate { get; }
+        public IDiscountTarget Target { get; }
+        public Double Percentage { get; }
 
-        //TODO: Add who eligible parameters for the discount (maybe User/RegisteredUser?)
-
-        public VisibleDiscount(double precentege, DateTime expirationDate)
+        public VisibleDiscount(DateTime expirationDate, IDiscountTarget target, Double percentage)
         {
-            Precentege = precentege;
             ExpirationDate = expirationDate;
+            Target = target;
+            if (percentage > 100)
+                Percentage = 100;
+            else if (percentage < 0)
+                Percentage = 0;
+            else
+                Percentage = percentage;
         }
 
-        public Result<Double> CalculatePrice(Product product, User user, int quantity, String code)
+        public Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
         {
-            //TODO: Add check if user is eligible?
-            if (DateTime.Now.CompareTo(ExpirationDate) < 0)
+            //if the discount is expired
+            if (DateTime.Now.CompareTo(ExpirationDate) >= 0)
+                return new Result<Dictionary<Product, Double>>("", true, new Dictionary<Product, Double>());
+
+            List<Product> targetProducts = Target.getTargets(products);
+            Dictionary<Product, Double> resultDictionary = new Dictionary<Product, Double>();
+            foreach(Product product in targetProducts)
             {
-                Double newPrice = product.Price * ((100 - Precentege) / 100);
-                return new Result<Double>($"Calculated price for {product.Name}.\n", true, newPrice*quantity);
+                resultDictionary.Add(product, Percentage);
             }
-            //else
-            return new Result<Double>($"Discount for {product.Name} is over.\n", false, product.Price*quantity);     //return -1 ?
-        }
 
-        public Result<bool> CheckIfEligible(User user)
-        {
-            throw new NotImplementedException();
+            return new Result<Dictionary<Product, double>>("", true, resultDictionary);
         }
     }
 }
