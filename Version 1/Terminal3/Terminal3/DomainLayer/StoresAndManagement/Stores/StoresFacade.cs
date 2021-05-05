@@ -25,6 +25,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID, String storeID);
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID, String storeID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);        
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID, string storeID);
@@ -109,6 +110,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
             {
                 return store.RemoveStoreManager(removedManagerID, currentlyOwnerID);
+            }
+            //else failed
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
+        }
+
+        public Result<Boolean> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID)
+        {
+            if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
+            {
+                return store.RemoveStoreOwner(removedOwnerID, currentlyOwnerID);
             }
             //else failed
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
