@@ -356,7 +356,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public Result<ShoppingCartDAL> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
             Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails);
-            if (res.ExecStatus)
+            if (res.Data != null)
             {
                 ShoppingCart purchasedCart = res.Data;
                 ConcurrentDictionary<String, ShoppingBag> purchasedBags = purchasedCart.ShoppingBags;
@@ -367,7 +367,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 }
                 return new Result<ShoppingCartDAL>(res.Message, true, res.Data.GetDAL().Data);
             }
-            //else faild
+            //else failed
             return new Result<ShoppingCartDAL>(res.Message, false, null);
         }
        

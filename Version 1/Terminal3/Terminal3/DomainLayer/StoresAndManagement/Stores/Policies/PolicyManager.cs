@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 {
@@ -60,6 +61,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         {
             //throw new NotImplementedException();
             return product.Price*quantity;
+        }
+
+        internal double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)
+        {
+            throw new NotImplementedException();
         }
     }
 }

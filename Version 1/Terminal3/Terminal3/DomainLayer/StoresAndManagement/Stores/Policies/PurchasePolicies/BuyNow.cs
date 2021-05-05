@@ -1,22 +1,24 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
     public class BuyNow : IPurchasePolicy
     {
-        //TODO: Complete properly
 
-        public Double BuyNowPrice { get; }
+        public IPurchasePolicy Policy { get; }
 
-        public BuyNow(Double buyNowPrice)
+        public BuyNow( IPurchasePolicy policy)
         {
-            BuyNowPrice = buyNowPrice;
+            this.Policy = policy;
         }
 
-        public Result<double> CalculatePrice(Product product, int quantity)
+        public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
         {
-            return new Result<double>($"Calculated price for {product.Name}.\n", true, BuyNowPrice * quantity);
+            if(this.Policy.IsConditionMet(bag, user).Data)
+                return new Result<bool>("",true,true);
+            return new Result<bool>("Policy conditions not met", true, false); 
         }
     }
 }

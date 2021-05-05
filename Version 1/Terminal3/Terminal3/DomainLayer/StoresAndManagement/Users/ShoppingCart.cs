@@ -3,6 +3,7 @@ using Terminal3.DALobjects;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
+using Terminal3.ExternalSystems;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -53,15 +54,51 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         }
 
-        public Double GetTotalShoppingCartPrice()
+        public Result<Double> GetTotalShoppingCartPrice()
         {
-            Double sum=0;
+            Double sum = 0;
+            foreach (ShoppingBag bag in ShoppingBags.Values)
+            {
+                sum += bag.GetTotalPrice();
+            }
+            return new Result<double>($"Total shopping cart price calculated, price = {sum}", true, sum);
+        }
+
+        public Result<bool> AdheresToPolicy()
+        {
             foreach(ShoppingBag bag in ShoppingBags.Values)
             {
-                sum = sum + bag.GetTotalPrice();
+                Result<bool> result = bag.AdheresToPolicy();
+                if (!result.Data)
+                    return result;
             }
-            TotalCartPrice = sum;
-            return sum;
+
+            return new Result<bool>("All bags adhere to their respective store policy", true, true);
+        }
+
+        public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        {
+            if (!AdheresToPolicy().Data)
+                return new Result<ShoppingCart>("A bag in the Shopping cart doesn't adhere to it's respective store's policy", true, null);
+
+            Double amount = GetTotalShoppingCartPrice().Data;
+
+            bool paymentSuccess = PaymentSystem.Pay(amount, paymentDetails);
+
+            if (!paymentSuccess)
+            {
+                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in payment details\n", true, null);
+
+            }
+
+            bool deliverySuccess = DeliverySystem.Deliver(deliveryDetails);
+            if (!deliverySuccess)
+            {
+                PaymentSystem.CancelTransaction(paymentDetails);
+                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details\n", true, null);
+            }
+            ShoppingCart copy = new ShoppingCart(this);
+            return new Result<ShoppingCart>("", true, copy);
         }
     }
 }

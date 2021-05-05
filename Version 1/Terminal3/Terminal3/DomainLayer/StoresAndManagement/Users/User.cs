@@ -90,27 +90,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
             }
 
-            Double amount = ShoppingCart.GetTotalShoppingCartPrice();
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails);
+            if(result.Data != null)
+                ShoppingCart = new ShoppingCart();              // create new shopping cart for user
 
-            bool paymentSuccess = PaymentSystem.Pay(amount, paymentDetails);
-
-            if (!paymentSuccess)
-            {
-                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in payment details\n", false, null);
-
-            }
-            
-            bool deliverySuccess = DeliverySystem.Deliver(deliveryDetails);
-            if (!deliverySuccess)
-            {
-                PaymentSystem.CancelTransaction(paymentDetails);
-                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in delivery details\n", false, null);
-            }
-
-            ShoppingCart copy = new ShoppingCart(ShoppingCart);
-            ShoppingCart = new ShoppingCart();              // create new shopping cart for user
-
-            return new Result<ShoppingCart>("Users purchased shopping cart\n", true, copy);
+            return result;
         }
 
 
