@@ -363,6 +363,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 foreach(var bag in purchasedBags)
                 {
                     Store store = StoresFacade.GetStore(bag.Key).Data;
+                    store.UpdateInventory(bag.Value);
                     store.History.AddPurchasedShoppingBag(bag.Value);
                 }
                 return new Result<ShoppingCartDAL>(res.Message, true, res.Data.GetDAL().Data);

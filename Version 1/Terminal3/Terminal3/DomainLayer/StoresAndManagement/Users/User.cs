@@ -90,6 +90,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
             }
 
+            if (!isValidCartQuantity())
+            {
+                return new Result<ShoppingCart>("Notice - The store is out of stock\n", false, null);   // TODO - do we want to reduce the products from the bag (i think not) and do we want to inform which of the products are out of stock ?
+            }
+
             Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails);
             if(result.Data != null)
                 ShoppingCart = new ShoppingCart();              // create new shopping cart for user
@@ -97,10 +102,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return result;
         }
 
+        private Boolean isValidCartQuantity()
+        {
+            ConcurrentDictionary<String, ShoppingBag> ShoppingBags = ShoppingCart.ShoppingBags;
 
-        
+            foreach (var bag in ShoppingBags)
+            {
+                ConcurrentDictionary<Product, int> Products = bag.Value.Products;
 
-
+                foreach (var product in Products)
+                {
+                    if (product.Key.Quantity < product.Value)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 
         public Result<UserDAL> GetDAL()
         {
