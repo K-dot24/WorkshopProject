@@ -35,6 +35,11 @@ const App = () => {
     
     // TODO: Fetch from API?
     const fetchCart = async () => {
+        setCart({products: [], totalPrice: 0});
+
+        // if (user.id !== -1){
+        //     // get from API
+        // }
     }
 
     // TODO: Update with real data
