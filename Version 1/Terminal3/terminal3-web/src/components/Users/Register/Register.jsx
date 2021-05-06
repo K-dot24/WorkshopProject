@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
@@ -20,7 +20,14 @@ function Copyright() {
 // TODO: Add onSubmit functionality
 
 const Register = () => {
+    const [data, setData] = useState({});
     const classes = useStyles();
+
+    // TODO: Connect to API
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log(data);
+    }
 
     return (
     <Container component="main" maxWidth="xs">
@@ -32,7 +39,7 @@ const Register = () => {
                 <Typography component="h1" variant="h5">
                     Sign up
                 </Typography>
-                <form className={classes.form}>
+                <form className={classes.form} onSubmit={handleSubmit}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                         <TextField
@@ -44,6 +51,7 @@ const Register = () => {
                             id="firstName"
                             label="First Name"
                             autoFocus
+                            onChange={(e) => setData({ ...data, firstname: e.target.value })}
                         />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -55,6 +63,7 @@ const Register = () => {
                             label="Last Name"
                             name="lastName"
                             autoComplete="lname"
+                            onChange={(e) => setData({ ...data, lastname: e.target.value })}
                         />
                         </Grid>
                         <Grid item xs={12}>
@@ -66,6 +75,7 @@ const Register = () => {
                             label="Email Address"
                             name="email"
                             autoComplete="email"
+                            onChange={(e) => setData({ ...data, email: e.target.value })}
                         />
                         </Grid>
                         <Grid item xs={12}>
@@ -78,6 +88,7 @@ const Register = () => {
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            onChange={(e) => setData({ ...data, password: e.target.value })}
                         />
                         </Grid>
                         <Grid item xs={12}>

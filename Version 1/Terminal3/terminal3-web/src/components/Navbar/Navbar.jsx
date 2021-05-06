@@ -7,7 +7,7 @@ import useStyles from './styles';
 
 import logo from '../../assets/terminal3_logo.png';
 
-const Navbar = ( { id, totalItems }) => {
+const Navbar = ( { id, totalItems, user }) => {
     const classes = useStyles();
     const location = useLocation();
     
@@ -19,14 +19,18 @@ const Navbar = ( { id, totalItems }) => {
                         <img src={logo} alt="Terminal 3" height="50px" className={classes.image} />
                     </Typography>
                     <div className={classes.grow} />
-                    {location.pathname !== '/register' && (
+                    {user.id !== -1 && 
+                        <Typography variant="h6" color="primary">
+                            Hello, {user.name}
+                        </Typography>}
+                    {user.id === -1 && location.pathname !== '/register' && (
                        <Button component={Link} to="/register" className={classes.checkoutButton} size="large" 
                                 type="button" variant="text" color="primary">
                             Sign Up
                         </Button> 
                     ) }
-                    {(location.pathname !== '/register' && location.pathname !== '/login') && <Typography> | </Typography>}
-                    {location.pathname !== '/login' && (
+                    {(user.id === -1 && location.pathname !== '/register' && location.pathname !== '/login') && <Typography> | </Typography>}
+                    {user.id === -1 && location.pathname !== '/login' && (
                        <Button component={Link} to="/login" className={classes.checkoutButton} size="large" 
                                 type="button" variant="text" color="primary">
                             Sign In

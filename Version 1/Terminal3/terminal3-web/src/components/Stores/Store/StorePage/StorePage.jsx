@@ -5,7 +5,7 @@ import { Products, Navbar, Cart } from '../../../index';
 
 
 
-const StorePage = ({ handleAddToCart, match }) => {
+const StorePage = ({ handleAddToCart, match, user }) => {
     const { id } = useParams();
 
     const [products, setProducts] = useState([]);
@@ -80,7 +80,7 @@ const StorePage = ({ handleAddToCart, match }) => {
 
     return (
         <div>
-            <Navbar id={id} totalItems={bag.products.length} />
+            <Navbar id={id} totalItems={bag.products.length} user={user} />
             <Switch>
                 <Route exact path={match.url}>
                     <Products products={products} onAddToBag={handleAddToBag} />

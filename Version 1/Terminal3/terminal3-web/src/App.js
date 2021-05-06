@@ -29,6 +29,7 @@ const theme = createMuiTheme({
 
 const App = () => {
     const [cart, setCart] = useState({products: [], totalPrice: 0});
+    const [user, setUser] = useState({id: -1, name: '', email: ''});
 
     //#region Cart Functionality 
     
@@ -98,11 +99,19 @@ const App = () => {
         setCart({products: [], totalPrice: 0});
     }
     //#endregion
-    
+
+    // TODO: API
+
+    const handleLogin = async (userLoginData) => {
+        // check with DB...
+
+        // User exists - what details we need here? name not in code
+        setUser({ id: 10, name: "Shimrit", email: userLoginData.email });
+    }
 
     useEffect(() => {
         fetchCart();
-    }, []);
+    }, [user]);
 
     //printing
     // useEffect(() => {
@@ -113,13 +122,13 @@ const App = () => {
         <MuiThemeProvider theme={theme}>
             <Router>
                 <div>
-                    <Navbar id={-1} totalItems={cart.products.length} />
+                    <Navbar id={-1} totalItems={cart.products.length} user={user} />
                     <Switch>
                         <Route exact path="/" component={Stores} />
                             {/* <Stores stores={stores} />
                         </Route> */}
 
-                        <Route path="/stores/:id" render={(props) => (<StorePage handleAddToCart={handleAddToCart} {...props} />)} />
+                        <Route path="/stores/:id" render={(props) => (<StorePage handleAddToCart={handleAddToCart} user={user} {...props} />)} />
 
                         <Route exact path="/cart">
                             <Cart
@@ -132,7 +141,8 @@ const App = () => {
                         </Route>
 
                         <Route path="/register" component={Register} />
-                        <Route path="/login" component={Login} />
+                        
+                        <Route path="/login" render={(props) => (<Login handleLogin={handleLogin} {...props} />)} />
 
                         <Route exact path="/checkout">
                             <Checkout cart={cart} handleEmptyCart={handleEmptyCart} />
