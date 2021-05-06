@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Stores, Navbar, Cart, Checkout, StorePage } from './components';
+import { Stores, Navbar, Cart, Checkout, StorePage, Register, Login } from './components';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
@@ -30,6 +30,8 @@ const theme = createMuiTheme({
 const App = () => {
     const [cart, setCart] = useState({products: [], totalPrice: 0});
 
+    //#region Cart Functionality 
+    
     // TODO: Fetch from API?
     const fetchCart = async () => {
     }
@@ -95,6 +97,8 @@ const App = () => {
     const handleEmptyCart = async () => {
         setCart({products: [], totalPrice: 0});
     }
+    //#endregion
+    
 
     useEffect(() => {
         fetchCart();
@@ -126,6 +130,9 @@ const App = () => {
                                 handleEmptyCart={handleEmptyCart} 
                             />
                         </Route>
+
+                        <Route path="/register" component={Register} />
+                        <Route path="/login" component={Login} />
 
                         <Route exact path="/checkout">
                             <Checkout cart={cart} handleEmptyCart={handleEmptyCart} />

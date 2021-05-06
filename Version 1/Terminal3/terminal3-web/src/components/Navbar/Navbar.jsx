@@ -1,10 +1,11 @@
 import React from 'react';
-import { AppBar, Toolbar, IconButton, Badge, MenuItem, Menu, Typography } from '@material-ui/core';
+import { AppBar, Toolbar, IconButton, Badge, MenuItem, Menu, Typography, Button } from '@material-ui/core';
 import { ShoppingCart, LocalMall } from '@material-ui/icons';
 import { Link, useLocation } from 'react-router-dom';
 
-import logo from '../../assets/terminal3_logo.png';
 import useStyles from './styles';
+
+import logo from '../../assets/terminal3_logo.png';
 
 const Navbar = ( { id, totalItems }) => {
     const classes = useStyles();
@@ -18,6 +19,19 @@ const Navbar = ( { id, totalItems }) => {
                         <img src={logo} alt="Terminal 3" height="50px" className={classes.image} />
                     </Typography>
                     <div className={classes.grow} />
+                    {location.pathname !== '/register' && (
+                       <Button component={Link} to="/register" className={classes.checkoutButton} size="large" 
+                                type="button" variant="text" color="primary">
+                            Sign Up
+                        </Button> 
+                    ) }
+                    {(location.pathname !== '/register' && location.pathname !== '/login') && <Typography> | </Typography>}
+                    {location.pathname !== '/login' && (
+                       <Button component={Link} to="/login" className={classes.checkoutButton} size="large" 
+                                type="button" variant="text" color="primary">
+                            Sign In
+                        </Button>
+                    ) }
                     {location.pathname === '/' ? (
                         <div className={classes.button}>
                             <IconButton component={Link} to="/cart" aria-label="Show cart items" color="inherit">
