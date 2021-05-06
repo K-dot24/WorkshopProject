@@ -109,6 +109,10 @@ const App = () => {
         setUser({ id: 10, name: "Shimrit", email: userLoginData.email });
     }
 
+    const handleLogOut = () => {
+        setUser({id: -1, name: '', email: ''});
+    }
+
     useEffect(() => {
         fetchCart();
     }, [user]);
@@ -122,13 +126,13 @@ const App = () => {
         <MuiThemeProvider theme={theme}>
             <Router>
                 <div>
-                    <Navbar id={-1} totalItems={cart.products.length} user={user} />
+                    <Navbar id={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} />
                     <Switch>
                         <Route exact path="/" component={Stores} />
                             {/* <Stores stores={stores} />
                         </Route> */}
 
-                        <Route path="/stores/:id" render={(props) => (<StorePage handleAddToCart={handleAddToCart} user={user} {...props} />)} />
+                        <Route path="/stores/:id" render={(props) => (<StorePage handleAddToCart={handleAddToCart} user={user} handleLogOut={handleLogOut} {...props} />)} />
 
                         <Route exact path="/cart">
                             <Cart

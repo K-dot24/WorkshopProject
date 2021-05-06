@@ -18,6 +18,7 @@ function Copyright() {
 }
 
 // TODO: Add onSubmit functionality
+//      Make sign in button go to main page (with regular link doesn't sign in)
 const Login = ({ handleLogin }) => {
     const [user, setUser] = useState({email: '', password: ''});
     const classes = useStyles();

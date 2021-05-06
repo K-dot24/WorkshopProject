@@ -7,7 +7,7 @@ import useStyles from './styles';
 
 import logo from '../../assets/terminal3_logo.png';
 
-const Navbar = ( { id, totalItems, user }) => {
+const Navbar = ( { id, totalItems, user, handleLogOut }) => {
     const classes = useStyles();
     const location = useLocation();
     
@@ -19,10 +19,17 @@ const Navbar = ( { id, totalItems, user }) => {
                         <img src={logo} alt="Terminal 3" height="50px" className={classes.image} />
                     </Typography>
                     <div className={classes.grow} />
-                    {user.id !== -1 && 
-                        <Typography variant="h6" color="primary">
-                            Hello, {user.name}
-                        </Typography>}
+                    {user.id !== -1 &&
+                        <> 
+                            <Typography variant="h6" color="primary">
+                                Hello, {user.name}
+                            </Typography>
+                            <Button component={Link} to="/" className={classes.checkoutButton} size="large" 
+                                    type="button" variant="text" color="primary" onClick={() => handleLogOut()}>
+                                Sign Out
+                            </Button>
+                        </>
+                    }
                     {user.id === -1 && location.pathname !== '/register' && (
                        <Button component={Link} to="/register" className={classes.checkoutButton} size="large" 
                                 type="button" variant="text" color="primary">
