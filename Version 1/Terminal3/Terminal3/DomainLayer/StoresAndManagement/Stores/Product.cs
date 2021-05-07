@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Terminal3.DALobjects;
 using System.Collections.Concurrent;
-
+using Terminal3.ServiceLayer.ServiceObjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -19,6 +18,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public int NumberOfRates { get; set; }
         public LinkedList<String> Keywords { get; set; }
         public ConcurrentDictionary<String, String> Review { get; set; }    //<userID , usersReview>
+        public NotificationManager NotificationManager { get; set; }
 
         //Constructor
         public Product(String name, Double price, int quantity , String category, [OptionalAttribute]LinkedList<String> Keywords)
@@ -31,6 +31,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             if (Keywords == null) { this.Keywords = new LinkedList<String>(); }
             else { this.Keywords = Keywords; }
             Review = new ConcurrentDictionary<string, string>();
+            this.NotificationManager = null;
         }       
 
         //Method
@@ -69,6 +70,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<ProductService>("Product DAL object", true, new ProductService(this.Id, this.Name, this.Price, this.Quantity, this.Category));
         }
 
-        //TODO: functions
+        public Result<Boolean> UpdatePurchasedProductQuantity(int quantity)
+        {
+            if (this.NotificationManager == null)
+            {
+                return new Result<bool>("Error: No Notification Manager set for this product\n", false, false);
+            }
+            Quantity = Quantity - quantity;
+            return NotificationManager.notifyStorePurchase(this, quantity);
+        }
+
     }
 }

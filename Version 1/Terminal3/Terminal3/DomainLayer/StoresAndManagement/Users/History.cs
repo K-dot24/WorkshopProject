@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System.Collections.Concurrent;
 using System;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
