@@ -388,5 +388,114 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
 
             Assert.Equal(4.9, store2BagDAL.TotalBagPrice);
         }
+
+
+        [Theory()]
+        [InlineData(true)]      
+        [InlineData(false)]    
+        public void NotificationPurchaseTest(Boolean loggedin)
+        {
+            NotificationManager notificationManager = new NotificationManager(TestStore);
+            TestStore.NotificationManager = notificationManager;
+
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 5, "Fruits");
+            Product product2 = new Product("Apple", 4.9, 5, "Fruits");
+            TestStore.InventoryManager.Products.TryAdd(product.Id, product);
+            TestStore.InventoryManager.Products.TryAdd(product2.Id, product2);
+
+            // Update products Notification Manager manually
+            product.NotificationManager = notificationManager;
+            product2.NotificationManager = notificationManager;
+
+            // Add product to user shopping bag
+            Facade.AddProductToCart(RegisteredUser.Id, product.Id, 2, TestStore.Id);
+            Facade.AddProductToCart(RegisteredUser.Id, product2.Id, 1, TestStore.Id);
+
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>();
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>();
+
+            Founder.LoggedIn = loggedin;
+
+            Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
+
+            if (loggedin)
+            {
+                Assert.Empty(Founder.PendingNotification);
+            }
+            else
+            {
+                Assert.Equal(2, Founder.PendingNotification.Count); // one for each product and not as quantity
+
+                foreach(Notification n in Founder.PendingNotification)
+                {
+                    Assert.False(n.isOpened);
+                    Assert.True(n.isStoreStaff);
+                    Assert.Equal(DateTime.Now.ToString("MM/dd/yyyy HH:mm"), n.Date.ToString("MM/dd/yyyy HH:mm"));
+                }
+            }
+        }
+
+
+
+        [Theory()]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void NotificationCloseStoreTest(Boolean loggedin)
+        {
+            // Create Notification Manager for store
+            NotificationManager notificationManager = new NotificationManager(TestStore);
+            TestStore.NotificationManager = notificationManager;
+
+            // Add 1 owner and 1 manager to store
+            StoreOwner owner = new StoreOwner(RegisteredUser, TestStore, TestStore.Founder);
+            RegisteredUser user = new RegisteredUser("shmar@gmail.com", "Password");
+            UserFacade.RegisteredUsers.TryAdd(user.Id, user);
+            StoreManager manager = new StoreManager(user, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Owners.TryAdd(owner.GetId(), owner);
+            TestStore.Managers.TryAdd(manager.GetId(), manager);
+
+            Founder.LoggedIn = loggedin;
+            owner.User.LoggedIn = loggedin;
+            manager.User.LoggedIn = loggedin;
+
+            Facade.CloseStore(TestStore.Id, Founder.Id);
+
+            if (loggedin)
+            {
+                Assert.Empty(Founder.PendingNotification);
+                Assert.Empty(owner.User.PendingNotification);
+                Assert.Empty(manager.User.PendingNotification);
+            }
+            else
+            {
+                Assert.Single(Founder.PendingNotification); 
+                Assert.Single(owner.User.PendingNotification); 
+                Assert.Single(manager.User.PendingNotification); 
+
+                foreach (Notification n in Founder.PendingNotification)
+                {
+                    Assert.False(n.isOpened);
+                    Assert.True(n.isStoreStaff);
+                    Assert.Equal(DateTime.Now.ToString("MM/dd/yyyy HH:mm"), n.Date.ToString("MM/dd/yyyy HH:mm"));
+                }
+
+                foreach (Notification n in owner.User.PendingNotification)
+                {
+                    Assert.False(n.isOpened);
+                    Assert.True(n.isStoreStaff);
+                    Assert.Equal(DateTime.Now.ToString("MM/dd/yyyy HH:mm"), n.Date.ToString("MM/dd/yyyy HH:mm"));
+                }
+
+                foreach (Notification n in manager.User.PendingNotification)
+                {
+                    Assert.False(n.isOpened);
+                    Assert.True(n.isStoreStaff);
+                    Assert.Equal(DateTime.Now.ToString("MM/dd/yyyy HH:mm"), n.Date.ToString("MM/dd/yyyy HH:mm"));
+                }
+            }
+        }
+
+
     }
 }

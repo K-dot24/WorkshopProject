@@ -9,9 +9,9 @@ using Terminal3.ServiceLayer;
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
 
-    public class NotificationCenter 
+    public sealed class NotificationCenter 
     {
-        private NotificationCenter Instance { get; set; }
+        private static NotificationCenter Instance { get; set; }
         public NotificationService NotificationService { get; }
 
         private NotificationCenter()
@@ -20,7 +20,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             this.NotificationService = NotificationService.GetInstance();
         }
 
-        public NotificationCenter GetInstance()
+        public static NotificationCenter GetInstance()
         {
             if(Instance == null)
             {
