@@ -30,15 +30,9 @@ namespace WebApplication3
             //Dependency injection 
             services.AddSingleton<IECommerceSystem, ECommerceSystem>();
 
-            services.AddCors(options =>
+            services.AddCors(c =>
             {
-                options.AddPolicy("ClientPermission", policy =>
-                {
-                    policy.AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .WithOrigins("http://localhost:3000")
-                        .AllowCredentials();
-                });
+                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
             });
         }
 
