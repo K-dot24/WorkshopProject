@@ -12,6 +12,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
     public interface IStoresAndManagementInterface
     {
         Result<StoreService> OpenNewStore(String storeName, String userID);
+        Result<Boolean> CloseStore(String storeId, String userID);
+        Result<StoreService> ReOpenStore(string storeId, string userID);
 
         #region Inventory Management
         Result<ProductService> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
@@ -88,6 +90,35 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             //else
             return new Result<StoreService>($"Failed to open store {storeName}: {userID} is not a registered user.\n", false, null);
         }
+
+        public Result<Boolean> CloseStore(string storeId, string userID)
+        {
+            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser founder))  // Check if userID is a registered user
+            {
+                // Close store
+                return StoresFacade.CloseStore(founder, storeId);
+            }
+            //else
+            return new Result<Boolean>($"Failed to close store (Id: {storeId}): {userID} is not a registered user.\n", false, false);
+        }
+
+        public Result<StoreService> ReOpenStore(string storeId, string userID)
+        {
+            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser owner))  // Check if userID is a registered user
+            {
+                // ReOpen store
+                Result<Store> res = StoresFacade.ReOpenStore(owner, storeId);
+                if (res.ExecStatus)
+                {
+                    return new Result<StoreService>(res.Message, true, res.Data.GetDAL().Data);
+                }
+                //else
+                return new Result<StoreService>($"Failed to open store (Id: {storeId})", false, null);
+            }
+            //else
+            return new Result<StoreService>($"Failed to reopen store (Id: {storeId}): {userID} is not a registered user.\n", false, null);
+        }
+
 
         public Result<ProductService> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {

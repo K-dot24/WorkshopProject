@@ -447,7 +447,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
             EmailToID.TryGetValue(removedOwnerEmail, out string removedOwnerId);
             EmailToID.TryGetValue(currentlyOwnerEmail, out string currentlyOwnerId);
-            
+
             Assert.Equal(expectedResult, Facade.RemoveStoreOwner(removedOwnerId, currentlyOwnerId, TestStore.Id).ExecStatus);
             if (expectedResult)
                 Assert.False(TestStore.Owners.ContainsKey(removedOwnerId));
@@ -481,9 +481,85 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
                 Assert.False(TestStore.Managers.ContainsKey(user4.Id));
             }
             else
-            {                
+            {
                 Assert.True(TestStore.Managers.ContainsKey(user4.Id));
             }
+        }
+
+        [Fact()]
+        public void CloseStoreTest()
+        {
+            Assert.True(Facade.CloseStore(Founder, TestStore.Id).ExecStatus);
+            Assert.False(Facade.Stores.ContainsKey(TestStore.Id));
+            Assert.True(Facade.ClosedStores.ContainsKey(TestStore.Id));
+        }
+
+        [Fact()]
+        public void CloseStoreTest2()
+        {
+            //Tomer and Founder are the only owners
+            RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "SassyMoodyNasty");
+            EmailToID.TryAdd(user2.Email, user2.Id);
+            StoreOwner owner = new StoreOwner(user2, TestStore, TestStore.Founder);
+            TestStore.Owners.TryAdd(owner.User.Id, owner);
+
+            RegisteredUser user3 = new RegisteredUser("zoe@gmail.com", "SassyMoodyNasty");
+            EmailToID.TryAdd(user3.Email, user3.Id);
+            StoreManager manager = new StoreManager(user3, TestStore, new Permission(), owner);
+            TestStore.Managers.TryAdd(manager.User.Id, manager);
+
+            // Fail - tomer is store owner not founder
+            Assert.False(Facade.CloseStore(user2, TestStore.Id).ExecStatus);
+            Assert.True(Facade.Stores.ContainsKey(TestStore.Id));
+            Assert.False(Facade.ClosedStores.ContainsKey(TestStore.Id));
+
+            // Fail: zoe is only store manager not founder
+            Assert.False(Facade.CloseStore(user3, TestStore.Id).ExecStatus);
+            Assert.True(Facade.Stores.ContainsKey(TestStore.Id));
+            Assert.False(Facade.ClosedStores.ContainsKey(TestStore.Id));
+        }
+
+        [Fact()]
+        public void ReOpenStoreTest()
+        {
+            Facade.CloseStore(Founder, TestStore.Id);
+            Assert.True(Facade.ReOpenStore(Founder, TestStore.Id).ExecStatus);
+            Assert.True(Facade.Stores.ContainsKey(TestStore.Id));
+            Assert.False(Facade.ClosedStores.ContainsKey(TestStore.Id));            
+        }
+
+        [Fact()]
+        public void ReOpenStoreTest2()
+        {
+            Facade.CloseStore(Founder, TestStore.Id);
+
+            //Tomer and Founder are the only owners
+            RegisteredUser user2 = new RegisteredUser("tomer@gmail.com", "SassyMoodyNasty");
+            EmailToID.TryAdd(user2.Email, user2.Id);
+            StoreOwner owner = new StoreOwner(user2, TestStore, TestStore.Founder);
+            TestStore.Owners.TryAdd(owner.User.Id, owner);
+
+            // Success - tomer is store owner 
+            Assert.True(Facade.ReOpenStore(user2, TestStore.Id).ExecStatus);
+            Assert.True(Facade.Stores.ContainsKey(TestStore.Id));
+            Assert.False(Facade.ClosedStores.ContainsKey(TestStore.Id));
+
+        }
+
+        [Fact()]
+        public void ReOpenStoreTest3()
+        {
+            Facade.CloseStore(Founder, TestStore.Id);
+
+            RegisteredUser user3 = new RegisteredUser("zoe@gmail.com", "SassyMoodyNasty");
+            EmailToID.TryAdd(user3.Email, user3.Id);
+            StoreManager manager = new StoreManager(user3, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Managers.TryAdd(manager.User.Id, manager);
+
+            // Fail: zoe is only store manager not owner
+            Assert.False(Facade.ReOpenStore(user3, TestStore.Id).ExecStatus);
+            Assert.False(Facade.Stores.ContainsKey(TestStore.Id));
+            Assert.True(Facade.ClosedStores.ContainsKey(TestStore.Id));
         }
     }
 }

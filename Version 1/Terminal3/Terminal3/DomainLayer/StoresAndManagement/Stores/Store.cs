@@ -428,13 +428,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         //TODO - DELETE??
         #region Notification
-        public Result<bool> notifyStoreClosed() //TODO - add the function CloseStore and add there the call to the notification 
+        public Result<bool> notifyStoreClosed()  
         {
             String msg = $"Event : Store Closed\nStore Id : {Id}\n";
             Notification notification = new Notification(msg, true);
             notify(notification);
             return new Result<bool>($"All staff members are notified that store {Id} is closed\n", true, true);
-
         }
 
         public Result<bool> notifyStoreOpened()
