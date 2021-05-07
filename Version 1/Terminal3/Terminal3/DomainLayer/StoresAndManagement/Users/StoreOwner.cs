@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
@@ -44,6 +44,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public string GetId()
         {
             return User.Id;
+        }
+
+        public Result<Boolean> Update(Notification notification)
+        {
+            return User.Update(notification);
         }
     }
 }

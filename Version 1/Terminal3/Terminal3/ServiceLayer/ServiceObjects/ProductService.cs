@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Terminal3.DALobjects
+namespace Terminal3.ServiceLayer.ServiceObjects
 {
     public class ProductService
     {

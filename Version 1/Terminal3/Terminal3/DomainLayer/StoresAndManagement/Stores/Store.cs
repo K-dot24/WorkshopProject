@@ -5,7 +5,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System.Threading;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
@@ -25,6 +25,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID);
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID);
+        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID);        
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String userID);
@@ -54,6 +55,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public History History { get; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
+        public NotificationManager NotificationManager { get; set; }
 
         //Constructors
         public Store(String name, RegisteredUser founder)
@@ -103,7 +105,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (CheckIfStoreOwner(userID) || CheckStoreManagerAndPermissions(userID, Methods.AddNewProduct))
             {
-                return InventoryManager.AddNewProduct(productName, price, initialQuantity, category, keywords);
+                Result<Product> res = InventoryManager.AddNewProduct(productName, price, initialQuantity, category, keywords);
+                if (res.ExecStatus)
+                {
+                    res.Data.NotificationManager = this.NotificationManager;                    
+                }
+                return res;
             }
             else
             {
@@ -154,7 +161,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             ConcurrentDictionary<Product, int> product_quantity = bag.Products;     // <Product, Quantity user bought>
             foreach(var product in product_quantity)
             {
-                product.Key.Quantity = product.Key.Quantity - product.Value;
+                product.Key.UpdatePurchasedProductQuantity(product.Value);
             }
 
             return new Result<bool>("Store inventory updated successuly\n", true, true);
@@ -265,13 +272,57 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (manager.AppointedBy.Equals(owner))
                 {
                     Managers.TryRemove(removedManagerID, out _);
-                    return new Result<bool>($"User (Email: {removedManagerID}) was successfully removed from store management at {this.Name}.\n", true, true);
+                    return new Result<bool>($"User (Id: {removedManagerID}) was successfully removed from store management at {this.Name}.\n", true, true);
                 }
                 //else failed
-                return new Result<bool>($"Failed to remove user (Email: {removedManagerID}) from store management: Unauthorized owner (Email: {currentlyOwnerID}).\n", false, false);
+                return new Result<bool>($"Failed to remove user (Id: {removedManagerID}) from store management: Unauthorized owner (Email: {currentlyOwnerID}).\n", false, false);
             }
             //else failed
-            return new Result<bool>($"Failed to remove user (Email: {removedManagerID}) from store management: Either not a manager or owner not found.\n", false, false);
+            return new Result<bool>($"Failed to remove user (Id: {removedManagerID}) from store management: Either not a manager or owner not found.\n", false, false);
+        }
+
+        public Result<bool> RemoveStoreOwner(String removedOwnerID, string currentlyOwnerID)
+        {
+            if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner ownerBoss) && Owners.TryGetValue(removedOwnerID, out StoreOwner ownerToRemove))
+            {
+                if (ownerToRemove.AppointedBy != null && ownerToRemove.AppointedBy.Equals(ownerBoss))
+                {
+                    Owners.TryRemove(removedOwnerID, out StoreOwner removedOwner);
+                    RemoveAllStaffAppointedByOwner(removedOwner);
+                    return new Result<bool>($"User (Id: {removedOwnerID}) was successfully removed as store owner at {this.Name}.\n", true, true);
+                }
+                //else failed
+                return new Result<bool>($"Failed to remove user (Id: {removedOwnerID}) as store owner: Unauthorized owner (Id: {currentlyOwnerID}).\n", false, false);
+            }
+            //else failed
+            return new Result<bool>($"Failed to remove user (Id: {removedOwnerID}) as store owner: Either currently owner or owner to be romoved not found.\n", false, false);
+        }
+
+        private void RemoveAllStaffAppointedByOwner(StoreOwner owner)
+        {
+            //notifyOwnerSubscriptionRemoved(owner.GetId());
+            if(Owners.Count != 0)
+            {
+                foreach (var staff_owner in Owners)
+                {
+                    if(staff_owner.Value.AppointedBy != null && staff_owner.Value.AppointedBy.GetId() == owner.GetId())
+                    {
+                        Owners.TryRemove(staff_owner.Value.AppointedBy.GetId(), out StoreOwner removedOwner);
+                        RemoveAllStaffAppointedByOwner(removedOwner);
+                    }
+                }
+            }
+
+            if(Managers.Count != 0)
+            {
+                foreach (var staff_manager in Managers)
+                {
+                    if (staff_manager.Value.AppointedBy.GetId() == owner.GetId())
+                    {
+                        Managers.TryRemove(staff_manager.Value.GetId(), out _);
+                    }
+                }
+            }
         }
 
         public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)   //TODO: OwnerID can be manager....
@@ -374,6 +425,47 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //else failed
             return new Result<bool>($"Staff ID not found in store.\n", false, false);
         }
+
+        //TODO - DELETE??
+        #region Notification
+        public Result<bool> notifyStoreClosed()  
+        {
+            String msg = $"Event : Store Closed\nStore Id : {Id}\n";
+            Notification notification = new Notification(msg, true);
+            notify(notification);
+            return new Result<bool>($"All staff members are notified that store {Id} is closed\n", true, true);
+        }
+
+        public Result<bool> notifyStoreOpened()
+        {
+            String msg = $"Event : Store Opened\nStore Id : {Id}\n";
+            Notification notification = new Notification(msg, true);
+            notify(notification);
+            return new Result<bool>($"All staff members are notified that store {Id} is opened\n", true, true);
+        }
+
+        public Result<bool> notifyOwnerSubscriptionRemoved(string ownerID)  
+        {
+            String msg = $"Event : Owner Subscription Removed\nStore Id : {Id}\nOwner Id : {ownerID}";
+            Notification notification = new Notification(msg, true);
+            notify(notification);
+            return new Result<bool>($"All staff members are notified that owner ({ownerID}) subscriptoin as store owner ({Id}) has been removed\n", true, true);
+        }
+
+        private void notify(Notification notification)
+        {
+            foreach (var owner in Owners)
+            {
+                owner.Value.Update(notification);
+            }
+
+            foreach (var manager in Managers)
+            {
+                manager.Value.Update(notification);
+            }
+        }
+        #endregion Notification
+
 
         //Getter
         public Result<Product> GetProduct(String productID)

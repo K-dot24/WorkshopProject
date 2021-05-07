@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ExternalSystems;
 
