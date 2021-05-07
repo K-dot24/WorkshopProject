@@ -45,7 +45,7 @@ namespace WebApplication3
             }
 
             app.UseHttpsRedirection();
-            app.UseCors("ClientPermission");
+            app.UseCors("AllowOrigin");
 
             app.UseRouting();
 
