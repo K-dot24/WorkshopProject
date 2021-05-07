@@ -12,4 +12,8 @@
     <ProjectReference Include="..\Terminal3\Terminal3.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Hubs\" />
+  </ItemGroup>
+
 </Project>

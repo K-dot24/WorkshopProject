@@ -29,6 +29,17 @@ namespace WebApplication3
             
             //Dependency injection 
             services.AddSingleton<IECommerceSystem, ECommerceSystem>();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("ClientPermission", policy =>
+                {
+                    policy.AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .WithOrigins("http://localhost:3000")
+                        .AllowCredentials();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,6 +51,7 @@ namespace WebApplication3
             }
 
             app.UseHttpsRedirection();
+            app.UseCors("ClientPermission");
 
             app.UseRouting();
 
@@ -49,6 +61,8 @@ namespace WebApplication3
             {
                 endpoints.MapControllers();
             });
+
+
 
             //Adding Swagger support
             app.UseSwagger();
