@@ -44,10 +44,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public StoresFacade()
         {
             Stores = new ConcurrentDictionary<String, Store>();
-            Store s1 = new Store("Shaked_store", null);
-            Store s2 = new Store("Tomer_store", null);
-            Store s3 = new Store("Raz_store", null);
-            Store s4 = new Store("Amit_store", null);
+            Store s1 = new Store("Shaked_store", new RegisteredUser("test1", "123"));
+            Store s2 = new Store("Tomer_store", new RegisteredUser("test2", "123"));
+            Store s3 = new Store("Raz_store", new RegisteredUser("test3", "123"));
+            Store s4 = new Store("Amit_store", new RegisteredUser("test4", "123"));
             Stores.TryAdd(s1.Id, s1);
             Stores.TryAdd(s2.Id, s2);
             Stores.TryAdd(s3.Id, s3);
