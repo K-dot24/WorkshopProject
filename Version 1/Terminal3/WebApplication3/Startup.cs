@@ -30,10 +30,6 @@ namespace WebApplication3
             //Dependency injection 
             services.AddSingleton<IECommerceSystem, ECommerceSystem>();
 
-            services.AddCors(c =>
-            {
-                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,9 +41,10 @@ namespace WebApplication3
             }
 
             app.UseHttpsRedirection();
-            app.UseCors("ClientPermission");
 
             app.UseRouting();
+
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.UseAuthorization();
 

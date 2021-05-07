@@ -14,7 +14,6 @@ namespace Terminal3WebAPI.Controllers
     /// This controller does not hold any functional requirements, it is only to transfer data to the view 
     /// </summary>
     /// 
-    [EnableCors("AllowOrigin")]
     [Route("api/[controller]")]
     [ApiController]
     public class DataController : ControllerBase
