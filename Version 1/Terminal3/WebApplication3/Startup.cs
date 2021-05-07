@@ -26,17 +26,17 @@ namespace WebApplication3
         {
             services.AddControllers();
             services.AddSignalR();
-            //services.AddCors(options =>
-            //{
-            //    options.AddPolicy("ClientPermission", policy =>
-            //    {
-            //        policy.AllowAnyHeader()
-            //            .AllowAnyMethod()
-            //            .WithOrigins("http://localhost:3000")
-            //            .AllowCredentials();
-            //    });
-            //});
-            //services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("ClientPermission", policy =>
+                {
+                    policy.AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .WithOrigins("http://localhost:3000")
+                        .AllowCredentials();
+                });
+            });
+            services.AddCors();
 
             services.AddSwaggerGen();
             
@@ -62,10 +62,10 @@ namespace WebApplication3
             app.UseAuthorization();
 
             // See: https://github.com/drwatson1/AspNet-Core-REST-Service/wiki#cross-origin-resource-sharing-cors-and-preflight-requests
-            //app.UseCors(builder => builder
-            //    .AllowAnyOrigin()
-            //    .AllowAnyMethod()
-            //    .AllowAnyHeader());
+            app.UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
             app.UseEndpoints(endpoints =>
             {
