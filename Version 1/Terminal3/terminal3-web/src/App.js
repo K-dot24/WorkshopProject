@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
 import { Stores, Navbar, Cart, Checkout, StorePage, Register, Login } from './components';
-import { BrowserRouter as Router, Switch, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
+import { Register as RegisterAPI, Login as LoginAPI, Logout } from './api/API';
+
+// primary and secondary colors for the app
 const theme = createMuiTheme({
     palette: {
         primary: {
@@ -18,7 +21,7 @@ const theme = createMuiTheme({
 const App = () => {
     // states
     const [cart, setCart] = useState({products: [], totalPrice: 0});
-    const [user, setUser] = useState({id: -1, name: '', email: ''});
+    const [user, setUser] = useState({id: -1, email: ''});
 
     //#region Cart Functionality 
     
@@ -93,26 +96,33 @@ const App = () => {
     }
     //#endregion
 
-    // TODO: API
-    const handleLogin = async (userLoginData) => {
-        // check with DB...
+    //#region User Functionality
 
-        // User exists - what details we need here?
-        setUser({ id: 10, email: userLoginData.email });
+    const handleLogin = async (data) => {
+        
+        // TODO: What to do in failure?
+        LoginAPI(data).then(response => response.ok ? 
+            response.json().then(id => setUser({ id, email: data.email})) : null).catch(err => console.log(err));
     }
 
-    // TODO: API
-    const handleRegister = async (userRegisterData) => {
-        console.log(userRegisterData);
+    // TODO: What to do in success/failure?
+    const handleRegister = async (data) => {
+        RegisterAPI(data).then(response => response.ok ? 
+            response.json().then(id => console.log(id)) : null).catch(err => console.log(err));
     }
 
+    // TODO: What to do in failure?
     const handleLogOut = () => {
-        setUser({id: -1, name: '', email: ''});
+        Logout(user.email).then(response => response.ok ?
+            response.json().then(message => setUser({id: -1, name: '', email: ''})) : console.log("NOT OK")).catch(err => console.log(err));
     }
+
+    //#endregion
 
     // Update cart when user change (login/sign out)
     useEffect(() => {
         fetchCart();
+        console.log(user);
     }, [user]);
 
     return (

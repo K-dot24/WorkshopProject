@@ -260,7 +260,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 if (res.ExecStatus)
                 {
                     GuestUsers.TryAdd(res.Data.Id, res.Data);
-                    return new Result<Boolean>($"There is not user using this email:{email}\n", true, true);
+                    return new Result<Boolean>(res.Message, true, true);
                 }
                 else
                     return new Result<Boolean>(res.Message, false, false);

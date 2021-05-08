@@ -61,27 +61,39 @@ export function GetAllProductByStoreIDToDisplay(storeId) {
     })
 }
 
-export function Register(email, password) {
+export function Register(data) {
     return fetch(`https://localhost:5000/api/GuestUser/Register`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { email, password },
+        body: JSON.stringify(data),
     })
 }
 
-export function Login(email, password) {
-    return fetch(`https://localhost:5000/api/GuestUser/Login`, {
+export function Login(data) {
+    return fetch(`https://localhost:5000/api/RegisteredUser/Login`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { email, password },
+        body: JSON.stringify(data),
     })
 }
+
+export function Logout(email) {
+    return fetch(`https://localhost:5000/api/RegisteredUser/Logout/${email}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: { email },
+    })
+}
+
 
 
 
