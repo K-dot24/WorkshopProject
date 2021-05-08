@@ -255,7 +255,7 @@ export function Login( data ) {
 }
 
 /// logout from the system
-export function Logout(email) {
+export function Logout( email ) {
     return fetch(`https://localhost:5000/api/RegisteredUser/Logout/${email}`, {
         method: 'POST',
         headers: {
@@ -274,14 +274,14 @@ export function Logout(email) {
 ///     "storeName":"string",
 ///     "userID":"string"
 /// }
-export function OpenNewStore(email) {
+export function OpenNewStore( data) {
     return fetch(`https://localhost:5000/api/RegisteredUser/OpenNewStore`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { storeName, userID },
+        body: JSON.stringify(data),
     })
 }
 
@@ -294,14 +294,14 @@ export function OpenNewStore(email) {
 ///     "productID":"string"
 ///     "review":"string"
 /// }
-export function AddProductReview(email) {
+export function AddProductReview( data ) {
     return fetch(`https://localhost:5000/api/RegisteredUser/AddProductReview`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { userID, storeID, productID, review },
+        body: JSON.stringify(data),
     })
 }
 
@@ -329,13 +329,6 @@ export function AddProductReview(email) {
 
 
 
-// export async function GetAllStoresToDisplay() {
-//     const response = await fetch('https://localhost:5000/api/Data/GetAllStoresToDisplay');
-//     const json = await response.json();
-
-//     console.log(json);
-//     return json;
-// }
 
 
 
