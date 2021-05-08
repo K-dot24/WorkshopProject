@@ -4,18 +4,6 @@ import { Stores, Navbar, Cart, Checkout, StorePage, Register, Login } from './co
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
-
-/* 
-    useEffect(() => {  
-        debugger;  
-        Axios  
-            .get("http://localhost:2345/Api/employee/DemoData")  
-            .then(result => setData(result.data));  
-        console.log(data);  
-        debugger;  
-    }, []);  
-*/
-
 const theme = createMuiTheme({
     palette: {
         primary: {
