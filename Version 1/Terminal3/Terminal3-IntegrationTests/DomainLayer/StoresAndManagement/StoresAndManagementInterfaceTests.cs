@@ -388,5 +388,330 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
 
             Assert.Equal(4.9, store2BagDAL.TotalBagPrice);
         }
+
+
+        [Theory()]
+        [InlineData(true)]      
+        [InlineData(false)]    
+        public void NotificationPurchaseTest(Boolean loggedin)
+        {
+            NotificationManager notificationManager = new NotificationManager(TestStore);
+            TestStore.NotificationManager = notificationManager;
+
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 5, "Fruits");
+            Product product2 = new Product("Apple", 4.9, 5, "Fruits");
+            TestStore.InventoryManager.Products.TryAdd(product.Id, product);
+            TestStore.InventoryManager.Products.TryAdd(product2.Id, product2);
+
+            // Update products Notification Manager manually
+            product.NotificationManager = notificationManager;
+            product2.NotificationManager = notificationManager;
+
+            // Add product to user shopping bag
+            Facade.AddProductToCart(RegisteredUser.Id, product.Id, 2, TestStore.Id);
+            Facade.AddProductToCart(RegisteredUser.Id, product2.Id, 1, TestStore.Id);
+
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>();
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>();
+
+            Founder.LoggedIn = loggedin;
+
+            Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
+
+            if (loggedin)
+            {
+                Assert.Empty(Founder.PendingNotification);
+            }
+            else
+            {
+                Assert.Equal(2, Founder.PendingNotification.Count); // one for each product and not as quantity
+
+                foreach(Notification n in Founder.PendingNotification)
+                {
+                    Assert.False(n.isOpened);
+                    Assert.True(n.isStoreStaff);
+                    Assert.Equal(DateTime.Now.ToString("MM/dd/yyyy HH:mm"), n.Date.ToString("MM/dd/yyyy HH:mm"));
+                    Assert.Equal(Founder.Id, n.ClientId);
+                }
+            }
+        }
+
+
+
+        [Theory()]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void NotificationCloseStoreTest(Boolean loggedin)
+        {
+            // Create Notification Manager for store
+            NotificationManager notificationManager = new NotificationManager(TestStore);
+            TestStore.NotificationManager = notificationManager;
+
+            // Add 1 owner and 1 manager to store
+            StoreOwner owner = new StoreOwner(RegisteredUser, TestStore, TestStore.Founder);
+            RegisteredUser user = new RegisteredUser("shmar@gmail.com", "Password");
+            UserFacade.RegisteredUsers.TryAdd(user.Id, user);
+            StoreManager manager = new StoreManager(user, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Owners.TryAdd(owner.GetId(), owner);
+            TestStore.Managers.TryAdd(manager.GetId(), manager);
+
+            Founder.LoggedIn = loggedin;
+            owner.User.LoggedIn = loggedin;
+            manager.User.LoggedIn = loggedin;
+
+            Facade.CloseStore(TestStore.Id, Founder.Id);
+
+            if (loggedin)
+            {
+                Assert.Empty(Founder.PendingNotification);
+                Assert.Empty(owner.User.PendingNotification);
+                Assert.Empty(manager.User.PendingNotification);
+            }
+            else
+            {
+                Assert.Single(Founder.PendingNotification); 
+                Assert.Single(owner.User.PendingNotification); 
+                Assert.Single(manager.User.PendingNotification); 
+
+                foreach (Notification n in Founder.PendingNotification)
+                {
+                    Assert.False(n.isOpened);
+                    Assert.True(n.isStoreStaff);
+                    Assert.Equal(DateTime.Now.ToString("MM/dd/yyyy HH:mm"), n.Date.ToString("MM/dd/yyyy HH:mm"));
+                    Assert.Equal(Founder.Id, n.ClientId);
+
+                }
+
+                foreach (Notification n in owner.User.PendingNotification)
+                {
+                    Assert.False(n.isOpened);
+                    Assert.True(n.isStoreStaff);
+                    Assert.Equal(DateTime.Now.ToString("MM/dd/yyyy HH:mm"), n.Date.ToString("MM/dd/yyyy HH:mm"));
+                    Assert.Equal(owner.GetId(), n.ClientId);
+
+                }
+
+                foreach (Notification n in manager.User.PendingNotification)
+                {
+                    Assert.False(n.isOpened);
+                    Assert.True(n.isStoreStaff);
+                    Assert.Equal(DateTime.Now.ToString("MM/dd/yyyy HH:mm"), n.Date.ToString("MM/dd/yyyy HH:mm"));
+                    Assert.Equal(manager.GetId(), n.ClientId);
+
+                }
+            }
+        }
+
+        [Theory()]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void NotificationOpenStoreTest(Boolean loggedin)
+        {
+            // Create Notification Manager for store
+            NotificationManager notificationManager = new NotificationManager(TestStore);
+            TestStore.NotificationManager = notificationManager;
+
+            // Add 1 owner and 1 manager to store
+            StoreOwner owner = new StoreOwner(RegisteredUser, TestStore, TestStore.Founder);
+            RegisteredUser user = new RegisteredUser("shmar@gmail.com", "Password");
+            UserFacade.RegisteredUsers.TryAdd(user.Id, user);
+            StoreManager manager = new StoreManager(user, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Owners.TryAdd(owner.GetId(), owner);
+            TestStore.Managers.TryAdd(manager.GetId(), manager);
+
+            Founder.LoggedIn = loggedin;
+            owner.User.LoggedIn = loggedin;
+            manager.User.LoggedIn = loggedin;
+
+            Facade.CloseStore(TestStore.Id, Founder.Id);
+            Facade.ReOpenStore(TestStore.Id, Founder.Id);
+
+            if (loggedin)
+            {
+                Assert.Empty(Founder.PendingNotification);
+                Assert.Empty(owner.User.PendingNotification);
+                Assert.Empty(manager.User.PendingNotification);
+            }
+            else
+            {
+                Assert.Equal(2 , Founder.PendingNotification.Count);
+                Assert.Equal(2 , owner.User.PendingNotification.Count);
+                Assert.Equal(2 , manager.User.PendingNotification.Count);
+
+                String firstmsg = $"Event : Store Closed\nStore Id : {TestStore.Id}\n";
+                Assert.Equal(firstmsg, Founder.PendingNotification.First.Value.Message);
+                Assert.Equal(firstmsg, owner.User.PendingNotification.First.Value.Message);
+                Assert.Equal(firstmsg, manager.User.PendingNotification.First.Value.Message);
+
+                String lastmsg = $"Event : Store Opened\nStore Id : {TestStore.Id}\n";
+                Assert.Equal(lastmsg, Founder.PendingNotification.Last.Value.Message);
+                Assert.Equal(lastmsg, owner.User.PendingNotification.Last.Value.Message);
+                Assert.Equal(lastmsg, manager.User.PendingNotification.Last.Value.Message);
+
+                Assert.Equal(Founder.Id, Founder.PendingNotification.First.Value.ClientId);
+                Assert.Equal(owner.GetId(), owner.User.PendingNotification.First.Value.ClientId);
+                Assert.Equal(manager.GetId(), manager.User.PendingNotification.First.Value.ClientId);
+
+                Assert.Equal(Founder.Id, Founder.PendingNotification.Last.Value.ClientId);
+                Assert.Equal(owner.GetId(), owner.User.PendingNotification.Last.Value.ClientId);
+                Assert.Equal(manager.GetId(), manager.User.PendingNotification.Last.Value.ClientId);
+
+            }
+        }
+
+
+        [Theory()]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void NotificationOwnerSubscriptionRemovedTest(Boolean loggedin)
+        {
+            // Create Notification Manager for store
+            NotificationManager notificationManager = new NotificationManager(TestStore);
+            TestStore.NotificationManager = notificationManager;
+
+            // Add 1 owner and 1 manager to store
+            StoreOwner owner = new StoreOwner(RegisteredUser, TestStore, TestStore.Founder);
+            RegisteredUser user = new RegisteredUser("shmar@gmail.com", "Password");
+            UserFacade.RegisteredUsers.TryAdd(user.Id, user);
+            StoreManager manager = new StoreManager(user, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Owners.TryAdd(owner.GetId(), owner);
+            TestStore.Managers.TryAdd(manager.GetId(), manager);
+
+            Founder.LoggedIn = loggedin;
+            owner.User.LoggedIn = loggedin;
+            manager.User.LoggedIn = loggedin;
+
+            Facade.RemoveStoreOwner(owner.GetId(), Founder.Id, TestStore.Id);            
+
+            if (loggedin)
+            {
+                Assert.Empty(Founder.PendingNotification);
+                Assert.Empty(owner.User.PendingNotification);
+                Assert.Empty(manager.User.PendingNotification);
+            }
+            else
+            {
+                Assert.Single(Founder.PendingNotification);
+                Assert.Single(owner.User.PendingNotification);
+                Assert.Single(manager.User.PendingNotification);
+
+                String msg = $"Event : Owner Subscription Removed\nStore Id : {TestStore.Id}\nOwner Id : {owner.GetId()}";
+                Assert.Equal(msg, Founder.PendingNotification.First.Value.Message);
+                Assert.Equal(msg, owner.User.PendingNotification.First.Value.Message);
+                Assert.Equal(msg, manager.User.PendingNotification.First.Value.Message);
+
+                Assert.Equal(Founder.Id, Founder.PendingNotification.First.Value.ClientId);
+                Assert.Equal(owner.GetId(), owner.User.PendingNotification.First.Value.ClientId);
+                Assert.Equal(manager.GetId(), manager.User.PendingNotification.First.Value.ClientId);
+            }
+        }
+
+        [Theory()]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void NotificationOwnerSubscriptionRemovedTest2(Boolean loggedin)
+        {
+            // Create Notification Manager for store
+            NotificationManager notificationManager = new NotificationManager(TestStore);
+            TestStore.NotificationManager = notificationManager;
+
+            // Add 1 owner and 1 manager to store
+            StoreOwner owner = new StoreOwner(RegisteredUser, TestStore, TestStore.Founder);
+            RegisteredUser user = new RegisteredUser("shmar@gmail.com", "Password");
+            UserFacade.RegisteredUsers.TryAdd(user.Id, user);
+            StoreManager manager = new StoreManager(user, TestStore, new Permission(), owner);  // Notice : this time the manager was appointed by the owner (and not by the founder)
+            TestStore.Owners.TryAdd(owner.GetId(), owner);
+            TestStore.Managers.TryAdd(manager.GetId(), manager);
+
+            Founder.LoggedIn = loggedin;
+            owner.User.LoggedIn = loggedin;
+            manager.User.LoggedIn = loggedin;
+
+            Facade.RemoveStoreOwner(owner.GetId(), Founder.Id, TestStore.Id);   // also the manager is removed by default - but there is no notification for that
+
+            if (loggedin)
+            {
+                Assert.Empty(Founder.PendingNotification);
+                Assert.Empty(owner.User.PendingNotification);
+                Assert.Empty(manager.User.PendingNotification);
+            }
+            else
+            {
+                Assert.Single(Founder.PendingNotification);
+                Assert.Single(owner.User.PendingNotification);
+                Assert.Single(manager.User.PendingNotification);
+
+                String msg = $"Event : Owner Subscription Removed\nStore Id : {TestStore.Id}\nOwner Id : {owner.GetId()}";
+                Assert.Equal(msg, Founder.PendingNotification.First.Value.Message);
+                Assert.Equal(msg, owner.User.PendingNotification.First.Value.Message);
+                Assert.Equal(msg, manager.User.PendingNotification.First.Value.Message);
+
+                Assert.Equal(Founder.Id, Founder.PendingNotification.First.Value.ClientId);
+                Assert.Equal(owner.GetId(), owner.User.PendingNotification.First.Value.ClientId);
+                Assert.Equal(manager.GetId(), manager.User.PendingNotification.First.Value.ClientId);
+            }
+        }
+
+
+        [Theory()]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void NotificationProductReviewTest(Boolean loggedin)
+        {
+            // Create Notification Manager for store
+            NotificationManager notificationManager = new NotificationManager(TestStore);
+            TestStore.NotificationManager = notificationManager;
+
+            // Add 1 owner and 1 manager to store
+            StoreOwner owner = new StoreOwner(RegisteredUser, TestStore, TestStore.Founder);
+            RegisteredUser user = new RegisteredUser("shmar@gmail.com", "Password");
+            UserFacade.RegisteredUsers.TryAdd(user.Id, user);
+            StoreManager manager = new StoreManager(user, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Owners.TryAdd(owner.GetId(), owner);
+            TestStore.Managers.TryAdd(manager.GetId(), manager);
+
+            Founder.LoggedIn = loggedin;
+            owner.User.LoggedIn = loggedin;
+            manager.User.LoggedIn = loggedin;
+
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 100, "Fruits");
+            TestStore.InventoryManager.Products.TryAdd(product.Id, product);
+
+            // Update products Notification Manager manually
+            product.NotificationManager = notificationManager;
+
+            // Add product to user shopping bag
+            Facade.AddProductToCart(RegisteredUser.Id, product.Id, 5, TestStore.Id);
+
+            // Add shopping bag to history
+            RegisteredUser.ShoppingCart.ShoppingBags.TryGetValue(TestStore.Id, out ShoppingBag bag);
+            RegisteredUser.History.ShoppingBags.AddLast(bag.GetDAL().Data);
+
+            // Add review to product 
+            String review = "The banana was awsome";
+            Facade.AddProductReview(RegisteredUser.Id, TestStore.Id, product.Id, review);
+
+            if (loggedin)
+            {
+                Assert.Empty(Founder.PendingNotification);
+                Assert.Empty(owner.User.PendingNotification);
+                Assert.Empty(manager.User.PendingNotification);
+            }
+            else
+            {
+                Assert.Single(Founder.PendingNotification);
+                Assert.Single(owner.User.PendingNotification);
+                Assert.Empty(manager.User.PendingNotification);     // managers dont get this notification
+
+                String msg = $"Event : A product review was added\nStore Id : {TestStore.Id}\nProduct Id : {product.Id}\nReview : {review}\n";
+                Assert.Equal(msg, Founder.PendingNotification.First.Value.Message);
+                Assert.Equal(msg, owner.User.PendingNotification.First.Value.Message);
+
+                Assert.Equal(Founder.Id, Founder.PendingNotification.First.Value.ClientId);
+                Assert.Equal(owner.GetId(), owner.User.PendingNotification.First.Value.ClientId);
+            }
+        }
     }
 }
