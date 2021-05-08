@@ -6,16 +6,16 @@ using Terminal3.DomainLayer.StoresAndManagement;
 
 namespace Terminal3.ServiceLayer
 {
-    public class NotificationService
+    public sealed class NotificationService
     {
-        private NotificationService Instance { get; set; }
+        private static NotificationService Instance { get; set; }
         
         private NotificationService()
         {
             Instance = null;
         }
 
-        public NotificationService GetInstance()
+        public static NotificationService GetInstance()
         {
             if (Instance == null)
             {
@@ -29,8 +29,8 @@ namespace Terminal3.ServiceLayer
         {
             notification.isOpened = true;      
 
-            throw new NotImplementedException();
-            //return new Result<bool>("Notification is displayed to manager\n", true, true);
+            //throw new NotImplementedException();
+            return new Result<bool>("Notification is displayed to manager\n", true, true);
         }
 
     }

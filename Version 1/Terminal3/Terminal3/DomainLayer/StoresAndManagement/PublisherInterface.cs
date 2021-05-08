@@ -11,7 +11,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> notifyStorePurchase(Product product , int quantity);
         Result<Boolean> notifyStoreClosed();
         Result<Boolean> notifyStoreOpened();
-        Result<Boolean> notifyOwnerSubscriptionRemoved(String ownerID);                
-
+        Result<Boolean> notifyOwnerSubscriptionRemoved(String ownerID , StoreOwner removedOwner);
     }
 }
