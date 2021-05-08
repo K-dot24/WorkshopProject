@@ -652,5 +652,66 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
                 Assert.Equal(manager.GetId(), manager.User.PendingNotification.First.Value.ClientId);
             }
         }
+
+
+        [Theory()]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void NotificationProductReviewTest(Boolean loggedin)
+        {
+            // Create Notification Manager for store
+            NotificationManager notificationManager = new NotificationManager(TestStore);
+            TestStore.NotificationManager = notificationManager;
+
+            // Add 1 owner and 1 manager to store
+            StoreOwner owner = new StoreOwner(RegisteredUser, TestStore, TestStore.Founder);
+            RegisteredUser user = new RegisteredUser("shmar@gmail.com", "Password");
+            UserFacade.RegisteredUsers.TryAdd(user.Id, user);
+            StoreManager manager = new StoreManager(user, TestStore, new Permission(), TestStore.Founder);
+            TestStore.Owners.TryAdd(owner.GetId(), owner);
+            TestStore.Managers.TryAdd(manager.GetId(), manager);
+
+            Founder.LoggedIn = loggedin;
+            owner.User.LoggedIn = loggedin;
+            manager.User.LoggedIn = loggedin;
+
+            // Add products to store
+            Product product = new Product("Banana", 5.7, 100, "Fruits");
+            TestStore.InventoryManager.Products.TryAdd(product.Id, product);
+
+            // Update products Notification Manager manually
+            product.NotificationManager = notificationManager;
+
+            // Add product to user shopping bag
+            Facade.AddProductToCart(RegisteredUser.Id, product.Id, 5, TestStore.Id);
+
+            // Add shopping bag to history
+            RegisteredUser.ShoppingCart.ShoppingBags.TryGetValue(TestStore.Id, out ShoppingBag bag);
+            RegisteredUser.History.ShoppingBags.AddLast(bag.GetDAL().Data);
+
+            // Add review to product 
+            String review = "The banana was awsome";
+            Facade.AddProductReview(RegisteredUser.Id, TestStore.Id, product.Id, review);
+
+            if (loggedin)
+            {
+                Assert.Empty(Founder.PendingNotification);
+                Assert.Empty(owner.User.PendingNotification);
+                Assert.Empty(manager.User.PendingNotification);
+            }
+            else
+            {
+                Assert.Single(Founder.PendingNotification);
+                Assert.Single(owner.User.PendingNotification);
+                Assert.Empty(manager.User.PendingNotification);     // managers dont get this notification
+
+                String msg = $"Event : A product review was added\nStore Id : {TestStore.Id}\nProduct Id : {product.Id}\nReview : {review}\n";
+                Assert.Equal(msg, Founder.PendingNotification.First.Value.Message);
+                Assert.Equal(msg, owner.User.PendingNotification.First.Value.Message);
+
+                Assert.Equal(Founder.Id, Founder.PendingNotification.First.Value.ClientId);
+                Assert.Equal(owner.GetId(), owner.User.PendingNotification.First.Value.ClientId);
+            }
+        }
     }
 }
