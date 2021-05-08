@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
 import { Products, Navbar, Cart } from '../../../index';
+import { GetAllProductByStoreIDToDisplay } from '../../../../api/API';
 
 
 
@@ -13,11 +14,14 @@ const StorePage = ({ handleAddToCart, match }) => {
 
     // TODO: Fetch real data from API
     const fetchProducts = async () => {
+        GetAllProductByStoreIDToDisplay(id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
 
-        setProducts([
-            { id: 1, name: 'Nike Blazer Mid 77', price: 450.0, quantity: 10, category: 'Shoes', rating: 5, numberOfRates: 2, keywords: ['nike', 'shoes', 'style'], image: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/ef4dbed6-c621-4879-8db3-f87296bfb570/blazer-mid-77-vintage-shoe-CBDjT0.png'},
-            { id: 2, name: 'Macbook', price: 4019.99, quantity: 50, category: 'Laptops', rating: 4.5, numberOfRates: 6, keywords: ['apple', 'macbook', 'expensive'], image: 'https://d3m9l0v76dty0.cloudfront.net/system/photos/5435150/large/d6b55817aafd21bc9c896dfcfcaf0ae7.jpg'}
-        ]);
+        
+        // Mock Data
+        // setProducts([
+        //     { id: 1, name: 'Nike Blazer Mid 77', price: 450.0, quantity: 10, category: 'Shoes', rating: 5, numberOfRates: 2, keywords: ['nike', 'shoes', 'style'], image: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/ef4dbed6-c621-4879-8db3-f87296bfb570/blazer-mid-77-vintage-shoe-CBDjT0.png'},
+        //     { id: 2, name: 'Macbook', price: 4019.99, quantity: 50, category: 'Laptops', rating: 4.5, numberOfRates: 6, keywords: ['apple', 'macbook', 'expensive'], image: 'https://d3m9l0v76dty0.cloudfront.net/system/photos/5435150/large/d6b55817aafd21bc9c896dfcfcaf0ae7.jpg'}
+        // ]);
     }
 
     // TODO: Fetch real data from API

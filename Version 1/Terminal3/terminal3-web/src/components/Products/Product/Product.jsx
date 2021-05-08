@@ -3,16 +3,14 @@ import { Card, CardMedia, CardContent, CardActions, Typography, IconButton } fro
 import { AddShoppingCart } from '@material-ui/icons';
 
 import useStyles from './styles';
+import { products_image_url } from '../../../api/API';
 
-// TODO: Check properties' names after getting real products
-//       Check onAddToCart after fetching real data
 const Product = ({ product, onAddToBag }) => {
     const classes = useStyles();
 
-    // TODO: Change onAddToCart to any quantity
     return (
         <Card className={classes.root}>
-            <CardMedia className={classes.media} image={product.image} title={product.name}/>
+            <CardMedia className={classes.media} image={products_image_url} title={product.name}/>
             <CardContent>
                 <div className={classes.cardContent}>
                     <Typography variant="h5" gutterBottom>
@@ -25,7 +23,7 @@ const Product = ({ product, onAddToBag }) => {
                 <Typography variant="body2" color="textSecondary">{product.category}</Typography>
             </CardContent>
             <CardActions disableSpacing className={classes.cardActions}>
-                <IconButton aria-label="Add to Bag" onClick={() => onAddToBag(product.id, product.name, product.price, 1, product.image)}>
+                <IconButton aria-label="Add to Bag" onClick={() => onAddToBag(product.id, product.name, product.price, 1, products_image_url)}>
                     <AddShoppingCart />
                 </IconButton>
             </CardActions>

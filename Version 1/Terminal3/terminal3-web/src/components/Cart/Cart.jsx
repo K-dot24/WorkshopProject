@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 import useStyles from './styles';
 import CartItem from './CartItem/CartItem';
+import { products_image_url } from '../../api/API';
 
 const Cart = ({ id, cart, handleUpdateCartQuantity, handleRemoveFromCart, handleEmptyCart, handleAddToCart }) => {
     const classes = useStyles();
@@ -56,7 +57,7 @@ const Cart = ({ id, cart, handleUpdateCartQuantity, handleRemoveFromCart, handle
                         <Button component={Link} to="/cart" className={classes.checkoutButton} 
                                 size="large" type="button" variant="contained" color="primary"
                                 onClick={() => cart.products.map((item) => (
-                                    handleAddToCart(item.id, item.name, item.price, item.quantity, item.image)
+                                    handleAddToCart(item.id, item.name, item.price, item.quantity, products_image_url)
                                 ))} >
                             Add to Cart
                         </Button>

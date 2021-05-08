@@ -1,3 +1,4 @@
+//#region to delete
 // import fetch from 'node-fetch';
 // import https from 'https';
 
@@ -25,7 +26,11 @@
         // };
         // fetchData();
         // console.log(data);
+//#endregion
 
+export const products_image_url = 'https://i.ibb.co/HxrQmhn/price-tag.jpg';
+
+// FuncName().then(response => response.json().then(json => setStateName(json))).catch(err => console.log(err));
 
 export function GetAllStoresToDisplay() {
     return fetch(`https://localhost:5000/api/Data/GetAllStoresToDisplay`, {
@@ -47,7 +52,7 @@ export function GetAllStoresToDisplay() {
 // }
 
 export function GetAllProductByStoreIDToDisplay(storeId) {
-    return fetch(`http://localhost:5000/api/Data/GetAllProductByStoreIDToDisplay/${storeId}`, {
+    return fetch(`https://localhost:5000/api/Data/GetAllProductByStoreIDToDisplay/${storeId}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -57,7 +62,7 @@ export function GetAllProductByStoreIDToDisplay(storeId) {
 }
 
 export function Register(email, password) {
-    return fetch(`http://localhost:5000/api/GuestUser/Register`, {
+    return fetch(`https://localhost:5000/api/GuestUser/Register`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -68,7 +73,7 @@ export function Register(email, password) {
 }
 
 export function Login(email, password) {
-    return fetch(`http://localhost:5000/api/GuestUser/Login`, {
+    return fetch(`https://localhost:5000/api/GuestUser/Login`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
