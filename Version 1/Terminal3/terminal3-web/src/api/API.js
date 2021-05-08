@@ -311,7 +311,190 @@ export function AddProductReview( data ) {
 //#region StoreStaffController
 
 
+ /// Add product to store
+/// Template of valid JSON:
+/// {
+///     "userID":"string",
+///     "storeID":"string",
+///     "productName":"string,
+///     "price":double,
+///     "initialQuantity":int,
+///     "category":"string",
+///     "keywords":["string","string"],
+/// }
+export function AddProductToStore( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddProductToStore`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
+/// Removing product from store
+/// <param name="userID">userId of the manager/owner who preform the action</param>
+/// <param name="storeID">storeId where the product is located in</param>
+/// <param name="productID">product identifier</param>
+export function RemoveProductFromStore( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemoveProductFromStore/${data.userID}/${data.storeID}/${data.productID}`, {
+        method: 'DELETE',                                                                   //TODO - HTTP DELETE
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+
+/// Edit product details
+/// Template of valid JSON:
+/// {
+///     "userID":"string",
+///     "storeID:"string",
+///     "productID":"string",
+///     "details": {
+///                     "Name":"string",
+///                     "Price":double,
+///                     "Quantity":int,
+///                     "Category":"string",
+///                     "Keywords":["string","string"...]
+///                 }
+/// }
+/// NOTE: all fields in "detalis" values are optionals
+export function EditProductDetails( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/EditProductDetails`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+/// Add new store owner to a given store
+/// Template of valid JSON:
+/// {
+///     "addedOwnerID":"string",
+///     "currentlyOwnerID:"string",
+///     "storeID":"string"
+/// }
+export function AddStoreOwner( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddStoreOwner`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+
+/// Adding new store manager to a given store
+/// Template of valid JSON:
+/// {
+///     "addedManagerID":"string",
+///     "currentlyOwnerID:"string",
+///     "storeID":"string"
+/// }
+export function AddStoreManager( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddStoreManager`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+
+/// Setting new set of permissions to manager
+/// Template of valid JSON:
+/// {
+///     "storeID":"string",
+///     "managerID:"string",
+///     "ownerID":"string",
+///     "permissions":[int,int,int...]
+/// }
+export function SetPermissions( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/SetPermissions`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+
+/// removing set of permissions to manager
+/// Template of valid JSON:
+/// {
+///     "storeID":"string",
+///     "managerID:"string",
+///     "ownerID":"string",
+///     "permissions":[int,int,int...]
+/// }
+export function RemovePermissions( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemovePermissions`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+/// Return list of pair, each pair hold details about the store staff and its permissions
+/// <param name="ownerID">ID of the owner who request to preform the operation</param>
+/// <param name="storeID">storeID</param>
+export function GetStoreStaff( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetStoreStaff`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+/// Returns in-store purchase history
+/// <param name="ownerID">ownerID</param>
+/// <param name="storeID">ID of the store to get the purchase history</param>
+export function GetStorePurchaseHistory( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeId}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+
+/// Removing excisting store manager by an owner
+/// <param name="storeID">StoreID</param>
+/// <param name="currentlyOwnerID">OwnerID</param>
+/// <param name="removedManagerID">ID of the manager to be removed</param>
+export function RemoveStoreManager( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemoveStoreManager/${data.storeID}/${data.currentlyOwnerID}/${data.removedManagerID}`, {
+        method: 'DELETE',                                                       //TODO - HTTP DELETE
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
 
 //#endregion
@@ -319,8 +502,78 @@ export function AddProductReview( data ) {
 
 //#region SystemAdminController
 
+/// Returns user's purchase history
+/// <param name="sysAdminID">system admin ID</param>
+/// <param name="userID">ID of the user to get the purchase history</param>
+export function GetUserPurchaseHistory( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/GetUserPurchaseHistory/${data.sysAdminID}/${data.userID}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
 
+/// Returns in-store purchase history
+/// <param name="sysAdminID">system admin ID</param>
+/// <param name="storeId">ID of the store to get the purchase history</param>
+export function GetStorePurchaseHistory( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeID}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+
+/// Adding new system admin
+/// <param name="sysAdminID">userId of the system admin who preform the addition</param>
+/// <param name="email">email of the request new system admin</param>
+export function AddSystemAdmin( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/AddSystemAdmin/${data.sysAdminID}/${data.email}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+
+/// Removing existing system admin
+/// <param name="sysAdminID">userId of the system admin who preform the addition</param>
+/// <param name="email">email of admin to be removed</param>
+export function RemoveSystemAdmin( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/RemoveSystemAdmin/${data.sysAdminID}/${data.email}`, {
+        method: 'DELETE',                                       //TODO - HTTP DELETE
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+
+/// Reset the system, including all the stored data
+/// <param name="sysAdminID">userId of the system admin who preform the addition</param>
+export function ResetSystem( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/ResetSystem/${data.sysAdminID}`, {
+        method: 'POST',                                       
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
 
 //#endregion

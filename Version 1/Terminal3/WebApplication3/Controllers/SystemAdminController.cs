@@ -48,7 +48,7 @@ namespace Terminal3WebAPI.Controllers
         /// <param name="sysAdminID">system admin ID</param>
         /// <param name="storeId">ID of the store to get the purchase history</param>
         /// <returns></returns>
-        [Route("GetStorePurchaseHistory/{sysAdminID}/{storeId}")]
+        [Route("GetStorePurchaseHistory/{sysAdminID}/{storeID}")]
         [HttpGet]
         public IActionResult GetStorePurchaseHistory(string sysAdminID, string storeId)
         {
