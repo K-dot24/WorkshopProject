@@ -6,7 +6,7 @@ import { GetAllProductByStoreIDToDisplay } from '../../../../api/API';
 
 
 
-const StorePage = ({ handleAddToCart, match }) => {
+const StorePage = ({ handleAddToCart, match, user, handleLogOut }) => {
     const { id } = useParams();
 
     const [products, setProducts] = useState([]);
@@ -83,7 +83,7 @@ const StorePage = ({ handleAddToCart, match }) => {
 
     return (
         <div>
-            <Navbar id={id} totalItems={bag.products.length} />
+            <Navbar id={id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} />
             <Switch>
                 <Route exact path={match.url}>
                     <Products products={products} onAddToBag={handleAddToBag} />

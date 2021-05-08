@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { useHistory } from 'react-router-dom';
 
 import useStyles from './styles';
 
@@ -19,8 +20,25 @@ function Copyright() {
 
 // TODO: Add onSubmit functionality
 
-const Register = () => {
+const Register = ({ handleRegister }) => {
+    // styles.js
     const classes = useStyles();
+    
+    // states
+    const [data, setData] = useState({});
+
+    // for redirecting after register
+    let history = useHistory();
+
+    // TODO: Connect to API
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        handleRegister(data);
+
+        // redirect to login page
+        history.push('/login');
+    }
 
     return (
     <Container component="main" maxWidth="xs">
@@ -32,29 +50,31 @@ const Register = () => {
                 <Typography component="h1" variant="h5">
                     Sign up
                 </Typography>
-                <form className={classes.form}>
+                <form className={classes.form} onSubmit={handleSubmit}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                         <TextField
                             autoComplete="fname"
                             name="firstName"
                             variant="outlined"
-                            required
+                            // required
                             fullWidth
                             id="firstName"
                             label="First Name"
                             autoFocus
+                            onChange={(e) => setData({ ...data, firstname: e.target.value })}
                         />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                         <TextField
                             variant="outlined"
-                            required
+                            // required
                             fullWidth
                             id="lastName"
                             label="Last Name"
                             name="lastName"
                             autoComplete="lname"
+                            onChange={(e) => setData({ ...data, lastname: e.target.value })}
                         />
                         </Grid>
                         <Grid item xs={12}>
@@ -66,6 +86,7 @@ const Register = () => {
                             label="Email Address"
                             name="email"
                             autoComplete="email"
+                            onChange={(e) => setData({ ...data, email: e.target.value })}
                         />
                         </Grid>
                         <Grid item xs={12}>
@@ -78,6 +99,7 @@ const Register = () => {
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            onChange={(e) => setData({ ...data, password: e.target.value })}
                         />
                         </Grid>
                         <Grid item xs={12}>

@@ -9,6 +9,7 @@ import FormInput from './FormInput';
 const AddressForm = ({ next }) => {
     const [shippingCountries, setShippingCountries] = useState([]);
     const [shippingCountry, setShippingCountry] = useState('');
+    const [data, setData] = useState({});
 
     const methods = useForm();
 
@@ -20,6 +21,11 @@ const AddressForm = ({ next }) => {
         setShippingCountry(countries[0]);
     }
 
+    const handleSubmit = (e) => {
+        // e.preventDefault();
+        next({ ...data, shippingCountry });
+    }
+
     useEffect(() => {
         fetchShippingCountries();
     }, []);
@@ -28,14 +34,14 @@ const AddressForm = ({ next }) => {
         <>
             <Typography variant="h6" gutterBottom>Shipping Address</Typography>
             <FormProvider {...methods}>
-                <form onSubmit={methods.handleSubmit((data) => next({ ...data, shippingCountry }))}>
+                <form onSubmit={handleSubmit}>
                     <Grid container spacing={3}>
-                        <FormInput name='firstName' label='First Name' />
-                        <FormInput name='lastName' label='Last Name' />
-                        <FormInput name='address1' label='Address' />
-                        <FormInput name='city' label='City' />
-                        <FormInput name='zip' label='ZIP / Postal Code' />
-                        <FormInput name='email' label='Email' />
+                        <FormInput name='firstName' label='First Name' onChange={(e) => setData({ ...data, firstname: e.target.value })} />
+                        <FormInput name='lastName' label='Last Name' onChange={(e) => setData({ ...data, lastname: e.target.value })} />
+                        <FormInput name='address1' label='Address' onChange={(e) => setData({ ...data, address: e.target.value })} />
+                        <FormInput name='city' label='City' onChange={(e) => setData({ ...data, city: e.target.value })} />
+                        <FormInput name='zip' label='ZIP / Postal Code' onChange={(e) => setData({ ...data, zip: e.target.value })} />
+                        <FormInput name='email' label='Email' onChange={(e) => setData({ ...data, email: e.target.value })} />
                         <Grid item xs={12} sm={6}>
                             <InputLabel>Shipping Country</InputLabel>
                             <Select value={shippingCountry} fullWidth onChange={(e) => setShippingCountry(e.target.value)}>
