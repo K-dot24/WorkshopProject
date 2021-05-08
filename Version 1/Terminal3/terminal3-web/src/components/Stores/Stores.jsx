@@ -1,24 +1,30 @@
 import React, { useState, useEffect } from 'react'
 import { Grid } from '@material-ui/core';
-
+import Axios from 'axios';
+import axios from 'axios';
+ 
+import { GetAllStoresToDisplay } from '../../api/API';
 import Store from './Store/Store';
 import useStyles from './styles';
 
 const Stores = () => {
     const [stores, setStores] = useState([]);
+
     const classes = useStyles();
 
-    // TODO: Fetch real data from API
     const fetchStores = async () => {
-        setStores([
-            { id: 1, name: 'Topshop', rating: 4, image: 'https://salience.co.uk/wp-content/uploads/topshop-1.jpg'},
-            { id: 2, name: 'ZARA MEN', rating: 4.5, image: 'https://blackfriday-best.co.il/wp-content/uploads/2020/11/ZARA-logo.jpg'}
-        ]);
+        GetAllStoresToDisplay().then(response => response.json().then(json => setStores(json))).catch(err => console.log(err));
+
+        // Mock data
+        // setStores([
+        //     { id: 1, name: 'Topshop', rating: 4, image: 'https://salience.co.uk/wp-content/uploads/topshop-1.jpg'},
+        //     { id: 2, name: 'ZARA MEN', rating: 4.5, image: 'https://blackfriday-best.co.il/wp-content/uploads/2020/11/ZARA-logo.jpg'}
+        // ]);
     }
 
-    useEffect(() => {
+    useEffect(() => { 
         fetchStores();
-    }, []);
+    }, []);  
 
     return (
         <main className={classes.content}>

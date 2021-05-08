@@ -5,14 +5,15 @@ import { Link } from 'react-router-dom';
 
 import useStyles from './styles';
 
-// TODO: Make whole card linkable to store page
 const Store = ({ store }) => {
     const classes = useStyles();
+
+    const image_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Store_Building_Flat_Icon_Vector.svg/1024px-Store_Building_Flat_Icon_Vector.svg.png';
 
     return (
         <Link to={{pathname: `/stores/${store.id}`, state: { store: store }}} style={{ textDecoration: "none" }}>
         <Card className={classes.root}>
-            <CardMedia className={classes.media} image={store.image} title={store.name} alt={store.name}/>
+            <CardMedia className={classes.media} image={image_url} title={store.name} alt={store.name}/>
             <CardContent>
                 <div className={classes.cardContent}>
                     <Typography variant="h5" gutterBottom>

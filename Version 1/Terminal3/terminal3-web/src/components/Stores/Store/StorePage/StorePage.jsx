@@ -13,7 +13,6 @@ const StorePage = ({ handleAddToCart, match }) => {
 
     // TODO: Fetch real data from API
     const fetchProducts = async () => {
-        // const id = state.store.id;
 
         setProducts([
             { id: 1, name: 'Nike Blazer Mid 77', price: 450.0, quantity: 10, category: 'Shoes', rating: 5, numberOfRates: 2, keywords: ['nike', 'shoes', 'style'], image: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/ef4dbed6-c621-4879-8db3-f87296bfb570/blazer-mid-77-vintage-shoe-CBDjT0.png'},
