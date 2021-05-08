@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3WebAPI.Hubs;
 using Terminal3WebAPI.Hubs.Client;
+using Terminal3WebAPI.Models;
 
 namespace Terminal3WebAPI.Controllers
 {
@@ -23,12 +24,12 @@ namespace Terminal3WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<string> Post([FromBody] Notification msg)
+        public async Task<string> Post([FromBody] ChatMessage msg)
         {
             var retMessage = string.Empty;
             try
             {
-                await _signalrHub.Clients.All.RecieveNotification(msg);
+                await _signalrHub.Clients.All.ReceiveMessage(msg);
                 retMessage = "Success";
             }
             catch (Exception e)

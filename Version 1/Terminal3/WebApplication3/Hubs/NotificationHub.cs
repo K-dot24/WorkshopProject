@@ -3,16 +3,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3WebAPI.Hubs.Client;
+using Terminal3WebAPI.Models;
 
 namespace Terminal3WebAPI.Hubs
 {
     public class NotificationHub : Hub<IClient>
     {
-        public async Task SendMessage(Notification message)
+        private static ConnectionMapping<string> _connections = new ConnectionMapping<string>(); //userid to connectionid
+
+        public override Task OnConnectedAsync()
         {
-            await Clients.All.RecieveNotification(message);
+            string name = Context.User.Identity.Name;
+            Console.WriteLine($"OnConnectedAsync name:{name}");
+
+            _connections.Add(name, Context.ConnectionId);
+
+            return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            string name = Context.User.Identity.Name;
+
+            _connections.Remove(name);
+
+            return base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task SendMessage(ChatMessage message)
+        {
+            await Clients.All.ReceiveMessage(message);
         }
     }
 }
