@@ -44,11 +44,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<bool> notifyOwnerSubscriptionRemoved(string ownerID, StoreOwner removedOwner)
         {
-            String msg = $"Event : Owner Subscription Removed\nStore Id : {Store.Id}\nOwner Id : {ownerID}";
+            String msg = $"Event : Owner Subscription Removed\nStore Id : {Store.Id}\nOwner Id : {ownerID}\n";
             Notification notification = new Notification(ownerID, msg, true);
             removedOwner.Update(notification);      // send notification to the removed owner itself as well as to the store staff
             notify(msg , true);
             return new Result<bool>($"All staff members are notified that owner ({ownerID}) subscriptoin as store owner ({Store.Id}) has been removed\n", true, true);
+        }
+
+        public Result<bool> notifyProductReview(Product product , String review)
+        {
+            String msg = $"Event : A product review was added\nStore Id : {Store.Id}\nProduct Id : {product.Id}\nReview : {review}\n";
+            notifyOwners(msg, true);
+            return new Result<bool>($"All staff members are notified that a product review was added to store {Store.Id} successfuly\n", true, true);
         }
 
 
@@ -71,6 +78,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 Notification notification = new Notification(manager.Value.GetId() ,msg, true);
                 manager.Value.Update(notification);
             }
+        }
+
+        private void notifyOwners(String msg, Boolean isStaff)
+        {
+            //Send a new (and different) notification for each staff member due to the addresse Id field in the notificaion itself
+            ConcurrentDictionary<String, StoreOwner> Owners = Store.Owners;
+
+            foreach (var owner in Owners)
+            {
+                Notification notification = new Notification(owner.Value.GetId(), msg, true);
+                owner.Value.Update(notification);
+            }            
         }
 
     }

@@ -62,7 +62,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             //TODO - check if user can add only one review and then overrride the last review ? or can add multiple reviews?
             Review.TryAdd(userId, review);
-            return new Result<Boolean>("The product review was added successfuly\n", true, true);
+            return NotificationManager.notifyProductReview(this, review);
         }
 
         public Result<ProductService> GetDAL()
