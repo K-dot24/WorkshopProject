@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { useHistory } from 'react-router-dom';
 
 import useStyles from './styles';
 
@@ -17,18 +18,24 @@ function Copyright() {
     );
 }
 
-// TODO: Add onSubmit functionality
-//      Make sign in button go to main page (with regular link doesn't sign in)
 const Login = ({ handleLogin }) => {
-    const [user, setUser] = useState({email: '', password: ''});
+    // styles.js
     const classes = useStyles();
+    
+    // states
+    const [user, setUser] = useState({email: '', password: ''});
+
+    // for redirecting after login
+    let history = useHistory();
 
     // TODO: fetch user from API
     const handleSubmit = (e) => {
         e.preventDefault();
-        
-        //do something
+
         handleLogin(user);
+
+        // redirect back to homepage
+        history.push('/');
     }
 
     // const submit = e => {

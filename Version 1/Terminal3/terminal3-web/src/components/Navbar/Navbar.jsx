@@ -22,7 +22,7 @@ const Navbar = ( { id, totalItems, user, handleLogOut }) => {
                     {user.id !== -1 &&
                         <> 
                             <Typography variant="h6" color="primary">
-                                Hello, {user.name}
+                                Hello, {user.email.substr(0, user.email.indexOf('@'))}
                             </Typography>
                             <Button component={Link} to="/" className={classes.checkoutButton} size="large" 
                                     type="button" variant="text" color="primary" onClick={() => handleLogOut()}>

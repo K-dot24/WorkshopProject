@@ -1,20 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 import { Stores, Navbar, Cart, Checkout, StorePage, Register, Login } from './components';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, useLocation } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-
-
-/* 
-    useEffect(() => {  
-        debugger;  
-        Axios  
-            .get("http://localhost:2345/Api/employee/DemoData")  
-            .then(result => setData(result.data));  
-        console.log(data);  
-        debugger;  
-    }, []);  
-*/
 
 const theme = createMuiTheme({
     palette: {
@@ -28,6 +16,7 @@ const theme = createMuiTheme({
   });
 
 const App = () => {
+    // states
     const [cart, setCart] = useState({products: [], totalPrice: 0});
     const [user, setUser] = useState({id: -1, name: '', email: ''});
 
@@ -42,7 +31,6 @@ const App = () => {
         // }
     }
 
-    // TODO: Update with real data
     const handleAddToCart = async (productId, name, price, quantity, image) => {
          setCart(function(prevState) {
             const productArr = prevState.products.filter(p => p.id === productId);
@@ -106,26 +94,26 @@ const App = () => {
     //#endregion
 
     // TODO: API
-
     const handleLogin = async (userLoginData) => {
         // check with DB...
 
-        // User exists - what details we need here? name not in code
-        setUser({ id: 10, name: "Shimrit", email: userLoginData.email });
+        // User exists - what details we need here?
+        setUser({ id: 10, email: userLoginData.email });
+    }
+
+    // TODO: API
+    const handleRegister = async (userRegisterData) => {
+        console.log(userRegisterData);
     }
 
     const handleLogOut = () => {
         setUser({id: -1, name: '', email: ''});
     }
 
+    // Update cart when user change (login/sign out)
     useEffect(() => {
         fetchCart();
     }, [user]);
-
-    //printing
-    // useEffect(() => {
-    //     console.log(cart);
-    // }, [cart]);
 
     return (
         <MuiThemeProvider theme={theme}>
@@ -149,7 +137,7 @@ const App = () => {
                             />
                         </Route>
 
-                        <Route path="/register" component={Register} />
+                        <Route path="/register" render={(props) => (<Register handleRegister={handleRegister} {...props} />)} />
                         
                         <Route path="/login" render={(props) => (<Login handleLogin={handleLogin} {...props} />)} />
 

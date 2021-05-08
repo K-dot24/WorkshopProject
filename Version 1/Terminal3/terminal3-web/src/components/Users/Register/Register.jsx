@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { useHistory } from 'react-router-dom';
 
 import useStyles from './styles';
 
@@ -19,14 +20,24 @@ function Copyright() {
 
 // TODO: Add onSubmit functionality
 
-const Register = () => {
-    const [data, setData] = useState({});
+const Register = ({ handleRegister }) => {
+    // styles.js
     const classes = useStyles();
+    
+    // states
+    const [data, setData] = useState({});
+
+    // for redirecting after register
+    let history = useHistory();
 
     // TODO: Connect to API
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(data);
+
+        handleRegister(data);
+
+        // redirect to login page
+        history.push('/login');
     }
 
     return (
@@ -46,7 +57,7 @@ const Register = () => {
                             autoComplete="fname"
                             name="firstName"
                             variant="outlined"
-                            required
+                            // required
                             fullWidth
                             id="firstName"
                             label="First Name"
@@ -57,7 +68,7 @@ const Register = () => {
                         <Grid item xs={12} sm={6}>
                         <TextField
                             variant="outlined"
-                            required
+                            // required
                             fullWidth
                             id="lastName"
                             label="Last Name"
