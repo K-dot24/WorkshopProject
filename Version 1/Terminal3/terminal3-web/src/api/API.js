@@ -505,7 +505,7 @@ export function RemoveStoreManager( data ) {
 /// Returns user's purchase history
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="userID">ID of the user to get the purchase history</param>
-export function GetUserPurchaseHistory( data ) {
+export function AdminGetUserPurchaseHistory( data ) {
     return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/GetUserPurchaseHistory/${data.sysAdminID}/${data.userID}`, {
         method: 'GET',
         headers: {
@@ -520,7 +520,7 @@ export function GetUserPurchaseHistory( data ) {
 /// Returns in-store purchase history
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="storeId">ID of the store to get the purchase history</param>
-export function GetStorePurchaseHistory( data ) {
+export function AdminGetStorePurchaseHistory( data ) {
     return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeID}`, {
         method: 'GET',
         headers: {
