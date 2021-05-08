@@ -11,12 +11,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
     public sealed class NotificationCenter 
     {
-        private static NotificationCenter Instance { get; set; }
+        private static NotificationCenter Instance { get; set; } = null;
         public NotificationService NotificationService { get; }
 
         private NotificationCenter()
         {
-            Instance = null;
             this.NotificationService = NotificationService.GetInstance();
         }
 

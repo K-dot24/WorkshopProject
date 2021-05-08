@@ -11,7 +11,10 @@ using XUnitTestTerminal3.AcceptanceTests.Utils;
 namespace Terminal3.ServiceLayer
 {   
     public interface IECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface, IDataController
-    { }
+    {
+        List<Notification> GetNotificationByEvent(Event eventEnum);
+        List<Notification> GetPendingMessagesByUserID(string userId);
+    }
     //try git action
     public class ECommerceSystem : IECommerceSystem
     {
@@ -21,6 +24,7 @@ namespace Terminal3.ServiceLayer
         public IStoreStaffInterface StoreStaffInterface { get; set;  }
         public SystemAdminController SystemAdminInterface { get; set; }
         public IDataController DataController{ get; set; }
+        public NotificationService NotificationService{ get; set; }
 
         //Constructor
         public ECommerceSystem()
@@ -31,6 +35,7 @@ namespace Terminal3.ServiceLayer
             StoreStaffInterface = new StoreStaffController(StoresAndManagement);
             SystemAdminInterface = new SystemAdminController(StoresAndManagement);
             DataController = new DataController(StoresAndManagement);
+            NotificationService = NotificationService.GetInstance();
         }
 
         public void DisplaySystem()
@@ -234,6 +239,17 @@ namespace Terminal3.ServiceLayer
         public List<ProductService> GetAllProductByStoreIDToDisplay(string storeID)
         {
             return DataController.GetAllProductByStoreIDToDisplay(storeID);
+        }
+        #endregion
+
+        #region Notification
+
+        public List<Notification> GetNotificationByEvent(Event eventEnum) 
+        {
+            return NotificationService.GetNotificationByEvent(eventEnum);
+        }
+        public List<Notification> GetPendingMessagesByUserID(string userId) {
+            return NotificationService.GetPendingMessagesByUserID(userId);
         }
         #endregion
     }

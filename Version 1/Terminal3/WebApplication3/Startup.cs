@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using Terminal3.ServiceLayer;
+using Terminal3WebAPI.Hubs;
 
 namespace WebApplication3
 {
@@ -40,7 +41,8 @@ namespace WebApplication3
 
             services.AddSwaggerGen();
             
-            //Dependency injection 
+            //Dependency injection
+            
             services.AddSingleton<IECommerceSystem, ECommerceSystem>();
 
         }
@@ -54,7 +56,8 @@ namespace WebApplication3
             }
 
             app.UseHttpsRedirection();
-            //app.UseCors("ClientPermission");
+            
+            app.UseCors("ClientPermission");
 
             app.UseRouting();
 
@@ -70,6 +73,7 @@ namespace WebApplication3
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/hubs/notification");
             });
 
 

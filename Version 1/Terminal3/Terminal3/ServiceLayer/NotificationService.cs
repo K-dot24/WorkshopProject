@@ -1,20 +1,40 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 
 namespace Terminal3.ServiceLayer
 {
+    public enum Event
+    {
+        StorePurchase,
+        StoreClosed,
+        StoreOpened,
+        OwnerSubscriptionRemoved,
+        ProductReview
+    };
+
     public sealed class NotificationService
     {
-        private static NotificationService Instance { get; set; }
+        //Properties
+        private static NotificationService Instance { get; set; } = null;
+        private Dictionary<Event, List<Notification>> notificationToBeSend;
         
         private NotificationService()
         {
-            Instance = null;
+            notificationToBeSend = new Dictionary<Event, List<Notification>>();
+            notificationToBeSend.Add(Event.StorePurchase, new List<Notification>());
+            notificationToBeSend.Add(Event.StoreClosed, new List<Notification>());
+            notificationToBeSend.Add(Event.StoreOpened, new List<Notification>());
+            notificationToBeSend.Add(Event.OwnerSubscriptionRemoved, new List<Notification>());
+            notificationToBeSend.Add(Event.ProductReview, new List<Notification>());
+
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static NotificationService GetInstance()
         {
             if (Instance == null)
@@ -25,12 +45,37 @@ namespace Terminal3.ServiceLayer
         }
 
         //TODO
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public Result<bool> Update(Notification notification)
         {
-            notification.isOpened = true;      
-
-            //throw new NotImplementedException();
+            notification.isOpened = true;
+            List<Notification> queue = notificationToBeSend[notification.EventName];
+            queue.Add(notification);            
             return new Result<bool>("Notification is displayed to manager\n", true, true);
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public List<Notification> GetNotificationByEvent(Event eventEnum)
+        {
+            List<Notification> toReturn = new List<Notification>(notificationToBeSend[eventEnum]);
+            notificationToBeSend[eventEnum].Clear();
+            return toReturn;
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public List<Notification> GetPendingMessagesByUserID(string userId)
+        {
+            List<Notification> pendingMessages = new List<Notification>();
+            foreach (Event evetLibrman in notificationToBeSend.Keys)
+            {
+                List<Notification> queue = notificationToBeSend[evetLibrman];
+                foreach (Notification notification in queue)
+                {
+                    if (notification.ClientId.Equals(userId)) {pendingMessages.Add(notification);}
+                }
+                queue.RemoveAll(x => x.ClientId == userId);
+            }
+            return pendingMessages;
         }
 
     }
