@@ -8,7 +8,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public interface IDiscountPolicy
     {
 
+        String Id { get; }
+
         Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "");
+
+        Result<bool> AddDiscount(String id, IDiscountPolicy discount);
+
+        Result<bool> RemoveDiscount(String id);
 
     }
 }

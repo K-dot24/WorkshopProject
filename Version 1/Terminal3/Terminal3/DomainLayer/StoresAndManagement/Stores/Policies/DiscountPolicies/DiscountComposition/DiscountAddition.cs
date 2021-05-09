@@ -5,17 +5,17 @@ using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
-    public class DiscountAddition : IDiscountPolicy
+    public class DiscountAddition : AbstractDiscountPolicy
     {
 
         public List<IDiscountPolicy> Discounts { get; }
 
-        public DiscountAddition()
+        public DiscountAddition(String id = "") : base(id)
         {
             Discounts = new List<IDiscountPolicy>();
         }
 
-        public DiscountAddition(List<IDiscountPolicy> discounts)
+        public DiscountAddition(List<IDiscountPolicy> discounts, String id = "") : base(id)
         {
             Discounts = discounts;
             if (Discounts == null)
@@ -27,7 +27,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             Discounts.Add(discount);
         }
 
-        public Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
+        public override Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
         {
             Dictionary<Product, Double> result = new Dictionary<Product, Double>();
 
@@ -46,6 +46,35 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             }
 
             return new Result<Dictionary<Product, Double>>("", true, result);
+        }
+
+        public override Result<bool> AddDiscount(String id, IDiscountPolicy discount)
+        {
+            if (Id.Equals(id))
+            {
+                Discounts.Add(discount);
+                return new Result<bool>("Successfully added the policy to the id of " + id, true, true);
+            }
+            foreach(IDiscountPolicy myDiscount in Discounts)
+            {
+                Result<bool> result = myDiscount.AddDiscount(id, discount);
+                if (result.ExecStatus && result.Data)
+                    return result;
+            }
+            return new Result<bool>("", true, false);
+        }
+
+        public override Result<bool> RemoveDiscount(String id)
+        {
+            if (Discounts.RemoveAll(discount => discount.Id.Equals(id)) >= 1)
+                return new Result<bool>("", true, true);
+            foreach (IDiscountPolicy myDiscount in Discounts)
+            {
+                Result<bool> result = myDiscount.RemoveDiscount(id);
+                if (result.ExecStatus && result.Data)
+                    return result;
+            }
+            return new Result<bool>("", true, false);
         }
     }
 }

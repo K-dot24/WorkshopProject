@@ -5,24 +5,34 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
-    public class DiscreetDiscount : IDiscountPolicy
+    public class DiscreetDiscount : AbstractDiscountPolicy
     {
         //TODO: Complete properly
 
         public String DiscountCode { get; }
         public IDiscountPolicy Discount { get; }
 
-        public DiscreetDiscount(IDiscountPolicy discount, String discountCode)
+        public DiscreetDiscount(IDiscountPolicy discount, String discountCode, String id = "") : base(id)
         {
             Discount = discount;
             DiscountCode = discountCode;
         }
 
-        public Result<Dictionary<Product, double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
+        public override Result<Dictionary<Product, double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
         {
             if (DiscountCode.Equals(code))
                 return Discount.CalculateDiscount(products, code);
             return new Result<Dictionary<Product, double>>("", false, new Dictionary<Product, double>());
+        }
+
+        public override Result<bool> AddDiscount(String id, IDiscountPolicy discount)
+        {
+            return Discount.AddDiscount(id, discount);
+        }
+
+        public override Result<bool> RemoveDiscount(String id)
+        {
+            return Discount.RemoveDiscount(id);
         }
     }
 }

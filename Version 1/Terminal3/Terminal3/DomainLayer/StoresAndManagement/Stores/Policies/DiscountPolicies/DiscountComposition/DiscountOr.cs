@@ -5,41 +5,89 @@ using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
-    public class DiscountOr : IDiscountPolicy
+    public class DiscountOr : AbstractDiscountPolicy
     {
 
-        public IDiscountPolicy Discount1 { get; }
-        public IDiscountPolicy Discount2 { get; }
+        public List<IDiscountPolicy> Discounts { get; }
 
-        public DiscountOr(IDiscountPolicy discount1, IDiscountPolicy discount2)
+        public DiscountOr(String id = "") : base(id)
         {
-            Discount1 = discount1;
-            Discount2 = discount2;
+            Discounts = new List<IDiscountPolicy>();
         }
 
-        public Result<Dictionary<Product, double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
+        public DiscountOr(List<IDiscountPolicy> discounts, String id = "") : base(id)
         {
-            Result<Dictionary<Product, double>> result1 = Discount1.CalculateDiscount(products);
-            Result<Dictionary<Product, double>> result2 = Discount2.CalculateDiscount(products);
-
-            if (result1.Data == null)
-                result1.Data = new Dictionary<Product, double>();
-            if (result2.Data == null)
-                result2.Data = new Dictionary<Product, double>();
-
-            return combineOrDiscounts(result1.Data, result2.Data);
+            Discounts = discounts;
+            if (Discounts == null)
+                Discounts = new List<IDiscountPolicy>();
         }
 
-        private Result<Dictionary<Product, double>> combineOrDiscounts(Dictionary<Product, double> discounts1, Dictionary<Product, double> discounts2)
+        public override Result<Dictionary<Product, double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
         {
-            foreach (KeyValuePair<Product, double> entry in discounts2)
+            List<Dictionary<Product, double>> results = new List<Dictionary<Product, double>>();
+
+            foreach (IDiscountPolicy myDiscount in Discounts)
             {
-                if (!discounts1.ContainsKey(entry.Key))
-                    discounts1[entry.Key] = entry.Value;
-                else if (discounts1[entry.Key] < entry.Value)
-                    discounts1[entry.Key] = entry.Value;
+                Result<Dictionary<Product, double>> result = myDiscount.CalculateDiscount(products, code);
+
+                if (result.Data == null)
+                    result.Data=new Dictionary<Product, double>();
+
+                results.Add(result.Data);
             }
-            return new Result<Dictionary<Product, double>>("", true, discounts1);
+
+            return combineOrDiscounts(results);
+        }
+
+        private Result<Dictionary<Product, double>> combineOrDiscounts(List<Dictionary<Product, double>> discounts)
+        {
+            if (discounts == null)
+                return new Result<Dictionary<Product, double>>("", true, new Dictionary<Product, double>());
+            if (discounts.Count == 0)
+                return new Result<Dictionary<Product, double>>("", true, new Dictionary<Product, double>());
+
+            Dictionary<Product, double> acc = discounts[0];
+
+            foreach (Dictionary<Product, double> discount in discounts)
+            {
+                foreach (KeyValuePair<Product, double> entry in discount)
+                {
+                    if (!acc.ContainsKey(entry.Key))
+                        acc[entry.Key] = entry.Value;
+                    else if (acc[entry.Key] < entry.Value)
+                        acc[entry.Key] = entry.Value;
+                }
+            }
+
+            return new Result<Dictionary<Product, double>>("", true, acc);
+        }
+        public override Result<bool> AddDiscount(String id, IDiscountPolicy discount)
+        {
+            if (Id.Equals(id))
+            {
+                Discounts.Add(discount);
+                return new Result<bool>("Successfully added the policy to the id of " + id, true, true);
+            }
+            foreach (IDiscountPolicy myDiscount in Discounts)
+            {
+                Result<bool> result = myDiscount.AddDiscount(id, discount);
+                if (result.ExecStatus && result.Data)
+                    return result;
+            }
+            return new Result<bool>("", true, false);
+        }
+
+        public override Result<bool> RemoveDiscount(String id)
+        {
+            if (Discounts.RemoveAll(discount => discount.Id.Equals(id)) >= 1)
+                return new Result<bool>("", true, true);
+            foreach (IDiscountPolicy myDiscount in Discounts)
+            {
+                Result<bool> result = myDiscount.RemoveDiscount(id);
+                if (result.ExecStatus && result.Data)
+                    return result;
+            }
+            return new Result<bool>("", true, false);
         }
     }
 }
