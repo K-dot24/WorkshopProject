@@ -496,14 +496,13 @@ export function GetStorePurchaseHistory( data ) {
 /// <param name="storeID">StoreID</param>
 /// <param name="currentlyOwnerID">OwnerID</param>
 /// <param name="removedManagerID">ID of the manager to be removed</param>
-export function RemoveStoreManager( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/RemoveStoreManager/${data.storeID}/${data.currentlyOwnerID}/${data.removedManagerID}`, {
-        method: 'DELETE',                                                       //TODO - HTTP DELETE
+export function RemoveStoreManager( storeID, currentlyOwnerID, removedManagerID ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemoveStoreManager/${storeID}/${currentlyOwnerID}/${removedManagerID}`, {
+        method: 'DELETE',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 

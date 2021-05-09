@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
 import { Products, Navbar, Cart, Action } from '../../../../components';
-import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, AddStoreOwner } from '../../../../api/API';
+import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
+        AddStoreOwner, AddStoreManager, RemoveStoreManager } from '../../../../api/API';
 
 
 
@@ -104,11 +105,23 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
     }
 
-    const handleAddStoreOwner = async (data) => {
-        console.log(data);
-        
+    const handleAddStoreOwner = async (data) => {  
         AddStoreOwner({ addedOwnerID: data.newownerid, currentlyOwnerID: user.id, storeID: store.id }).then(response => response.ok ?
             response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
+    const handleAddStoreManager = async (data) => {
+        console.log(data);
+        
+        AddStoreManager({ addedManagerID: data.newmanagerid, currentlyOwnerID: user.id, storeID: store.id }).then(response => response.ok ?
+            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
+    const handleRemoveStoreManager = async (data) => {
+        console.log(data);
+
+        RemoveStoreManager(store.id, user.id, data.removedmanagerid).then(response => response.ok ?
+            response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
     }
 
     //#endregion
@@ -168,6 +181,18 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                     render={(props) => (<Action name='Add Store Owner' 
                                                 fields={[{name: 'New Owner ID', required: true}]} 
                                                 handleAction={handleAddStoreOwner} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/addstoreManager`} 
+                    render={(props) => (<Action name='Add Store Manager' 
+                                                fields={[{name: 'New Manager ID', required: true}]} 
+                                                handleAction={handleAddStoreManager} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/removestoremanager`} 
+                    render={(props) => (<Action name='Remove Store Manager' 
+                                                fields={[{name: 'Removed Manager ID', required: true}]} 
+                                                handleAction={handleRemoveStoreManager} {...props} />)} 
                 />
 
             </Switch>
