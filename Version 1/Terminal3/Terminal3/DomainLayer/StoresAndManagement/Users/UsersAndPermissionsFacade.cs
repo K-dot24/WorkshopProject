@@ -375,7 +375,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (RegisteredUsers.ContainsKey(userID))
             {
                 //User Found
-                Double TotalPrice = RegisteredUsers[userID].ShoppingCart.GetTotalShoppingCartPrice();
+                Double TotalPrice = RegisteredUsers[userID].ShoppingCart.GetTotalShoppingCartPrice().Data;
                 return new Result<double>($"Total price of current shoppinh cart is: {TotalPrice}", true, TotalPrice);
             }
             else
