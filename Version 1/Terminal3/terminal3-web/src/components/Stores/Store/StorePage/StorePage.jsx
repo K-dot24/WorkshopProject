@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
-import { Products, Navbar, Cart } from '../../../index';
-import { GetAllProductByStoreIDToDisplay } from '../../../../api/API';
+import { Products, Navbar, Cart, Action } from '../../../../components';
+import { GetAllProductByStoreIDToDisplay, AddProductToStore } from '../../../../api/API';
 
 
 
@@ -10,7 +10,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     const [products, setProducts] = useState([]);
     const [bag, setBag] = useState({products: [], totalPrice: 0});
 
-    // TODO: Fetch real data from API
     const fetchProducts = async () => {
         GetAllProductByStoreIDToDisplay(store.id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
 
@@ -74,6 +73,17 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         setBag({products: [], totalPrice: 0});
     }
 
+    const handleAddProductToStore = async (data) => {
+        let keywords = [];
+        if (data.keywords) {
+            keywords = data.keywords.split(',');
+        }
+
+        AddProductToStore({ userID: user.id, storeID: store.id, ...data, keywords }).then(response => response.ok ?
+            response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
+        
+    }
+
     useEffect(() => {
         fetchProducts();
         fetchBag();
@@ -97,6 +107,14 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                         handleAddToCart={handleAddToCart}
                     />
                 </Route>
+
+                <Route exact path={match.url + `/addnewproduct`} 
+                    render={(props) => (<Action name='Add New Product' 
+                                                fields={[{name: 'Product Name', required: true}, 
+                                                        {name: 'Price', required: true, type: "number"}, 
+                                                        {name: 'Initial Quantity', required: true, type: "number"},
+                                                        {name: 'Category', required: true},
+                                                        {name: 'Keywords', required: false}]} handleAction={handleAddProductToStore} {...props} />)} />
             </Switch>
         </div>
     )

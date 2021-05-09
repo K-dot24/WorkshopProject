@@ -8,7 +8,6 @@ import useStyles from './styles';
 
 const Stores = ({ match, user, handleAddToCart, handleLogOut }) => {
     const [stores, setStores] = useState([]);
-    console.log(match);
 
     const classes = useStyles();
 

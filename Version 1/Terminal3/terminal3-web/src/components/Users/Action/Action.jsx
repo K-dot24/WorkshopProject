@@ -41,17 +41,18 @@ const Action = ({ name, fields, handleAction }) => {
                     <form className={classes.form} onSubmit={handleSubmit}>
                         {fields.map((field) => (
                             <TextField
-                            key={field}
+                            key={field.name}
+                            type={field.type ? field.type : "text"}
                             variant="outlined"
                             margin="normal"
-                            required
+                            required={field.required}
                             fullWidth
-                            id={field}
-                            label={field}
-                            name={field}
-                            autoComplete={field}
+                            id={field.name}
+                            label={field.name}
+                            name={field.name}
+                            autoComplete={field.name}
                             autoFocus
-                            onChange={(e) => setData({ ...data, [field.replace(/\s/g, "").toLowerCase()]: e.target.value })}
+                            onChange={(e) => setData({ ...data, [field.name.replace(/\s/g, "").toLowerCase()]: (field.type && field.type === "number") ? parseInt(e.target.value) : e.target.value })}
                         />
                         ))}
                         <Button
@@ -61,7 +62,7 @@ const Action = ({ name, fields, handleAction }) => {
                             color="primary"
                             className={classes.submit}
                         >
-                            Submit
+                            OK
                         </Button>
                     </form>
                 </div>

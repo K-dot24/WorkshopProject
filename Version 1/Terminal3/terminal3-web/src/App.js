@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
-import { Stores, Navbar, Cart, Checkout, StorePage, Register, Login, Action } from './components';
+import { Stores, Navbar, Cart, Checkout, Register, Login, Action } from './components';
 import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, GetUserShoppingCart, UpdateShoppingCart } from './api/API';
 
 // primary and secondary colors for the app
@@ -19,8 +19,10 @@ const theme = createMuiTheme({
 
 const App = () => {
     // states
-    const [cart, setCart] = useState({products: [], totalPrice: 0});
     const [user, setUser] = useState({id: -1, email: ''});
+    const [cart, setCart] = useState({products: [], totalPrice: 0});
+    // const [cart, setCart] = useState({id: 0, shoppingBags: [], totalPrice: 0, totalItems: 0});
+
 
     //#region Stores Functionality
 
@@ -34,15 +36,22 @@ const App = () => {
     
     // TODO: Fetch from API?
     const fetchCart = async () => {
-        setCart({products: [], totalPrice: 0});
+        setCart({products: [], totalPrice: 0})
+        
+        // setCart({id: 0, shoppingBags: [], totalPrice: 0});
 
         // if (user.id !== -1){
-        //     // get from API
+        //     GetUserShoppingCart(user.id).then(response => response.ok ? 
+        //         response.json().then(json => setCart({...json.data, 
+        //                             totalItems: cart.shoppingBags.reduce(function(count, bag) {
+        //                                             return count + bag.length;
+        //                                         }, 0)})) : null).catch(err => console.log(err));
         // }
     }
 
     const handleAddToCart = async (storeId, productId, name, price, quantity, image) => {
-        AddProductToCart({userID: user.id, productId, ProductQuantity: quantity, storeId}).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+        AddProductToCart({userID: user.id, productId, ProductQuantity: quantity, storeId}).then(response => response.ok ? 
+            response.json().then(json => console.log(json)) : null).catch(err => console.log(err));
         
         
         setCart(function(prevState) {
@@ -135,6 +144,11 @@ const App = () => {
         console.log(user);
     }, [user]);
 
+    useEffect(() => {
+        console.log(cart);
+    }, [cart]);
+
+
     return (
         <MuiThemeProvider theme={theme}>
             <Router>
@@ -162,7 +176,9 @@ const App = () => {
                             <Checkout cart={cart} handleEmptyCart={handleEmptyCart} />
                         </Route>
                         
-                        <Route exact path={`/${user.id}/openstore`} render={(props) => (<Action name='Open New Store' fields={['Store Name']} handleAction={handleOpenNewStore} {...props} />)} />
+                        <Route exact path={`/${user.id}/openstore`} 
+                                render={(props) => (<Action name='Open New Store' fields={[{name: 'Store Name', required: true}]} 
+                                                            handleAction={handleOpenNewStore} {...props} />)} />
                         
                         <Route path="/" render={(props) => (<Stores user={user} handleAddToCart={handleAddToCart} handleLogOut={handleLogOut} {...props} />)} />
                     </Switch>

@@ -140,14 +140,24 @@ export function AddProductToCart( data ) {
 }
 
 /// Return the user's shopping cart
+///
+/// {
+///   "message": "User shopping cart\n",
+///   "execStatus": true,
+///   "data": {
+///     "id": "3404a9b11ab8435d8ae703effa1955ab",
+///     "shoppingBags": [],
+///     "totalCartPrice": 0
+///    }
+/// }
+///
 export function GetUserShoppingCart( userID ) {    
-    return fetch(`https://localhost:5000/api/GuestUser/GetUserShoppingCart`, {
+    return fetch(`https://localhost:5000/api/GuestUser/GetUserShoppingCart/${userID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-        },
-        body: { userID },    
+        }, 
     })
 }
 
