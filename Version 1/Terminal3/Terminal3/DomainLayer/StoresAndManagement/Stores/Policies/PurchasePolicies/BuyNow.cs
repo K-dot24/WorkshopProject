@@ -27,8 +27,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
         public Result<bool> AddPolicy(IPurchasePolicy policy, string id)
         {
-            this.Policy.AddPolicy(policy, id);
-            return new Result<bool>("", true, true);
+            return this.Policy.AddPolicy(policy, id);
         }
 
         public Result<bool> RemovePolicy(string id)

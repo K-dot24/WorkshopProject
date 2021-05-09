@@ -11,37 +11,29 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
     {
         double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
         Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
-    }    
+        Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount);
+        Result<Boolean> AddDiscountPolicy(String id, IDiscountPolicy discount);
+        Result<Boolean> RemoveDiscountPolicy(String id);
+        Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
+        Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
+        Result<Boolean> RemovePurchasePolicy(string id);
+    }
 
     public class PolicyManager : IPolicyManager
     {
 
-        //TODO: Complete properly
+        public DiscountAddition MainDiscount { get; }
+        public BuyNow MainPolicy { get; set; }
 
-
-        public DiscountAddition Discounts { get; }
-        public BuyNow Policies { get; set; }
         public PolicyManager()
         {
-            Policies = new BuyNow();
-            Discounts = new DiscountAddition();
-        }
-
-        public Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount)
-        {
-            Discounts.AddDiscount(discount);
-            return new Result<bool>($"Discount policy was succesfully added.\n", true, true);
-        }        
-
-        public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id)
-        {
-            Policies.AddPolicy(policy, id);
-            return new Result<bool>($"Purchase policy was successfully added.\n", true, true);
+            MainDiscount = new DiscountAddition();
+            MainPolicy = new BuyNow();
         }
 
         public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
         {
-            Result<Dictionary<Product, Double>> discountsResult = Discounts.CalculateDiscount(products, discountCode);
+            Result<Dictionary<Product, Double>> discountsResult = MainDiscount.CalculateDiscount(products, discountCode);
             if (!discountsResult.ExecStatus)
                 return -1;
 
@@ -59,7 +51,79 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         }
         public Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)
         {
-            return Policies.IsConditionMet(products, user);
+            return MainPolicy.IsConditionMet(products, user);
+        }
+
+        public Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount)
+        {
+            Result<bool> result = MainDiscount.AddDiscount(MainDiscount.Id, discount);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount has been added successfully", true, true);
+                else return new Result<bool>($"The discount could not be added", false, false);
+            }
+            return result;
+        }
+
+        public Result<Boolean> AddDiscountPolicy(String id, IDiscountPolicy discount)
+        {
+            Result<bool> result = MainDiscount.AddDiscount(id, discount);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount has been added successfully", true, true);
+                else return new Result<bool>($"The discount addition failed because the discount with an id ${id} was not found", false, false);
+            }
+            return result;
+        }
+
+        public Result<bool> RemoveDiscountPolicy(string id)
+        {
+            Result<bool> result = MainDiscount.RemoveDiscount(id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount has been removed successfully", true, true);
+                else return new Result<bool>($"The discount removal failed because the discount with an id ${id} was not found", false, false);
+            }
+            return result;
+        }
+
+        public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy)
+        {
+            Result<bool> result = MainPolicy.AddPolicy(policy, MainPolicy.Policy.Id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The policy has been added successfully", true, true);
+                else return new Result<bool>($"The policy could not be added", false, false);
+            }
+            return result;
+        }
+
+        public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, String id)
+        {
+            Result<bool> result = MainPolicy.AddPolicy(policy, id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The policy has been added successfully", true, true);
+                else return new Result<bool>($"The policy addition failed because the policy with an id ${id} was not found", false, false);
+            }
+            return result;
+        }
+
+        public Result<bool> RemovePurchasePolicy(string id)
+        {
+            Result<bool> result = MainPolicy.RemovePolicy(id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The policy has been removed successfully", true, true);
+                else return new Result<bool>($"The policy removal failed because the policy with an id ${id} was not found", false, false);
+            }
+            return result;
         }
     }
 }

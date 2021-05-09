@@ -22,11 +22,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 Discounts = new List<IDiscountPolicy>();
         }
 
-        public void AddDiscount(IDiscountPolicy discount)
-        {
-            Discounts.Add(discount);
-        }
-
         public override Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
         {
             Dictionary<Product, Double> result = new Dictionary<Product, Double>();
@@ -53,7 +48,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (Id.Equals(id))
             {
                 Discounts.Add(discount);
-                return new Result<bool>("Successfully added the policy to the id of " + id, true, true);
+                return new Result<bool>("", true, true);
             }
             foreach(IDiscountPolicy myDiscount in Discounts)
             {

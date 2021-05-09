@@ -80,7 +80,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (Id.Equals(id))
             {
                 Discounts.Add(discount);
-                return new Result<bool>("Successfully added the policy to the id of " + id, true, true);
+                return new Result<bool>("", true, true);
             }
             foreach (IDiscountPolicy myDiscount in Discounts)
             {
