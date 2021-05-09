@@ -10,7 +10,12 @@ const StorePage = ({ handleAddToCart, match, user, handleLogOut }) => {
     const { id } = useParams();
     const { state } = useLocation();    // passed from <Store> Link
 
-    const store = state.store;
+    let store = null;
+    if (state) {
+        store = state.store;
+        console.log(store);
+    }
+    
     const [products, setProducts] = useState([]);
     const [bag, setBag] = useState({products: [], totalPrice: 0});
 
@@ -88,7 +93,7 @@ const StorePage = ({ handleAddToCart, match, user, handleLogOut }) => {
             <Navbar storeId={id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} />
             <Switch>
                 <Route exact path={match.url}>
-                    <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} />
+                    <Products storeName={store !== null ? store.name : ''} products={products} onAddToBag={handleAddToBag} />
                 </Route>
 
                 <Route exact path={match.url + "/bag"}>

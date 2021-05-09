@@ -12,9 +12,43 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
     const location = useLocation();
     let history = useHistory();
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    /*
+        AddStoreOwner = 3,
+        AddStoreManager = 4,
+        RemoveStoreManager = 5,
+        SetPermissions = 6,
+        GetStoreStaff = 7,
+        #endregion
 
+        #region Policies Management
+        SetPurchasePolicyAtStore = 8,
+        GetPurchasePolicyAtStore = 9,
+        SetDiscountPolicyAtStore = 10,
+        GetDiscountPolicyAtStore = 11,
+        #endregion
+
+        #region Information
+        GetStorePurchaseHistory = 12,
+    */
+
+    const allActions = ['Add New Product', 'Remove Product', 'Edit Product', 'Add Store Owner', 'Add Store Manager', 'Remove Store Manager', 
+                        'Set Permissions', 'Get Store Staff', 'Set Purchase Policy At Store', 'Get Purchase Policy At Store',
+                        'Set Discount Policy At Store', 'Get Discount Policy At Store', 'Get Store Purchase History'];
+    const userWithMockPermissions = { ...user, permissions: [true, true, true, true, true, true, true, true, true, true, true, true, true]};
+
+    if (allActions.length !== userWithMockPermissions.permissions.length)
+        console.log("Unmatching number of actions and permissions");
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
     const isMenuOpen = Boolean(anchorEl);
+
+    const StoreActions = () => {
+        return [
+            allActions.map((action, index) => userWithMockPermissions.permissions[index] &&  
+                        <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    
+            )
+        ];
+    };
 
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -36,9 +70,17 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
         open={isMenuOpen}
         onClose={() => setAnchorEl(null)}
         >
-        <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
-        <MenuItem onClick={() => handleMenuClick(`/${user.id}/review`)}>Write Review</MenuItem>
-        <MenuItem onClick={() => handleMenuClick(`/${user.id}/purchase_history`)}>Purchase History</MenuItem>
+        {storeId === -1 ? (
+            <div>
+                <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
+                <MenuItem onClick={() => handleMenuClick(`/${user.id}/review`)}>Write Review</MenuItem>
+                <MenuItem onClick={() => handleMenuClick(`/${user.id}/purchase_history`)}>Purchase History</MenuItem>
+            </div>
+        ) : (
+            <StoreActions />
+        )
+        
+        }
         </Menu>
     );
     
@@ -49,12 +91,14 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
                     <Typography component={Link} to="/" variant="h6" className={classes.title} color="inherit">
                         <img src={logo} alt="Terminal 3" height="50px" className={classes.image} />
                     </Typography>
+                    {user.id !== -1 &&
+                        <Typography variant="h6" color="primary">
+                                    Hello, {user.email.substr(0, user.email.indexOf('@'))}
+                        </Typography>
+                    }
                     <div className={classes.grow} />
                     {user.id !== -1 &&
                         <> 
-                            <Typography variant="h6" color="primary">
-                                Hello, {user.email.substr(0, user.email.indexOf('@'))}
-                            </Typography>
                             <Button component={Link} to="/" className={classes.checkoutButton} size="large" 
                                     type="button" variant="text" color="primary" onClick={() => handleLogOut()}>
                                 Sign Out
