@@ -26,7 +26,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.LoggedIn = false;
             this.History = new History();
             this.PendingNotification = new LinkedList<Notification>();
-           //this.NotificationCenter = NotificationCenter.GetInstance();
+            this.NotificationCenter = NotificationCenter.GetInstance();
         }
 
         //Methods

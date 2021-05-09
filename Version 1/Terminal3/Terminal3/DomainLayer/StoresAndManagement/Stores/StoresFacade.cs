@@ -203,7 +203,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Stores.TryAdd(newStore.Id, newStore);
             NotificationManager notificationManager = new NotificationManager(newStore);
             newStore.NotificationManager = notificationManager;
-            newStore.notifyStoreOpened();
+            newStore.NotificationManager.notifyStoreOpened();
 
             return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, newStore);
         }
@@ -216,7 +216,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if(store.Founder.GetId() == founder.Id)
                 {
                     ClosedStores.TryAdd(storeId, store);
-                    store.notifyStoreClosed();
+                    store.NotificationManager.notifyStoreClosed();
                     return new Result<bool>($"The store {store.Name} is closed\n", true, true);
                 }
                 // else faild so return the store to the Stores list
@@ -234,7 +234,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (store.Owners.ContainsKey(owner.Id))
                 {
                     Stores.TryAdd(storeId, store);
-                    store.notifyStoreOpened();
+                    store.NotificationManager.notifyStoreOpened();
                     return new Result<Store>($"The store {store.Name} is reopened\n", true, store);
                 }
                 // else faild so return the store to the closed stores list
