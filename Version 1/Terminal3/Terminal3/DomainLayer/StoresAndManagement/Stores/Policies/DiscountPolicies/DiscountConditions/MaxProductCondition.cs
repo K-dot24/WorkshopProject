@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions
 {
-    class MaxProductCondition : IDiscountCondition
+    public class MaxProductCondition : IDiscountCondition
     {
 
         public int MaxQuantity { get; }

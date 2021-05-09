@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
-    class DiscountTargetShop : IDiscountTarget
+    public class DiscountTargetShop : IDiscountTarget
     {
         public List<Product> getTargets(ConcurrentDictionary<Product, int> products)
         {

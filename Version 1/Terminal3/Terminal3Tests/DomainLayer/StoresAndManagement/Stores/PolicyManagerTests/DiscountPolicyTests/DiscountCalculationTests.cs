@@ -1,9 +1,9 @@
 ﻿using Xunit;
 using System;
-using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountTargets;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
 {
@@ -28,7 +28,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 5, 75)]
         public void CalculatePrice(String productName, int sum, Double expectedPrice)
         {
-            PolicyManager.AddDiscountPolicy(new VisibleDiscount(DateTime.MaxValue, new DiscountTargetProducts(), 0.2));
+            DiscountTargetProducts target = new DiscountTargetProducts(new List<Product>() { Products[productName] });
+            PolicyManager.AddDiscountPolicy(new VisibleDiscount(DateTime.MaxValue, target, 0.2));
             ConcurrentDictionary<Product, int> bag = new ConcurrentDictionary<Product, int>();
             bag.TryAdd(Products[productName], sum);
             Double price =PolicyManager.GetTotalBagPrice(bag);

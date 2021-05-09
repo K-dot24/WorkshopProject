@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions
+namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountTargets
 {
-    class DiscountTargetProducts : IDiscountTarget
+    public class DiscountTargetProducts : IDiscountTarget
     {
 
         public List<Product> Products { get; }
