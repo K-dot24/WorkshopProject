@@ -42,6 +42,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public override Result<bool> AddDiscount(String id, IDiscountPolicy discount)
         {
+            if (Id.Equals(id))
+                return new Result<bool>("Can't add a discount to a visible discount with an id " + id, false, false);
             return new Result<bool>("", true, false);
         }
 

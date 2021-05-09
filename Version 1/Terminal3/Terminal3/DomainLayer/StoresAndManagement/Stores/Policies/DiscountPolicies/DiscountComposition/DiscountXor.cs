@@ -48,6 +48,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             Result<bool> result = Discount1.AddDiscount(id, discount);
             if (result.ExecStatus && result.Data)
                 return result;
+            if (!result.ExecStatus)
+                return result;
             return Discount2.AddDiscount(id, discount);
         }
 
@@ -60,6 +62,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
             Result<bool> result = Discount1.RemoveDiscount(id);
             if (result.ExecStatus && result.Data)
+                return result;
+            if (!result.ExecStatus)
                 return result;
             return Discount2.RemoveDiscount(id);
         }
