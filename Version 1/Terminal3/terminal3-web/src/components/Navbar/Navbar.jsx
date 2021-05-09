@@ -12,7 +12,7 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
     const location = useLocation();
     let history = useHistory();
 
-    const allActions = ['Add New Product', 'Remove Product', 'Edit Product', 'Add Store Owner', 'Add Store Manager', 'Remove Store Manager', 
+    const allActions = ['Add New Product', 'Remove Product', 'Edit Product Details', 'Add Store Owner', 'Add Store Manager', 'Remove Store Manager', 
                         'Set Permissions', 'Get Store Staff', 'Set Purchase Policy At Store', 'Get Purchase Policy At Store',
                         'Set Discount Policy At Store', 'Get Discount Policy At Store', 'Get Store Purchase History'];
     

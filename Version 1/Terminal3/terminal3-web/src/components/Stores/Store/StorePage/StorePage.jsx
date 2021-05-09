@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
 import { Products, Navbar, Cart, Action } from '../../../../components';
-import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore } from '../../../../api/API';
+import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails } from '../../../../api/API';
 
 
 
@@ -81,9 +81,26 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     }
 
     const handleRemoveProductFromStore = async (data) => {
-        console.log({userID: user.id, storeID: store.id, ...data});
-
         RemoveProductFromStore(user.id, store.id, data.productid).then(response => response.ok ?
+            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
+    const handleEditProductDetails = async (data) => {
+        for (var key in data) {
+            if (data[key] === null || data[key] === "" || (typeof data[key] !== 'string' && !(data[key] instanceof String) && isNaN(data[key]))){
+                delete data[key]
+            }
+        }
+
+        const productID = data.productid;
+        delete data.productid;
+
+        const details = { ...data };
+        data = { productID, details};
+
+        console.log({ userID: user.id, storeID: store.id, ...data });
+
+        EditProductDetails({ userID: user.id, storeID: store.id, ...data }).then(response => response.ok ?
             response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
     }
 
@@ -126,7 +143,19 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 <Route exact path={match.url + `/removeproduct`} 
                     render={(props) => (<Action name='Remove Product' 
                                                 fields={[{name: 'Product ID', required: true}]} 
-                                                handleAction={handleRemoveProductFromStore} {...props} />)} />
+                                                handleAction={handleRemoveProductFromStore} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/editproductdetails`} 
+                    render={(props) => (<Action name='Edit Product Details' 
+                                                fields={[{name: 'Product ID', required: true}, 
+                                                        {name: 'Name', required: false}, 
+                                                        {name: 'Price', required: false, type: "number"},
+                                                        {name: 'Quantity', required: false, type: "number"},
+                                                        {name: 'Category', required: false},
+                                                        {name: 'Keywords', required: false}]} 
+                                                handleAction={handleEditProductDetails} {...props} />)} 
+                />
 
             </Switch>
         </div>
