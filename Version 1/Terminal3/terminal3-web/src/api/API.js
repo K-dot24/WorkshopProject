@@ -349,14 +349,13 @@ export function AddProductToStore( data ) {
 /// <param name="userID">userId of the manager/owner who preform the action</param>
 /// <param name="storeID">storeId where the product is located in</param>
 /// <param name="productID">product identifier</param>
-export function RemoveProductFromStore( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/RemoveProductFromStore/${data.userID}/${data.storeID}/${data.productID}`, {
-        method: 'DELETE',                                                                   //TODO - HTTP DELETE
+export function RemoveProductFromStore( userID, storeID, productID ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemoveProductFromStore/${userID}/${storeID}/${productID}`, {
+        method: 'DELETE',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 

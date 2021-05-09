@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
 import { Products, Navbar, Cart, Action } from '../../../../components';
-import { GetAllProductByStoreIDToDisplay, AddProductToStore } from '../../../../api/API';
+import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore } from '../../../../api/API';
 
 
 
@@ -12,13 +12,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     const fetchProducts = async () => {
         GetAllProductByStoreIDToDisplay(store.id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
-
-        
-        // Mock Data
-        // setProducts([
-        //     { id: 1, name: 'Nike Blazer Mid 77', price: 450.0, quantity: 10, category: 'Shoes', rating: 5, numberOfRates: 2, keywords: ['nike', 'shoes', 'style'], image: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/ef4dbed6-c621-4879-8db3-f87296bfb570/blazer-mid-77-vintage-shoe-CBDjT0.png'},
-        //     { id: 2, name: 'Macbook', price: 4019.99, quantity: 50, category: 'Laptops', rating: 4.5, numberOfRates: 6, keywords: ['apple', 'macbook', 'expensive'], image: 'https://d3m9l0v76dty0.cloudfront.net/system/photos/5435150/large/d6b55817aafd21bc9c896dfcfcaf0ae7.jpg'}
-        // ]);
     }
 
     // TODO: Fetch real data from API
@@ -73,16 +66,28 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         setBag({products: [], totalPrice: 0});
     }
 
+    //#region Staff Actions
+
     const handleAddProductToStore = async (data) => {
         let keywords = [];
         if (data.keywords) {
             keywords = data.keywords.split(',');
         }
 
+        // To take only product ID if needed: message.substring(message.indexOf(":") + 2)
         AddProductToStore({ userID: user.id, storeID: store.id, ...data, keywords }).then(response => response.ok ?
-            response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
+            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
         
     }
+
+    const handleRemoveProductFromStore = async (data) => {
+        console.log({userID: user.id, storeID: store.id, ...data});
+
+        RemoveProductFromStore(user.id, store.id, data.productid).then(response => response.ok ?
+            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
+    //#endregion
 
     useEffect(() => {
         fetchProducts();
@@ -114,7 +119,15 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                                                         {name: 'Price', required: true, type: "number"}, 
                                                         {name: 'Initial Quantity', required: true, type: "number"},
                                                         {name: 'Category', required: true},
-                                                        {name: 'Keywords', required: false}]} handleAction={handleAddProductToStore} {...props} />)} />
+                                                        {name: 'Keywords', required: false}]} 
+                                                handleAction={handleAddProductToStore} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/removeproduct`} 
+                    render={(props) => (<Action name='Remove Product' 
+                                                fields={[{name: 'Product ID', required: true}]} 
+                                                handleAction={handleRemoveProductFromStore} {...props} />)} />
+
             </Switch>
         </div>
     )
