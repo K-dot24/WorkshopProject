@@ -11,8 +11,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         public TimeSpan StartRestrict { get; }
         public TimeSpan EndRestrict { get; }
         public Product Product { get; }
-        public RestrictedHoursPolicy(TimeSpan startRestrict, TimeSpan endRestrict, Product product)
+        public string Id { get; }
+
+        public RestrictedHoursPolicy(TimeSpan startRestrict, TimeSpan endRestrict, Product product, string id = "")
         {
+            this.Id = id;
+            if (id.Equals(""))
+                this.Id = Service.GenerateId();
             this.StartRestrict = startRestrict;
             this.EndRestrict= endRestrict;
             this.Product = product;
@@ -22,6 +27,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         {
             TimeSpan now = DateTime.Now.TimeOfDay;
             return new Result<bool>("", true, now > EndRestrict && now < StartRestrict);
+        }
+
+        public Result<bool> AddPolicy(IPurchasePolicy policy, string id)
+        {
+            if (this.Id.Equals(id))
+                return new Result<bool>("Cannot add a policy to this type of policy", false, false);
+            return new Result<bool>("", true, false);
+        }
+
+        public Result<bool> RemovePolicy(string id)
+        {
+            return new Result<bool>("", true, false);
         }
     }
 }

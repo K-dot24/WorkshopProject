@@ -10,9 +10,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
     {
         public IPurchasePolicy PreCond { get; }
         public IPurchasePolicy Cond { get; }
+        public string Id { get; }
 
-        public ConditionalPolicy(IPurchasePolicy preCond, IPurchasePolicy cond)
+        public ConditionalPolicy(IPurchasePolicy preCond, IPurchasePolicy cond, string id = "")
         {
+            this.Id = id;
+            if (id.Equals(""))
+                this.Id = Service.GenerateId();
             this.PreCond = preCond;
             this.Cond = cond;
         }
@@ -23,6 +27,32 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 if (!this.Cond.IsConditionMet(bag, user).Data)                
                     return new Result<bool>("", true, false);
             return new Result<bool>("", true, true);
+        }
+
+        public Result<bool> AddPolicy(IPurchasePolicy policy, string id)
+        {
+            if (this.Id.Equals(id))
+                return new Result<bool>("Cannot add a policy to this type of policy", false, false);
+            return new Result<bool>("", true, false);
+        }
+
+        public Result<bool> RemovePolicy(string id)
+        {
+            if(PreCond.Id.Equals(id) || Cond.Id.Equals(id))
+                return new Result<bool>("", false, false);
+
+            Result<bool> res = PreCond.RemovePolicy(id);
+            if (!res.ExecStatus)
+                return res;
+            if (res.Data)
+                return res;
+
+            res = Cond.RemovePolicy(id);
+            if (!res.ExecStatus)
+                return res;
+            if (res.Data)
+                return res;
+            return new Result<bool>("", true, false);
         }
     }
 }
