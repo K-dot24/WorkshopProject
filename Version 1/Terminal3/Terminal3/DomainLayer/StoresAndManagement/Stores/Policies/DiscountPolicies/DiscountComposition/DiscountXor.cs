@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
-    public class DiscountXor : IDiscountPolicy
+    public class DiscountXor : AbstractDiscountPolicy
     {
 
         public IDiscountPolicy Discount1 { get; }
@@ -19,7 +19,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             ChoosingCondition = choosingCondition;
         }
 
-        public Result<Dictionary<Product, double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
+        public override Result<Dictionary<Product, double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
         {
             Result<Dictionary<Product, double>> result1 = Discount1.CalculateDiscount(products);
             Result<Dictionary<Product, double>> result2 = Discount2.CalculateDiscount(products);
@@ -38,6 +38,34 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (conditionResult.ExecStatus && conditionResult.Data)
                 return result1;
             return result2;
+        }
+
+        public override Result<bool> AddDiscount(string id, IDiscountPolicy discount)
+        {
+            if (Id.Equals(id))
+                return new Result<bool>("Can't add a discount to a xor with an id " + id, false, false);
+
+            Result<bool> result = Discount1.AddDiscount(id, discount);
+            if (result.ExecStatus && result.Data)
+                return result;
+            if (!result.ExecStatus)
+                return result;
+            return Discount2.AddDiscount(id, discount);
+        }
+
+        public override Result<bool> RemoveDiscount(string id)
+        {
+            if (Discount1.Id.Equals(id))
+                return new Result<bool>("Can't remove a discount that is a child of xor. Id of the discount is " + id, false, false);
+            if (Discount2.Id.Equals(id))
+                return new Result<bool>("Can't remove a discount that is a child of xor. Id of the discount is " + id, false, false);
+
+            Result<bool> result = Discount1.RemoveDiscount(id);
+            if (result.ExecStatus && result.Data)
+                return result;
+            if (!result.ExecStatus)
+                return result;
+            return Discount2.RemoveDiscount(id);
         }
     }
 }
