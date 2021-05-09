@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // 
 
 import { Products, Navbar, Cart, Action } from '../../../../components';
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
-        AddStoreOwner, AddStoreManager, RemoveStoreManager } from '../../../../api/API';
+        AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff } from '../../../../api/API';
 
 
 
@@ -124,11 +124,17 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
     }
 
+    const handleGetStoreStaff = async () => {
+        GetStoreStaff(user.id, store.id).then(response => response.ok ?
+            response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
     //#endregion
 
     useEffect(() => {
         fetchProducts();
         fetchBag();
+        console.log("store id: " + store.id);
     }, []);
 
     return (
@@ -193,6 +199,12 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                     render={(props) => (<Action name='Remove Store Manager' 
                                                 fields={[{name: 'Removed Manager ID', required: true}]} 
                                                 handleAction={handleRemoveStoreManager} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/getstorestaff`} 
+                    render={(props) => (<Action name='Get Store Stuff' 
+                                                 
+                                                handleAction={handleGetStoreStaff} {...props} />)} 
                 />
 
             </Switch>

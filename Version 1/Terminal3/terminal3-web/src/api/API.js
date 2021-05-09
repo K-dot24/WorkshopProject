@@ -466,14 +466,13 @@ export function RemovePermissions( data ) {
 /// Return list of pair, each pair hold details about the store staff and its permissions
 /// <param name="ownerID">ID of the owner who request to preform the operation</param>
 /// <param name="storeID">storeID</param>
-export function GetStoreStaff( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/GetStoreStaff`, {
+export function GetStoreStaff(ownerID, storeID) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetStoreStaff/${ownerID}/${storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 

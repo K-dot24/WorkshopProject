@@ -39,7 +39,8 @@ const Action = ({ name, fields, handleAction }) => {
                         {name}
                     </Typography>
                     <form className={classes.form} onSubmit={handleSubmit}>
-                        {fields.map((field) => (
+                    {fields && 
+                        fields.map((field) => (
                             <TextField
                             key={field.name}
                             type={field.type ? field.type : "text"}
@@ -54,17 +55,20 @@ const Action = ({ name, fields, handleAction }) => {
                             autoFocus
                             onChange={(e) => setData({ ...data, [field.name.replace(/\s/g, "").toLowerCase()]: (field.type && field.type === "number") ? parseInt(e.target.value) : e.target.value })}
                         />
-                        ))}
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            className={classes.submit}
-                        >
-                            OK
-                        </Button>
-                    </form>
+                        ))
+                        
+                    }
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.submit}
+                    >
+                        OK
+                    </Button>
+                </form>
+                    
                 </div>
         </Container>
     )
