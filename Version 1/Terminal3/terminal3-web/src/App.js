@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-
-import { Stores, Navbar, Cart, Checkout, StorePage, Register, Login } from './components';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
-import { Register as RegisterAPI, Login as LoginAPI, Logout } from './api/API';
+import { Stores, Navbar, Cart, Checkout, StorePage, Register, Login, Action } from './components';
+import { Register as RegisterAPI, Login as LoginAPI, Logout, GetAllStoresToDisplay, OpenNewStore } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -20,8 +19,21 @@ const theme = createMuiTheme({
 
 const App = () => {
     // states
+    const [stores, setStores] = useState([]);
     const [cart, setCart] = useState({products: [], totalPrice: 0});
     const [user, setUser] = useState({id: -1, email: ''});
+
+    //#region Stores Functionality
+    
+    const fetchStores = async () => {
+        GetAllStoresToDisplay().then(response => response.json().then(json => setStores(json))).catch(err => console.log(err));
+    }
+
+    const handleOpenNewStore = async (data) => {
+        OpenNewStore({ userID: user.id, ...data }).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+    }
+
+    //#endregion
 
     //#region Cart Functionality 
     
@@ -119,6 +131,11 @@ const App = () => {
 
     //#endregion
 
+    useEffect(() => {
+        fetchStores();
+        console.log(user);
+    }, []);
+
     // Update cart when user change (login/sign out)
     useEffect(() => {
         fetchCart();
@@ -131,9 +148,7 @@ const App = () => {
                 <div>
                     <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} />
                     <Switch>
-                        <Route exact path="/" component={Stores} />
-                            {/* <Stores stores={stores} />
-                        </Route> */}
+                        <Route exact path="/" render={(props) => (<Stores stores={stores} {...props} />)} />
 
                         <Route path="/stores/:id" render={(props) => (<StorePage handleAddToCart={handleAddToCart} user={user} handleLogOut={handleLogOut} {...props} />)} />
 
@@ -154,6 +169,9 @@ const App = () => {
                         <Route exact path="/checkout">
                             <Checkout cart={cart} handleEmptyCart={handleEmptyCart} />
                         </Route>
+                        
+                        <Route exact path={`/${user.id}/openstore`} render={(props) => (<Action name='Open New Store' fields={['Store Name']} handleAction={handleOpenNewStore} {...props} />)} />
+                        
                     </Switch>
                 </div>
             </Router>

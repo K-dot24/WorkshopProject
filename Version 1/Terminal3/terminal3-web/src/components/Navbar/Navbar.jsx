@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppBar, Toolbar, IconButton, Badge, MenuItem, Menu, Typography, Button } from '@material-ui/core';
 import { ShoppingCart, LocalMall, Menu as MenuIcon, Notifications as NotificationsIcon } from '@material-ui/icons';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useHistory } from 'react-router-dom';
 
 import useStyles from './styles';
 
@@ -10,6 +10,7 @@ import logo from '../../assets/terminal3_logo.png';
 const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
     const classes = useStyles();
     const location = useLocation();
+    let history = useHistory();
 
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -19,12 +20,9 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
         setAnchorEl(event.currentTarget);
       };
 
-    const handleMenuClose = () => {
+    const handleMenuClick = (path) => {
+        history.push(path);
         setAnchorEl(null);
-    };
-
-    const handleOpenStore = () => {
-        
     };
 
     const menuId = 'primary-search-account-menu';
@@ -36,11 +34,11 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
         keepMounted
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         open={isMenuOpen}
-        onClose={handleMenuClose}
+        onClose={() => setAnchorEl(null)}
         >
-        <MenuItem onClick={handleMenuClose}>Open New Store</MenuItem>
-        <MenuItem onClick={handleMenuClose}>Write Review</MenuItem>
-        <MenuItem onClick={handleMenuClose}>Purchase History</MenuItem>
+        <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
+        <MenuItem onClick={() => handleMenuClick(`/${user.id}/review`)}>Write Review</MenuItem>
+        <MenuItem onClick={() => handleMenuClick(`/${user.id}/purchase_history`)}>Purchase History</MenuItem>
         </Menu>
     );
     
