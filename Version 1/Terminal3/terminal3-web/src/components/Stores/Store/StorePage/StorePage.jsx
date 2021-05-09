@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
 import { Products, Navbar, Cart, Action } from '../../../../components';
-import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails } from '../../../../api/API';
+import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, AddStoreOwner } from '../../../../api/API';
 
 
 
@@ -104,6 +104,13 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
     }
 
+    const handleAddStoreOwner = async (data) => {
+        console.log(data);
+        
+        AddStoreOwner({ addedOwnerID: data.newownerid, currentlyOwnerID: user.id, storeID: store.id }).then(response => response.ok ?
+            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
     //#endregion
 
     useEffect(() => {
@@ -155,6 +162,12 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                                                         {name: 'Category', required: false},
                                                         {name: 'Keywords', required: false}]} 
                                                 handleAction={handleEditProductDetails} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/addstoreowner`} 
+                    render={(props) => (<Action name='Add Store Owner' 
+                                                fields={[{name: 'New Owner ID', required: true}]} 
+                                                handleAction={handleAddStoreOwner} {...props} />)} 
                 />
 
             </Switch>

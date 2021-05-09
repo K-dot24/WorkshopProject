@@ -19,7 +19,7 @@ const Product = ({ product, onAddToBag }) => {
                     <Typography variant="h5">
                         {product.price}₪
                     </Typography>
-                    <Typography variant="h8">   {/* TODO: Remove this when done with PID */}
+                    <Typography variant="subtitle2">   {/* TODO: Remove this when done with PID */}
                         {product.id}
                     </Typography>
                 </div>
