@@ -6,7 +6,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {    
-    class MaxProductPolicy : IPurchasePolicy
+    public class MaxProductPolicy : IPurchasePolicy
     {
         public Product Product { get; }
         public int Max { get; }

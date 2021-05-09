@@ -6,7 +6,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
-    class ConditionalPolicy : IPurchasePolicy
+    public class ConditionalPolicy : IPurchasePolicy
     {
         public IPurchasePolicy PreCond { get; }
         public IPurchasePolicy Cond { get; }

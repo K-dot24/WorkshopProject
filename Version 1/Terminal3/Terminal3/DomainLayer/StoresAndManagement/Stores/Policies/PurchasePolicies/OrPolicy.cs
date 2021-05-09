@@ -6,7 +6,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
-    class OrPolicy : IPurchasePolicy
+    public class OrPolicy : IPurchasePolicy
     {
         public List<IPurchasePolicy> Policies { get; }
         public string Id { get; }

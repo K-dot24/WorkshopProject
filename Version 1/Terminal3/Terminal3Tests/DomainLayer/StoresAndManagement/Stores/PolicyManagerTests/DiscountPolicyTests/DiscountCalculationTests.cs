@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountTargets;
 using System.Collections.Concurrent;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests

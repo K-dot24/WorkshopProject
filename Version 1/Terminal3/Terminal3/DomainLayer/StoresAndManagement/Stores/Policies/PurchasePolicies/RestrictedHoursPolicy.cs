@@ -6,7 +6,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
-    class RestrictedHoursPolicy : IPurchasePolicy
+    public class RestrictedHoursPolicy : IPurchasePolicy
     {
         public TimeSpan StartRestrict { get; }
         public TimeSpan EndRestrict { get; }
