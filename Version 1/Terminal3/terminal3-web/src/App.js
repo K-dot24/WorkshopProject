@@ -129,7 +129,7 @@ const App = () => {
         <MuiThemeProvider theme={theme}>
             <Router>
                 <div>
-                    <Navbar id={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} />
+                    <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} />
                     <Switch>
                         <Route exact path="/" component={Stores} />
                             {/* <Stores stores={stores} />

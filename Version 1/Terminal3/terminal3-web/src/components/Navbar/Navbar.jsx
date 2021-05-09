@@ -1,15 +1,48 @@
 import React from 'react';
 import { AppBar, Toolbar, IconButton, Badge, MenuItem, Menu, Typography, Button } from '@material-ui/core';
-import { ShoppingCart, LocalMall } from '@material-ui/icons';
+import { ShoppingCart, LocalMall, Menu as MenuIcon, Notifications as NotificationsIcon } from '@material-ui/icons';
 import { Link, useLocation } from 'react-router-dom';
 
 import useStyles from './styles';
 
 import logo from '../../assets/terminal3_logo.png';
 
-const Navbar = ( { id, totalItems, user, handleLogOut }) => {
+const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
     const classes = useStyles();
     const location = useLocation();
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    const isMenuOpen = Boolean(anchorEl);
+
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+      };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleOpenStore = () => {
+        
+    };
+
+    const menuId = 'primary-search-account-menu';
+    const renderMenu = (
+        <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        id={menuId}
+        keepMounted
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={isMenuOpen}
+        onClose={handleMenuClose}
+        >
+        <MenuItem onClick={handleMenuClose}>Open New Store</MenuItem>
+        <MenuItem onClick={handleMenuClose}>Write Review</MenuItem>
+        <MenuItem onClick={handleMenuClose}>Purchase History</MenuItem>
+        </Menu>
+    );
     
     return (
         <>
@@ -51,17 +84,30 @@ const Navbar = ( { id, totalItems, user, handleLogOut }) => {
                                 </Badge>
                             </IconButton>
                         </div>) :
-                        (location.pathname.includes(`/stores/`) && id !== -1 ) && (
+                        (location.pathname.includes(`/stores/${storeId}`) && storeId !== -1 ) && (
                             <div className={classes.button}>
-                            <IconButton component={Link} to={`/stores/${id}/bag`} aria-label="Show bag items" color="inherit">
+                            <IconButton component={Link} to={`/stores/${storeId}/bag`} aria-label="Show bag items" color="inherit">
                                 <Badge badgeContent={totalItems} color="secondary">
                                     <LocalMall />
                                 </Badge>
                             </IconButton>
                         </div>)
                     }
+                    <div className={classes.sectionDesktop}>
+                        <IconButton aria-label="show 2 new notifications" color="inherit">
+                            <Badge badgeContent={2} color="secondary">
+                                <NotificationsIcon />
+                            </Badge>
+                        </IconButton>
+                    </div>
+                    {user.id !== -1 &&
+                        <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="open drawer" onClick={handleMenuOpen}>
+                            <MenuIcon />
+                        </IconButton>
+                    }
                 </Toolbar>
             </AppBar>
+            {renderMenu}
         </>
     )
 }

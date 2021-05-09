@@ -22,9 +22,10 @@ export default makeStyles((theme) => ({
   },
   menuButton: {
     marginRight: theme.spacing(2),
-    [theme.breakpoints.up('sm')]: {
-      display: 'none',
-    },
+    marginLeft: theme.spacing(1),
+    // [theme.breakpoints.up('sm')]: {
+    //   display: 'none',
+    // },
   },
   grow: {
     flexGrow: 1,
@@ -63,6 +64,12 @@ export default makeStyles((theme) => ({
     width: '100%',
     [theme.breakpoints.up('md')]: {
       width: '20ch',
+    },
+  },
+  sectionDesktop: {
+    display: 'none',
+    [theme.breakpoints.up('md')]: {
+      display: 'flex',
     },
   },
 }));

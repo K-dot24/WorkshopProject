@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
+import { useLocation, useParams, BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
 import { Products, Navbar, Cart } from '../../../index';
 import { GetAllProductByStoreIDToDisplay } from '../../../../api/API';
@@ -8,7 +8,9 @@ import { GetAllProductByStoreIDToDisplay } from '../../../../api/API';
 
 const StorePage = ({ handleAddToCart, match, user, handleLogOut }) => {
     const { id } = useParams();
+    const { state } = useLocation();    // passed from <Store> Link
 
+    const store = state.store;
     const [products, setProducts] = useState([]);
     const [bag, setBag] = useState({products: [], totalPrice: 0});
 
@@ -83,10 +85,10 @@ const StorePage = ({ handleAddToCart, match, user, handleLogOut }) => {
 
     return (
         <div>
-            <Navbar id={id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} />
+            <Navbar storeId={id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} />
             <Switch>
                 <Route exact path={match.url}>
-                    <Products products={products} onAddToBag={handleAddToBag} />
+                    <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} />
                 </Route>
 
                 <Route exact path={match.url + "/bag"}>
