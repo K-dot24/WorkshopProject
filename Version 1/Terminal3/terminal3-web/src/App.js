@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 import { Stores, Navbar, Cart, Checkout, StorePage, Register, Login, Action } from './components';
-import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore } from './api/API';
+import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, GetUserShoppingCart, UpdateShoppingCart } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -41,8 +41,11 @@ const App = () => {
         // }
     }
 
-    const handleAddToCart = async (productId, name, price, quantity, image) => {
-         setCart(function(prevState) {
+    const handleAddToCart = async (storeId, productId, name, price, quantity, image) => {
+        AddProductToCart({userID: user.id, productId, ProductQuantity: quantity, storeId}).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+        
+        
+        setCart(function(prevState) {
             const productArr = prevState.products.filter(p => p.id === productId);
             
             return {
@@ -138,9 +141,8 @@ const App = () => {
                 <div>
                     <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} />
                     <Switch>
-                        <Route exact path="/" render={(props) => (<Stores {...props} />)} />
 
-                        <Route path="/stores/:id" render={(props) => (<StorePage handleAddToCart={handleAddToCart} user={user} handleLogOut={handleLogOut} {...props} />)} />
+                        {/* <Route path="/stores/:id" render={(props) => (<StorePage handleAddToCart={handleAddToCart} user={user} handleLogOut={handleLogOut} {...props} />)} /> */}
 
                         <Route exact path="/cart">
                             <Cart
@@ -162,6 +164,7 @@ const App = () => {
                         
                         <Route exact path={`/${user.id}/openstore`} render={(props) => (<Action name='Open New Store' fields={['Store Name']} handleAction={handleOpenNewStore} {...props} />)} />
                         
+                        <Route path="/" render={(props) => (<Stores user={user} handleAddToCart={handleAddToCart} handleLogOut={handleLogOut} {...props} />)} />
                     </Switch>
                 </div>
             </Router>

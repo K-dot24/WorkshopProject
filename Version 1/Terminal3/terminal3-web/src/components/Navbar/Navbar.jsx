@@ -12,28 +12,11 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
     const location = useLocation();
     let history = useHistory();
 
-    /*
-        AddStoreOwner = 3,
-        AddStoreManager = 4,
-        RemoveStoreManager = 5,
-        SetPermissions = 6,
-        GetStoreStaff = 7,
-        #endregion
-
-        #region Policies Management
-        SetPurchasePolicyAtStore = 8,
-        GetPurchasePolicyAtStore = 9,
-        SetDiscountPolicyAtStore = 10,
-        GetDiscountPolicyAtStore = 11,
-        #endregion
-
-        #region Information
-        GetStorePurchaseHistory = 12,
-    */
-
     const allActions = ['Add New Product', 'Remove Product', 'Edit Product', 'Add Store Owner', 'Add Store Manager', 'Remove Store Manager', 
                         'Set Permissions', 'Get Store Staff', 'Set Purchase Policy At Store', 'Get Purchase Policy At Store',
                         'Set Discount Policy At Store', 'Get Discount Policy At Store', 'Get Store Purchase History'];
+    
+    // TODO: Delete this when connecting to real API permissions
     const userWithMockPermissions = { ...user, permissions: [true, true, true, true, true, true, true, true, true, true, true, true, true]};
 
     if (allActions.length !== userWithMockPermissions.permissions.length)
@@ -42,7 +25,7 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const isMenuOpen = Boolean(anchorEl);
 
-    const StoreActions = () => {
+    const StoreActions = () => {    // TODO: Get real permissions from API
         return [
             allActions.map((action, index) => userWithMockPermissions.permissions[index] &&  
                         <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    

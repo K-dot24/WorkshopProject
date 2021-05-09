@@ -57,7 +57,7 @@ const Cart = ({ id, cart, handleUpdateCartQuantity, handleRemoveFromCart, handle
                         <Button component={Link} to="/cart" className={classes.checkoutButton} 
                                 size="large" type="button" variant="contained" color="primary"
                                 onClick={() => cart.products.map((item) => (
-                                    handleAddToCart(item.id, item.name, item.price, item.quantity, products_image_url)
+                                    handleAddToCart(id, item.id, item.name, item.price, item.quantity, products_image_url)
                                 ))} >
                             Add to Cart
                         </Button>

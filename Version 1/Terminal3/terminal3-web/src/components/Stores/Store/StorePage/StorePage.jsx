@@ -1,27 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { useLocation, useParams, BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
 import { Products, Navbar, Cart } from '../../../index';
 import { GetAllProductByStoreIDToDisplay } from '../../../../api/API';
 
 
 
-const StorePage = ({ handleAddToCart, match, user, handleLogOut }) => {
-    const { id } = useParams();
-    const { state } = useLocation();    // passed from <Store> Link
-
-    let store = null;
-    if (state) {
-        store = state.store;
-        console.log(store);
-    }
-    
+const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     const [products, setProducts] = useState([]);
     const [bag, setBag] = useState({products: [], totalPrice: 0});
 
     // TODO: Fetch real data from API
     const fetchProducts = async () => {
-        GetAllProductByStoreIDToDisplay(id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
+        GetAllProductByStoreIDToDisplay(store.id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
 
         
         // Mock Data
@@ -90,15 +81,15 @@ const StorePage = ({ handleAddToCart, match, user, handleLogOut }) => {
 
     return (
         <div>
-            <Navbar storeId={id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} />
+            <Navbar storeId={store.id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} />
             <Switch>
                 <Route exact path={match.url}>
-                    <Products storeName={store !== null ? store.name : ''} products={products} onAddToBag={handleAddToBag} />
+                    <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} />
                 </Route>
 
                 <Route exact path={match.url + "/bag"}>
                     <Cart
-                        id={id}
+                        id={store.id}
                         cart={bag}
                         handleUpdateCartQuantity={handleUpdateBagQuantity} 
                         handleRemoveFromCart={handleRemoveFromBag} 
