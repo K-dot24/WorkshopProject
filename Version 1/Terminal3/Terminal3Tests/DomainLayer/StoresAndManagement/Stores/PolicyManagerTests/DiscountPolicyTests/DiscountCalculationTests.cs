@@ -2,9 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
+using System.Collections.Concurrent;
 
-namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
+namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
 {
     public class DiscountCalculationTests
     {
@@ -24,11 +25,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
         [Theory()]
         [Trait("Category", "Unit")]
         [InlineData("Bread", 5, 40)]
-        [InlineData("Bread", 1, 10)]
         [InlineData("Milk", 5, 75)]
-        public void CalculatePriceMinProduct(String productname, int sum, Double expectedPrice)
+        public void CalculatePrice(String productName, int sum, Double expectedPrice)
         {
-            
+            PolicyManager.AddDiscountPolicy(new VisibleDiscount(DateTime.MaxValue, new DiscountTargetProducts(), 0.2));
+            ConcurrentDictionary<Product, int> bag = new ConcurrentDictionary<Product, int>();
+            bag.TryAdd(Products[productName], sum);
+            Double price =PolicyManager.GetTotalBagPrice(bag);
+            Assert.True(price == expectedPrice);
         }
 
     }
