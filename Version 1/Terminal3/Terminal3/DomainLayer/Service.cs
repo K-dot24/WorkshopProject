@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 
 namespace Terminal3.DomainLayer
@@ -247,7 +249,8 @@ namespace Terminal3.DomainLayer
             {
                 if (properties[i].CanWrite && lowerCaseDict.ContainsKey(properties[i].Name.ToLower()))
                 {
-                    properties[i].SetValue(obj, lowerCaseDict[properties[i].Name.ToLower()], null);
+                    JsonElement value = (JsonElement)lowerCaseDict[properties[i].Name.ToLower()];
+                    properties[i].SetValue(obj, value.GetString(), null);
                 }
             }
         }
