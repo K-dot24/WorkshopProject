@@ -300,7 +300,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         private void RemoveAllStaffAppointedByOwner(StoreOwner owner)
         {
-            //notifyOwnerSubscriptionRemoved(owner.GetId());
+            NotificationManager.notifyOwnerSubscriptionRemoved(owner.GetId() , owner);
             if(Owners.Count != 0)
             {
                 foreach (var staff_owner in Owners)
@@ -425,47 +425,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //else failed
             return new Result<bool>($"Staff ID not found in store.\n", false, false);
         }
-
-        //TODO - DELETE??
-        #region Notification
-        public Result<bool> notifyStoreClosed()  
-        {
-            String msg = $"Event : Store Closed\nStore Id : {Id}\n";
-            Notification notification = new Notification(msg, true);
-            notify(notification);
-            return new Result<bool>($"All staff members are notified that store {Id} is closed\n", true, true);
-        }
-
-        public Result<bool> notifyStoreOpened()
-        {
-            String msg = $"Event : Store Opened\nStore Id : {Id}\n";
-            Notification notification = new Notification(msg, true);
-            notify(notification);
-            return new Result<bool>($"All staff members are notified that store {Id} is opened\n", true, true);
-        }
-
-        public Result<bool> notifyOwnerSubscriptionRemoved(string ownerID)  
-        {
-            String msg = $"Event : Owner Subscription Removed\nStore Id : {Id}\nOwner Id : {ownerID}";
-            Notification notification = new Notification(msg, true);
-            notify(notification);
-            return new Result<bool>($"All staff members are notified that owner ({ownerID}) subscriptoin as store owner ({Id}) has been removed\n", true, true);
-        }
-
-        private void notify(Notification notification)
-        {
-            foreach (var owner in Owners)
-            {
-                owner.Value.Update(notification);
-            }
-
-            foreach (var manager in Managers)
-            {
-                manager.Value.Update(notification);
-            }
-        }
-        #endregion Notification
-
 
         //Getter
         public Result<Product> GetProduct(String productID)

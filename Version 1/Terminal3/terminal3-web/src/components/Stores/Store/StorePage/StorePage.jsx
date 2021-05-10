@@ -1,27 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
-import { Products, Navbar, Cart } from '../../../index';
-import { GetAllProductByStoreIDToDisplay } from '../../../../api/API';
+import { Products, Navbar, Cart, Action } from '../../../../components';
+import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
+        AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff } from '../../../../api/API';
 
 
 
-const StorePage = ({ handleAddToCart, match }) => {
-    const { id } = useParams();
-
+const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     const [products, setProducts] = useState([]);
     const [bag, setBag] = useState({products: [], totalPrice: 0});
 
-    // TODO: Fetch real data from API
     const fetchProducts = async () => {
-        GetAllProductByStoreIDToDisplay(id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
-
-        
-        // Mock Data
-        // setProducts([
-        //     { id: 1, name: 'Nike Blazer Mid 77', price: 450.0, quantity: 10, category: 'Shoes', rating: 5, numberOfRates: 2, keywords: ['nike', 'shoes', 'style'], image: 'https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/ef4dbed6-c621-4879-8db3-f87296bfb570/blazer-mid-77-vintage-shoe-CBDjT0.png'},
-        //     { id: 2, name: 'Macbook', price: 4019.99, quantity: 50, category: 'Laptops', rating: 4.5, numberOfRates: 6, keywords: ['apple', 'macbook', 'expensive'], image: 'https://d3m9l0v76dty0.cloudfront.net/system/photos/5435150/large/d6b55817aafd21bc9c896dfcfcaf0ae7.jpg'}
-        // ]);
+        GetAllProductByStoreIDToDisplay(store.id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
     }
 
     // TODO: Fetch real data from API
@@ -76,22 +67,87 @@ const StorePage = ({ handleAddToCart, match }) => {
         setBag({products: [], totalPrice: 0});
     }
 
+    //#region Staff Actions
+
+    const handleAddProductToStore = async (data) => {
+        let keywords = [];
+        if (data.keywords) {
+            keywords = data.keywords.split(',');
+        }
+
+        // To take only product ID if needed: message.substring(message.indexOf(":") + 2)
+        AddProductToStore({ userID: user.id, storeID: store.id, ...data, keywords }).then(response => response.ok ?
+            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+        
+    }
+
+    const handleRemoveProductFromStore = async (data) => {
+        RemoveProductFromStore(user.id, store.id, data.productid).then(response => response.ok ?
+            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
+    const handleEditProductDetails = async (data) => {
+        for (var key in data) {
+            if (data[key] === null || data[key] === "" || (typeof data[key] !== 'string' && !(data[key] instanceof String) && isNaN(data[key]))){
+                delete data[key]
+            }
+        }
+
+        const productID = data.productid;
+        delete data.productid;
+
+        const details = { ...data };
+        data = { productID, details};
+
+        console.log({ userID: user.id, storeID: store.id, ...data });
+
+        EditProductDetails({ userID: user.id, storeID: store.id, ...data }).then(response => response.ok ?
+            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
+    const handleAddStoreOwner = async (data) => {  
+        AddStoreOwner({ addedOwnerID: data.newownerid, currentlyOwnerID: user.id, storeID: store.id }).then(response => response.ok ?
+            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
+    const handleAddStoreManager = async (data) => {
+        console.log(data);
+        
+        AddStoreManager({ addedManagerID: data.newmanagerid, currentlyOwnerID: user.id, storeID: store.id }).then(response => response.ok ?
+            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
+    const handleRemoveStoreManager = async (data) => {
+        console.log(data);
+
+        RemoveStoreManager(store.id, user.id, data.removedmanagerid).then(response => response.ok ?
+            response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
+    const handleGetStoreStaff = async () => {
+        GetStoreStaff(user.id, store.id).then(response => response.ok ?
+            response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
+    //#endregion
+
     useEffect(() => {
         fetchProducts();
         fetchBag();
+        console.log("store id: " + store.id);
     }, []);
 
     return (
         <div>
-            <Navbar id={id} totalItems={bag.products.length} />
+            <Navbar storeId={store.id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} />
             <Switch>
                 <Route exact path={match.url}>
-                    <Products products={products} onAddToBag={handleAddToBag} />
+                    <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} />
                 </Route>
 
                 <Route exact path={match.url + "/bag"}>
                     <Cart
-                        id={id}
+                        id={store.id}
                         cart={bag}
                         handleUpdateCartQuantity={handleUpdateBagQuantity} 
                         handleRemoveFromCart={handleRemoveFromBag} 
@@ -99,6 +155,58 @@ const StorePage = ({ handleAddToCart, match }) => {
                         handleAddToCart={handleAddToCart}
                     />
                 </Route>
+
+                <Route exact path={match.url + `/addnewproduct`} 
+                    render={(props) => (<Action name='Add New Product' 
+                                                fields={[{name: 'Product Name', required: true}, 
+                                                        {name: 'Price', required: true, type: "number"}, 
+                                                        {name: 'Initial Quantity', required: true, type: "number"},
+                                                        {name: 'Category', required: true},
+                                                        {name: 'Keywords', required: false}]} 
+                                                handleAction={handleAddProductToStore} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/removeproduct`} 
+                    render={(props) => (<Action name='Remove Product' 
+                                                fields={[{name: 'Product ID', required: true}]} 
+                                                handleAction={handleRemoveProductFromStore} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/editproductdetails`} 
+                    render={(props) => (<Action name='Edit Product Details' 
+                                                fields={[{name: 'Product ID', required: true}, 
+                                                        {name: 'Name', required: false}, 
+                                                        {name: 'Price', required: false, type: "number"},
+                                                        {name: 'Quantity', required: false, type: "number"},
+                                                        {name: 'Category', required: false},
+                                                        {name: 'Keywords', required: false}]} 
+                                                handleAction={handleEditProductDetails} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/addstoreowner`} 
+                    render={(props) => (<Action name='Add Store Owner' 
+                                                fields={[{name: 'New Owner ID', required: true}]} 
+                                                handleAction={handleAddStoreOwner} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/addstoreManager`} 
+                    render={(props) => (<Action name='Add Store Manager' 
+                                                fields={[{name: 'New Manager ID', required: true}]} 
+                                                handleAction={handleAddStoreManager} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/removestoremanager`} 
+                    render={(props) => (<Action name='Remove Store Manager' 
+                                                fields={[{name: 'Removed Manager ID', required: true}]} 
+                                                handleAction={handleRemoveStoreManager} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/getstorestaff`} 
+                    render={(props) => (<Action name='Get Store Stuff' 
+                                                 
+                                                handleAction={handleGetStoreStaff} {...props} />)} 
+                />
+
             </Switch>
         </div>
     )

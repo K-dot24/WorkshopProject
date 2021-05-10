@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-
-import { Stores, Navbar, Cart, Checkout, StorePage, Register, Login } from './components';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
+import { Stores, Navbar, Cart, Checkout, Register, Login, Action } from './components';
+import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, GetUserShoppingCart, UpdateShoppingCart } from './api/API';
+
+// primary and secondary colors for the app
 const theme = createMuiTheme({
     palette: {
         primary: {
@@ -16,17 +18,43 @@ const theme = createMuiTheme({
   });
 
 const App = () => {
+    // states
+    const [user, setUser] = useState({id: -1, email: ''});
     const [cart, setCart] = useState({products: [], totalPrice: 0});
+    // const [cart, setCart] = useState({id: 0, shoppingBags: [], totalPrice: 0, totalItems: 0});
+
+
+    //#region Stores Functionality
+
+    const handleOpenNewStore = async (data) => {
+        OpenNewStore({ userID: user.id, ...data }).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+    }
+
+    //#endregion
 
     //#region Cart Functionality 
     
     // TODO: Fetch from API?
     const fetchCart = async () => {
+        setCart({products: [], totalPrice: 0})
+        
+        // setCart({id: 0, shoppingBags: [], totalPrice: 0});
+
+        // if (user.id !== -1){
+        //     GetUserShoppingCart(user.id).then(response => response.ok ? 
+        //         response.json().then(json => setCart({...json.data, 
+        //                             totalItems: cart.shoppingBags.reduce(function(count, bag) {
+        //                                             return count + bag.length;
+        //                                         }, 0)})) : null).catch(err => console.log(err));
+        // }
     }
 
-    // TODO: Update with real data
-    const handleAddToCart = async (productId, name, price, quantity, image) => {
-         setCart(function(prevState) {
+    const handleAddToCart = async (storeId, productId, name, price, quantity, image) => {
+        AddProductToCart({userID: user.id, productId, ProductQuantity: quantity, storeId}).then(response => response.ok ? 
+            response.json().then(json => console.log(json)) : null).catch(err => console.log(err));
+        
+        
+        setCart(function(prevState) {
             const productArr = prevState.products.filter(p => p.id === productId);
             
             return {
@@ -86,28 +114,49 @@ const App = () => {
         setCart({products: [], totalPrice: 0});
     }
     //#endregion
-    
 
+    //#region User Functionality
+
+    const handleLogin = async (data) => {
+        
+        // TODO: What to do in failure?
+        LoginAPI(data).then(response => response.ok ? 
+            response.json().then(id => setUser({ id, email: data.email})) : null).catch(err => console.log(err));
+    }
+
+    // TODO: What to do in success/failure?
+    const handleRegister = async (data) => {
+        RegisterAPI(data).then(response => response.ok ? 
+            response.json().then(id => console.log(id)) : null).catch(err => console.log(err));
+    }
+
+    // TODO: What to do in failure?
+    const handleLogOut = () => {
+        Logout(user.email).then(response => response.ok ?
+            response.json().then(message => setUser({id: -1, name: '', email: ''})) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
+    //#endregion
+
+    // Update cart when user change (login/sign out)
     useEffect(() => {
         fetchCart();
-    }, []);
+        console.log(user);
+    }, [user]);
 
-    //printing
-    // useEffect(() => {
-    //     console.log(cart);
-    // }, [cart]);
+    useEffect(() => {
+        console.log(cart);
+    }, [cart]);
+
 
     return (
         <MuiThemeProvider theme={theme}>
             <Router>
                 <div>
-                    <Navbar id={-1} totalItems={cart.products.length} />
+                    <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} />
                     <Switch>
-                        <Route exact path="/" component={Stores} />
-                            {/* <Stores stores={stores} />
-                        </Route> */}
 
-                        <Route path="/stores/:id" render={(props) => (<StorePage handleAddToCart={handleAddToCart} {...props} />)} />
+                        {/* <Route path="/stores/:id" render={(props) => (<StorePage handleAddToCart={handleAddToCart} user={user} handleLogOut={handleLogOut} {...props} />)} /> */}
 
                         <Route exact path="/cart">
                             <Cart
@@ -119,12 +168,19 @@ const App = () => {
                             />
                         </Route>
 
-                        <Route path="/register" component={Register} />
-                        <Route path="/login" component={Login} />
+                        <Route path="/register" render={(props) => (<Register handleRegister={handleRegister} {...props} />)} />
+                        
+                        <Route path="/login" render={(props) => (<Login handleLogin={handleLogin} {...props} />)} />
 
                         <Route exact path="/checkout">
                             <Checkout cart={cart} handleEmptyCart={handleEmptyCart} />
                         </Route>
+                        
+                        <Route exact path={`/${user.id}/openstore`} 
+                                render={(props) => (<Action name='Open New Store' fields={[{name: 'Store Name', required: true}]} 
+                                                            handleAction={handleOpenNewStore} {...props} />)} />
+                        
+                        <Route path="/" render={(props) => (<Stores user={user} handleAddToCart={handleAddToCart} handleLogOut={handleLogOut} {...props} />)} />
                     </Switch>
                 </div>
             </Router>

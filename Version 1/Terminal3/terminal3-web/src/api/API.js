@@ -151,14 +151,24 @@ export function AddProductToCart( data ) {
 }
 
 /// Return the user's shopping cart
+///
+/// {
+///   "message": "User shopping cart\n",
+///   "execStatus": true,
+///   "data": {
+///     "id": "3404a9b11ab8435d8ae703effa1955ab",
+///     "shoppingBags": [],
+///     "totalCartPrice": 0
+///    }
+/// }
+///
 export function GetUserShoppingCart( userID ) {    
-    return fetch(`https://localhost:5000/api/GuestUser/GetUserShoppingCart`, {
+    return fetch(`https://localhost:5000/api/GuestUser/GetUserShoppingCart/${userID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-        },
-        body: { userID },    
+        }, 
     })
 }
 
@@ -227,6 +237,9 @@ export function GetTotalShoppingCartPrice( userID ) {
 }
 
 
+
+
+
 /// Returns all the reviews on a specific product
 export function GetProductReview( data ) {    
     return fetch(`https://localhost:5000/api/GuestUser/GetProductReview/${data.storeID}/${data.productID}`, {
@@ -276,7 +289,6 @@ export function Logout( email ) {
         body: { email },
     })
 }
-
 
 /// Open new store in the system
 /// </summary>
@@ -348,14 +360,13 @@ export function AddProductToStore( data ) {
 /// <param name="userID">userId of the manager/owner who preform the action</param>
 /// <param name="storeID">storeId where the product is located in</param>
 /// <param name="productID">product identifier</param>
-export function RemoveProductFromStore( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/RemoveProductFromStore/${data.userID}/${data.storeID}/${data.productID}`, {
-        method: 'DELETE',                                                                   //TODO - HTTP DELETE
+export function RemoveProductFromStore( userID, storeID, productID ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemoveProductFromStore/${userID}/${storeID}/${productID}`, {
+        method: 'DELETE',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
@@ -466,14 +477,13 @@ export function RemovePermissions( data ) {
 /// Return list of pair, each pair hold details about the store staff and its permissions
 /// <param name="ownerID">ID of the owner who request to preform the operation</param>
 /// <param name="storeID">storeID</param>
-export function GetStoreStaff( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/GetStoreStaff`, {
+export function GetStoreStaff(ownerID, storeID) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetStoreStaff/${ownerID}/${storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
@@ -496,14 +506,13 @@ export function GetStorePurchaseHistory( data ) {
 /// <param name="storeID">StoreID</param>
 /// <param name="currentlyOwnerID">OwnerID</param>
 /// <param name="removedManagerID">ID of the manager to be removed</param>
-export function RemoveStoreManager( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/RemoveStoreManager/${data.storeID}/${data.currentlyOwnerID}/${data.removedManagerID}`, {
-        method: 'DELETE',                                                       //TODO - HTTP DELETE
+export function RemoveStoreManager( storeID, currentlyOwnerID, removedManagerID ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemoveStoreManager/${storeID}/${currentlyOwnerID}/${removedManagerID}`, {
+        method: 'DELETE',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
@@ -516,7 +525,7 @@ export function RemoveStoreManager( data ) {
 /// Returns user's purchase history
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="userID">ID of the user to get the purchase history</param>
-export function GetUserPurchaseHistory( data ) {
+export function AdminGetUserPurchaseHistory( data ) {
     return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/GetUserPurchaseHistory/${data.sysAdminID}/${data.userID}`, {
         method: 'GET',
         headers: {
@@ -531,7 +540,7 @@ export function GetUserPurchaseHistory( data ) {
 /// Returns in-store purchase history
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="storeId">ID of the store to get the purchase history</param>
-export function GetStorePurchaseHistory( data ) {
+export function AdminGetStorePurchaseHistory( data ) {
     return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeID}`, {
         method: 'GET',
         headers: {

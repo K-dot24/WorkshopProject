@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { useHistory } from 'react-router-dom';
 
 import useStyles from './styles';
 
@@ -15,11 +16,38 @@ function Copyright() {
         {'.'}
       </Typography>
     );
-  }
+}
 
-// TODO: Add onSubmit functionality
-const Login = () => {
+const Login = ({ handleLogin }) => {
+    // styles.js
     const classes = useStyles();
+    
+    // states
+    const [user, setUser] = useState({email: '', password: ''});
+
+    // for redirecting after login
+    let history = useHistory();
+
+    // TODO: fetch user from API
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        handleLogin(user);
+
+        // redirect back to homepage
+        history.push('/');
+    }
+
+    // const submit = e => {
+    //     e.preventDefault()
+    //     fetch('/api', {
+    //       method: 'POST',
+    //       body: JSON.stringify({ user }),
+    //       headers: { 'Content-Type': 'application/json' },
+    //     })
+    //       .then(res => res.json())
+    //       .then(json => setUser(json.user))
+    // }
 
     return (
         <Container component="main" maxWidth="xs">
@@ -31,7 +59,7 @@ const Login = () => {
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
-                    <form className={classes.form}>
+                    <form className={classes.form} onSubmit={handleSubmit}>
                         <TextField
                             variant="outlined"
                             margin="normal"
@@ -42,6 +70,7 @@ const Login = () => {
                             name="email"
                             autoComplete="email"
                             autoFocus
+                            onChange={(e) => setUser({ ...user, email: e.target.value })}
                         />
                         <TextField
                             variant="outlined"
@@ -53,6 +82,7 @@ const Login = () => {
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            onChange={(e) => setUser({ ...user, password: e.target.value })}
                         />
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}
