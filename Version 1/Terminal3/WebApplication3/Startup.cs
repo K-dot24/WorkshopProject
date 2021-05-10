@@ -6,10 +6,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using signalRgateway.Hubs;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Terminal3.ServiceLayer;
-using Terminal3WebAPI.Hubs;
 
 namespace WebApplication3
 {
@@ -26,7 +29,7 @@ namespace WebApplication3
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSignalR();
+            //services.AddSignalR();
             services.AddCors(options =>
             {
                 options.AddPolicy("ClientPermission", policy =>
@@ -40,9 +43,8 @@ namespace WebApplication3
             services.AddCors();
 
             services.AddSwaggerGen();
-            
+
             //Dependency injection
-            
             services.AddSingleton<IECommerceSystem, ECommerceSystem>();
 
         }
@@ -73,7 +75,7 @@ namespace WebApplication3
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<NotificationHub>("/hubs/notification");
+                //endpoints.MapHub<NotificationHub>("/hubs/notification");
             });
 
 

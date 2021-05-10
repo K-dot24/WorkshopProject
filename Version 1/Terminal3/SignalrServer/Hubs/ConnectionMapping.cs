@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Terminal3WebAPI.Hubs
+namespace SignalrServer.Hubs
 {
     public class ConnectionMapping<T>
     {

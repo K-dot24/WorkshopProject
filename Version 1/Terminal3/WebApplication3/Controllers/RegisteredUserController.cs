@@ -34,15 +34,16 @@ namespace Terminal3WebAPI.Controllers
         /// {
         ///     "Email":"string",
         ///     "Password":"string"
+        ///     "GuestUserID":"string"
         /// }
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
         [Route("Login")]
         [HttpPost]
-        public IActionResult Login([FromBody] CredentialsModel data)
+        public IActionResult Login([FromBody] LoginModel data)
         {
-            Result<RegisteredUserService> result = system.Login(data.Email, data.Password);
+            Result<RegisteredUserService> result = system.Login(data.email, data.password,data.guestuserid);
             if (result.ExecStatus) { return Ok(result.Data.Id); }
             else { return BadRequest(result.Message); }
 
