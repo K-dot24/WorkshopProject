@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 import { Stores, Navbar, Cart, Checkout, Register, Login, Action } from './components';
-import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, GetUserShoppingCart, UpdateShoppingCart } from './api/API';
+import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
+        GetUserShoppingCart, UpdateShoppingCart, GetTotalShoppingCartPrice } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -52,15 +53,17 @@ const App = () => {
 
         if (user.id !== -1){
             GetUserShoppingCart(user.id).then(response => response.ok ? 
-                response.json().then(json => setCart({id: json.data.id,
-                                                      products: json.data.shoppingBags.length === 0 ? [] : 
-                                                        json.data.shoppingBags.reduce(function(list, bag) {
+                response.json().then(data => setCart({id: data.id,
+                                                      products: data.shoppingBags.length === 0 ? [] : 
+                                                        data.shoppingBags.reduce(function(list, bag) {
                                                             return list.concat(bag.products.map(item => item.item1));
-                                                        }, []),  
-                                                      totalPrice: json.data.shoppingBags.reduce(function(total, bag) {
-                                                                    return total + bag.totalBagPrice;
-                                                                }, 0)
+                                                        }, [])  
+                                                    //   totalPrice: data.shoppingBags.reduce(function(total, bag) {
+                                                    //                 return total + bag.totalBagPrice;
+                                                    //             }, 0)
                                                         })) : null).catch(err => console.log(err));    // TODO: Check
+            GetTotalShoppingCartPrice(user.id).then(response => response.ok ? 
+                response.json().then(json => setCart({...cart, totalPrice: json.data})) : null).catch(err => console.log(err));
         }
     }
 

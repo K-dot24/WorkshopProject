@@ -242,7 +242,6 @@ export function GetTotalShoppingCartPrice( userID ) {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { userID }, 
     })
 }
 
