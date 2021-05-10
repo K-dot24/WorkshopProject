@@ -60,6 +60,17 @@ export function GetAllProductByStoreIDToDisplay(storeId) {
 
 //#region GuestUserController
 
+/// Get welcome page of the system
+export function EnterSystem( ) {
+    return fetch(`https://localhost:5000/api/GuestUser/Register`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
 
 /// Register new user to the system
 /// Template of valid JSON:
