@@ -59,6 +59,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #region Display data
         List<StoreService> GetAllStoresToDisplay();
         List<ProductService> GetAllProductByStoreIDToDisplay(string storeID);
+        Boolean[] GetPermission(string userID, string storeID);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -466,6 +467,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 productsService.Add(productService);
             }
             return productsService;
+        }
+
+        public Boolean[] GetPermission(string userID, string storeID)
+        {
+            Store store = StoresFacade.Stores[storeID];
+            return store.GetPermission(userID);
         }
 
     }

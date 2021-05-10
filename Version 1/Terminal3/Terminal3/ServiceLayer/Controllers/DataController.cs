@@ -11,6 +11,7 @@ namespace Terminal3.ServiceLayer.Controllers
     {
         List<StoreService> GetAllStoresToDisplay();
         List<ProductService> GetAllProductByStoreIDToDisplay(string storeID);
+        Boolean[] GetPermission(string userID, string storeID);
 
     }
     /// <summary>
@@ -37,6 +38,11 @@ namespace Terminal3.ServiceLayer.Controllers
         public List<ProductService> GetAllProductByStoreIDToDisplay(string storeID)
         {
             return StoresAndManagementInterface.GetAllProductByStoreIDToDisplay(storeID);
+        }
+
+        public Boolean[] GetPermission(string userID, string storeID)
+        {
+            return StoresAndManagementInterface.GetPermission(userID, storeID);
         }
 
 
