@@ -54,8 +54,6 @@ const App = () => {
                                                                     return total + bag.totalBagPrice;
                                                                 }, 0)
                                                         })) : null).catch(err => console.log(err));    // TODO: Check
-            GetTotalShoppingCartPrice(user.id).then(response => response.ok ? 
-                response.json().then(json => setCart({...cart, totalPrice: json.data})) : null).catch(err => console.log(err));
         }
     }
 
