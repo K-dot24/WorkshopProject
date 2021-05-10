@@ -149,8 +149,8 @@ namespace Terminal3WebAPI.Controllers
         public IActionResult GetUserShoppingCart(String userID)
         {
             Result<ShoppingCartService> result = system.GetUserShoppingCart(userID);
-            if (result.ExecStatus) { return Ok(result); }
-            else { return BadRequest(result); }
+            if (result.ExecStatus) { return Ok(result.Data); }
+            else { return BadRequest(result.Data); }
         }
 
         /// <summary>
