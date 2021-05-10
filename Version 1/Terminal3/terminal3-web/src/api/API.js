@@ -55,6 +55,16 @@ export function GetAllProductByStoreIDToDisplay(storeId) {
     })
 }
 
+export function GetPermission(userId , storeId) {
+    return fetch(`https://localhost:5000/api/Data/GetAllProductByStoreIDToDisplay/${userId}/${storeId}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
 //#endregion
 
 

@@ -42,5 +42,16 @@ namespace Terminal3WebAPI.Controllers
             List<ProductService> result = system.GetAllProductByStoreIDToDisplay(storeID);
             return Ok(result);
         }
+
+        [Route("GetPermission/{userID}/{storeID}")]
+        [HttpGet]
+        public IActionResult GetPermission(string userID , string storeID)
+        {
+            Boolean[] result = system.GetPermission(userID, storeID);
+            if (result != null) return Ok(result);
+            else return BadRequest(result);
+        }
+
+
     }
 }
