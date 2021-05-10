@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, IconButton, Badge, MenuItem, Menu, Typography, Button } from '@material-ui/core';
 import { ShoppingCart, LocalMall, Menu as MenuIcon, Notifications as NotificationsIcon } from '@material-ui/icons';
 import { Link, useLocation, useHistory } from 'react-router-dom';
@@ -10,8 +10,11 @@ import useStyles from './styles';
 import logo from '../../assets/terminal3_logo.png';
 
 const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
+    const [permissions, setPermissions] = useState([])
+    
     const classes = useStyles();
     const location = useLocation();
+
     let history = useHistory();
 
     const allActions = ['Add New Product', 'Remove Product', 'Edit Product Details', 'Add Store Owner', 'Add Store Manager', 'Remove Store Manager', 
@@ -22,7 +25,10 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
     const userWithMockPermissions = { ...user, permissions: [true, true, true, true, true, true, true, true, true, true, true, true, true]};
 
     const fetchPermissions = async () => {
-        GetPermission(user.id, storeId).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+        if (user.id !== -1 && storeId !== -1) {
+            GetPermission(user.id, storeId).then(response => response.ok ? 
+                response.json().then(permissions => setPermissions(permissions)) : null).catch(err => console.log(err));
+        }
     }
 
 
@@ -34,7 +40,7 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
 
     const StoreActions = () => {    // TODO: Get real permissions from API
         return [
-            allActions.map((action, index) => userWithMockPermissions.permissions[index] &&  
+            allActions.map((action, index) => permissions[index] &&  
                         <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    
             )
         ];
@@ -48,6 +54,11 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
         history.push(path);
         setAnchorEl(null);
     };
+
+    useEffect(() => {
+        fetchPermissions();
+        console.log(user);
+    }, [user]);
 
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
@@ -132,7 +143,7 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
                             </Badge>
                         </IconButton>
                     </div>
-                    {user.id !== -1 &&
+                    {(user.id !== -1) &&
                         <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="open drawer" onClick={handleMenuOpen}>
                             <MenuIcon />
                         </IconButton>

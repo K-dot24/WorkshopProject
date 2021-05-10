@@ -533,7 +533,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 }
             }
 
-            return null;
+            // No Permissions
+            for (int i = 0; i < per.Length; i++)
+            {
+                per[i] = false;
+            }
+            return per;
         }
     }
 }
