@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal3-IntegrationTests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal3WebAPI", "WebApplication3\Terminal3WebAPI.csproj", "{53112A7E-AD8E-459C-9337-2A317630C408}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal3Tests1", "Terminal3Tests1\Terminal3Tests1.csproj", "{58DA5BC2-03EB-423A-A83D-2D7BE3517530}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRgateway", "WebApplication1\SignalRgateway.csproj", "{34ED8049-EC8A-44A4-8FB6-C14A25F2B2A0}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalrServer", "SignalrServer\SignalrServer.csproj", "{DE7175F9-A8BB-4ACA-8148-0D08E743D10B}"
 EndProject
 Global
@@ -41,6 +45,14 @@ Global
 		{53112A7E-AD8E-459C-9337-2A317630C408}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53112A7E-AD8E-459C-9337-2A317630C408}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53112A7E-AD8E-459C-9337-2A317630C408}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58DA5BC2-03EB-423A-A83D-2D7BE3517530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58DA5BC2-03EB-423A-A83D-2D7BE3517530}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58DA5BC2-03EB-423A-A83D-2D7BE3517530}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58DA5BC2-03EB-423A-A83D-2D7BE3517530}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34ED8049-EC8A-44A4-8FB6-C14A25F2B2A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34ED8049-EC8A-44A4-8FB6-C14A25F2B2A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34ED8049-EC8A-44A4-8FB6-C14A25F2B2A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34ED8049-EC8A-44A4-8FB6-C14A25F2B2A0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DE7175F9-A8BB-4ACA-8148-0D08E743D10B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DE7175F9-A8BB-4ACA-8148-0D08E743D10B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE7175F9-A8BB-4ACA-8148-0D08E743D10B}.Release|Any CPU.ActiveCfg = Release|Any CPU
