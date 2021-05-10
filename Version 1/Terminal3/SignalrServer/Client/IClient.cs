@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SignalrServer.Client
 {
     public interface IClient {
-        Task ReceiveMessage(Notification message);
+        Task ReceiveMessage(String message);
 
     }
 }

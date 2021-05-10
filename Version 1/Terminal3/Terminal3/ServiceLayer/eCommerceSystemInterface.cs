@@ -41,12 +41,18 @@ namespace Terminal3.ServiceLayer
             StoreStaffInterface = new StoreStaffController(StoresAndManagement);
             SystemAdminInterface = new SystemAdminController(StoresAndManagement);
             DataController = new DataController(StoresAndManagement);
-            NotificationService = NotificationService.GetInstance();
 
             //Setting up SignalR connection
+
             HubConnection SignalRClient = new HubConnection("http://localhost:8080/signalr");
             hubProxy = SignalRClient.CreateHubProxy("NotificationHub");
             SignalRClient.Start();
+            while (!(SignalRClient.State == ConnectionState.Connected)) {}
+
+
+            NotificationService = NotificationService.GetInstance();
+            NotificationService.hubProxy = hubProxy;
+
 
         }
 
