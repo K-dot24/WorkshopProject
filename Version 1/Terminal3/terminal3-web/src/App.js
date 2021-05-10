@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
@@ -21,9 +21,6 @@ const theme = createMuiTheme({
 const App = () => {
     // states
     const [user, setUser] = useState({id: -1, email: ''});
-    // const [cart, setCart] = useState({products: [], totalPrice: 0});
-
-    // const [cart, setCart] = useState({id: 0, shoppingBags: [], totalPrice: 0, totalItems: 0});
     const [cart, setCart] = useState({id: 0, products: [], totalPrice: 0});
 
 
@@ -39,8 +36,6 @@ const App = () => {
     
     // TODO: Fetch from API?
     const fetchCart = async () => {
-        // setCart({products: [], totalPrice: 0})
-
         setCart({id: 0, products: [], totalPrice: 0});
 
         if (user.id !== -1){
@@ -58,21 +53,10 @@ const App = () => {
     }
 
     const handleAddToCart = async (storeId, productId, name, price, quantity, image) => {
+        AddProductToCart({ userID: user.id, productID: productId, ProductQuantity: quantity, storeID: storeId }).then(response => response.ok ? 
+            response.json().then(json => console.log(json)) : console.log("NOT OKAY")).catch(err => console.log(err));
 
-        console.log(JSON.stringify({ userID: user.id, productID: productId, ProductQuantity: quantity, storeID: storeId }));
-
-        // AddProductToCart({ userID: user.id, productID: productId, ProductQuantity: quantity, storeID: storeId }).then(response => response.ok ? 
-        //     response.json().then(json => console.log("here" + json)) : console.log("NOT OKAY")).catch(err => console.log(err));
-        
-        
-        setCart(function(prevState) {
-            const productArr = prevState.products.filter(p => p.id === productId);
-            
-            return {
-                products: productArr.length === 0 ? [...prevState.products, {id: productId, name, price, quantity, image}] : handleUpdateCartQuantity(productId, productArr[0].quantity + quantity),
-                totalPrice: prevState.totalPrice + price*quantity      
-            }
-        }); 
+        fetchCart();
     }
 
     const handleUpdateCartQuantity = async (productId, quantity) => {
