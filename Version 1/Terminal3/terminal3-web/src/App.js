@@ -20,8 +20,10 @@ const theme = createMuiTheme({
 const App = () => {
     // states
     const [user, setUser] = useState({id: -1, email: ''});
-    const [cart, setCart] = useState({products: [], totalPrice: 0});
+    // const [cart, setCart] = useState({products: [], totalPrice: 0});
+
     // const [cart, setCart] = useState({id: 0, shoppingBags: [], totalPrice: 0, totalItems: 0});
+    const [cart, setCart] = useState({id: 0, products: [], totalPrice: 0});
 
 
     //#region Stores Functionality
@@ -36,22 +38,38 @@ const App = () => {
     
     // TODO: Fetch from API?
     const fetchCart = async () => {
-        setCart({products: [], totalPrice: 0})
-        
-        // setCart({id: 0, shoppingBags: [], totalPrice: 0});
+        // setCart({products: [], totalPrice: 0})
+
+        setCart({id: 0, products: [], totalPrice: 0});
 
         // if (user.id !== -1){
         //     GetUserShoppingCart(user.id).then(response => response.ok ? 
         //         response.json().then(json => setCart({...json.data, 
         //                             totalItems: cart.shoppingBags.reduce(function(count, bag) {
         //                                             return count + bag.length;
-        //                                         }, 0)})) : null).catch(err => console.log(err));
+        //                                         }, 0)})) : null).catch(err => console.log(err));    // TODO: Check
         // }
+
+        if (user.id !== -1){
+            GetUserShoppingCart(user.id).then(response => response.ok ? 
+                response.json().then(json => setCart({id: json.data.id,
+                                                      products: json.data.shoppingBags.length === 0 ? [] : 
+                                                        json.data.shoppingBags.reduce(function(list, bag) {
+                                                            return list.concat(bag.products.map(item => item.item1));
+                                                        }, []),  
+                                                      totalPrice: json.data.shoppingBags.reduce(function(total, bag) {
+                                                                    return total + bag.totalBagPrice;
+                                                                }, 0)
+                                                        })) : null).catch(err => console.log(err));    // TODO: Check
+        }
     }
 
     const handleAddToCart = async (storeId, productId, name, price, quantity, image) => {
-        AddProductToCart({userID: user.id, productId, ProductQuantity: quantity, storeId}).then(response => response.ok ? 
-            response.json().then(json => console.log(json)) : null).catch(err => console.log(err));
+
+        console.log(JSON.stringify({ userID: user.id, productID: productId, ProductQuantity: quantity, storeID: storeId }));
+
+        // AddProductToCart({ userID: user.id, productID: productId, ProductQuantity: quantity, storeID: storeId }).then(response => response.ok ? 
+        //     response.json().then(json => console.log("here" + json)) : console.log("NOT OKAY")).catch(err => console.log(err));
         
         
         setCart(function(prevState) {
@@ -142,10 +160,11 @@ const App = () => {
     useEffect(() => {
         fetchCart();
         console.log(user);
+        console.log(cart);
     }, [user]);
 
     useEffect(() => {
-        console.log(cart);
+        console.log(cart.products);
     }, [cart]);
 
 
