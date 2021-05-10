@@ -78,6 +78,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             PolicyManager.SetDiscountPolicy(Discounts.Visible, true);
         }
 
+        //For Testing ONLY
+        public Store(string id, String name, RegisteredUser founder)
+        {
+            Id = id;
+            Name = name;
+            Founder = new StoreOwner(founder, this, null);
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+            InventoryManager = new InventoryManager();
+            PolicyManager = new PolicyManager();
+            History = new History();
+
+            //Add founder to list of owners
+            Owners.TryAdd(founder.Id, Founder);
+
+            //TODO: Complete when policies done properly
+            //Add default policies
+            PolicyManager.SetPurchasePolicy(Purchases.BuyNow, true);
+            PolicyManager.SetDiscountPolicy(Discounts.Visible, true);
+        }
+
         //TODO: Implement all functions
         //Methods
         public Result<Double> AddRating(Double rate)
