@@ -43,24 +43,16 @@ const App = () => {
 
         setCart({id: 0, products: [], totalPrice: 0});
 
-        // if (user.id !== -1){
-        //     GetUserShoppingCart(user.id).then(response => response.ok ? 
-        //         response.json().then(json => setCart({...json.data, 
-        //                             totalItems: cart.shoppingBags.reduce(function(count, bag) {
-        //                                             return count + bag.length;
-        //                                         }, 0)})) : null).catch(err => console.log(err));    // TODO: Check
-        // }
-
         if (user.id !== -1){
             GetUserShoppingCart(user.id).then(response => response.ok ? 
                 response.json().then(data => setCart({id: data.id,
                                                       products: data.shoppingBags.length === 0 ? [] : 
                                                         data.shoppingBags.reduce(function(list, bag) {
-                                                            return list.concat(bag.products.map(item => item.item1));
-                                                        }, [])  
-                                                    //   totalPrice: data.shoppingBags.reduce(function(total, bag) {
-                                                    //                 return total + bag.totalBagPrice;
-                                                    //             }, 0)
+                                                            return list.concat(bag.products);
+                                                        }, []),  
+                                                      totalPrice: data.shoppingBags.reduce(function(total, bag) {
+                                                                    return total + bag.totalBagPrice;
+                                                                }, 0)
                                                         })) : null).catch(err => console.log(err));    // TODO: Check
             GetTotalShoppingCartPrice(user.id).then(response => response.ok ? 
                 response.json().then(json => setCart({...cart, totalPrice: json.data})) : null).catch(err => console.log(err));
@@ -163,7 +155,6 @@ const App = () => {
     useEffect(() => {
         fetchCart();
         console.log(user);
-        console.log(cart);
     }, [user]);
 
     useEffect(() => {
@@ -177,8 +168,6 @@ const App = () => {
                 <div>
                     <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} />
                     <Switch>
-
-                        {/* <Route path="/stores/:id" render={(props) => (<StorePage handleAddToCart={handleAddToCart} user={user} handleLogOut={handleLogOut} {...props} />)} /> */}
 
                         <Route exact path="/cart">
                             <Cart
