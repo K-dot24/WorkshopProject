@@ -29,6 +29,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (product.Quantity >= quantity && quantity > 0)
             {
                 Products.TryAdd(product, quantity);
+                this.TotalBagPrice = GetTotalPrice();
                 return new Result<bool>($"Product {product.Name} was added successfully to shopping bag of {Store.Name}\n", true, true);
             }
             //else failed
