@@ -44,6 +44,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public StoresFacade()
         {
             Stores = new ConcurrentDictionary<String, Store>();
+            Store s1 = new Store("1","Shaked_store", new RegisteredUser("1","test1", "123"));
+            Store s2 = new Store("2", "Tomer_store", new RegisteredUser("2","test2", "123"));
+            Store s3 = new Store("3", "Raz_store", new RegisteredUser("3","test3", "123"));
+            Store s4 = new Store("4", "Amit_store", new RegisteredUser("4","test4", "123"));
+            Stores.TryAdd(s1.Id, s1);
+            Stores.TryAdd(s2.Id, s2);
+            Stores.TryAdd(s3.Id, s3);
+            Stores.TryAdd(s4.Id, s4);
             ClosedStores = new ConcurrentDictionary<String, Store>();
         }
 
