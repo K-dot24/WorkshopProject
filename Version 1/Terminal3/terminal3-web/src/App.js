@@ -23,15 +23,6 @@ const App = () => {
     const [cart, setCart] = useState({products: [], totalPrice: 0});
     // const [cart, setCart] = useState({id: 0, shoppingBags: [], totalPrice: 0, totalItems: 0});
 
-
-    //#region Stores Functionality
-
-    const handleOpenNewStore = async (data) => {
-        OpenNewStore({ userID: user.id, ...data }).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
-    }
-
-    //#endregion
-
     //#region Cart Functionality 
     
     // TODO: Fetch from API?
@@ -135,6 +126,14 @@ const App = () => {
         Logout(user.email).then(response => response.ok ?
             response.json().then(message => setUser({id: -1, name: '', email: ''})) : console.log("NOT OK")).catch(err => console.log(err));
     }
+    
+    const handleOpenNewStore = async (data) => {
+        OpenNewStore({ userID: user.id, ...data }).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+    }
+
+    const handleAddSystemAdmin = async (data) => {
+        console.log(data);
+    }
 
     //#endregion
 
@@ -178,9 +177,16 @@ const App = () => {
                         
                         <Route exact path={`/${user.id}/openstore`} 
                                 render={(props) => (<Action name='Open New Store' fields={[{name: 'Store Name', required: true}]} 
-                                                            handleAction={handleOpenNewStore} {...props} />)} />
+                                                            handleAction={handleOpenNewStore} {...props} />)} 
+                        />
+                        {/* <Route exact path={`/${user.id}/addsystemadmin`} 
+                                render={(props) => (<Action name='Add System Admin' fields={[{name: 'Email', required: true}]} 
+                                                            handleAction={handleAddSystemAdmin} {...props} />)} 
+                        /> */}
                         
                         <Route path="/" render={(props) => (<Stores user={user} handleAddToCart={handleAddToCart} handleLogOut={handleLogOut} {...props} />)} />
+
+                        
                     </Switch>
                 </div>
             </Router>

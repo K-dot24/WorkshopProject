@@ -544,14 +544,13 @@ export function AdminGetStorePurchaseHistory( data ) {
 /// Adding new system admin
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
 /// <param name="email">email of the request new system admin</param>
-export function AddSystemAdmin( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/AddSystemAdmin/${data.sysAdminID}/${data.email}`, {
+export function AddSystemAdmin( sysAdminID, email ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/AddSystemAdmin/${sysAdminID}/${email}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
