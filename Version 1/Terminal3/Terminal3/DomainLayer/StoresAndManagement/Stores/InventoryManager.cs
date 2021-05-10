@@ -59,7 +59,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<Product> EditProduct(string productID, IDictionary<String, object> details)
         {
             if (Products.TryGetValue(productID, out Product toEdit))
-            {
+            {   
                 ObjectDictionaryMapper<Product>.SetPropertyValue(toEdit, details);
                 return new Result<Product>($"Succeded to edit product (ID: {productID}).\n", true, toEdit);
             }
