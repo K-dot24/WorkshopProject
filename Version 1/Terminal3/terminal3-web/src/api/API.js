@@ -56,7 +56,7 @@ export function GetAllProductByStoreIDToDisplay(storeId) {
 }
 
 export function GetPermission(userId , storeId) {
-    return fetch(`https://localhost:5000/api/Data/GetAllProductByStoreIDToDisplay/${userId}/${storeId}`, {
+    return fetch(`https://localhost:5000/api/Data/GetPermission/${userId}/${storeId}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',

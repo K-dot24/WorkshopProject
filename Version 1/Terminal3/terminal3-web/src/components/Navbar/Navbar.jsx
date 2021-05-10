@@ -3,6 +3,8 @@ import { AppBar, Toolbar, IconButton, Badge, MenuItem, Menu, Typography, Button 
 import { ShoppingCart, LocalMall, Menu as MenuIcon, Notifications as NotificationsIcon } from '@material-ui/icons';
 import { Link, useLocation, useHistory } from 'react-router-dom';
 
+import { GetPermission } from '../../api/API';
+
 import useStyles from './styles';
 
 import logo from '../../assets/terminal3_logo.png';
@@ -18,6 +20,11 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
     
     // TODO: Delete this when connecting to real API permissions
     const userWithMockPermissions = { ...user, permissions: [true, true, true, true, true, true, true, true, true, true, true, true, true]};
+
+    const fetchPermissions = async () => {
+        GetPermission(user.id, storeId).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+    }
+
 
     if (allActions.length !== userWithMockPermissions.permissions.length)
         console.log("Unmatching number of actions and permissions");
