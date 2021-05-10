@@ -25,20 +25,15 @@ namespace SignalrServer.Hubs
             String connectionID = GuestConnections.GetConnections(message.UserID);
             if (!connectionID.Equals(String.Empty))
             {
-                await Clients.Client(connectionID).ReceiveMessage(message.Message);
+                await Clients.Client(connectionID).ReceiveMessage(message);
             }
             else if (!RegisteredConnections.GetConnections(message.UserID).Equals(String.Empty))
             {
                 connectionID = RegisteredConnections.GetConnections(message.UserID);
-                await Clients.Client(connectionID).ReceiveMessage(message.Message);
+                await Clients.Client(connectionID).ReceiveMessage(message);
             }
         }
-
-        public async Task SendBroadcast(Notification message)
-        {
-            await Clients.All.ReceiveMessage(message.Message);
-        }
-
+       
         public async Task Identify(Identifier message)
         {
             GuestConnections.Add(message.UserID, Context.ConnectionId);

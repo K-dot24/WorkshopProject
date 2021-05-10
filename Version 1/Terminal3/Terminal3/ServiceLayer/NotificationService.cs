@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNet.SignalR.Client;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -23,8 +22,7 @@ namespace Terminal3.ServiceLayer
         //Properties
         private static NotificationService Instance { get; set; } = null;
         private Dictionary<Event, List<Notification>> notificationToBeSend;
-        public IHubProxy hubProxy { get; set; }
-
+        
         private NotificationService()
         {
             notificationToBeSend = new Dictionary<Event, List<Notification>>();
@@ -51,10 +49,9 @@ namespace Terminal3.ServiceLayer
         public Result<bool> Update(Notification notification)
         {
             notification.isOpened = true;
-            hubProxy.Invoke("SendMessage", notification);
-            //List<Notification> queue = notificationToBeSend[notification.EventName];
-            //queue.Add(notification);            
-            return new Result<bool>("Notification is displayed to user\n", true, true);
+            List<Notification> queue = notificationToBeSend[notification.EventName];
+            queue.Add(notification);            
+            return new Result<bool>("Notification is displayed to manager\n", true, true);
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]

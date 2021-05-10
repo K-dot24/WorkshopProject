@@ -209,7 +209,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 
         public Result<bool> LogOut(string email)
         {
-            Result<UserService> fromSystem = system.LogOut(email);
+            Result<bool> fromSystem = system.LogOut(email);
             if (fromSystem.ExecStatus)
                 return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
             return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
