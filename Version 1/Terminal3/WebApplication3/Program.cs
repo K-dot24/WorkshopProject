@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WebApplication3
@@ -13,6 +14,7 @@ namespace WebApplication3
     {
         public static void Main(string[] args)
         {
+            Thread.Sleep(1000);
             CreateHostBuilder(args).Build().Run();
         }
 
