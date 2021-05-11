@@ -5,17 +5,17 @@ using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions
 {
-    class MinBagPriceCondition : IDiscountCondition
+    class MinBagPriceCondition : AbstractDiscountCondition
     {
 
         public Double MinPrice { get; }
 
-        public MinBagPriceCondition(Double minPrice)
+        public MinBagPriceCondition(Double minPrice, String id = "") : base(id)
         {
             MinPrice = minPrice;
         }
 
-        public Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)
+        public override Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)
         {
             double priceAcc = 0;
             foreach(KeyValuePair<Product, int> entry in products)
@@ -24,6 +24,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 if (priceAcc >= MinPrice)
                     return new Result<bool>("", true, true);
             }
+            return new Result<bool>("", true, false);
+        }
+
+        public override Result<bool> AddCondition(string id, IDiscountCondition condition)
+        {
+            return new Result<bool>("", true, false);
+        }
+
+        public override Result<bool> RemoveCondition(string id)
+        {
             return new Result<bool>("", true, false);
         }
 

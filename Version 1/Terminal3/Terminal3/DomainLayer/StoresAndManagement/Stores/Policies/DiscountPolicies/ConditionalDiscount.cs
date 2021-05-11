@@ -36,5 +36,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         {
             return Discount.RemoveDiscount(id);
         }
+
+        public override Result<bool> AddCondition(string id, IDiscountCondition condition)
+        {
+            return Condition.AddCondition(id, condition);
+        }
+
+        public override Result<bool> RemoveCondition(string id)
+        {
+            if (Condition.Id.Equals(id))
+                return new Result<bool>("Cant remove the main condition of the conditional discount yet", false, false);
+            return Condition.RemoveCondition(id);
+        }
     }
 }

@@ -51,5 +51,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         {
             return new Result<bool>("", true, false);
         }
+
+        public override Result<bool> AddCondition(string id, IDiscountCondition condition)
+        {
+            return new Result<bool>("", true, false);
+        }
+
+        public override Result<bool> RemoveCondition(string id)
+        {
+            return new Result<bool>("", true, false);
+        }
     }
 }

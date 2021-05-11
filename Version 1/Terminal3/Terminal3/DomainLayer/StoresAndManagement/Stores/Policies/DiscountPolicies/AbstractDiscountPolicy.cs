@@ -20,5 +20,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public abstract Result<Dictionary<Product, double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "");
         public abstract Result<bool> AddDiscount(String id, IDiscountPolicy discount);
         public abstract Result<bool> RemoveDiscount(String id);
+        public abstract Result<bool> AddCondition(string id, IDiscountCondition condition);
+        public abstract Result<bool> RemoveCondition(string id);
     }
 }

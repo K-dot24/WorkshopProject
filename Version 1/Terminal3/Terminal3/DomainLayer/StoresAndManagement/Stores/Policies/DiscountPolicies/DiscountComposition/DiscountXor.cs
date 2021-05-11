@@ -67,5 +67,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 return result;
             return Discount2.RemoveDiscount(id);
         }
+
+        public override Result<bool> AddCondition(string id, IDiscountCondition condition)
+        {
+            Result<bool> result = Discount1.AddCondition(id, condition);
+            if (result.ExecStatus && result.Data)
+                return result;
+            if (!result.ExecStatus)
+                return result;
+            return Discount2.AddCondition(id, condition);
+        }
+
+        public override Result<bool> RemoveCondition(string id)
+        {
+            Result<bool> result = Discount1.RemoveCondition(id);
+            if (result.ExecStatus && result.Data)
+                return result;
+            if (!result.ExecStatus)
+                return result;
+            return Discount2.RemoveCondition(id);
+        }
     }
 }
