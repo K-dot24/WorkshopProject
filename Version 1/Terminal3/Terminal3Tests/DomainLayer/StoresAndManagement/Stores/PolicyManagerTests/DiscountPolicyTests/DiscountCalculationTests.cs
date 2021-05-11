@@ -120,9 +120,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         public void OrDiscountTest(String productName, int count, Double expectedResult)
         {
             IDiscountTarget target = new DiscountTargetProducts(new List<Product>() { Products[productName] });
-            IDiscountCondition c1 = new MinProductCondition(Products[productName], 10);
+            IDiscountCondition c1 = new MinProductCondition(Products["Bread"], 10);
             IDiscountPolicy p1 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c1);
-            IDiscountCondition c2 = new MaxProductCondition(Products[productName], 5);
+            IDiscountCondition c2 = new MaxProductCondition(Products["Bread"], 5);
             IDiscountPolicy p2 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c2);
             PolicyManager.AddDiscountPolicy(new DiscountOr(new List<IDiscountPolicy>() { p1, p2 }));
             currProducts.TryAdd(Products[productName], count);
@@ -140,8 +140,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         public void OrDiscountConditionTest(String productName, int count, Double expectedResult)
         {
             IDiscountTarget target = new DiscountTargetProducts(new List<Product>() { Products[productName] });
-            IDiscountCondition c1 = new MinProductCondition(Products[productName], 10);
-            IDiscountCondition c2 = new MaxProductCondition(Products[productName], 5);
+            IDiscountCondition c1 = new MinProductCondition(Products["Bread"], 10);
+            IDiscountCondition c2 = new MaxProductCondition(Products["Bread"], 5);
             IDiscountCondition c = new DiscountConditionOr(new List<IDiscountCondition>() { c1, c2 });
             IDiscountPolicy p = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c);
             PolicyManager.AddDiscountPolicy(p);
