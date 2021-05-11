@@ -75,8 +75,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Bread", 4, "Milk", 1, true)]
         [InlineData("Bread", 11, "Milk", 20, true)]
         [InlineData("Bread", 4, "Milk", 11, false)]
-        [InlineData("Bread", 6, "Milk", 11, true)]
-        [InlineData("Bread", 3, "Milk", 10, true)]
         public void OrPolicyTest(String productName1, int count1, String productName2, int count2, bool expectedResult)
         {
             IPurchasePolicy p1 = new MinProductPolicy(Products[productName1], 5);
