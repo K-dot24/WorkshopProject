@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
-using SignalrServer.Client;
-using SignalrServer.Hubs;
-using SignalrServer.Model;
+using signalRgateway.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +32,7 @@ namespace Terminal3WebAPI.Controllers
             //while (!(SignalRClient.State == ConnectionState.Connected)) { }
 
             string url = "http://localhost:4000/signalr/notification";
-            HubConnection connection = new HubConnectionBuilder()
+            connection = new HubConnectionBuilder()
                .WithUrl(url)
                .WithAutomaticReconnect()
                .Build();
