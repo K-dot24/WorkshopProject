@@ -13,8 +13,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
         Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
         Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount);
-        Result<Boolean> AddDiscountPolicy(String id, IDiscountPolicy discount);
-        Result<Boolean> AddDiscountCondition(String id, IDiscountCondition condition);
+        Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount, String id);
+        Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id);
         Result<Boolean> RemoveDiscountPolicy(String id);
         Result<Boolean> RemoveDiscountCondition(String id);
         Result<IDiscountPolicyData> GetData();
@@ -70,7 +70,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return result;
         }
 
-        public Result<Boolean> AddDiscountPolicy(String id, IDiscountPolicy discount)
+        public Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount, String id)
         {
             Result<bool> result = MainDiscount.AddDiscount(id, discount);
             if (result.ExecStatus)
@@ -82,7 +82,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return result;
         }
 
-        public Result<Boolean> AddDiscountCondition(String id, IDiscountCondition condition)
+        public Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id)
         {
             Result<bool> result = MainDiscount.AddCondition(id, condition);
             if (result.ExecStatus)

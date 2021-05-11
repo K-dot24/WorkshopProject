@@ -252,7 +252,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [Trait("Category", "Unit")]
         [InlineData("Bread", 1, 8)]
         [InlineData("Milk", 1, 16)]
-        [InlineData("Cup", 1, 34)]
+        [InlineData("Cup", 1, 24)]
         public void DiscountTargetShopTest(String productName, int count, Double expectedResult)
         {
             IDiscountTarget t = new DiscountTargetShop();
@@ -273,7 +273,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
             IDiscountPolicy p = new DiscreetDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), "secret code");
             PolicyManager.AddDiscountPolicy(p);
             currProducts.TryAdd(Products[productName], count);
-            Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedResult);
+            Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts, code), expectedResult);
         }
 
     }
