@@ -15,7 +15,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> AddSystemAdmin(String email); 
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
-        Result<Boolean> LogOut(String email);
+        Result<RegisteredUser> Login(String email, String password,String GuestUserID);
+        Result<GuestUser> LogOut(String email);
         Result<Product> AddProductReview(String userID, Store store, Product product, String review);
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
@@ -184,7 +185,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// <param name="email"></param>
         /// <param name="table">from which table source to find the user [RegisteredUser/ SystemAdmins]</param>
         /// <returns></returns>
-        private Result<RegisteredUser> FindUserByEmail(String email, ConcurrentDictionary<String, RegisteredUser> table)
+        public Result<RegisteredUser> FindUserByEmail(String email, ConcurrentDictionary<String, RegisteredUser> table)
         {
             foreach (RegisteredUser registeredUser in table.Values)
             {
@@ -250,7 +251,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public Result<Boolean> LogOut(String email)
+        public Result<GuestUser> LogOut(String email)
         {
             Result<RegisteredUser> searchResult = FindUserByEmail(email, RegisteredUsers);
             if (searchResult.ExecStatus)
@@ -260,15 +261,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 if (res.ExecStatus)
                 {
                     GuestUsers.TryAdd(res.Data.Id, res.Data);
-                    return new Result<Boolean>($"There is not user using this email:{email}\n", true, true);
+                    RegisteredUsers.TryRemove(searchResult.Data.Id, out RegisteredUser _);
+                    return new Result<GuestUser>($"There is not user using this email:{email}\n", true, res.Data);
                 }
                 else
-                    return new Result<Boolean>(res.Message, false, false);
+                    return new Result<GuestUser>(res.Message, false, null);
             }
             else
             {
                 //No user if found using the given email
-                return new Result<Boolean>($"There is not user using this email:{email}\n", false, false);
+                return new Result<GuestUser>($"There is not user using this email:{email}\n", false, null);
 
             }
         }

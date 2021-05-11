@@ -7,30 +7,53 @@ using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.ServiceLayer.Controllers;
 using XUnitTestTerminal3.AcceptanceTests.Utils;
+using Microsoft.AspNet.SignalR.Client;
+using SignalrServer.Models;
+using Terminal3.DomainLayer.StoresAndManagement.Users;
+//using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Terminal3.ServiceLayer
 {   
     public interface IECommerceSystem : IGuestUserInterface, IRegisteredUserInterface, IStoreStaffInterface, ISystemAdminInterface, IDataController
-    { }
+    {
+        List<Notification> GetNotificationByEvent(Event eventEnum);
+        List<Notification> GetPendingMessagesByUserID(string userId);
+    }
     //try git action
     public class ECommerceSystem : IECommerceSystem
     {
         //Properties
+        public StoresAndManagementInterface StoresAndManagement  { get;set;}
         public IGuestUserInterface GuestUserInterface { get; set; }
         public IRegisteredUserInterface RegisteredUserInterface { get; set; }
         public IStoreStaffInterface StoreStaffInterface { get; set;  }
         public SystemAdminController SystemAdminInterface { get; set; }
         public IDataController DataController{ get; set; }
+        public NotificationService NotificationService{ get; set; }
+        public IHubProxy hubProxy { get; set; }
 
         //Constructor
         public ECommerceSystem()
         {
-            StoresAndManagementInterface StoresAndManagement = new StoresAndManagementInterface();
+            StoresAndManagement = new StoresAndManagementInterface();
             GuestUserInterface = new GuestUserController(StoresAndManagement);
             RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
             StoreStaffInterface = new StoreStaffController(StoresAndManagement);
             SystemAdminInterface = new SystemAdminController(StoresAndManagement);
             DataController = new DataController(StoresAndManagement);
+
+            //Setting up SignalR connection
+
+            HubConnection SignalRClient = new HubConnection("http://localhost:8080/signalr");
+            hubProxy = SignalRClient.CreateHubProxy("NotificationHub");
+            SignalRClient.Start();
+            while (!(SignalRClient.State == ConnectionState.Connected)) {}
+
+
+            NotificationService = NotificationService.GetInstance();
+            NotificationService.hubProxy = hubProxy;
+
+
         }
 
         public void DisplaySystem()
@@ -103,9 +126,27 @@ namespace Terminal3.ServiceLayer
             return RegisteredUserInterface.Login(email, password);
         }
 
-        public Result<bool> LogOut(string email)
+        public Result<RegisteredUserService> Login(string email, string password,string guestUserID)
         {
-            return RegisteredUserInterface.LogOut(email);
+            Result<RegisteredUserService> result =  RegisteredUserInterface.Login(email, password, guestUserID);
+            if (result.ExecStatus)
+            {
+                SignalRLoginModel message = new SignalRLoginModel(guestUserID, result.Data.Id);
+                hubProxy.Invoke("Login", message);
+            }
+            return result;
+        }
+
+        public Result<UserService> LogOut(string email)
+        {
+            Result<RegisteredUser> registeredUser = StoresAndManagement.FindUserByEmail(email);
+            Result<UserService> result =  RegisteredUserInterface.LogOut(email);
+            if (result.ExecStatus && registeredUser.ExecStatus) 
+            {
+                SignalRLoginModel message = new SignalRLoginModel(registeredUser.Data.Id, result.Data.Id);
+                hubProxy.Invoke("Logout", message);
+            }
+            return result;
         }
 
         public Result<StoreService> OpenNewStore(string storeName, string userID)
@@ -234,6 +275,17 @@ namespace Terminal3.ServiceLayer
         public List<ProductService> GetAllProductByStoreIDToDisplay(string storeID)
         {
             return DataController.GetAllProductByStoreIDToDisplay(storeID);
+        }
+        #endregion
+
+        #region Notification
+
+        public List<Notification> GetNotificationByEvent(Event eventEnum) 
+        {
+            return NotificationService.GetNotificationByEvent(eventEnum);
+        }
+        public List<Notification> GetPendingMessagesByUserID(string userId) {
+            return NotificationService.GetPendingMessagesByUserID(userId);
         }
         #endregion
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace Terminal3WebAPI.Controllers
     /// <summary>
     /// This controller does not hold any functional requirements, it is only to transfer data to the view 
     /// </summary>
+    /// 
     [Route("api/[controller]")]
     [ApiController]
     public class DataController : ControllerBase
