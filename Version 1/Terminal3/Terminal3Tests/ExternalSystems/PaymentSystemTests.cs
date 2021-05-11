@@ -8,11 +8,18 @@ namespace Terminal3.ExternalSystems.Tests
 {
     public class PaymentSystemTests
     {
-        [Fact()]
-        public void PayTest()
+        [Theory()]
+        [InlineData(false)]
+        [InlineData(true)]
+
+        public void PayTest(bool isEmpty)
         {
-            bool result = PaymentSystem.Pay(500.0 , new Dictionary<String, Object>());
-            Assert.Equal(result, result);
+            bool result;
+            if(isEmpty)
+                result = PaymentSystem.Pay(500.0 , new Dictionary<String, Object>());
+            else
+                result = PaymentSystem.Pay(500.0, new Dictionary<String, Object>() { { "number", new Object() } });
+            Assert.Equal(!isEmpty, result);
         }
     }
 }

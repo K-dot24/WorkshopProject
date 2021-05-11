@@ -23,95 +23,51 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
             Products.Add("Milk", new Product("Milk", 15, 100, "Dairy", new LinkedList<string>()));
         }
 
-        [Theory()]
+        [Fact()]
         [Trait("Category", "Unit")]
-        [InlineData("Bread", 6)]
-        [InlineData("Bread", 4)]
-        [InlineData("Milk", 50)]
-        [InlineData("Milk", 1)]
-        public void RemoveMaxProductPolicyTest(String productName, int count)
+        public void RemovePolicyTest()
         {
-            IPurchasePolicy policy = new MaxProductPolicy(Products[productName], 10);
-            currProducts.TryAdd(Products[productName], count);
+            IPurchasePolicy policy = new MaxProductPolicy(Products["Bread"], 10);
             PolicyManager.AddPurchasePolicy(policy);
+            Assert.Equal(PolicyManager.MainPolicy.Policy.Policies[0], policy);
             PolicyManager.RemovePurchasePolicy(policy.Id);
             Assert.Empty(PolicyManager.MainPolicy.Policy.Policies);
-
         }
 
-        [Theory()]
+        [Fact()]
         [Trait("Category", "Unit")]
-        [InlineData("Bread", 6)]
-        [InlineData("Bread", 4)]
-        [InlineData("Milk", 50)]
-        [InlineData("Milk", 1)]
-        public void RemoveMinProductPolicyTest(String productName, int count)
+        public void RemovePolicyToTest()
         {
-            IPurchasePolicy policy = new MinProductPolicy(Products[productName], 10);
-            currProducts.TryAdd(Products[productName], count);
-            PolicyManager.AddPurchasePolicy(policy);
-            PolicyManager.RemovePurchasePolicy(policy.Id);
-            Assert.Empty(PolicyManager.MainPolicy.Policy.Policies);
-
+            IPurchasePolicy policy = new MinProductPolicy(Products["Bread"], 10);
+            AndPolicy andPolicy = new AndPolicy();
+            PolicyManager.AddPurchasePolicy(andPolicy);
+            PolicyManager.AddPurchasePolicy(policy, andPolicy.Id);
+            Result<bool> res = PolicyManager.RemovePurchasePolicy(policy.Id);
+            Assert.Empty(andPolicy.Policies);
         }
 
-        [Theory()]
+        [Fact()]
         [Trait("Category", "Unit")]
-        [InlineData("Bread", 11)]
-        [InlineData("Bread", 6)]
-        [InlineData("Milk", 50)]
-        [InlineData("Milk", 8)]
-        public void RemoveAndPolicyTest(String productName, int count)
+        public void RemoveNonexistantPolicyTest()
         {
-            IPurchasePolicy policy1 = new MinProductPolicy(Products[productName], 5);
-            IPurchasePolicy policy2 = new MaxProductPolicy(Products[productName], 10);
-            List<IPurchasePolicy> policies = new List<IPurchasePolicy>();
-            policies.Add(policy1);
-            policies.Add(policy2);
-            IPurchasePolicy policyAnd = new AndPolicy(policies);
-            currProducts.TryAdd(Products[productName], count);
-            PolicyManager.AddPurchasePolicy(policyAnd);
-            PolicyManager.RemovePurchasePolicy(policyAnd.Id);
-            Assert.Empty(PolicyManager.MainPolicy.Policy.Policies);
+            IPurchasePolicy policy = new MinProductPolicy(Products["Bread"], 10);
+            AndPolicy andPolicy = new AndPolicy();
+            PolicyManager.AddPurchasePolicy(andPolicy);
+            Result<bool> res = PolicyManager.RemovePurchasePolicy(policy.Id);
+            Assert.False(res.Data);
         }
 
-        [Theory()]
+        [Fact()]
         [Trait("Category", "Unit")]
-        [InlineData("Bread", 6, "Milk", 8)]
-        [InlineData("Bread", 4, "Milk", 1)]
-        [InlineData("Bread", 11, "Milk", 20)]
-        [InlineData("Bread", 4, "Milk", 11)]
-        public void RemoveOrPolicyTest(String productName1, int count1, String productName2, int count2)
+        public void RemoveIllegalPolicyTest()
         {
-            IPurchasePolicy policy1 = new MinProductPolicy(Products[productName1], 5);
-            IPurchasePolicy policy2 = new MaxProductPolicy(Products[productName2], 10);
-            List<IPurchasePolicy> policies = new List<IPurchasePolicy>();
-            policies.Add(policy1);
-            policies.Add(policy2);
-            IPurchasePolicy policyOr = new OrPolicy(policies);
-            currProducts.TryAdd(Products[productName1], count1);
-            currProducts.TryAdd(Products[productName2], count2);
-            PolicyManager.AddPurchasePolicy(policyOr);
-            PolicyManager.RemovePurchasePolicy(policyOr.Id);
-            Assert.Empty(PolicyManager.MainPolicy.Policy.Policies);
-        }
+            IPurchasePolicy policy1 = new MinProductPolicy(Products["Bread"], 5);
+            IPurchasePolicy policy2 = new MaxProductPolicy(Products["Bread"], 10);
+            IPurchasePolicy condPolicy = new ConditionalPolicy(policy1, policy2);            
+            PolicyManager.AddPurchasePolicy(condPolicy);
+            Result<bool> res = PolicyManager.RemovePurchasePolicy(policy1.Id);
 
-        [Theory()]
-        [Trait("Category", "Unit")]
-        [InlineData("Bread", 6, "Milk", 8)]
-        [InlineData("Bread", 4, "Milk", 11)]
-        [InlineData("Bread", 11, "Milk", 20)]
-        [InlineData("Bread", 3, "Milk", 10)]
-        public void RemoveConditionalPolicyTest(String productName1, int count1, String productName2, int count2)
-        {
-            IPurchasePolicy policy1 = new MinProductPolicy(Products[productName1], 5);
-            IPurchasePolicy policy2 = new MaxProductPolicy(Products[productName2], 10);
-            IPurchasePolicy policyCond = new ConditionalPolicy(policy1, policy2);
-            currProducts.TryAdd(Products[productName1], count1);
-            currProducts.TryAdd(Products[productName2], count2);
-            PolicyManager.AddPurchasePolicy(policyCond);
-            PolicyManager.RemovePurchasePolicy(policyCond.Id);
-            Assert.Empty(PolicyManager.MainPolicy.Policy.Policies);
+            Assert.False(res.ExecStatus);
         }
     }
 }
