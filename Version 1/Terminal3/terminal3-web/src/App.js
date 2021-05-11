@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 import { Stores, Navbar, Cart, Checkout, Register, Login, Action } from './components';
-import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, GetUserShoppingCart, UpdateShoppingCart } from './api/API';
+import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
+        GetUserShoppingCart, UpdateShoppingCart, GetTotalShoppingCartPrice } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -20,39 +21,33 @@ const theme = createMuiTheme({
 const App = () => {
     // states
     const [user, setUser] = useState({id: -1, email: ''});
-    const [cart, setCart] = useState({products: [], totalPrice: 0});
-    // const [cart, setCart] = useState({id: 0, shoppingBags: [], totalPrice: 0, totalItems: 0});
+    const [cart, setCart] = useState({id: 0, products: [], totalPrice: 0});
 
     //#region Cart Functionality 
     
     // TODO: Fetch from API?
     const fetchCart = async () => {
-        setCart({products: [], totalPrice: 0})
-        
-        // setCart({id: 0, shoppingBags: [], totalPrice: 0});
+        setCart({id: 0, products: [], totalPrice: 0});
 
-        // if (user.id !== -1){
-        //     GetUserShoppingCart(user.id).then(response => response.ok ? 
-        //         response.json().then(json => setCart({...json.data, 
-        //                             totalItems: cart.shoppingBags.reduce(function(count, bag) {
-        //                                             return count + bag.length;
-        //                                         }, 0)})) : null).catch(err => console.log(err));
-        // }
+        if (user.id !== -1){
+            GetUserShoppingCart(user.id).then(response => response.ok ? 
+                response.json().then(data => setCart({id: data.id,
+                                                      products: data.shoppingBags.length === 0 ? [] : 
+                                                        data.shoppingBags.reduce(function(list, bag) {
+                                                            return list.concat(bag.products);
+                                                        }, []),  
+                                                      totalPrice: data.shoppingBags.reduce(function(total, bag) {
+                                                                    return total + bag.totalBagPrice;
+                                                                }, 0)
+                                                        })) : null).catch(err => console.log(err));    // TODO: Check
+        }
     }
 
     const handleAddToCart = async (storeId, productId, name, price, quantity, image) => {
-        AddProductToCart({userID: user.id, productId, ProductQuantity: quantity, storeId}).then(response => response.ok ? 
-            response.json().then(json => console.log(json)) : null).catch(err => console.log(err));
-        
-        
-        setCart(function(prevState) {
-            const productArr = prevState.products.filter(p => p.id === productId);
-            
-            return {
-                products: productArr.length === 0 ? [...prevState.products, {id: productId, name, price, quantity, image}] : handleUpdateCartQuantity(productId, productArr[0].quantity + quantity),
-                totalPrice: prevState.totalPrice + price*quantity      
-            }
-        }); 
+        AddProductToCart({ userID: user.id, productID: productId, ProductQuantity: quantity, storeID: storeId }).then(response => response.ok ? 
+            response.json().then(json => console.log(json)) : console.log("NOT OKAY")).catch(err => console.log(err));
+
+        fetchCart();
     }
 
     const handleUpdateCartQuantity = async (productId, quantity) => {
@@ -144,7 +139,7 @@ const App = () => {
     }, [user]);
 
     useEffect(() => {
-        console.log(cart);
+        console.log(cart.products);
     }, [cart]);
 
 
@@ -154,8 +149,6 @@ const App = () => {
                 <div>
                     <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} />
                     <Switch>
-
-                        {/* <Route path="/stores/:id" render={(props) => (<StorePage handleAddToCart={handleAddToCart} user={user} handleLogOut={handleLogOut} {...props} />)} /> */}
 
                         <Route exact path="/cart">
                             <Cart
@@ -172,7 +165,7 @@ const App = () => {
                         <Route path="/login" render={(props) => (<Login handleLogin={handleLogin} {...props} />)} />
 
                         <Route exact path="/checkout">
-                            <Checkout cart={cart} handleEmptyCart={handleEmptyCart} />
+                            <Checkout userID={user.id} cart={cart} handleEmptyCart={handleEmptyCart} />
                         </Route>
                         
                         <Route exact path={`/${user.id}/openstore`} 
