@@ -12,7 +12,7 @@ namespace Terminal3.ServiceLayer.ServiceObjects
         public String Id { get; }
         public String UserId { get; }
         public String StoreId { get; }
-        public LinkedList<Tuple< ProductService , int>> Products { get; }  //<productDAL , quantity>
+        public LinkedList<Tuple< ProductService , int>> Products { get; set; }  //<productDAL , quantity>
         public Double TotalBagPrice { get; }
 
 

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.ServiceLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public class Notification
     {
         // Properties
+        public Event EventName { get; }
         public String Message { get; }
         public DateTime Date { get; }
         public Boolean isOpened { get; set; }
@@ -14,8 +16,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public String ClientId { get; set; }
 
 
-        public Notification(String clientId , String msg  ,Boolean staff)
+        public Notification(Event eventName, String clientId , String msg  ,Boolean staff)
         {
+            EventName = eventName;
             this.Message = msg;
             this.Date = DateTime.Now;
             isOpened = false;

@@ -105,7 +105,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             Assert.False(Facade.LogOut(email).ExecStatus, "Able to loggout twice");
             Assert.False(user.LoggedIn, "Logout returned false, but the user is actually loged in");
             Facade.Login(email, password);
-            Result<bool> guest = Facade.LogOut(email);
+            Result<GuestUser> guest = Facade.LogOut(email);
             Assert.True(guest.ExecStatus, "Not able to log out");
             Assert.False(user.LoggedIn, "Logout returned true, but the user is still loged in");
 

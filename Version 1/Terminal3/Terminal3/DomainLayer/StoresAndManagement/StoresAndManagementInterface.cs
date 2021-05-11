@@ -14,6 +14,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<StoreService> OpenNewStore(String storeName, String userID);
         Result<Boolean> CloseStore(String storeId, String userID);
         Result<StoreService> ReOpenStore(string storeId, string userID);
+        Result<RegisteredUser> FindUserByEmail(String email);
 
         #region Inventory Management
         Result<ProductService> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
@@ -37,7 +38,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #region User Actions
         Result<RegisteredUserService> Register(String email, String password);
         Result<RegisteredUserService> Login(String email, String password);
-        Result<Boolean> LogOut(String email);
+        Result<RegisteredUserService> Login(String email, String password, String guestUserID);
+        Result<UserService> LogOut(String email);
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity);
         Result<ShoppingCartService> GetUserShoppingCart(String userID);
@@ -59,6 +61,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #region Display data
         List<StoreService> GetAllStoresToDisplay();
         List<ProductService> GetAllProductByStoreIDToDisplay(string storeID);
+        Boolean[] GetPermission(string userID, string storeID);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -406,10 +409,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, null);
             }
         }
-
-        public Result<Boolean> LogOut(string email)
+        public Result<RegisteredUserService> Login(string email, string password,string guestUserID)
         {
-            return UsersAndPermissionsFacade.LogOut(email);
+            Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password, guestUserID);
+            if (res.ExecStatus)
+            {
+                return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
+            }
+            else
+            {
+                return new Result<RegisteredUserService>(res.Message, res.ExecStatus, null);
+            }
+        }
+
+        public Result<UserService> LogOut(string email)
+        {
+            Result<GuestUser> result = UsersAndPermissionsFacade.LogOut(email);
+            if (result.ExecStatus)
+            {
+                return new Result<UserService>(result.Message, result.ExecStatus, result.Data.GetDAL().Data);
+            }
+            return new Result<UserService>(result.Message, result.ExecStatus,null);
         }
 
         public Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
@@ -469,5 +489,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return productsService;
         }
 
+        public Boolean[] GetPermission(string userID, string storeID)
+        {
+            Store store = StoresFacade.Stores[storeID];
+            return store.GetPermission(userID);
+        }
+
+        public Result<RegisteredUser> FindUserByEmail(String email)
+        {
+            return UsersAndPermissionsFacade.FindUserByEmail(email, UsersAndPermissionsFacade.RegisteredUsers);
+        }
     }
 }

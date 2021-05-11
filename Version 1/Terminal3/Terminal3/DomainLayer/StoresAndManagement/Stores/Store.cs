@@ -500,6 +500,43 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<StoreService>("Store DAL object", true, store);
 
         }
-        
+
+        internal Boolean[] GetPermission(string userID)
+        {
+            return getUserPermissionByID(userID);
+        }
+
+        public Boolean[] getUserPermissionByID (string userID)
+        {
+            Boolean[] per = new Boolean[13];
+            foreach(var user in Owners)
+            {
+                if (user.Key == userID)
+                {
+                    StoreOwner owner = user.Value;
+                    for(int i=0; i< per.Length; i++)
+                    {
+                        per[i] = true; 
+                    }
+                    return per; 
+                }
+            }
+
+            foreach (var user in Managers)
+            {
+                if (user.Key == userID)
+                {
+                    StoreManager manager = user.Value;
+                    return (Boolean[])manager.Permission.functionsBitMask;                  
+                }
+            }
+
+            // No Permissions
+            for (int i = 0; i < per.Length; i++)
+            {
+                per[i] = false;
+            }
+            return per;
+        }
     }
 }
