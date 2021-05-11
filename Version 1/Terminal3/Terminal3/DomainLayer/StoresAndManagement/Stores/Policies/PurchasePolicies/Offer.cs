@@ -39,5 +39,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         {
             throw new NotImplementedException();
         }
+
+        public Result<IPurchasePolicyData> GetData()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
