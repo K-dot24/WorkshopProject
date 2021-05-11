@@ -269,6 +269,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Bread", 1, "wrong code", 10)]
         public void DiscreetDiscountTest(String productName, int count, String code, Double expectedResult)
         {
+            IDiscountTarget t = new DiscountTargetShop();
             IDiscountPolicy p = new DiscreetDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), "secret code");
             PolicyManager.AddDiscountPolicy(p);
             currProducts.TryAdd(Products[productName], count);
