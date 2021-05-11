@@ -45,7 +45,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 Dictionary<Product, Double> discountResultDictionary = discount.CalculateDiscount(products, code).Data;
                 if (discountResultDictionary == null)
                     discountResultDictionary = new Dictionary<Product, double>();
-                discountsResultsList.Add(discountResultDictionary);
+                if (discountResultDictionary.Count != 0)
+                    discountsResultsList.Add(discountResultDictionary);
             }
             return discountsResultsList;
         }
