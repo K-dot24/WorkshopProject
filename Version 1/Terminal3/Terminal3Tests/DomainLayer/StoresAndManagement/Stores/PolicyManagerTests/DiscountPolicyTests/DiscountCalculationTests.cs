@@ -24,7 +24,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
             Products = new Dictionary<string, Product>();
             Products.Add("Bread", new Product("Bread", 10, 100, "Bakery", new LinkedList<string>()));
             Products.Add("Milk", new Product("Milk", 20, 100, "Dairy", new LinkedList<string>()));
-            Products.Add("Milk", new Product("Cup", 30, 100, "Dishes", new LinkedList<string>()));
+            Products.Add("Cup", new Product("Cup", 30, 100, "Dishes", new LinkedList<string>()));
             currProducts = new ConcurrentDictionary<Product, int>();
         }
 
