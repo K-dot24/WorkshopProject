@@ -53,7 +53,7 @@ namespace Terminal3.ServiceLayer
         {
             notification.isOpened = true;
             //hubProxy.Invoke("SendMessage", notification);
-            connection.InvokeAsync("SendMessage", notification);
+            connection.InvokeAsync("SendMessage", notification.ClientId,notification.Message);
             //List<Notification> queue = notificationToBeSend[notification.EventName];
             //queue.Add(notification);            
             return new Result<bool>("Notification is displayed to user\n", true, true);
