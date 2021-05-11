@@ -1,5 +1,5 @@
 ﻿using System;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System.Reflection;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using System.Collections.Concurrent;
@@ -15,6 +15,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public String Password { get; }
         public Boolean LoggedIn { get; set; }
         public History History { get; set; }
+        public LinkedList<Notification> PendingNotification { get; }
+        public NotificationCenter NotificationCenter {get;}     
 
         //Constructor
         public RegisteredUser(String email , String password) : base()
@@ -23,6 +25,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.Password = password;
             this.LoggedIn = false;
             this.History = new History();
+            this.PendingNotification = new LinkedList<Notification>();
+            this.NotificationCenter = NotificationCenter.GetInstance();
         }
 
         //Methods
@@ -35,6 +39,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             {
                 //Correct paswword
                 LoggedIn = true;
+                DisplayPendingNotifications();
                 return new Result<RegisteredUser>($"{this.Email} is Logged in\n", true, this);
             }
             else
@@ -57,23 +62,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }           
         }
 
-        public Result<Boolean> AddProductReview(Store store, Product product , String review)
+        public Result<Product> AddProductReview(Store store, Product product , String review)
         {
             if (checkIfProductPurchasedByUser(store , product))
             {
                 product.AddProductReview(Id , review);
-                return new Result<Boolean>("The product review was added successfuly\n", true, true);
+                return new Result<Product>("The product review was added successfuly\n", true, product);
             }
-            return new Result<Boolean>("The User did not purchase the product before, therefore can not write it a review\n", false, false);
+            return new Result<Product>("The User did not purchase the product before, therefore can not write it a review\n", false, null);
         }
 
         private Boolean checkIfProductPurchasedByUser(Store store, Product product)
         {
-            LinkedList<ShoppingBagDAL> shoppingBags = History.ShoppingBags;
-            foreach (ShoppingBagDAL bag in shoppingBags)
+            LinkedList<ShoppingBagService> shoppingBags = History.ShoppingBags;
+            foreach (ShoppingBagService bag in shoppingBags)
             {             
-                foreach(ProductDAL productInHistory in bag.Products.Keys)
+                foreach(Tuple<ProductService,int> productQuantity in bag.Products)
                 {
+                    ProductService productInHistory = productQuantity.Item1;
                     if (productInHistory.Id.Equals(product.Id)) { return true; }
                 }
 
@@ -85,10 +91,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             return new Result<History>("User history\n", true, History);
         }
-        public Result<RegisteredUserDAL> GetDAL()
+        public Result<RegisteredUserService> GetDAL()
         {
-            ShoppingCartDAL SCD = this.ShoppingCart.GetDAL().Data;
-            return new Result<RegisteredUserDAL>("RegisteredUser DAL object" , true , new RegisteredUserDAL(this.Id, this.Email, this.Password, this.LoggedIn , SCD));
+            ShoppingCartService SCD = this.ShoppingCart.GetDAL().Data;
+            return new Result<RegisteredUserService>("RegisteredUser DAL object" , true , new RegisteredUserService(this.Id, this.Email, this.LoggedIn , SCD));
         }
 
         public Result<Boolean> ExitSystem()
@@ -103,28 +109,53 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public new Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
-            Double amount = ShoppingCart.GetTotalShoppingCartPrice();
-
-            bool paymentSuccess = PaymentSystem.Pay(amount, paymentDetails);
-
-            if (!paymentSuccess)
+            if (ShoppingCart.ShoppingBags.IsEmpty)
             {
-                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in payment details\n", false, null);
-
-            }
-            
-            bool deliverySuccess = DeliverySystem.Deliver(deliveryDetails);
-            if (!deliverySuccess)
-            {
-                PaymentSystem.CancelTransaction(paymentDetails);
-                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in delivery details\n", false, null);
+                return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
             }
 
-            History.AddPurchasedShoppingCart(ShoppingCart);
-            ShoppingCart copy = new ShoppingCart(ShoppingCart);
-            ShoppingCart = new ShoppingCart();          // create new shopping cart for user
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails);
+            if (result.Data != null)
+            {
+                History.AddPurchasedShoppingCart(ShoppingCart);
+                ShoppingCart = new ShoppingCart();          // create new shopping cart for user
+            }
+            return result;
+        }
+    
+        public Result<Boolean> Update(Notification notification)
+        {
+            if (LoggedIn)
+            {
+                NotificationCenter.notifyNotificationServer(notification);
+                return new Result<Boolean>("User is LoggedIn , therefor displaying the notification\n", true, true);
+            }
+            PendingNotification.AddLast(notification);
+            return new Result<Boolean>("User not logged in , therefore the notification is added to pending list\n", false, false);
+        }    
 
-            return new Result<ShoppingCart>("Users purchased shopping cart\n", true, copy);
+        private void DisplayPendingNotifications()
+        {
+            foreach(Notification notification in PendingNotification)
+            {
+                if (!notification.isOpened)
+                {
+                    NotificationCenter.notifyNotificationServer(notification);
+                }
+            }
+
+            RemoveOpenedNotifications();
+        }
+
+        private void RemoveOpenedNotifications()
+        {
+            foreach (Notification notification in PendingNotification)
+            {
+                if (notification.isOpened)
+                {
+                    PendingNotification.Remove(notification);
+                }
+            }
         }
     }
 }

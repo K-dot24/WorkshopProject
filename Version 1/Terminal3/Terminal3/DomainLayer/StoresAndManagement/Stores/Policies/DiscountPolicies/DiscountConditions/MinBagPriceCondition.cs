@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions
 {
-    class MinBagPriceCondition : AbstractDiscountCondition
+    public class MinBagPriceCondition : AbstractDiscountCondition
     {
 
         public Double MinPrice { get; }

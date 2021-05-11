@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 using System.Collections.Concurrent;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
@@ -311,8 +311,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
 
             // Check Historys bags
             History history = founder.History;
-            LinkedList<ShoppingBagDAL> bagsDAL = history.ShoppingBags;
-            ShoppingBagDAL bagDAL = bagsDAL.First.Value;
+            LinkedList<ShoppingBagService> bagsDAL = history.ShoppingBags;
+            ShoppingBagService bagDAL = bagsDAL.First.Value;
 
             Assert.Equal(16.3, bagDAL.TotalBagPrice);
 

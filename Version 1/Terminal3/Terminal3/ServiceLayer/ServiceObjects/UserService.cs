@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Terminal3.DALobjects
+namespace Terminal3.ServiceLayer.ServiceObjects
 {
-    public class UserDAL
+    public class UserService
     {
         //Properties
         public String Id { get; }
-        public ShoppingCartDAL ShoppingCart { get; }
+        public ShoppingCartService ShoppingCart { get; set; }
 
         //Constructor
-        public UserDAL(String id,ShoppingCartDAL shoppingCart)
+        public UserService(String id,ShoppingCartService shoppingCart)
         {
             Id = id;
             ShoppingCart = shoppingCart;

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
-    class DiscountTargetCategories : IDiscountTarget
+    public class DiscountTargetCategories : IDiscountTarget
     {
         public List<string> Categories { get; }
 

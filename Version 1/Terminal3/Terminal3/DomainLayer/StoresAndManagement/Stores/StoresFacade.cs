@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
-using Terminal3.DALobjects;
+using Terminal3.ServiceLayer.ServiceObjects;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -178,6 +178,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             Store newStore = new Store(storeName, founder);
             Stores.TryAdd(newStore.Id, newStore);
+            NotificationManager notificationManager = new NotificationManager(newStore);
+            newStore.NotificationManager = notificationManager;
+            newStore.notifyStoreOpened();
 
             return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, newStore);
         }

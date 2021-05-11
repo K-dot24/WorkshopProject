@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Terminal3.DALobjects
+namespace Terminal3.ServiceLayer.ServiceObjects
 {
-    public class ProductDAL
+    public class ProductService
     {
         //Properties
         public String Id { get; }
@@ -14,7 +14,7 @@ namespace Terminal3.DALobjects
         public String Category { get; }
 
         //Constructor
-        public ProductDAL(string id, string name, double price, int quantity, string category)
+        public ProductService(string id, string name, double price, int quantity, string category)
         {
             Id = id;
             Name = name;

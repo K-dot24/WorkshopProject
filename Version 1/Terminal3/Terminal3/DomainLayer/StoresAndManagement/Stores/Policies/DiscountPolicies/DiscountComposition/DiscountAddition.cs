@@ -22,11 +22,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 Discounts = new List<IDiscountPolicy>();
         }
 
-        public void AddDiscount(IDiscountPolicy discount)
-        {
-            Discounts.Add(discount);
-        }
-
         public override Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
         {
             Dictionary<Product, Double> result = new Dictionary<Product, Double>();
