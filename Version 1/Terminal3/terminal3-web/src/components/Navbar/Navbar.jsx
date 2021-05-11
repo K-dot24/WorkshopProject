@@ -10,7 +10,7 @@ import useStyles from './styles';
 import logo from '../../assets/terminal3_logo.png';
 
 const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
-    const [permissions, setPermissions] = useState([])
+    const [permissions, setPermissions] = useState([]);
     
     const classes = useStyles();
     const location = useLocation();

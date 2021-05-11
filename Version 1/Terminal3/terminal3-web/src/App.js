@@ -34,7 +34,6 @@ const App = () => {
 
     //#region Cart Functionality 
     
-    // TODO: Fetch from API?
     const fetchCart = async () => {
         setCart({id: 0, products: [], totalPrice: 0});
 
@@ -59,7 +58,9 @@ const App = () => {
         fetchCart();
     }
 
+    // TODO: Connect somehow to API - can't get bagID
     const handleUpdateCartQuantity = async (productId, quantity) => {
+        
         if (quantity === 0) {
             handleRemoveFromCart(productId);
         } else {
