@@ -261,8 +261,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 if (res.ExecStatus)
                 {
                     GuestUsers.TryAdd(res.Data.Id, res.Data);
-                    RegisteredUsers.TryRemove(searchResult.Data.Id, out RegisteredUser _);
-                    return new Result<GuestUser>($"There is not user using this email:{email}\n", true, res.Data);
+                    return new Result<GuestUser>($"{email} logged out\n", true, res.Data);
                 }
                 else
                     return new Result<GuestUser>(res.Message, false, null);
