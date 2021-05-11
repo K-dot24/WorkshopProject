@@ -1,13 +1,13 @@
-﻿using SignalRgateway.Model;
+﻿using signalRgateway.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace signalRgateway.Hubs.Client
+namespace signalRgateway.Client
 {
     public interface IClient {
-        Task ReceiveMessage(Notification message);
+        Task ReceiveMessage(String message);
 
     }
 }

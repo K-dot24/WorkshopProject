@@ -10,5 +10,10 @@ namespace signalRgateway.Models
         public string oldUserID { get; set; }
         public string newUserID { get; set; }
 
+        public SignalRLoginModel(string oldUserID, string newUserID)
+        {
+            this.oldUserID = oldUserID;
+            this.newUserID = newUserID;
+        }
     }
 }

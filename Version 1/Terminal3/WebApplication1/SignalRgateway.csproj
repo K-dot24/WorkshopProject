@@ -8,5 +8,9 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.5" />
+  </ItemGroup>
+
 
 </Project>

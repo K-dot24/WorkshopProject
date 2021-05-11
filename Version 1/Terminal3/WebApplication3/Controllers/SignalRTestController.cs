@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNet.SignalR.Client;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Client;
 using SignalrServer.Client;
 using SignalrServer.Hubs;
 using SignalrServer.Model;
@@ -18,7 +18,8 @@ namespace Terminal3WebAPI.Controllers
     [ApiController]
     public class SignalRTestController : ControllerBase
     {
-        public IHubProxy hubProxy { get; set; }
+        //public IHubProxy hubProxy { get; set; }
+        public HubConnection connection { get; set; }
         private readonly IECommerceSystem system;
 
 
@@ -27,10 +28,19 @@ namespace Terminal3WebAPI.Controllers
             //Setting up SignalR connection
             this.system = system;
 
-            HubConnection SignalRClient = new HubConnection("http://localhost:8080/signalr");
-            hubProxy = SignalRClient.CreateHubProxy("NotificationHub");
-            SignalRClient.Start();
-            while (!(SignalRClient.State == ConnectionState.Connected)) { }
+            //HubConnection SignalRClient = new HubConnection("http://localhost:8080/signalr");
+            //hubProxy = SignalRClient.CreateHubProxy("NotificationHub");
+            //SignalRClient.Start();
+            //while (!(SignalRClient.State == ConnectionState.Connected)) { }
+
+            string url = "http://localhost:4000/signalr/notification";
+            HubConnection connection = new HubConnectionBuilder()
+               .WithUrl(url)
+               .WithAutomaticReconnect()
+               .Build();
+            connection.StartAsync();
+            while (connection.State != HubConnectionState.Connected) { }
+
         }
 
         [HttpPost]
@@ -39,7 +49,8 @@ namespace Terminal3WebAPI.Controllers
             var retMessage = string.Empty;
             try
             {
-                hubProxy.Invoke("SendBroadcast",msg);
+                //hubProxy.Invoke("SendBroadcast",msg);
+                await connection.InvokeAsync("SendBroadcast",msg);
             }
             catch (Exception e)
             {

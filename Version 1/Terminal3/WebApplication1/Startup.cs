@@ -66,7 +66,7 @@ namespace signalRgateway
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<NotificationHub>("/hubs/notification");
+                endpoints.MapHub<NotificationHub>("/signalr/notification");
             });
 
             app.UseEndpoints(endpoints =>
