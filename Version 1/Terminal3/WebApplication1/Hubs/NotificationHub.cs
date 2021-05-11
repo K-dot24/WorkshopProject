@@ -20,17 +20,17 @@ namespace signalRgateway.Hubs
             Console.WriteLine("OnConnected");
             return base.OnConnectedAsync();
         }
-        public async Task SendMessage(Notification message)
+        public async Task SendMessage(string userID, string message)
         {
-            String connectionID = GuestConnections.GetConnections(message.UserID);
+            String connectionID = GuestConnections.GetConnections(userID);
             if (!connectionID.Equals(String.Empty))
             {
-                await Clients.Client(connectionID).ReceiveMessage(message.Message);
+                await Clients.Client(connectionID).ReceiveMessage(message);
             }
-            else if (!RegisteredConnections.GetConnections(message.UserID).Equals(String.Empty))
+            else if (!RegisteredConnections.GetConnections(userID).Equals(String.Empty))
             {
-                connectionID = RegisteredConnections.GetConnections(message.UserID);
-                await Clients.Client(connectionID).ReceiveMessage(message.Message);
+                connectionID = RegisteredConnections.GetConnections(userID);
+                await Clients.Client(connectionID).ReceiveMessage(message);
             }
         }
 
