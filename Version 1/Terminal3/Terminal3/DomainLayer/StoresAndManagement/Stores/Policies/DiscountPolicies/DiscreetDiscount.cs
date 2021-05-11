@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
     public class DiscreetDiscount : AbstractDiscountPolicy
     {
-        //TODO: Complete properly
 
         public String DiscountCode { get; }
         public IDiscountPolicy Discount { get; }
@@ -45,6 +45,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public override Result<bool> RemoveCondition(string id)
         {
             return new Result<bool>("", true, false);
+        }
+
+        public override Result<IDiscountPolicyData> GetData()
+        {
+            IDiscountPolicyData discountData = null;
+            if (Discount != null)
+            {
+                Result<IDiscountPolicyData> discountDataResult = Discount.GetData();
+                if (!discountDataResult.ExecStatus)
+                    return discountDataResult;
+                discountData = discountDataResult.Data;
+            }
+
+            return new Result<IDiscountPolicyData>("", true, new DiscreetDiscountData(discountData, DiscountCode, Id));
         }
     }
 }

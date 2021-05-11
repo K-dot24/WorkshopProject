@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountTargetsData;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
@@ -60,6 +62,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public override Result<bool> RemoveCondition(string id)
         {
             return new Result<bool>("", true, false);
+        }
+
+        public override Result<IDiscountPolicyData> GetData()
+        {
+            IDiscountTargetData targetData = null;
+            if (Target != null)
+            {
+                Result<IDiscountTargetData> targetDataResult = Target.GetData();
+                if (!targetDataResult.ExecStatus)
+                    return new Result<IDiscountPolicyData>(targetDataResult.Message, false, null);
+                targetData = targetDataResult.Data;
+            }
+
+            return new Result<IDiscountPolicyData>("", true, new VisibleDiscountData(ExpirationDate, targetData, Percentage, Id));
         }
     }
 }

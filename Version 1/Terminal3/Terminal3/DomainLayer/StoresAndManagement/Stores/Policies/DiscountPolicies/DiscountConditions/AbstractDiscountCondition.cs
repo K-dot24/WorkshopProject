@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountConditionsData;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions
 {
@@ -20,5 +21,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public abstract Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products);
         public abstract Result<bool> AddCondition(string id, IDiscountCondition condition);
         public abstract Result<bool> RemoveCondition(string id);
+        public abstract Result<IDiscountConditionData> GetData();
     }
 }

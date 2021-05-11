@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountConditionsData;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
@@ -65,6 +66,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                     return result;
             }
             return new Result<bool>("", true, false);
+        }
+
+        public override Result<IDiscountConditionData> GetData()
+        {
+            List<IDiscountConditionData> conditionsList = new List<IDiscountConditionData>();
+            foreach (IDiscountCondition myCondition in Conditions)
+            {
+                Result<IDiscountConditionData> conditionResult = myCondition.GetData();
+                if (!conditionResult.ExecStatus)
+                    return new Result<IDiscountConditionData>(conditionResult.Message, false, null);
+                conditionsList.Add(conditionResult.Data);
+            }
+            return new Result<IDiscountConditionData>("", true, new DiscountConditionAndData(conditionsList, Id));
         }
     }
 }

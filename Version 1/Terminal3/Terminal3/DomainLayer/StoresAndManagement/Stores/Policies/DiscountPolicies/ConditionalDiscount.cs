@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountConditionsData;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
@@ -47,6 +49,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (Condition.Id.Equals(id))
                 return new Result<bool>("Cant remove the main condition of the conditional discount yet", false, false);
             return Condition.RemoveCondition(id);
+        }
+
+        public override Result<IDiscountPolicyData> GetData()
+        {
+            IDiscountPolicyData discountData = null;
+            if (Discount != null)
+            {
+                Result<IDiscountPolicyData> discountDataResult = Discount.GetData();
+                if (!discountDataResult.ExecStatus)
+                    return discountDataResult;
+                discountData = discountDataResult.Data;
+            }
+            IDiscountConditionData conditionData = null;
+            if (Condition != null)
+            {
+                Result<IDiscountConditionData> conditionDataResult = Condition.GetData();
+                if (!conditionDataResult.ExecStatus)
+                    return new Result<IDiscountPolicyData>(conditionDataResult.Message, false, null);
+                conditionData = conditionDataResult.Data;
+            }
+
+            return new Result<IDiscountPolicyData>("", true, new ConditionalDiscountData(discountData, conditionData, Id));
         }
     }
 }

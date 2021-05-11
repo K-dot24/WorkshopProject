@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
@@ -16,6 +17,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         Result<Boolean> AddDiscountCondition(String id, IDiscountCondition condition);
         Result<Boolean> RemoveDiscountPolicy(String id);
         Result<Boolean> RemoveDiscountCondition(String id);
+        Result<IDiscountPolicyData> GetData();
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
         Result<Boolean> RemovePurchasePolicy(string id);
@@ -114,6 +116,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
                 else return new Result<bool>($"The discount condition removal failed because the discount condition with an id ${id} was not found", false, false);
             }
             return result;
+        }
+
+        public Result<IDiscountPolicyData> GetData()
+        {
+            return MainDiscount.GetData();
         }
 
         public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy)

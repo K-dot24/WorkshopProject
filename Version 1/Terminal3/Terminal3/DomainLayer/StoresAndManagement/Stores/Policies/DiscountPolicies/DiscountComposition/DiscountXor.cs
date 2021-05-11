@@ -2,6 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountComposition;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountConditionsData;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
@@ -12,7 +15,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public IDiscountPolicy Discount2 { get; }
         public IDiscountCondition ChoosingCondition { get; }
 
-        public DiscountXor(IDiscountPolicy discount1, IDiscountPolicy discount2, IDiscountCondition choosingCondition)
+        public DiscountXor(IDiscountPolicy discount1, IDiscountPolicy discount2, IDiscountCondition choosingCondition, String Id = "") : base(Id)
         {
             Discount1 = discount1;
             Discount2 = discount2;
@@ -86,6 +89,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (!result.ExecStatus)
                 return result;
             return Discount2.RemoveCondition(id);
+        }
+
+        public override Result<IDiscountPolicyData> GetData()
+        {
+            Result<IDiscountPolicyData> discount1Result = Discount1.GetData();
+            if (!discount1Result.ExecStatus)
+                return new Result<IDiscountPolicyData>(discount1Result.Message, false, null);
+            Result<IDiscountPolicyData> discount2Result = Discount2.GetData();
+            if (!discount2Result.ExecStatus)
+                return new Result<IDiscountPolicyData>(discount2Result.Message, false, null);
+            Result<IDiscountConditionData> choosingConditionResult = ChoosingCondition.GetData();
+            if (!choosingConditionResult.ExecStatus)
+                return new Result<IDiscountPolicyData>(choosingConditionResult.Message, false, null);
+            return new Result<IDiscountPolicyData>("", true, new DiscountXorData(discount1Result.Data, discount2Result.Data, choosingConditionResult.Data, Id));
         }
     }
 }

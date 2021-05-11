@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
@@ -22,5 +23,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public abstract Result<bool> RemoveDiscount(String id);
         public abstract Result<bool> AddCondition(string id, IDiscountCondition condition);
         public abstract Result<bool> RemoveCondition(string id);
+        public abstract Result<IDiscountPolicyData> GetData();
     }
 }

@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountComposition;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
@@ -118,6 +120,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                     return result;
             }
             return new Result<bool>("", true, false);
+        }
+
+        public override Result<IDiscountPolicyData> GetData()
+        {
+            List<IDiscountPolicyData> discountsList = new List<IDiscountPolicyData>();
+            foreach (IDiscountPolicy myDiscount in Discounts)
+            {
+                Result<IDiscountPolicyData> discountResult = myDiscount.GetData();
+                if (!discountResult.ExecStatus)
+                    return new Result<IDiscountPolicyData>(discountResult.Message, false, null);
+                discountsList.Add(discountResult.Data);
+            }
+            return new Result<IDiscountPolicyData>("", true, new DiscountOrData(discountsList, Id));
         }
     }
 }
