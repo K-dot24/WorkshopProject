@@ -8,7 +8,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public interface IDiscountCondition
     {
 
+        String Id { get; }
+
         Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products);
+        Result<bool> AddCondition(String id, IDiscountCondition condition);
+        Result<bool> RemoveCondition(String id);
 
     }
 }

@@ -14,7 +14,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         Result<bool> AddDiscount(String id, IDiscountPolicy discount);
 
+        Result<bool> AddCondition(String id, IDiscountCondition condition);
+
         Result<bool> RemoveDiscount(String id);
+
+        Result<bool> RemoveCondition(String id);
 
     }
 }

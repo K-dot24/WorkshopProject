@@ -5,22 +5,32 @@ using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions
 {
-    public class MinProductCondition : IDiscountCondition
+    public class MinProductCondition : AbstractDiscountCondition
     {
 
         public int MinQuantity { get; }
         public Product Product { get; }
 
-        public MinProductCondition(Product product, int minQuantity)
+        public MinProductCondition(Product product, int minQuantity, String id = "") : base(id)
         {
             Product = product;
             MinQuantity = minQuantity;
         }
 
-        public Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)
+        public override Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)
         {
             if (products.ContainsKey(Product) && products[Product] >= MinQuantity)
                 return new Result<bool>("", true, true);
+            return new Result<bool>("", true, false);
+        }
+
+        public override Result<bool> AddCondition(string id, IDiscountCondition condition)
+        {
+            return new Result<bool>("", true, false);
+        }
+
+        public override Result<bool> RemoveCondition(string id)
+        {
             return new Result<bool>("", true, false);
         }
 
