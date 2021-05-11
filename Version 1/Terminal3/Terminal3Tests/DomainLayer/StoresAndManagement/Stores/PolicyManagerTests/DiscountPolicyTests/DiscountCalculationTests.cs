@@ -14,6 +14,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
 
         public Dictionary<String, Product> Products { get; }
 
+        public ConcurrentDictionary<Product, int> currProducts { get; }
+
         public DiscountCalculationTests()
         {
             PolicyManager = new PolicyManager();
