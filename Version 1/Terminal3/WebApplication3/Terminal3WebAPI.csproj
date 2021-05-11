@@ -10,10 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Terminal3\Terminal3.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Hubs\" />
+    <ProjectReference Include="..\WebApplication1\SignalRgateway.csproj" />
   </ItemGroup>
 
 </Project>

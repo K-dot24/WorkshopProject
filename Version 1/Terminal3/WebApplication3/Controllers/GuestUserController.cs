@@ -35,9 +35,15 @@ namespace Terminal3WebAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         public IActionResult EnterSystem() {
-            Result<UserService> res = system.EnterSystem();
-            if(res.ExecStatus) return Ok(res.Data.Id);
-            else return BadRequest(res.Data.Id);
+            Result<UserService> result = system.EnterSystem();
+            if (result.ExecStatus)
+            {
+                return Ok(result.Data.Id);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
         }
 
         /// <summary>

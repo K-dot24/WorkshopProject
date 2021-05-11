@@ -6,7 +6,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Terminal3.ServiceLayer;
 
@@ -25,7 +28,7 @@ namespace WebApplication3
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSignalR();
+            //services.AddSignalR();
             services.AddCors(options =>
             {
                 options.AddPolicy("ClientPermission", policy =>
@@ -39,8 +42,8 @@ namespace WebApplication3
             services.AddCors();
 
             services.AddSwaggerGen();
-            
-            //Dependency injection 
+
+            //Dependency injection
             services.AddSingleton<IECommerceSystem, ECommerceSystem>();
 
         }
@@ -54,7 +57,8 @@ namespace WebApplication3
             }
 
             app.UseHttpsRedirection();
-            //app.UseCors("ClientPermission");
+            
+            app.UseCors("ClientPermission");
 
             app.UseRouting();
 
@@ -70,6 +74,7 @@ namespace WebApplication3
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                //endpoints.MapHub<NotificationHub>("/hubs/notification");
             });
 
 
