@@ -19,6 +19,9 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID);
         Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID,Boolean isSystemAdmin=false);
         Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID);
+        Result<Boolean> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID);
+        Result<Boolean> CloseStore(string storeId, string userID);
+        Result<StoreService> ReOpenStore(string storeId, string userID);
 
     }
     public class StoreStaffController : IStoreStaffInterface
@@ -43,6 +46,16 @@ namespace Terminal3.ServiceLayer.Controllers
         public Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID) { return StoresAndManagementInterface.GetStoreStaff(ownerID, storeID); }
         public Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID, Boolean isSystemAdmin = false) { return StoresAndManagementInterface.GetStorePurchaseHistory(ownerID, storeID); }
         public Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID) { return StoresAndManagementInterface.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID); }
+        public Result<Boolean> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID) { return StoresAndManagementInterface.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID); }
+        public Result<Boolean> CloseStore(string storeId, string userID)
+        {
+            return StoresAndManagementInterface.CloseStore(storeId, userID);
+        }
+
+        public Result<StoreService> ReOpenStore(string storeId, string userID)
+        {
+            return StoresAndManagementInterface.ReOpenStore(storeId, userID);
+        }
 
         #endregion
     }

@@ -29,6 +29,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.NotificationCenter = NotificationCenter.GetInstance();
         }
 
+        //For test Purpose ONLY
+        public RegisteredUser(string id, String email, String password) : base(id)
+        {
+            this.Email = email;
+            this.Password = password;
+            this.LoggedIn = false;
+            this.History = new History();
+            this.PendingNotification = new LinkedList<Notification>();
+            this.NotificationCenter = NotificationCenter.GetInstance();
+        }
+
         //Methods
         public Result<RegisteredUser> Login(String password) {
             if (LoggedIn) {

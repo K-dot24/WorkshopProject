@@ -9,6 +9,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     public interface IStoresFacade
     {
         Result<Store> OpenNewStore(RegisteredUser founder, String storeName);
+        Result<Boolean> CloseStore(RegisteredUser founder, String storeId);
+        Result<Store> ReOpenStore(RegisteredUser owner, String storeId);
 
         #region Inventory Management
         Result<Product> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
@@ -25,6 +27,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID, String storeID);
         Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID, String storeID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);        
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID, string storeID);
@@ -35,11 +38,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     public class StoresFacade : IStoresFacade
     {
         public ConcurrentDictionary<String, Store> Stores { get; }
+        public ConcurrentDictionary<String, Store> ClosedStores { get; }
 
         //TODO: Change constructor if needed (initializer?)
         public StoresFacade()
         {
             Stores = new ConcurrentDictionary<String, Store>();
+            Store s1 = new Store("1","Shaked_store", new RegisteredUser("1","test1", "123"));
+            Store s2 = new Store("2", "Tomer_store", new RegisteredUser("2","test2", "123"));
+            Store s3 = new Store("3", "Raz_store", new RegisteredUser("3","test3", "123"));
+            Store s4 = new Store("4", "Amit_store", new RegisteredUser("4","test4", "123"));
+            Stores.TryAdd(s1.Id, s1);
+            Stores.TryAdd(s2.Id, s2);
+            Stores.TryAdd(s3.Id, s3);
+            Stores.TryAdd(s4.Id, s4);
+            ClosedStores = new ConcurrentDictionary<String, Store>();
         }
 
         //TODO: Implement all functions
@@ -114,6 +127,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
         }
 
+        public Result<Boolean> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID)
+        {
+            if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
+            {
+                return store.RemoveStoreOwner(removedOwnerID, currentlyOwnerID);
+            }
+            //else failed
+            return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
+        }
+
         public Result<List<Product>> SearchProduct(IDictionary<String, Object> searchAttributes)
         {
             List<Product> searchResult = new List<Product>();
@@ -180,9 +203,46 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Stores.TryAdd(newStore.Id, newStore);
             NotificationManager notificationManager = new NotificationManager(newStore);
             newStore.NotificationManager = notificationManager;
-            newStore.notifyStoreOpened();
+            newStore.NotificationManager.notifyStoreOpened();
 
             return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, newStore);
+        }
+
+        public Result<Boolean> CloseStore(RegisteredUser founder, string storeId)
+        {
+            
+            if(Stores.TryRemove(storeId , out Store store))
+            {
+                if(store.Founder.GetId() == founder.Id)
+                {
+                    ClosedStores.TryAdd(storeId, store);
+                    store.NotificationManager.notifyStoreClosed();
+                    return new Result<bool>($"The store {store.Name} is closed\n", true, true);
+                }
+                // else faild so return the store to the Stores list
+                Stores.TryAdd(storeId, store);
+                return new Result<bool>($"Registered user (Id:{founder.Id}) is not the store founder , therefore can not close the store\n", false, false);
+            }
+            //else faild
+            return new Result<bool>("Store does not exists\n", false, false);
+        }
+
+        public Result<Store> ReOpenStore(RegisteredUser owner, string storeId)
+        {
+            if (ClosedStores.TryRemove(storeId, out Store store))
+            {
+                if (store.Owners.ContainsKey(owner.Id))
+                {
+                    Stores.TryAdd(storeId, store);
+                    store.NotificationManager.notifyStoreOpened();
+                    return new Result<Store>($"The store {store.Name} is reopened\n", true, store);
+                }
+                // else faild so return the store to the closed stores list
+                ClosedStores.TryAdd(storeId, store);
+                return new Result<Store>($"Registered user (Id:{owner.Id}) is not one of the store owners , therefore can not reopen the store\n", false, null);
+            }
+            //else faild
+            return new Result<Store>("Store is not closed or does not exists, therefore can not reopen it\n", false, null);
         }
 
 
@@ -248,6 +308,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 }
             }
             return result;
-        }
+        }   
     }
 }
