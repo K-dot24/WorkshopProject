@@ -36,7 +36,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 foreach(KeyValuePair<Product, Double> entry in discountResult)
                 {
                     if (result.ContainsKey(entry.Key))
-                        result[entry.Key] = result[entry.Key] + entry.Value;
+                        if (result[entry.Key] + entry.Value > 100)
+                            result[entry.Key] = 100;
+                        else
+                            result[entry.Key] = result[entry.Key] + entry.Value;
                     else
                         result[entry.Key] = entry.Value;
                 }
