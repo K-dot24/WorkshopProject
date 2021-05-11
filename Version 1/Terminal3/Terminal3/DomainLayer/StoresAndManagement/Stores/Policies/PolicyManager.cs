@@ -13,7 +13,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
         Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount);
         Result<Boolean> AddDiscountPolicy(String id, IDiscountPolicy discount);
+        Result<Boolean> AddDiscountCondition(String id, IDiscountCondition condition);
         Result<Boolean> RemoveDiscountPolicy(String id);
+        Result<Boolean> RemoveDiscountCondition(String id);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
         Result<Boolean> RemovePurchasePolicy(string id);
@@ -78,6 +80,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return result;
         }
 
+        public Result<Boolean> AddDiscountCondition(String id, IDiscountCondition condition)
+        {
+            Result<bool> result = MainDiscount.AddCondition(id, condition);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount condition has been added successfully", true, true);
+                else return new Result<bool>($"The discount condition addition failed because the discount condition with an id ${id} was not found", false, false);
+            }
+            return result;
+        }
+
         public Result<bool> RemoveDiscountPolicy(string id)
         {
             Result<bool> result = MainDiscount.RemoveDiscount(id);
@@ -86,6 +100,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
                 if (result.Data)
                     return new Result<bool>("The discount has been removed successfully", true, true);
                 else return new Result<bool>($"The discount removal failed because the discount with an id ${id} was not found", false, false);
+            }
+            return result;
+        }
+
+        public Result<bool> RemoveDiscountCondition(string id)
+        {
+            Result<bool> result = MainDiscount.RemoveCondition(id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount condition has been removed successfully", true, true);
+                else return new Result<bool>($"The discount condition removal failed because the discount condition with an id ${id} was not found", false, false);
             }
             return result;
         }
