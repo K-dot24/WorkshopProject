@@ -168,5 +168,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
             Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedResult);
         }
 
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData("Bread", 1, 10)]
+        [InlineData("Bread", 5, 40)]
+        [InlineData("Bread", 10, 60)]
+        public void AdditionDiscountTest(String productName, int count, Double expectedResult)
+        {
+            IDiscountTarget t = new DiscountTargetShop();
+            IDiscountCondition c1 = new MinProductCondition(Products[productName], 5);
+            IDiscountPolicy p1 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), c1);
+            IDiscountCondition c2 = new MinProductCondition(Products[productName], 10);
+            IDiscountPolicy p2 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), c2);
+            PolicyManager.AddDiscountPolicy(new DiscountAddition(new List<IDiscountPolicy>() { p1, p2 }));
+            currProducts.TryAdd(Products[productName], count);
+            Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedResult);
+        }
+
     }
 }
