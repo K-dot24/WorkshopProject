@@ -30,7 +30,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
             foreach(IDiscountPolicy discountPolicy in Discounts)
             {
-                Dictionary<Product, Double> discountResult = discountPolicy.CalculateDiscount(products).Data;
+                Dictionary<Product, Double> discountResult = discountPolicy.CalculateDiscount(products, code).Data;
                 if (discountResult == null)
                     continue;
                 foreach(KeyValuePair<Product, Double> entry in discountResult)

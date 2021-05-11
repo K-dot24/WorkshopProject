@@ -24,8 +24,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public override Result<Dictionary<Product, double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
         {
-            Result<Dictionary<Product, double>> result1 = Discount1.CalculateDiscount(products);
-            Result<Dictionary<Product, double>> result2 = Discount2.CalculateDiscount(products);
+            Result<Dictionary<Product, double>> result1 = Discount1.CalculateDiscount(products, code);
+            Result<Dictionary<Product, double>> result2 = Discount2.CalculateDiscount(products, code);
 
             if (result1.Data == null)
                 return new Result<Dictionary<Product, double>>("", false, new Dictionary<Product, double>());
