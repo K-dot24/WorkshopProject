@@ -47,7 +47,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
 
             //Add first system admin
-            RegisteredUser defaultUser = new RegisteredUser("Admin@terminal3", "Admin");
+            RegisteredUser defaultUser = new RegisteredUser("-777", "Admin@terminal3", "Admin");
             this.SystemAdmins.TryAdd(defaultUser.Id, defaultUser );
             this.RegisteredUsers.TryAdd(defaultUser.Id, defaultUser);
 
@@ -216,7 +216,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 {
                     //Delete relevant guest user from list 
                     GuestUsers.TryRemove(guestId , out GuestUser guest);
-                    guest.Active = false;
                     return res;
                 }
                 //else faild

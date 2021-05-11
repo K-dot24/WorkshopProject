@@ -23,7 +23,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         //Constructor
         public Product(String name, Double price, int quantity , String category, [OptionalAttribute]LinkedList<String> Keywords)
         {
-            Id = Service.GenerateId();
+            //Id = Service.GenerateId();
+            Id = "1";  //TODO delete
             Name = name;
             Price = price;
             Quantity = quantity;

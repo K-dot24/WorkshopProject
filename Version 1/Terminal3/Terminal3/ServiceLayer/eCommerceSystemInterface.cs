@@ -290,6 +290,11 @@ namespace Terminal3.ServiceLayer
         {
             return DataController.GetAllProductByStoreIDToDisplay(storeID);
         }
+
+        public Boolean[] GetPermission(string userID, string storeID)
+        {
+            return DataController.GetPermission(userID, storeID);
+        }
         #endregion
 
         #region Notification
