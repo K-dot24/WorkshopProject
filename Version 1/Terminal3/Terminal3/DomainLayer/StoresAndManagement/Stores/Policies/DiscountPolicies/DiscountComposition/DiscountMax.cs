@@ -53,6 +53,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         private Dictionary<Product, double> ChooseDiscountByResult(List<Dictionary<Product, Double>> discountsResultsList, ConcurrentDictionary<Product, int> products)
         {
+            if (discountsResultsList.Count == 0)
+                return new Dictionary<Product, double>();
             Dictionary<Product, double> chosenDiscount = discountsResultsList[0];
             Double chosenValue = CalculateDiscountsValue(chosenDiscount, products);
 
