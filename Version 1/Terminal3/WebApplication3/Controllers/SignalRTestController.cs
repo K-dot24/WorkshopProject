@@ -31,7 +31,7 @@ namespace Terminal3WebAPI.Controllers
             //SignalRClient.Start();
             //while (!(SignalRClient.State == ConnectionState.Connected)) { }
 
-            string url = "http://localhost:4000/signalr/notification";
+            string url = "https://localhost:4001/signalr/notification";
             connection = new HubConnectionBuilder()
                .WithUrl(url)
                .WithAutomaticReconnect()

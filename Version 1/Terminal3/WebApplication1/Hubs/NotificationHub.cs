@@ -17,7 +17,7 @@ namespace signalRgateway.Hubs
 
         public override Task OnConnectedAsync()
         {
-            Console.WriteLine("New connection");
+            Console.WriteLine("OnConnected");
             return base.OnConnectedAsync();
         }
         public async Task SendMessage(Notification message)
@@ -42,20 +42,22 @@ namespace signalRgateway.Hubs
         public async Task Identify(Identifier message)
         {
             GuestConnections.Add(message.UserID, Context.ConnectionId);
-            Console.WriteLine($"New Connection: UserID:{message.UserID}, ConnectionID:{Context.ConnectionId}");
+            Console.WriteLine($"Identify: UserID:{message.UserID}, ConnectionID:{Context.ConnectionId}");
         }
 
         public async Task Login(SignalRLoginModel message)
         {
             GuestConnections.Remove(message.oldUserID); //Clearing the old etry
             RegisteredConnections.Add(message.newUserID, Context.ConnectionId);
-            Console.WriteLine($"New Connection: UserID:{message.newUserID}, ConnectionID:{Context.ConnectionId}");
+            Console.WriteLine($"Login: UserID:{message.newUserID}, ConnectionID:{Context.ConnectionId}");
         }
         public async Task Logout(SignalRLoginModel message)
         {
             RegisteredConnections.Remove(message.oldUserID); //Clearing the old etry
             GuestConnections.Add(message.newUserID, Context.ConnectionId);
-   
+            Console.WriteLine($"Logout: UserID:{message.newUserID}, ConnectionID:{Context.ConnectionId}");
+
+
         }
     }
 }
