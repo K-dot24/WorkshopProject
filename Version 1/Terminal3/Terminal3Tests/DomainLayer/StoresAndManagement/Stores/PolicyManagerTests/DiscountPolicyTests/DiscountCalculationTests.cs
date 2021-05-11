@@ -28,11 +28,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 5, 75)]
         public void CalculatePrice(String productName, int sum, Double expectedPrice)
         {
-            DiscountTargetProducts target = new DiscountTargetProducts(new List<Product>() { Products[productName] });
-            PolicyManager.AddDiscountPolicy(new VisibleDiscount(DateTime.MaxValue, target, 0.2));
+            DiscountTargetProducts target = new DiscountTargetProducts(new List<Product>() { Products["Bread"] });
+            PolicyManager.AddDiscountPolicy(new VisibleDiscount(DateTime.MaxValue, target, 20));
             ConcurrentDictionary<Product, int> bag = new ConcurrentDictionary<Product, int>();
             bag.TryAdd(Products[productName], sum);
             Double price =PolicyManager.GetTotalBagPrice(bag);
+            
             Assert.True(price == expectedPrice);
         }
 
