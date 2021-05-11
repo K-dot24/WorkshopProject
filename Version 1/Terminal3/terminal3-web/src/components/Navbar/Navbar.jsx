@@ -76,9 +76,9 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/review`)}>Write Review</MenuItem>
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
-                <MenuItem onClick={() => handleMenuClick(`/${user.id}/addsystemadmin`)}>Add System Admin</MenuItem>
+                {/* <MenuItem onClick={() => handleMenuClick(`/${user.id}/addsystemadmin`)}>Add System Admin</MenuItem>
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/removesystemadmin`)}>Remove System Admin</MenuItem>
-                <MenuItem onClick={() => handleMenuClick(`/${user.id}/resetsystem`)}>Reset System</MenuItem>
+                <MenuItem onClick={() => handleMenuClick(`/${user.id}/resetsystem`)}>Reset System</MenuItem> */}
             </div>
         ) : (
             <StoreActions />
