@@ -31,10 +31,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [Theory()]
         [Trait("Category", "Unit")]
         [InlineData("Bread", 5, 40)]
-        [InlineData("Milk", 5, 100)]
-        public void CalculatePrice(String productName, int sum, Double expectedPrice)
+        [InlineData("Milk", 5, 80)]
+        public void VisibleDiscountTest(String productName, int sum, Double expectedPrice)
         {
-            DiscountTargetProducts target = new DiscountTargetProducts(new List<Product>() { Products["Bread"] });
+            IDiscountTarget target = new DiscountTargetShop();
             PolicyManager.AddDiscountPolicy(new VisibleDiscount(DateTime.MaxValue, target, 20));
             currProducts.TryAdd(Products[productName], sum);
             Double price =PolicyManager.GetTotalBagPrice(currProducts);
@@ -258,6 +258,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
             IDiscountTarget t = new DiscountTargetShop();
             IDiscountCondition c = new MinBagPriceCondition(0);
             IDiscountPolicy p = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), c);
+            PolicyManager.AddDiscountPolicy(p);
+            currProducts.TryAdd(Products[productName], count);
+            Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedResult);
+        }
+
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData("Bread", 1, "secret code", 8)]
+        [InlineData("Bread", 1, "wrong code", 10)]
+        public void DiscreetDiscountTest(String productName, int count, String code, Double expectedResult)
+        {
+            IDiscountPolicy p = new DiscreetDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), "secret code");
             PolicyManager.AddDiscountPolicy(p);
             currProducts.TryAdd(Products[productName], count);
             Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedResult);
