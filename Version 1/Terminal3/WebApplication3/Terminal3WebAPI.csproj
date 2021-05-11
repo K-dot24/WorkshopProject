@@ -9,8 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SignalrServer\SignalrServer.csproj" />
     <ProjectReference Include="..\Terminal3\Terminal3.csproj" />
+    <ProjectReference Include="..\WebApplication1\SignalRgateway.csproj" />
   </ItemGroup>
 
 </Project>

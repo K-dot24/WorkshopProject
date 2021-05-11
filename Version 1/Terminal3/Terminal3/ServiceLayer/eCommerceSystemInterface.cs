@@ -7,10 +7,9 @@ using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.ServiceLayer.Controllers;
 using XUnitTestTerminal3.AcceptanceTests.Utils;
-using Microsoft.AspNet.SignalR.Client;
-using SignalrServer.Models;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
-//using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
+using signalRgateway.Models;
 
 namespace Terminal3.ServiceLayer
 {   
@@ -30,7 +29,8 @@ namespace Terminal3.ServiceLayer
         public SystemAdminController SystemAdminInterface { get; set; }
         public IDataController DataController{ get; set; }
         public NotificationService NotificationService{ get; set; }
-        public IHubProxy hubProxy { get; set; }
+        public HubConnection connection { get; set; }
+
 
         //Constructor
         public ECommerceSystem()
@@ -44,14 +44,25 @@ namespace Terminal3.ServiceLayer
 
             //Setting up SignalR connection
 
-            HubConnection SignalRClient = new HubConnection("http://localhost:8080/signalr");
-            hubProxy = SignalRClient.CreateHubProxy("NotificationHub");
-            SignalRClient.Start();
-            while (!(SignalRClient.State == ConnectionState.Connected)) {}
+            //HubConnection SignalRClient = new HubConnection("http://localhost:8080/signalr");
+            //hubProxy = SignalRClient.CreateHubProxy("NotificationHub");
+            //SignalRClient.Start();
+            //while (!(SignalRClient.State == ConnectionState.Connected)) {}
 
 
+            //NotificationService = NotificationService.GetInstance();
+            //NotificationService.hubProxy = hubProxy;
+            string url = "https://localhost:4001/signalr/notification";
+            connection = new HubConnectionBuilder()
+               .WithUrl(url)
+               .WithAutomaticReconnect()
+               .Build();
+            connection.StartAsync();
+            while (connection.State != HubConnectionState.Connected) { }
             NotificationService = NotificationService.GetInstance();
-            NotificationService.hubProxy = hubProxy;
+            NotificationService.connection = connection;
+
+
 
 
         }
@@ -132,7 +143,8 @@ namespace Terminal3.ServiceLayer
             if (result.ExecStatus)
             {
                 SignalRLoginModel message = new SignalRLoginModel(guestUserID, result.Data.Id);
-                hubProxy.Invoke("Login", message);
+                //hubProxy.Invoke("Login", message);
+                connection.InvokeAsync("Login", message);
             }
             return result;
         }
@@ -144,7 +156,9 @@ namespace Terminal3.ServiceLayer
             if (result.ExecStatus && registeredUser.ExecStatus) 
             {
                 SignalRLoginModel message = new SignalRLoginModel(registeredUser.Data.Id, result.Data.Id);
-                hubProxy.Invoke("Logout", message);
+                //hubProxy.Invoke("Logout", message);
+                connection.InvokeAsync("Logout", message);
+
             }
             return result;
         }

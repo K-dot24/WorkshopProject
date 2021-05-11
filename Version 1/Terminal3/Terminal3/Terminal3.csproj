@@ -2,20 +2,19 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.12" />
-    <PackageReference Include="Microsoft.AspNet.SignalR.Client" Version="2.4.2" />
     <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.2.7" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="5.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SignalrServer\SignalrServer.csproj" />
+    <ProjectReference Include="..\WebApplication1\SignalRgateway.csproj" />
   </ItemGroup>
 
 </Project>
