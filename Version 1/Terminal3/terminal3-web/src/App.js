@@ -2,9 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
+// SignalR
+import { HubConnectionBuilder } from '@microsoft/signalr';
+
 import { Stores, Navbar, Cart, Checkout, Register, Login, Action } from './components';
 import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
-        GetUserShoppingCart, UpdateShoppingCart, GetTotalShoppingCartPrice } from './api/API';
+        GetUserShoppingCart, UpdateShoppingCart, EnterSystem } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -22,6 +25,14 @@ const App = () => {
     // states
     const [user, setUser] = useState({id: -1, email: '', loggedIn: false});
     const [cart, setCart] = useState({id: 0, products: [], totalPrice: 0});
+
+    // SignalR
+    const [connection, setConnection] = useState(null);
+
+    const handleEnterSystem = async () => {
+        EnterSystem().then(response => response.ok ? 
+            response.json().then(id => setUser({ ...user, id }) ) : console.log("NOT OKAY")).catch(err => alert(err));
+    }
 
     //#region Cart Functionality 
     
@@ -45,7 +56,7 @@ const App = () => {
 
     const handleAddToCart = async (storeId, productId, name, price, quantity, image) => {
         AddProductToCart({ userID: user.id, productID: productId, ProductQuantity: quantity, storeID: storeId }).then(response => response.ok ? 
-            response.json().then(json => console.log(json)) : console.log("NOT OKAY")).catch(err => console.log(err));
+            response.json().then(status => alert("Product added successfully")) : console.log("NOT OKAY")).catch(err => alert(err));
 
         fetchCart();
     }
@@ -104,33 +115,59 @@ const App = () => {
     //#region User Functionality
 
     const handleLogin = async (data) => {
-        
-        // TODO: What to do in failure?
-        LoginAPI(data).then(response => response.ok ? 
-            response.json().then(id => setUser({ id, email: data.email, loggedIn: true})) : null).catch(err => console.log(err));
+        LoginAPI({ ...data, guestuserid: user.id }).then(response => response.ok ? 
+            response.json().then(id => 
+                reIdentify(user.id, id, 'Login')
+                .then(() => setUser({ id, email: data.email, loggedIn: true}))
+                .catch(err => alert(err))) : console.log("NOT OK")).catch(err => alert(err));
     }
 
-    // TODO: What to do in success/failure?
     const handleRegister = async (data) => {
         RegisterAPI(data).then(response => response.ok ? 
-            response.json().then(id => console.log(id)) : null).catch(err => console.log(err));
+            response.json().then(id => console.log(id)) : console.log("NOT OK")).catch(err => alert(err));
     }
 
-    // TODO: What to do in failure?
     const handleLogOut = () => {
         Logout(user.email).then(response => response.ok ?
-            response.json().then(message => setUser({id: -1, name: '', email: '', loggedIn: false})) : console.log("NOT OK")).catch(err => console.log(err));
+            response.json().then(id => 
+                reIdentify(user.id, id, 'Logout')
+                .then(() => setUser({id, email: '', loggedIn: false}))
+                .catch(err => alert(err))) : console.log("NOT OK")).catch(err => alert(err));
     }
     
     const handleOpenNewStore = async (data) => {
-        OpenNewStore({ userID: user.id, ...data }).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+        OpenNewStore({ userID: user.id, ...data }).then(response => response.json().then(message => alert(message))).catch(err => alert(err));
     }
 
+    // TODO
     const handleAddSystemAdmin = async (data) => {
         console.log(data);
     }
+    //#endregion
+
+    //#region Signal-R Functionality
+    
+    //method can be 'Login' | 'Logout'
+    const reIdentify = async (_oldUserID, _newUserID,method)=>{
+        const SignalRIreIdentifyModel = {
+            oldUserID: _oldUserID,
+            newUserID: _newUserID
+        }
+        if (connection.connectionStarted) {
+            try {
+                await connection.send(method, SignalRIreIdentifyModel);
+            }
+            catch(e) {
+                console.log(e);
+            }
+        }
+        else {
+            alert('No connection to server yet.');
+        }
+    }
 
     //#endregion
+
 
     // Update cart when user change (login/sign out)
     useEffect(() => {
@@ -141,6 +178,56 @@ const App = () => {
     useEffect(() => {
         console.log(cart.products);
     }, [cart]);
+
+    useEffect(() => {
+        handleEnterSystem();
+
+        // SignalR - Create new connection
+        console.log('Creating new connection');
+        var newConnection = new HubConnectionBuilder()
+            .withUrl('https://localhost:4001/signalr/notification')
+            .withAutomaticReconnect()
+            .build();
+        setConnection(newConnection);
+        console.log('after connection');
+    }, []);
+
+    // SignalR
+    useEffect(() => {
+        const IdentifyInServer = (_userid)=> {
+            try{
+                //Identify in the server
+                console.log('before identify');
+                const identifer = {
+                    userID: _userid
+                };
+                connection.send('Identify',identifer);
+                console.log('after identify');
+            }
+            catch(e){
+                console.log(e);
+            }
+        }
+        if (connection) {
+            connection.start()
+                .then(result => {
+                    console.log('Connected!');
+                    //Register client to listen on ReceiveMessage events
+                    connection.on('ReceiveMessage', notification => {
+                        //Add functunality when new notification is arrive
+                        // console.log('recevice new message')
+                        // console.log(notification)
+                        alert(notification);
+                        // TODO: something
+                        // const updatedChat = [...latestChat.current];
+                        // updatedChat.push(notification);
+                        // setChat(notification);
+                    });
+                    IdentifyInServer(user.id);
+                })
+                .catch(e => console.log('Connection failed: ', e));
+        }
+    }, [connection]);
 
 
     return (

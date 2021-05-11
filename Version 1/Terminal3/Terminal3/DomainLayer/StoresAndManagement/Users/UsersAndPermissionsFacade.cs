@@ -216,7 +216,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 {
                     //Delete relevant guest user from list 
                     GuestUsers.TryRemove(guestId , out GuestUser guest);
-                    guest.Active = false;
                     return res;
                 }
                 //else faild

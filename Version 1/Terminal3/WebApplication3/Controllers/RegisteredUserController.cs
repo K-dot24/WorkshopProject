@@ -58,7 +58,7 @@ namespace Terminal3WebAPI.Controllers
         public IActionResult LogOut(String email)
         {
             Result<UserService> result = system.LogOut(email);
-            if (result.ExecStatus) { return Created("api/GuestUserController", result.Message); }
+            if (result.ExecStatus) { return Ok(result.Data.Id); }
             else { return BadRequest(result.Message); }
         }
 

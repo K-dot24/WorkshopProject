@@ -71,8 +71,8 @@ export function GetPermission(userId , storeId) {
 //#region GuestUserController
 
 /// Get welcome page of the system
-export function EnterSystem( ) {
-    return fetch(`https://localhost:5000/api/GuestUser/EnterSystem`, {
+export function EnterSystem() {
+    return fetch(`https://localhost:5000/api/GuestUser`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
