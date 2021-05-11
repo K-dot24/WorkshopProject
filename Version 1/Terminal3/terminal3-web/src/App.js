@@ -172,10 +172,14 @@ const App = () => {
                                 render={(props) => (<Action name='Open New Store' fields={[{name: 'Store Name', required: true}]} 
                                                             handleAction={handleOpenNewStore} {...props} />)} 
                         />
-                        {/* <Route exact path={`/${user.id}/addsystemadmin`} 
-                                render={(props) => (<Action name='Add System Admin' fields={[{name: 'Email', required: true}]} 
-                                                            handleAction={handleAddSystemAdmin} {...props} />)} 
-                        /> */}
+                        
+                        {/* {user.id === "-777" && (
+                            <Route exact path={`/${user.id}/addsystemadmin`} 
+                                    render={(props) => (<Action name='Add System Admin' fields={[{name: 'Email', required: true}]} 
+                                    handleAction={handleAddSystemAdmin} {...props} />)} 
+                            />
+                        ) } */}
+                        
                         
                         <Route path="/" render={(props) => (<Stores user={user} handleAddToCart={handleAddToCart} handleLogOut={handleLogOut} {...props} />)} />
 
