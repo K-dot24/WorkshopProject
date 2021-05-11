@@ -20,7 +20,7 @@ const theme = createMuiTheme({
 
 const App = () => {
     // states
-    const [user, setUser] = useState({id: -1, email: ''});
+    const [user, setUser] = useState({id: -1, email: '', loggedIn: false});
     const [cart, setCart] = useState({id: 0, products: [], totalPrice: 0});
 
     //#region Cart Functionality 
@@ -29,7 +29,7 @@ const App = () => {
     const fetchCart = async () => {
         setCart({id: 0, products: [], totalPrice: 0});
 
-        if (user.id !== -1){
+        if (user.loggedIn === true){
             GetUserShoppingCart(user.id).then(response => response.ok ? 
                 response.json().then(data => setCart({id: data.id,
                                                       products: data.shoppingBags.length === 0 ? [] : 
@@ -107,7 +107,7 @@ const App = () => {
         
         // TODO: What to do in failure?
         LoginAPI(data).then(response => response.ok ? 
-            response.json().then(id => setUser({ id, email: data.email})) : null).catch(err => console.log(err));
+            response.json().then(id => setUser({ id, email: data.email, loggedIn: true})) : null).catch(err => console.log(err));
     }
 
     // TODO: What to do in success/failure?
@@ -119,7 +119,7 @@ const App = () => {
     // TODO: What to do in failure?
     const handleLogOut = () => {
         Logout(user.email).then(response => response.ok ?
-            response.json().then(message => setUser({id: -1, name: '', email: ''})) : console.log("NOT OK")).catch(err => console.log(err));
+            response.json().then(message => setUser({id: -1, name: '', email: '', loggedIn: false})) : console.log("NOT OK")).catch(err => console.log(err));
     }
     
     const handleOpenNewStore = async (data) => {

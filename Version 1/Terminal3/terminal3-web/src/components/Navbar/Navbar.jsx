@@ -25,7 +25,7 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
     const userWithMockPermissions = { ...user, permissions: [true, true, true, true, true, true, true, true, true, true, true, true, true]};
 
     const fetchPermissions = async () => {
-        if (user.id !== -1 && storeId !== -1) {
+        if (user.loggedIn && storeId !== -1) {
             GetPermission(user.id, storeId).then(response => response.ok ? 
                 response.json().then(permissions => setPermissions(permissions)) : null).catch(err => console.log(err));
         }
@@ -95,13 +95,13 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
                     <Typography component={Link} to="/" variant="h6" className={classes.title} color="inherit">
                         <img src={logo} alt="Terminal 3" height="50px" className={classes.image} />
                     </Typography>
-                    {user.id !== -1 &&
+                    {user.loggedIn &&
                         <Typography variant="h6" color="primary">
                                     Hello, {user.email.substr(0, user.email.indexOf('@'))}
                         </Typography>
                     }
                     <div className={classes.grow} />
-                    {user.id !== -1 &&
+                    {user.loggedIn &&
                         <> 
                             <Button component={Link} to="/" className={classes.checkoutButton} size="large" 
                                     type="button" variant="text" color="primary" onClick={() => handleLogOut()}>
@@ -109,14 +109,14 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
                             </Button>
                         </>
                     }
-                    {user.id === -1 && location.pathname !== '/register' && (
+                    {!user.loggedIn && location.pathname !== '/register' && (
                        <Button component={Link} to="/register" className={classes.checkoutButton} size="large" 
                                 type="button" variant="text" color="primary">
                             Sign Up
                         </Button> 
                     ) }
-                    {(user.id === -1 && location.pathname !== '/register' && location.pathname !== '/login') && <Typography> | </Typography>}
-                    {user.id === -1 && location.pathname !== '/login' && (
+                    {(!user.loggedIn && location.pathname !== '/register' && location.pathname !== '/login') && <Typography> | </Typography>}
+                    {!user.loggedIn && location.pathname !== '/login' && (
                        <Button component={Link} to="/login" className={classes.checkoutButton} size="large" 
                                 type="button" variant="text" color="primary">
                             Sign In
@@ -146,7 +146,7 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut }) => {
                             </Badge>
                         </IconButton>
                     </div>
-                    {(user.id !== -1) &&
+                    {(user.loggedIn) &&
                         <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="open drawer" onClick={handleMenuOpen}>
                             <MenuIcon />
                         </IconButton>
