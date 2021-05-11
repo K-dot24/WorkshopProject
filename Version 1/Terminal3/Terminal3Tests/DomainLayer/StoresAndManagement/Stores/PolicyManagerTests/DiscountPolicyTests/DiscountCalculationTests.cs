@@ -236,10 +236,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [Theory()]
         [Trait("Category", "Unit")]
         [InlineData("Bread", 1, 8)]
-        [InlineData("Milk", 1, 20)]
+        [InlineData("Milk", 1, 16)]
+        [InlineData("Cup", 1, 30)]
         public void DiscountTargetCategoriesTest(String productName, int count, Double expectedResult)
         {
-            IDiscountTarget t = new DiscountTargetCategories(new List<String>() { "Bakery" });
+            IDiscountTarget t = new DiscountTargetCategories(new List<String>() { "Bakery", "Dairy" });
             IDiscountCondition c = new MinBagPriceCondition(0);
             IDiscountPolicy p = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), c);
             PolicyManager.AddDiscountPolicy(p);
