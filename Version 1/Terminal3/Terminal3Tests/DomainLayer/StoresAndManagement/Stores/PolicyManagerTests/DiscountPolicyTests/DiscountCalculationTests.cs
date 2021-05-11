@@ -55,5 +55,59 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
             Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedPrice);
         }
 
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData("Bread", 20, 160)]
+        [InlineData("Bread", 5, 50)]
+        [InlineData("Milk", 20, 320)]
+        [InlineData("Milk", 5, 100)]
+        public void MinProductDiscountTest(String productName, int count, Double expectedPrice)
+        {
+            DiscountTargetProducts target = new DiscountTargetProducts(new List<Product>() { Products["Bread"] });
+            PolicyManager.AddDiscountPolicy(new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), new MinProductCondition(Products["Bread"], 10)));
+            currProducts.TryAdd(Products[productName], count);
+            Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedPrice);
+        }
+
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData("Bread", 6, 48)]
+        [InlineData("Bread", 4, 40)]
+        [InlineData("Bread", 11, 110)]
+        [InlineData("Milk", 8, 160)]
+        [InlineData("Milk", 1, 20)]
+        [InlineData("Milk", 20, 400)]
+        public void AndPolicyTest(String productName, int count, Double expectedResult)
+        {
+            IDiscountTarget target = new DiscountTargetProducts(new List<Product>() { Products[productName] });
+            IDiscountCondition c1 = new MinProductCondition(Products[productName], 5);
+            IDiscountPolicy p1 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c1);
+            IDiscountCondition c2 = new MaxProductCondition(Products[productName], 10);
+            IDiscountPolicy p2 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c2);
+            PolicyManager.AddDiscountPolicy(new DiscountAnd(new List<IDiscountPolicy>() { p1, p2 }));
+            currProducts.TryAdd(Products[productName], count);
+            Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedResult);
+        }
+
+        [Theory()]
+        [Trait("Category", "Unit")]
+        [InlineData("Bread", 6, 48)]
+        [InlineData("Bread", 4, 40)]
+        [InlineData("Bread", 11, 110)]
+        [InlineData("Milk", 8, 160)]
+        [InlineData("Milk", 1, 20)]
+        [InlineData("Milk", 20, 400)]
+        public void AndPolicyConditionTest(String productName, int count, Double expectedResult)
+        {
+            IDiscountTarget target = new DiscountTargetProducts(new List<Product>() { Products[productName] });
+            IDiscountCondition c1 = new MinProductCondition(Products[productName], 5);
+            IDiscountCondition c2 = new MaxProductCondition(Products[productName], 10);
+            IDiscountCondition c = new DiscountConditionAnd(new List<IDiscountCondition>() { c1, c2 });
+            IDiscountPolicy p = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c);
+            PolicyManager.AddDiscountPolicy(p);
+            currProducts.TryAdd(Products[productName], count);
+            Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedResult);
+        }
+
     }
 }
