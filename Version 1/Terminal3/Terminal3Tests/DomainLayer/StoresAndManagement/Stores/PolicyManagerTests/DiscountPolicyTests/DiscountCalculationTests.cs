@@ -24,7 +24,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
             Products = new Dictionary<string, Product>();
             Products.Add("Bread", new Product("Bread", 10, 100, "Bakery", new LinkedList<string>()));
             Products.Add("Milk", new Product("Milk", 20, 100, "Dairy", new LinkedList<string>()));
-            Products.Add("Milk", new Product("Cup", 30, 100, "Dishes", new LinkedList<string>()));
+            Products.Add("Cup", new Product("Cup", 30, 100, "Dishes", new LinkedList<string>()));
             currProducts = new ConcurrentDictionary<Product, int>();
         }
 
@@ -252,7 +252,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [Trait("Category", "Unit")]
         [InlineData("Bread", 1, 8)]
         [InlineData("Milk", 1, 16)]
-        [InlineData("Cup", 1, 34)]
+        [InlineData("Cup", 1, 24)]
         public void DiscountTargetShopTest(String productName, int count, Double expectedResult)
         {
             IDiscountTarget t = new DiscountTargetShop();
@@ -273,7 +273,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
             IDiscountPolicy p = new DiscreetDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), "secret code");
             PolicyManager.AddDiscountPolicy(p);
             currProducts.TryAdd(Products[productName], count);
-            Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedResult);
+            Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts, code), expectedResult);
         }
 
     }
