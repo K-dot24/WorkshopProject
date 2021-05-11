@@ -24,7 +24,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             Result<bool> isEligible = Condition.isConditionMet(products);
             if (isEligible.ExecStatus && isEligible.Data)
             {
-                return Discount.CalculateDiscount(products);
+                return Discount.CalculateDiscount(products, code);
             }
             return new Result<Dictionary<Product, Double>>("", true, new Dictionary<Product, Double>());
         }

@@ -31,18 +31,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 return new Result<Dictionary<Product, double>>("", true, new Dictionary<Product, double>());
 
             //calculating all discounts
-            List<Dictionary<Product, Double>> discountsResultsList = CalculateAllDiscounts(products);
+            List<Dictionary<Product, Double>> discountsResultsList = CalculateAllDiscounts(products, code);
 
             //choosing the biggest discount
             return new Result<Dictionary<Product, double>>("", true, ChooseDiscountByResult(discountsResultsList, products));
         }
 
-        private List<Dictionary<Product, Double>> CalculateAllDiscounts(ConcurrentDictionary<Product, int> products)
+        private List<Dictionary<Product, Double>> CalculateAllDiscounts(ConcurrentDictionary<Product, int> products, String code)
         {
             List<Dictionary<Product, Double>> discountsResultsList = new List<Dictionary<Product, double>>();
             foreach (IDiscountPolicy discount in Discounts)
             {
-                Dictionary<Product, Double> discountResultDictionary = discount.CalculateDiscount(products).Data;
+                Dictionary<Product, Double> discountResultDictionary = discount.CalculateDiscount(products, code).Data;
                 if (discountResultDictionary == null)
                     discountResultDictionary = new Dictionary<Product, double>();
                 discountsResultsList.Add(discountResultDictionary);

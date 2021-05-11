@@ -38,10 +38,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 results.Add(result.Data);
             }
 
-            return combineOrDiscounts(results);
+            return CombineOrDiscounts(results);
         }
 
-        private Result<Dictionary<Product, double>> combineOrDiscounts(List<Dictionary<Product, double>> discounts)
+        private Result<Dictionary<Product, double>> CombineOrDiscounts(List<Dictionary<Product, double>> discounts)
         {
             if (discounts == null)
                 return new Result<Dictionary<Product, double>>("", true, new Dictionary<Product, double>());
