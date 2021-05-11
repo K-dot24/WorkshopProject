@@ -167,7 +167,7 @@ const App = () => {
                         <Route path="/login" render={(props) => (<Login handleLogin={handleLogin} {...props} />)} />
 
                         <Route exact path="/checkout">
-                            <Checkout cart={cart} handleEmptyCart={handleEmptyCart} />
+                            <Checkout userID={user.id} cart={cart} handleEmptyCart={handleEmptyCart} />
                         </Route>
                         
                         <Route exact path={`/${user.id}/openstore`} 
