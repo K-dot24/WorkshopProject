@@ -79,5 +79,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Discounts.Tests
             Assert.Equal(c.Conditions[0], c1);
         }
 
+        [Fact()]
+        [Trait("Category", "Unit")]
+        public void AddConditionToNonExistantTest()
+        {
+            IDiscountCondition p = new MinBagPriceCondition(0);
+            Result<bool> result = PolicyManager.AddDiscountCondition(p, "Non existant Id");
+            Assert.False(result.ExecStatus);
+        }
+
+        [Fact()]
+        [Trait("Category", "Unit")]
+        public void AddConditionToIllegalConditionTest()
+        {
+            IDiscountCondition c = new MinBagPriceCondition(0);
+            IDiscountPolicy p = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, new DiscountTargetShop(), 20), c);
+            PolicyManager.AddDiscountPolicy(p);
+            Result<bool> result = PolicyManager.AddDiscountCondition(c, c.Id);
+            Assert.False(result.ExecStatus);
+        }
+
     }
 }
