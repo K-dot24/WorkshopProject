@@ -24,6 +24,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
             Products = new Dictionary<string, Product>();
             Products.Add("Bread", new Product("Bread", 10, 100, "Bakery", new LinkedList<string>()));
             Products.Add("Milk", new Product("Milk", 20, 100, "Dairy", new LinkedList<string>()));
+            currProducts = new ConcurrentDictionary<Product, int>();
         }
 
         [Theory()]
@@ -46,7 +47,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Bread", 5, 40)]
         [InlineData("Milk", 20, 400)]
         [InlineData("Milk", 5, 100)]
-        public void MaxProductPolicyTest(String productName, int count, Double expectedPrice)
+        public void MaxProductDiscountTest(String productName, int count, Double expectedPrice)
         {
             DiscountTargetProducts target = new DiscountTargetProducts(new List<Product>() { Products["Bread"] });
             PolicyManager.AddDiscountPolicy(new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), new MaxProductCondition(Products["Bread"], 10)));
