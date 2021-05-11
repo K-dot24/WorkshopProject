@@ -11,13 +11,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public DateTime Date { get; }
         public Boolean isOpened { get; set; }
         public Boolean isStoreStaff { get; set; }
-        
-        public Notification(String msg  ,Boolean staff)
+        public String ClientId { get; set; }
+
+
+        public Notification(String clientId , String msg  ,Boolean staff)
         {
             this.Message = msg;
             this.Date = DateTime.Now;
             isOpened = false;
             isStoreStaff = staff;
+            this.ClientId = clientId;
         }
 
         public String ToString()

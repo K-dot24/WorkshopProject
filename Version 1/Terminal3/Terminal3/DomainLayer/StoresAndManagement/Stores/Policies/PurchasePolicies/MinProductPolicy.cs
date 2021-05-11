@@ -38,5 +38,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         {
             return new Result<bool>("", true, false);
         }
+
+        public Result<IPurchasePolicyData> GetData()
+        {
+            return new Result<IPurchasePolicyData>("", true, new MinProductPolicyData(Product.GetDAL().Data, Min, Id));
+        }
     }
 }

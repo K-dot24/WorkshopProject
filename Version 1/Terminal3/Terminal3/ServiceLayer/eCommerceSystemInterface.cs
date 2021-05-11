@@ -112,6 +112,18 @@ namespace Terminal3.ServiceLayer
         {
             return RegisteredUserInterface.OpenNewStore(storeName, userID);
         }
+
+        public Result<Boolean> CloseStore(string storeId, string userID)
+        {
+            return StoreStaffInterface.CloseStore(storeId, userID);
+        }
+
+
+        public Result<StoreService> ReOpenStore(string storeId, string userID)
+        {
+            return StoreStaffInterface.ReOpenStore(storeId, userID);
+        }
+
         public Result<ProductService> AddProductReview(String userID, String storeID, String productID, String review) {
             return RegisteredUserInterface.AddProductReview(userID, storeID, productID, review);
         }
@@ -172,6 +184,11 @@ namespace Terminal3.ServiceLayer
         public Result<bool> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID)
         {
             return StoreStaffInterface.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID);
+        }
+
+        public Result<bool> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID)
+        {
+            return StoreStaffInterface.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID);
         }
         #endregion
 

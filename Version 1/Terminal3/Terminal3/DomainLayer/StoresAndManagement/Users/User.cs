@@ -18,6 +18,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             Id = Service.GenerateId();
             ShoppingCart = new ShoppingCart();
         }
+        //For Test purpose ONLY
+        protected User(string id)
+        {
+            Id = id;
+            ShoppingCart = new ShoppingCart();
+        }
 
         public Result<bool> AddProductToCart(Product product, int productQuantity, Store store)
         {

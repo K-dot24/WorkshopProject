@@ -54,5 +54,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 return res;
             return new Result<bool>("", true, false);
         }
+
+        public Result<IPurchasePolicyData> GetData()
+        {
+            return new Result<IPurchasePolicyData>("", true, new ConditionalPolicyData(PreCond.GetData().Data, Cond.GetData().Data, Id));
+        }
     }
 }

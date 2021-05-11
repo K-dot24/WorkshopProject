@@ -39,5 +39,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             }
             return Policy.RemovePolicy(id);            
         }
+
+        public Result<IPurchasePolicyData> GetData()
+        {
+            return new Result<IPurchasePolicyData>("", true, new BuyNowData((AndPolicyData)Policy.GetData().Data, Id));
+        }
     }
 }

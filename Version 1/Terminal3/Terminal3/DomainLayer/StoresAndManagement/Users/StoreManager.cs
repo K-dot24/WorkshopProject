@@ -17,6 +17,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             User = user;
             Store = store;
             Permission = permission;
+            AppointedBy = appointedBy;
         }
 
         public Result<Boolean> SetPermission(int method, Boolean active)

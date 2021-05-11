@@ -23,6 +23,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public InventoryManager()
         {
             Products = new ConcurrentDictionary<String, Product>();
+            createProducts();
+        }
+
+        public void createProducts()
+        {
+            AddNewProduct("p1", 10, 10, "test1", null);
+            AddNewProduct("p2", 20, 10, "test2", null);
+            AddNewProduct("p3", 30, 10, "test3", null);
+            AddNewProduct("p4", 40, 10, "test4", null);
         }
 
         public InventoryManager(ConcurrentDictionary<String, Product> products)
@@ -50,7 +59,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<Product> EditProduct(string productID, IDictionary<String, object> details)
         {
             if (Products.TryGetValue(productID, out Product toEdit))
-            {
+            {   
                 ObjectDictionaryMapper<Product>.SetPropertyValue(toEdit, details);
                 return new Result<Product>($"Succeded to edit product (ID: {productID}).\n", true, toEdit);
             }

@@ -1,8 +1,6 @@
 ﻿using Xunit;
 using System;
-using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
-using System.Collections.Concurrent;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
 {
