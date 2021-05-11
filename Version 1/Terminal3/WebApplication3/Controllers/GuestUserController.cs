@@ -137,7 +137,7 @@ namespace Terminal3WebAPI.Controllers
         public IActionResult AddProductToCart([FromBody] ProductToCart productToCart)
         {
             Result < Boolean > result = system.AddProductToCart(productToCart.userID, productToCart.ProductID, productToCart.ProductQuantity, productToCart.StoreID);
-            if (result.ExecStatus) { return Created($"GetUserShoppingCart/{productToCart.userID}",null); }
+            if (result.ExecStatus) { return Ok(result.Data); }
             else { return BadRequest(result.Message); } 
         }
 

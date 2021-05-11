@@ -1,35 +1,50 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Typography, Button, Divider } from '@material-ui/core';
-import { Elements, CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
+
+import CreditCardInput from 'react-credit-card-input';
 
 import Review from './Review'
+import { Purchase } from '../../api/API';
 
-// TODO: Fix payment to work without stripe
-//       Figure what to do after pressing "Pay"
-const stripePromise = loadStripe('...');
+const PaymentForm = ({ userID, shippingData, checkoutToken, nextStep, backStep }) => {
+    const [cardNumber, setCardNumber] = useState('');
+    const [expiry, setExpiry] = useState('');
+    const [cvc, setCvc] = useState('');
 
-const PaymentForm = ({ shippingData, checkoutToken, nextStep, backStep }) => {
-    const handleSubmit = (event, elements, stripe) => {
+    const handleCardNumberChange = (data) => {
+        setCardNumber(data);
+    }
+
+    const handleExpiryChange = (data) => {
+        setExpiry(data);
+    }
+    
+    const handleCvcChange = (data) => {
+        setCvc(data);
+    }
+
+    const handleSubmit = (event) => {
         event.preventDefault();     // prevent website from refreshing after clicking
 
         const orderData = {
-            products: checkoutToken.products,
-            customer: { firstname: shippingData.firstName, lastname: shippingData.lastName, email: shippingData.email },
-            shipping: { 
-                street: shippingData.address1, 
+            // products: checkoutToken.products,
+            // customer: { firstname: shippingData.firstName, lastname: shippingData.lastName, email: shippingData.email },
+            userID: userID,
+            deliveryDetails: { 
+                address: shippingData.address, 
                 city: shippingData.city, 
                 zip: shippingData.zip,
-                country: shippingData.shippingCountry 
+                shippingCountry: shippingData.shippingCountry 
             },
-            payment: {
-                //TODO: how to get payment data in a new way
+            paymentDetails: {
+                cardNumber: cardNumber,
+                expiryDate: expiry,
+                cvc: cvc
             }
         }
 
-        // TODO: do something with data
-
-        nextStep();
+        Purchase(orderData).then(response => response.ok ?
+            response.json().then(result => result.execStatus ? nextStep() : console.log(result.message)) : console.log("NOT OK")).catch(err => console.log(err));
     }
 
     return (
@@ -37,22 +52,21 @@ const PaymentForm = ({ shippingData, checkoutToken, nextStep, backStep }) => {
             <Review checkoutToken={checkoutToken} />
             <Divider />
             <Typography variant="h6" gutterBottom style={{ margin: '20px 0' }}>Payment Method</Typography>
-            <Elements stripe={stripePromise}>
-                <ElementsConsumer>
-                    {({ elements, stripe }) => (
-                        <form onSubmit={(e) => handleSubmit(e, elements, stripe)}>
-                            <CardElement />
-                            <br /> <br />
-                            <div style={{ display: 'flex', justifyContent: 'space-between'}}>
-                                <Button variant="outlined" onClick={backStep}>Back</Button>
-                                <Button type="submit" variant="contained" disabled={!stripe} color="primary">
-                                    Pay {checkoutToken.totalPrice}₪
-                                </Button>
-                            </div>
-                        </form>
-                    )}
-                </ElementsConsumer>
-            </Elements>
+            <form onSubmit={(e) => handleSubmit(e)}>
+                <CreditCardInput
+                    cardNumberInputProps={{ value: cardNumber, onChange: ((e) => handleCardNumberChange(e.target.value)) }}
+                    cardExpiryInputProps={{ value: expiry, onChange: ((e) => handleExpiryChange(e.target.value)) }}
+                    cardCVCInputProps={{ value: cvc, onChange: ((e) => handleCvcChange(e.target.value)) }}
+                    fieldClassName="input"
+                />
+                <br /> <br />
+                <div style={{ display: 'flex', justifyContent: 'space-between'}}>
+                    <Button variant="outlined" onClick={backStep}>Back</Button>
+                    <Button type="submit" variant="contained" color="primary">
+                        Pay {checkoutToken.totalPrice}₪
+                    </Button>
+                </div>
+            </form>
         </>
     )
 }
