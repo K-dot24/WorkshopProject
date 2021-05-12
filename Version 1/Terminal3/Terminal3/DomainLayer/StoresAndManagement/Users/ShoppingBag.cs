@@ -75,15 +75,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<ShoppingBagService>("Shopping bag DAL object", true, new ShoppingBagService(Id , User.Id, Store.Id, products , TotalBagPrice));
         }
 
-        internal double GetTotalPrice()
+        internal double GetTotalPrice(String DiscountCode = "")
         {
-            double sum = 0;
-            foreach(Product product in Products.Keys)
-            {
-                sum = sum + (Store.PolicyManager.GetCurrentProductPrice(product, Products[product]));
-            }
-            TotalBagPrice = sum;
-            return sum;
+            return Store.PolicyManager.GetTotalBagPrice(this.Products, DiscountCode);
+        }
+
+        internal Result<bool> AdheresToPolicy()
+        {
+            return Store.PolicyManager.AdheresToPolicy(this.Products, this.User);
         }
     }
 }

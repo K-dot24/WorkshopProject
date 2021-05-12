@@ -11,7 +11,7 @@ namespace Terminal3.ExternalSystems
         {
             //bool[] bools = { true, false };
             //return bools[new Random().Next(0, 2)];
-            return true;
+            return paymentDetails.Count != 0;
         }
 
         public static void CancelTransaction(IDictionary<String, Object> paymentDetails)

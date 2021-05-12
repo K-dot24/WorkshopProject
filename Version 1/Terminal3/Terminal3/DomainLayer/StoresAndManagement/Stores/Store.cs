@@ -7,6 +7,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.ServiceLayer.ServiceObjects;
 using System.Threading;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -32,10 +33,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #endregion
 
         #region Policies Management
-        Result<Object> SetPurchasePolicyAtStore(IPurchasePolicy policy);
-        Result<Object> GetPurchasePolicyAtStore();
-        Result<Object> SetDiscountPolicyAtStore(IDiscountPolicy policy);
-        Result<Object> GetDiscountPolicyAtStore();
+        double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
+        Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
+        Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount);
+        Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount, String id);
+        Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id);
+        Result<Boolean> RemoveDiscountPolicy(String id);
+        Result<Boolean> RemoveDiscountCondition(String id);
+        Result<IDiscountPolicyData> GetPoliciesData();
+        Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
+        Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
+        Result<Boolean> RemovePurchasePolicy(string id);
         #endregion
 
         #region Information        
@@ -74,8 +82,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
             //TODO: Complete when policies done properly
             //Add default policies
-            PolicyManager.SetPurchasePolicy(Purchases.BuyNow, true);
-            PolicyManager.SetDiscountPolicy(Discounts.Visible, true);
         }
 
         //For Testing ONLY
@@ -95,8 +101,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
             //TODO: Complete when policies done properly
             //Add default policies
-            PolicyManager.SetPurchasePolicy(Purchases.BuyNow, true);
-            PolicyManager.SetDiscountPolicy(Discounts.Visible, true);
+            //PolicyManager.SetPurchasePolicy(Purchases.BuyNow, true);
+            //PolicyManager.SetDiscountPolicy(Discounts.Visible, true);
         }
 
         //TODO: Implement all functions
@@ -388,31 +394,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Dictionary<IStoreStaff, Permission>>("The given store staff does not have permission to see the stores staff members\n", false, null);
         }
 
-        public Result<object> SetPurchasePolicyAtStore(IPurchasePolicy policy)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<object> GetPurchasePolicyAtStore()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<object> SetDiscountPolicyAtStore(IDiscountPolicy policy)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<object> GetDiscountPolicyAtStore()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> RemoveProduct(Product product)
-        {
-            throw new NotImplementedException();
-        }
-
         public Result<History> GetStorePurchaseHistory(string userID,bool sysAdmin)
         {
             if(sysAdmin || CheckStoreManagerAndPermissions(userID, Methods.GetStorePurchaseHistory) || CheckIfStoreOwner(userID))
@@ -539,6 +520,61 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 per[i] = false;
             }
             return per;
+        }
+
+        public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
+        {
+            return PolicyManager.GetTotalBagPrice(products, discountCode);
+        }
+
+        public Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)
+        {
+            return PolicyManager.AdheresToPolicy(products, user);
+        }
+
+        public Result<bool> AddDiscountPolicy(IDiscountPolicy discount)
+        {
+            return PolicyManager.AddDiscountPolicy(discount);
+        }
+
+        public Result<bool> AddDiscountPolicy(IDiscountPolicy discount, string id)
+        {
+            return PolicyManager.AddDiscountPolicy(discount, id);
+        }
+
+        public Result<bool> AddDiscountCondition(IDiscountCondition condition, string id)
+        {
+            return PolicyManager.AddDiscountCondition(condition, id);
+        }
+
+        public Result<bool> RemoveDiscountPolicy(string id)
+        {
+            return PolicyManager.RemoveDiscountPolicy(id);
+        }
+
+        public Result<bool> RemoveDiscountCondition(string id)
+        {
+            return PolicyManager.RemoveDiscountCondition(id);
+        }
+
+        public Result<IDiscountPolicyData> GetPoliciesData()
+        {
+            return PolicyManager.GetData();
+        }
+
+        public Result<bool> AddPurchasePolicy(IPurchasePolicy policy)
+        {
+            return PolicyManager.AddPurchasePolicy(policy);
+        }
+
+        public Result<bool> AddPurchasePolicy(IPurchasePolicy policy, string id)
+        {
+            return PolicyManager.AddPurchasePolicy(policy, id);
+        }
+
+        public Result<bool> RemovePurchasePolicy(string id)
+        {
+            return PolicyManager.RemovePurchasePolicy(id);
         }
     }
 }

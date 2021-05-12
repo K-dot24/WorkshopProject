@@ -105,31 +105,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<ShoppingCart>("Notice - The store is out of stock\n", false, null);   // TODO - do we want to reduce the products from the bag (i think not) and do we want to inform which of the products are out of stock ?
             }
 
-            Double amount = ShoppingCart.GetTotalShoppingCartPrice();
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails);
+            if(result.Data != null)
+                ShoppingCart = new ShoppingCart();              // create new shopping cart for user
 
-            bool paymentSuccess = PaymentSystem.Pay(amount, paymentDetails);
-
-            if (!paymentSuccess)
-            {
-                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in payment details\n", false, null);
-
-            }
-            
-            bool deliverySuccess = DeliverySystem.Deliver(deliveryDetails);
-            if (!deliverySuccess)
-            {
-                PaymentSystem.CancelTransaction(paymentDetails);
-                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in delivery details\n", false, null);
-            }            
-
-            ShoppingCart copy = new ShoppingCart(ShoppingCart);
-            ShoppingCart = new ShoppingCart();              // create new shopping cart for user
-
-            return new Result<ShoppingCart>("Users purchased shopping cart\n", true, copy);
+            return result;
         }
-
-
-        
+     
         private Boolean isValidCartQuantity()
         {
             ConcurrentDictionary<String, ShoppingBag> ShoppingBags = ShoppingCart.ShoppingBags;
@@ -148,7 +130,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
             return true;
         }
-
 
         public Result<UserService> GetDAL()
         {
