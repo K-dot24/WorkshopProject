@@ -91,7 +91,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
         public Result<IPurchasePolicyData> GetData()
         {
-            return new Result<IPurchasePolicyData>("", true, new ConditionalPolicyData(PreCond.GetData().Data, Cond.GetData().Data, Id));
+            IPurchasePolicyData pre = null;
+            IPurchasePolicyData cond = null;
+            if (PreCond != null)
+                pre = PreCond.GetData().Data;
+            if (Cond != null)
+                cond = Cond.GetData().Data;
+            return new Result<IPurchasePolicyData>("", true, new ConditionalPolicyData(pre, cond, Id));
         }
     }
 }
