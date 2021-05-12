@@ -39,5 +39,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         {
             return new Result<IPurchasePolicyData>("", true, new MinAgePolicyData(Age, Id));
         }
+
+        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
+        {
+            return new Result<bool>("", true, false);
+        }
     }
 }

@@ -4,7 +4,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
-    public class BuyNow : IPurchasePolicy
+    public class BuyNow : IPurchasePolicyType
     {
 
         public AndPolicy Policy { get; set; }
@@ -43,6 +43,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         public Result<IPurchasePolicyData> GetData()
         {
             return new Result<IPurchasePolicyData>("", true, new BuyNowData((AndPolicyData)Policy.GetData().Data, Id));
+        }
+
+        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
+        {
+            if(Id.Equals(id))
+                return new Result<bool>("Can't edit the main purchase type", false, false);
+            if (Policy.Id.Equals(id))            
+                return new Result<bool>("Can't edit the main 'And node'", false, false);            
+            return Policy.EditPolicy(policy, id);
         }
     }
 }

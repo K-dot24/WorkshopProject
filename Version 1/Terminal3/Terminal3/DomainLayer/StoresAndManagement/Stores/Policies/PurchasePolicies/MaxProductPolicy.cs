@@ -44,5 +44,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         {
             return new Result<IPurchasePolicyData>("", true, new MaxProductPolicyData(Product.GetDAL().Data, Max, Id));
         }
+
+        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
+        {
+            return new Result<bool>("", true, false);
+        }
     }
 }

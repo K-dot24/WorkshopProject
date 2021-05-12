@@ -99,5 +99,32 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 cond = Cond.GetData().Data;
             return new Result<IPurchasePolicyData>("", true, new ConditionalPolicyData(pre, cond, Id));
         }
+
+        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
+        {
+            if(PreCond != null)
+            {
+                if (PreCond.Id.Equals(id))
+                {
+                    PreCond = policy;
+                    return new Result<bool>("", true, true);
+                }
+                Result<bool> res = PreCond.EditPolicy(policy, id);
+                if (res.Data)
+                    return res;
+            }
+            if (Cond != null)
+            {
+                if (Cond.Id.Equals(id))
+                {
+                    Cond = policy;
+                    return new Result<bool>("", true, true);
+                }
+                Result<bool> res = Cond.EditPolicy(policy, id);
+                if (res.Data)
+                    return res;
+            }                        
+            return new Result<bool>("", true, false);
+        }
     }
 }

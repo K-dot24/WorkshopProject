@@ -4,7 +4,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
-    public class Auction : IPurchasePolicy
+    public class Auction : IPurchasePolicyType
     {
         //TODO: Complete properly
 
@@ -42,6 +42,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         }
 
         public Result<IPurchasePolicyData> GetData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
         {
             throw new NotImplementedException();
         }

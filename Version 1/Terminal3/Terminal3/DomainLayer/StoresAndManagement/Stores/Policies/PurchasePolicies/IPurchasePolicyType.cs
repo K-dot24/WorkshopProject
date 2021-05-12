@@ -3,7 +3,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
-    public interface IPurchasePolicy
+    public interface IPurchasePolicyType
     {
         string Id { get; }
         Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user);

@@ -82,5 +82,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             }
             return new Result<IPurchasePolicyData>("",true, new AndPolicyData(dataPolicies, Id));
         }
+
+        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
+        {
+            if (Policies.RemoveAll(p => p.Id.Equals(id)) >= 1)
+            {
+                Policies.Add(policy);
+                return new Result<bool>("", true, true);
+            }
+
+            foreach (IPurchasePolicy p in Policies)
+            {
+                Result<bool> res = p.EditPolicy(policy, id);                
+                if (res.Data)
+                    return res;
+            }
+            return new Result<bool>("", true, false);
+        }
     }
 }
