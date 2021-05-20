@@ -22,6 +22,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             StoreOwners = new LinkedList<StoreOwner>();
         }
 
+        public StoreOwner(RegisteredUser user, Store store, IStoreStaff appointedBy, LinkedList<StoreManager> storeManagers, LinkedList<StoreOwner> storeOwners) 
+        {
+            User = user;
+            Store = store;
+            AppointedBy = appointedBy;
+            StoreManagers = storeManagers;
+            StoreOwners = storeOwners;
+        }
+
         public Result<object> GetDAL()
         {           
             LinkedList<String> storeOwners = new LinkedList<String>();

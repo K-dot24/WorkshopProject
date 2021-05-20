@@ -84,6 +84,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //Add default policies
         }
 
+        public Store(string id, string name, StoreOwner founder, ConcurrentDictionary<string, StoreOwner> owners, ConcurrentDictionary<string, StoreManager> managers, InventoryManager inventoryManager, History history, double rating, int numberOfRates, NotificationManager notificationManager)
+        {
+            Id = id;
+            Name = name;
+            Founder = founder;
+            Owners = owners;
+            Managers = managers;
+            InventoryManager = inventoryManager;
+            //PolicyManager = policyManager;     TODO
+            History = history;
+            Rating = rating;
+            NumberOfRates = numberOfRates;
+            NotificationManager = notificationManager;
+        }
+
+
+
+
         //For Testing ONLY
         public Store(string id, String name, RegisteredUser founder)
         {

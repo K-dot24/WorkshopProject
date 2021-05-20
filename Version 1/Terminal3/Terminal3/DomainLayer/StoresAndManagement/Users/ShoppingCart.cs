@@ -20,6 +20,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             TotalCartPrice = 0;
         }
 
+        // For loading from database
+        public ShoppingCart( String id , ConcurrentDictionary<String, ShoppingBag> shoppingBags , Double totalCartPrice)
+        {
+            Id = id;
+            ShoppingBags =shoppingBags;
+            TotalCartPrice = totalCartPrice;
+        }
+
         public ShoppingCart(ShoppingCart original)
         {
             Id = original.Id;
@@ -83,20 +91,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             Double amount = GetTotalShoppingCartPrice().Data;
 
-            bool paymentSuccess = PaymentSystem.Pay(amount, paymentDetails);
+            //bool paymentSuccess = PaymentSystem.Pay(amount, paymentDetails);
 
-            if (!paymentSuccess)
-            {
-                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in payment details\n", true, null);
+            //if (!paymentSuccess)
+            //{
+            //    return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in payment details\n", true, null);
 
-            }
+            //}
 
-            bool deliverySuccess = DeliverySystem.Deliver(deliveryDetails);
-            if (!deliverySuccess)
-            {
-                PaymentSystem.CancelTransaction(paymentDetails);
-                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details\n", true, null);
-            }
+            //bool deliverySuccess = DeliverySystem.Deliver(deliveryDetails);
+            //if (!deliverySuccess)
+            //{
+            //    PaymentSystem.CancelTransaction(paymentDetails);
+            //    return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details\n", true, null);
+            //}
             ShoppingCart copy = new ShoppingCart(this);
             return new Result<ShoppingCart>("", true, copy);
         }
