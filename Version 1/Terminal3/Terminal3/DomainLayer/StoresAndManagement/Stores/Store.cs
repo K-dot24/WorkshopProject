@@ -55,9 +55,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     {
         public String Id { get; }
         public String Name { get; }
-        public StoreOwner Founder { get; }
-        public ConcurrentDictionary<String, StoreOwner> Owners { get; }
-        public ConcurrentDictionary<String, StoreManager> Managers { get; }
+        public StoreOwner Founder { get; set; }
+        public ConcurrentDictionary<String, StoreOwner> Owners { get; set; }
+        public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; }
         public History History { get; }
@@ -99,6 +99,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             NotificationManager = notificationManager;
         }
 
+        public Store(string id, string name, InventoryManager inventoryManager, History history, double rating, int numberOfRates, NotificationManager notificationManager)
+        {
+            Id = id;
+            Name = name;            
+            InventoryManager = inventoryManager;
+            //PolicyManager = policyManager;     TODO
+            History = history;
+            Rating = rating;
+            NumberOfRates = numberOfRates;
+            NotificationManager = notificationManager;
+        }
 
 
 
@@ -110,7 +121,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Founder = new StoreOwner(founder, this, null);
             Owners = new ConcurrentDictionary<String, StoreOwner>();
             Managers = new ConcurrentDictionary<String, StoreManager>();
-            InventoryManager = new InventoryManager();
+            InventoryManager = new InventoryManager(new ConcurrentDictionary<string, Product>());
             PolicyManager = new PolicyManager();
             History = new History();
 

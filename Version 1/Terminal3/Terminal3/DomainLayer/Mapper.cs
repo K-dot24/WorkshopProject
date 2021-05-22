@@ -319,7 +319,7 @@ namespace Terminal3.DataAccessLayer
 
             var user_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.UserId);
             var store_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.StoreId);
-            var owner_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.AppointedBy);
+            var owner_filter = Builders<BsonDocument>.Filter.Eq("UserId", dto.AppointedBy)& Builders<BsonDocument>.Filter.Eq("StoreId", dto.StoreId);
 
             sm = new StoreManager(LoadRegisteredUser(user_filter), LoadStore(store_filter), new Permission(dto.Permission), LoadStoreOwner(owner_filter));
 
@@ -405,19 +405,19 @@ namespace Terminal3.DataAccessLayer
 
             var user_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.UserId);
             var store_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.StoreId);
-            var owner_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.AppointedBy);
+            var owner_filter = Builders<BsonDocument>.Filter.Eq("UserId", dto.AppointedBy) & Builders<BsonDocument>.Filter.Eq("StoreId", dto.StoreId);            
 
             LinkedList<StoreOwner> owners = new LinkedList<StoreOwner>();
             LinkedList<StoreManager> managers = new LinkedList<StoreManager>();
 
             foreach (String owner in dto.StoreOwners)
             {
-                var filter1 = Builders<BsonDocument>.Filter.Eq("_id", owner);
+                var filter1 = Builders<BsonDocument>.Filter.Eq("UserId", owner) & Builders<BsonDocument>.Filter.Eq("StoreId", dto.StoreId);
                 owners.AddLast(LoadStoreOwner(filter1));
             }
             foreach (String manager in dto.StoreManagers)
             {
-                var filter2 = Builders<BsonDocument>.Filter.Eq("_id", manager);
+                var filter2 = Builders<BsonDocument>.Filter.Eq("UserId", manager) & Builders<BsonDocument>.Filter.Eq("StoreId", dto.StoreId);
                 managers.AddLast(LoadStoreManager(filter2)); 
             }
 
@@ -426,6 +426,8 @@ namespace Terminal3.DataAccessLayer
             list.AddLast(so);
             if (!listExists)  { StoreOwners.TryAdd(so.GetId(), list); }
             // else added to list pointer
+
+            //TODO - inject owners and managers
 
             return so;
         }
@@ -524,7 +526,7 @@ namespace Terminal3.DataAccessLayer
             DTO_Store dto = DAO_Store.Load(filter);
             if (Stores.TryGetValue(dto._id, out s)) { return s; }
 
-            var founder_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Founder);
+            var founder_filter = Builders<BsonDocument>.Filter.Eq("UserId", dto.Founder)&Builders<BsonDocument>.Filter.Eq("StoreId", dto._id);
 
             ConcurrentDictionary<String, StoreOwner> owners = new ConcurrentDictionary<String, StoreOwner>();
             ConcurrentDictionary<String, StoreManager> managers = new ConcurrentDictionary<String, StoreManager>();
@@ -532,12 +534,12 @@ namespace Terminal3.DataAccessLayer
 
             foreach (String owner in dto.Owners)
             {
-                var filter1 = Builders<BsonDocument>.Filter.Eq("_id", owner);
+                var filter1 = Builders<BsonDocument>.Filter.Eq("UserId", owner) & Builders<BsonDocument>.Filter.Eq("StoreId", dto._id);
                 owners.TryAdd(owner , LoadStoreOwner(filter1));
             }
             foreach (String manager in dto.Managers)
             {
-                var filter2 = Builders<BsonDocument>.Filter.Eq("_id", manager);
+                var filter2 = Builders<BsonDocument>.Filter.Eq("UserId", manager) & Builders<BsonDocument>.Filter.Eq("StoreId", dto._id);
                 managers.TryAdd(manager , LoadStoreManager(filter2));
             }
 
@@ -556,6 +558,34 @@ namespace Terminal3.DataAccessLayer
             s = new Store(dto._id, dto.Name, LoadStoreOwner(founder_filter), owners, managers, inventory, ToObject(dto.History), dto.Rating, dto.NumberOfRates , notificationManager);                            
 
             Stores.TryAdd(s.Id, s);
+
+            // TODO - inject owners and managers
+
+            return s;
+        }
+
+        private Store LoadStore_Partial(FilterDefinition<BsonDocument> filter)
+        {
+            Store s;
+            DTO_Store dto = DAO_Store.Load(filter);
+            if (Stores.TryGetValue(dto._id, out s)) { return s; }            
+
+            ConcurrentDictionary<String, Product> products = new ConcurrentDictionary<String, Product>();
+            NotificationManager notificationManager = new NotificationManager();
+
+            foreach (String product in dto.InventoryManager)
+            {
+                var filter3 = Builders<BsonDocument>.Filter.Eq("_id", product);
+                Product p = LoadProduct(filter3);
+                p.NotificationManager = notificationManager;
+                products.TryAdd(product, p);
+            }
+
+            s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager);
+
+            Stores.TryAdd(s.Id, s);
+
+            // inject owners and managers from calling object
 
             return s;
         }

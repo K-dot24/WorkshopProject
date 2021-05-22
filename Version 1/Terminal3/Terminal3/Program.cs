@@ -17,20 +17,37 @@ namespace Terminal3
     {        
         static void Main(string[] args)
         {
-            RegisteredUser zoe = new RegisteredUser("zoe.ellins@gmail.com", "password");
-            Mapper.getInstance().Create(zoe);
-            RegisteredUser shmar = new RegisteredUser("shmar@gmail.com", "shmar");
-            Mapper.getInstance().Create(shmar);
+            //RegisteredUser zoe = new RegisteredUser("zoe.ellins@gmail.com", "password");
+            //Mapper.getInstance().Create(zoe);
+            //RegisteredUser shmar = new RegisteredUser("shmar@gmail.com", "shmar");
+            //Mapper.getInstance().Create(shmar);
 
-            Store store = new Store("TestStore", zoe);
-            Mapper.getInstance().Create(store.Founder);
+            //Store store = new Store("TestStore", zoe);
+            //Mapper.getInstance().Create(store);
+            //Mapper.getInstance().Create(store.Founder);
 
-            StoreManager manager = new StoreManager(shmar, store, new Permission(), store.Founder);
-            Mapper.getInstance().Create(manager);
-            var filter2 = Builders<BsonDocument>.Filter.Eq("_id", store.Founder.GetId());
-            var update = Builders<BsonDocument>.Update.Set("StoreManagers", Mapper.getInstance().Get_DTO_ManagerList(store.Founder.StoreManagers));
-            Mapper.getInstance().UpdateRegisteredUser(filter2, update);
+            //StoreManager manager = new StoreManager(shmar, store, new Permission(), store.Founder);
+            //Mapper.getInstance().Create(manager);
+            //store.Founder.StoreManagers.AddLast(manager);
+            //var filter2 = Builders<BsonDocument>.Filter.Eq("UserId", store.Founder.GetId()) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Founder.Store.Id); ;
+            //var update = Builders<BsonDocument>.Update.Set("StoreManagers", Mapper.getInstance().Get_DTO_ManagerList(store.Founder.StoreManagers));
+            //Mapper.getInstance().UpdateStoreOwner(filter2, update);
 
+            //var m_filter = Builders<BsonDocument>.Filter.Eq("UserId", manager.GetId())& Builders<BsonDocument>.Filter.Eq("StoreId", manager.Store.Id);
+            //var o_filter = Builders<BsonDocument>.Filter.Eq("UserId", store.Founder.GetId()) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Founder.Store.Id);
+            //var z_filter = Builders<BsonDocument>.Filter.Eq("_id", zoe.Id);
+            //var s_filter = Builders<BsonDocument>.Filter.Eq("_id", shmar.Id);
+
+            var m_filter = Builders<BsonDocument>.Filter.Eq("UserId", "981567a26c224326a696d8f92aacc914") & Builders<BsonDocument>.Filter.Eq("StoreId", "c8fd8b4fade94c7c8aa8ba02e2b4a290");
+            var o_filter = Builders<BsonDocument>.Filter.Eq("UserId", "4d43053d5b7f4f5c936dd24df5b0bac8") & Builders<BsonDocument>.Filter.Eq("StoreId", "c8fd8b4fade94c7c8aa8ba02e2b4a290");
+            var z_filter = Builders<BsonDocument>.Filter.Eq("_id", "4d43053d5b7f4f5c936dd24df5b0bac8");
+            var s_filter = Builders<BsonDocument>.Filter.Eq("_id", "981567a26c224326a696d8f92aacc914");
+
+
+            StoreManager load_manager = Mapper.getInstance().LoadStoreManager(m_filter);
+            StoreOwner load_owner = Mapper.getInstance().LoadStoreOwner(o_filter);
+            RegisteredUser load_zoe = Mapper.getInstance().LoadRegisteredUser(z_filter);
+            RegisteredUser load_shmar = Mapper.getInstance().LoadRegisteredUser(s_filter);
 
             //Product product = new Product("Banana", 19.9, 10, "Fruit");
             //Mapper.getInstance().Create(product);

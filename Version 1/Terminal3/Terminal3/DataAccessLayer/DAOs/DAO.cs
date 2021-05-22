@@ -1,13 +1,7 @@
 ﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
-using Terminal3.DataAccessLayer.DTOs;
-using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DataAccessLayer.DAOs
 {
@@ -38,8 +32,11 @@ namespace Terminal3.DataAccessLayer.DAOs
 
         public T Load(FilterDefinition<BsonDocument> filter)
         {
-            var Document = collection.Find(filter).FirstOrDefault();
-            T dto = JsonConvert.DeserializeObject<T>(Document.ToJson());
+            var Document = collection.Find(filter).FirstOrDefault();                         
+            var json = Document.ToJson();
+            if(json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{"+ json.Substring(47);  }
+            Console.WriteLine(json);
+            T dto = JsonConvert.DeserializeObject<T>(json);
             return dto;
         }
 

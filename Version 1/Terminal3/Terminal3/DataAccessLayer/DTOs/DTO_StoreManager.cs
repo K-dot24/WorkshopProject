@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Terminal3.DataAccessLayer.DTOs
 {
+    [BsonIgnoreExtraElements]
     public class DTO_StoreManager
     {
         [BsonElement]
