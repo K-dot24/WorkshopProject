@@ -436,7 +436,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             // TODO - lock products ?
             Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails);
-            if (res.ExecStatus)
+            if (res.Data != null)
             {
                 ShoppingCart purchasedCart = res.Data;
                 ConcurrentDictionary<String, ShoppingBag> purchasedBags = purchasedCart.ShoppingBags;
@@ -448,7 +448,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 }
                 return new Result<ShoppingCartService>(res.Message, true, res.Data.GetDAL().Data);
             }
-            //else faild
+
+            //else failed
             return new Result<ShoppingCartService>(res.Message, false, null);
         }
        
