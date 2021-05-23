@@ -83,21 +83,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //TODO: Complete when policies done properly
             //Add default policies
         }
-
-        public Store(string id, string name, StoreOwner founder, ConcurrentDictionary<string, StoreOwner> owners, ConcurrentDictionary<string, StoreManager> managers, InventoryManager inventoryManager, History history, double rating, int numberOfRates, NotificationManager notificationManager)
-        {
-            Id = id;
-            Name = name;
-            Founder = founder;
-            Owners = owners;
-            Managers = managers;
-            InventoryManager = inventoryManager;
-            //PolicyManager = policyManager;     TODO
-            History = history;
-            Rating = rating;
-            NumberOfRates = numberOfRates;
-            NotificationManager = notificationManager;
-        }
+       
 
         public Store(string id, string name, InventoryManager inventoryManager, History history, double rating, int numberOfRates, NotificationManager notificationManager)
         {
@@ -109,6 +95,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Rating = rating;
             NumberOfRates = numberOfRates;
             NotificationManager = notificationManager;
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
         }
 
 
