@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
@@ -311,15 +313,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             Boolean result = true;
             ICollection<String> properties = searchAttributes.Keys;
+            IDictionary<String, Object> lowerCaseDict = searchAttributes.ToDictionary(k => k.Key.ToLower(), k => k.Value);
+
             foreach (string property in properties)
             {
-                var value = searchAttributes[property];
+                JsonElement jsonElement = (JsonElement)lowerCaseDict[property.ToLower()];
+                Object value=null;
+
                 switch (property.ToLower())
                 {
                     case "name":
-                        if (!store.Name.ToLower().Contains(((string)value).ToLower())) { result = false; }
+                        value = jsonElement.GetString().ToLower();
+                        if (!store.Name.ToLower().Contains((String)value)) { result = false; }
                         break;
                     case "rating":
+                        value = jsonElement.GetDouble();
                         if (store.Rating < (Double)value) { result = false; }
                         break;
                 }
