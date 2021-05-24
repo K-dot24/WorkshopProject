@@ -3,13 +3,14 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // 
 
 import { Products, Navbar, Cart, Action, CheckboxList } from '../../../../components';
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
-        AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions } from '../../../../api/API';
+        AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct } from '../../../../api/API';
 
 
 
 const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     const [products, setProducts] = useState([]);
     const [bag, setBag] = useState({products: [], totalPrice: 0});
+    const [searchQuery, setsearchQuery] = useState('');
 
     const fetchProducts = async () => {
         GetAllProductByStoreIDToDisplay(store.id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
@@ -137,6 +138,25 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     //#endregion
 
+    // TODO: SearchStore- fix API and check
+    const searchProductsByQuery = async () => {
+        const query = {Name: searchQuery};
+        console.log(query);
+        SearchProduct(query).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+    }
+
+    const handleProductSearch = async (query) => {
+        setsearchQuery(query);
+    }
+
+    useEffect(() => {
+        // TODO: Check after API works
+        if (searchQuery !== '')
+            searchProductsByQuery();
+        // else
+        //     fetchStores();
+    }, [searchQuery]);
+
     useEffect(() => {
         fetchProducts();
         console.log("store id: " + store.id);
@@ -144,7 +164,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     return (
         <div>
-            <Navbar storeId={store.id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} />
+            <Navbar storeId={store.id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} handleSearch={handleProductSearch} />
             <Switch>
                 <Route exact path={match.url}>
                     <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} />

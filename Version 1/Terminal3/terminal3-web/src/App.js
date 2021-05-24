@@ -25,6 +25,7 @@ const App = () => {
     // states
     const [user, setUser] = useState({id: -1, email: '', loggedIn: false});
     const [cart, setCart] = useState({id: 0, products: [], totalPrice: 0});
+    const [storeSearchQuery, setStoreSearchQuery] = useState('');
 
     // SignalR
     const [connection, setConnection] = useState(null);
@@ -145,6 +146,10 @@ const App = () => {
     }
     //#endregion
 
+    const handleStoreSearch = async (query) => {
+        setStoreSearchQuery(query);
+    }
+
     //#region Signal-R Functionality
     
     //method can be 'Login' | 'Logout'
@@ -234,7 +239,7 @@ const App = () => {
         <MuiThemeProvider theme={theme}>
             <Router>
                 <div>
-                    <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} />
+                    <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} handleSearch={handleStoreSearch} />
                     <Switch>
 
                         <Route exact path="/cart">
@@ -268,7 +273,7 @@ const App = () => {
                         ) } */}
                         
                         
-                        <Route path="/" render={(props) => (<Stores user={user} handleAddToCart={handleAddToCart} handleLogOut={handleLogOut} {...props} />)} />
+                        <Route path="/" render={(props) => (<Stores user={user} searchQuery={storeSearchQuery} handleAddToCart={handleAddToCart} handleLogOut={handleLogOut} {...props} />)} />
 
                         
                     </Switch>

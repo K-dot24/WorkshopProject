@@ -109,12 +109,12 @@ export function Register( data ) {
 /// NOTE: fields are optionals
 export function SearchStore( search_by ) {    //TODO - search by other params
     return fetch(`https://localhost:5000/api/GuestUser/SearchStore`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { search_by },    
+        body: JSON.stringify(search_by),    
     })
 }
 
@@ -132,12 +132,12 @@ export function SearchStore( search_by ) {    //TODO - search by other params
 /// NOTE: fields are optionals
 export function SearchProduct( search_by ) {    //TODO - search by other params
     return fetch(`https://localhost:5000/api/GuestUser/SearchProduct`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { search_by },    
+        body: JSON.stringify(search_by),    
     })
 }
 
