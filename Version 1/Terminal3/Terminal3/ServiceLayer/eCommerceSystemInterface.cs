@@ -35,36 +35,10 @@ namespace Terminal3.ServiceLayer
         //Constructor
         public ECommerceSystem()
         {
-            StoresAndManagement = new StoresAndManagementInterface();
-            GuestUserInterface = new GuestUserController(StoresAndManagement);
-            RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
-            StoreStaffInterface = new StoreStaffController(StoresAndManagement);
-            SystemAdminInterface = new SystemAdminController(StoresAndManagement);
-            DataController = new DataController(StoresAndManagement);
 
-            //Setting up SignalR connection
-
-            //HubConnection SignalRClient = new HubConnection("http://localhost:8080/signalr");
-            //hubProxy = SignalRClient.CreateHubProxy("NotificationHub");
-            //SignalRClient.Start();
-            //while (!(SignalRClient.State == ConnectionState.Connected)) {}
-
-
-            //NotificationService = NotificationService.GetInstance();
-            //NotificationService.hubProxy = hubProxy;
-            string url = "https://localhost:4001/signalr/notification";
-            connection = new HubConnectionBuilder()
-               .WithUrl(url)
-               .WithAutomaticReconnect()
-               .Build();
-            connection.StartAsync();
-            while (connection.State != HubConnectionState.Connected) { }
-            NotificationService = NotificationService.GetInstance();
-            NotificationService.connection = connection;
-
-
-
-
+            Initializer.init(StoresAndManagement, GuestUserInterface, RegisteredUserInterface, StoreStaffInterface,
+                SystemAdminInterface, DataController, NotificationService, this.connection);
+            
         }
 
         public void DisplaySystem()
