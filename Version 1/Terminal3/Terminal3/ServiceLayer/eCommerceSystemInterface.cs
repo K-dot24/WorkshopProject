@@ -10,6 +10,9 @@ using XUnitTestTerminal3.AcceptanceTests.Utils;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Microsoft.AspNetCore.SignalR.Client;
 using signalRgateway.Models;
+using Newtonsoft.Json;
+using Terminal3.DataAccessLayer;
+using System.IO;
 
 namespace Terminal3.ServiceLayer
 {   
@@ -22,7 +25,7 @@ namespace Terminal3.ServiceLayer
     public class ECommerceSystem : IECommerceSystem
     {
         //Properties
-        public StoresAndManagementInterface StoresAndManagement  { get;set;}
+        public StoresAndManagementInterface StoresAndManagement { get; set; }
         public IGuestUserInterface GuestUserInterface { get; set; }
         public IRegisteredUserInterface RegisteredUserInterface { get; set; }
         public IStoreStaffInterface StoreStaffInterface { get; set;  }
@@ -36,9 +39,34 @@ namespace Terminal3.ServiceLayer
         public ECommerceSystem()
         {
 
-            Initializer.init(StoresAndManagement, GuestUserInterface, RegisteredUserInterface, StoreStaffInterface,
-                SystemAdminInterface, DataController, NotificationService, this.connection);
-            
+            /*Initializer.init(StoresAndManagement,
+                            GuestUserInterface,
+                            RegisteredUserInterface,
+                            StoreStaffInterface,
+                            SystemAdminInterface, 
+                            DataController, 
+                            NotificationService, this.connection);*/
+
+            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(@"..\Terminal3\Config.json"));
+            Mapper.getInstance(config.mongoDB_url);
+
+            StoresAndManagement = new StoresAndManagementInterface(config.email, config.password);
+            GuestUserInterface = new GuestUserController(StoresAndManagement);
+            RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
+            StoreStaffInterface = new StoreStaffController(StoresAndManagement);
+            SystemAdminInterface = new SystemAdminController(StoresAndManagement);
+            DataController = new DataController(StoresAndManagement);
+
+            string url = config.signalRServer_url;
+            connection = new HubConnectionBuilder()
+               .WithUrl(url)
+               .WithAutomaticReconnect()
+               .Build();
+            connection.StartAsync();
+            while (connection.State != HubConnectionState.Connected) { }
+            NotificationService = NotificationService.GetInstance();
+            NotificationService.connection = connection;
+
         }
 
         public void DisplaySystem()

@@ -18,11 +18,15 @@ namespace Terminal3.ServiceLayer
 
         public Initializer() { }
         public static void init(StoresAndManagementInterface StoresAndManagement,
-             IGuestUserInterface GuestUserInterface, IRegisteredUserInterface RegisteredUserInterface,
-            IStoreStaffInterface StoreStaffInterface, SystemAdminController SystemAdminInterface , 
-            IDataController DataController , NotificationService NotificationService, HubConnection connection)
+             IGuestUserInterface GuestUserInterface, 
+             IRegisteredUserInterface RegisteredUserInterface,
+            IStoreStaffInterface StoreStaffInterface,
+            SystemAdminController SystemAdminInterface , 
+            IDataController DataController ,
+            NotificationService NotificationService, 
+            HubConnection connection)
         {
-            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(@"Config.json"));
+            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(@"..\Terminal3\Config.json"));
             Mapper.getInstance(config.mongoDB_url);
 
             StoresAndManagement = new StoresAndManagementInterface(config.email, config.password);

@@ -1,29 +1,28 @@
 {
-  "Functions": [
+  "story": [
     {
-      "Function": "Register",
-      "Args": [ "u2", "u2", "2" ]
+      "function": "Register",
+      "args": [ "u2", "u2", "2" ]
     },
     {
-      "Function": "Register",
-      "Args": [ "u3", "u3", "3" ]
+      "function": "Register",
+      "args": [ "u3", "u3", "3" ]
     },
     {
-      "Function": "Login",
-      "Args": [ "u2", "u2" ]
+      "function": "Login",
+      "args": [ "u2", "u2" ]
     },
     {
-      "Function": "OpenNewStore",
-      "Args": [ "s1", "2", "1" ]
+      "function": "OpenNewStore",
+      "args": [ "s1", "2", "1" ]
     },
     {
-      "Function": "AddProductToStore",
-      "Args": [ "2", "1", "Bamba", "30.0", "20", "Snacks" ]
+      "function": "AddProductToStore",
+      "args": [ "2", "1", "Bamba", "30.0", "20", "Snacks" ]
     },
     {
-      "Function": "AddStoreManager",
-      "Args": [ "3", "2", "1" ]
+      "function": "AddStoreManager",
+      "args": [ "3", "2", "1" ]
     }
   ]
-
 }
