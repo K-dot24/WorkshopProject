@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using System;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DataAccessLayer.DAOs
 {
@@ -35,10 +36,24 @@ namespace Terminal3.DataAccessLayer.DAOs
             var Document = collection.Find(filter).FirstOrDefault();                         
             var json = Document.ToJson();
             if(json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{"+ json.Substring(47);  }
-            Console.WriteLine(json);
             T dto = JsonConvert.DeserializeObject<T>(json);
             return dto;
         }
+
+        //public T LoadComplexPolicies(FilterDefinition<BsonDocument> filter)
+        //{
+        //    var Document = collection.Find(filter).FirstOrDefault();
+        //    var Policies = Document.GetValue("Policies");
+        //    var type = Policies[0]["_t"];
+
+        //    DTO_AndPolicy and_dto = new DTO_AndPolicy(Document["_id"]);
+        //    and_dto.Policies.Add()
+
+        //    Document.Remove("Policies");
+        //    var json = Document.ToJson();
+        //    T dto = JsonConvert.DeserializeObject<T>(json);
+        //    return dto;
+        //}
 
         public void Update(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
         {

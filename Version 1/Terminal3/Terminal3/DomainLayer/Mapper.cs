@@ -11,8 +11,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.ServiceLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
-
-
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -30,6 +29,17 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_StoreManager> DAO_StoreManager;
         public DAO<DTO_StoreOwner> DAO_StoreOwner;
         public DAO<DTO_Store> DAO_Store;
+        public DAO<DTO_Auction> DAO_Auction;
+        public DAO<DTO_Lottery> DAO_Lottery;
+        public DAO<DTO_MaxProductPolicy> DAO_MaxProductPolicy;
+        public DAO<DTO_MinAgePolicy> DAO_MinAgePolicy;
+        public DAO<DTO_MinProductPolicy> DAO_MinProductPolicy;
+        public DAO<DTO_Offer> DAO_Offer;
+        public DAO<DTO_RestrictedHoursPolicy> DAO_RestrictedHoursPolicy;
+        public DAO<DTO_AndPolicy> DAO_AndPolicy;
+        public DAO<DTO_OrPolicy> DAO_OrPolicy;
+        public DAO<DTO_BuyNow> DAO_BuyNow;
+        public DAO<DTO_ConditionalPolicy> DAO_ConditionalPolicy;
 
         // IdentityMaps  <Id , object>
         public ConcurrentDictionary<String, RegisteredUser> RegisteredUsers;
@@ -38,6 +48,18 @@ namespace Terminal3.DataAccessLayer
         public ConcurrentDictionary<String, LinkedList<StoreManager>> StoreManagers;
         public ConcurrentDictionary<String, LinkedList<StoreOwner>> StoreOwners;
         public ConcurrentDictionary<String, Store> Stores;
+        public ConcurrentDictionary<String, Auction> Policy_Auctions;
+        public ConcurrentDictionary<String, Lottery> Policy_Lotterys;
+        public ConcurrentDictionary<String, MaxProductPolicy> Policy_MaxProductPolicys;
+        public ConcurrentDictionary<String, MinAgePolicy> Policy_MinAgePolicys;
+        public ConcurrentDictionary<String, MinProductPolicy> Policy_MinProductPolicys;
+        public ConcurrentDictionary<String, Offer> Policy_Offers;
+        public ConcurrentDictionary<String, RestrictedHoursPolicy> Policy_RestrictedHoursPolicys;
+        public ConcurrentDictionary<String, AndPolicy> Policy_AndPolicys;
+        public ConcurrentDictionary<String, OrPolicy> Policy_OrPolicys;
+        public ConcurrentDictionary<String, BuyNow> Policy_BuyNows;
+        public ConcurrentDictionary<String, ConditionalPolicy> Policy_ConditionalPolicys;
+
 
         //Constructor
         private Mapper()
@@ -52,6 +74,17 @@ namespace Terminal3.DataAccessLayer
             DAO_StoreManager = new DAO<DTO_StoreManager>(database, "Users");
             DAO_StoreOwner = new DAO<DTO_StoreOwner>(database, "Users");
             DAO_Store = new DAO<DTO_Store>(database, "Stores");
+            DAO_Auction = new DAO<DTO_Auction>(database, "Policies");
+            DAO_Lottery = new DAO<DTO_Lottery>(database, "Policies");
+            DAO_MaxProductPolicy = new DAO<DTO_MaxProductPolicy>(database, "Policies");
+            DAO_MinAgePolicy = new DAO<DTO_MinAgePolicy>(database, "Policies");
+            DAO_MinProductPolicy = new DAO<DTO_MinProductPolicy>(database, "Policies");
+            DAO_Offer = new DAO<DTO_Offer>(database, "Policies");
+            DAO_RestrictedHoursPolicy = new DAO<DTO_RestrictedHoursPolicy>(database, "Policies");
+            DAO_AndPolicy = new DAO<DTO_AndPolicy>(database, "Policies");
+            DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "Policies");
+            DAO_BuyNow = new DAO<DTO_BuyNow>(database, "Policies");
+            DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "Policies");
 
             // IdentityMaps  <Id , object>
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
@@ -60,6 +93,18 @@ namespace Terminal3.DataAccessLayer
             StoreManagers = new ConcurrentDictionary<String, LinkedList<StoreManager>>();
             StoreOwners = new ConcurrentDictionary<String, LinkedList<StoreOwner>>();
             Stores = new ConcurrentDictionary<String, Store>();
+            Policy_Auctions = new ConcurrentDictionary<String, Auction>();
+            Policy_Lotterys = new ConcurrentDictionary<String, Lottery>();
+            Policy_MaxProductPolicys = new ConcurrentDictionary<String, MaxProductPolicy>();
+            Policy_MinAgePolicys = new ConcurrentDictionary<String, MinAgePolicy>();
+            Policy_MinProductPolicys = new ConcurrentDictionary<String, MinProductPolicy>();
+            Policy_Offers = new ConcurrentDictionary<String, Offer>();
+            Policy_RestrictedHoursPolicys = new ConcurrentDictionary<String, RestrictedHoursPolicy>();
+            Policy_AndPolicys = new ConcurrentDictionary<String, AndPolicy>();
+            Policy_OrPolicys = new ConcurrentDictionary<String, OrPolicy>();
+            Policy_BuyNows = new ConcurrentDictionary<String, BuyNow>();
+            Policy_ConditionalPolicys = new ConcurrentDictionary<String, ConditionalPolicy>();
+
     }
 
         public static Mapper getInstance()
@@ -153,6 +198,7 @@ namespace Terminal3.DataAccessLayer
 
             return owners;
         }
+
         #endregion Convert to DTO
 
         #region Convert to Object
@@ -199,7 +245,154 @@ namespace Terminal3.DataAccessLayer
 
             return pendingNotifications;
         }
+
         #endregion Convert to Object
+
+        private ConcurrentDictionary<String, String> getPoliciesIDs(List<IPurchasePolicy> list)
+        {
+            ConcurrentDictionary<String, String> Policies = new ConcurrentDictionary<String, String>();
+            foreach (IPurchasePolicy policy in list)
+            {
+                string[] type = policy.GetType().ToString().Split('.');
+                string policy_type = type[type.Length - 1];
+                AddToDB(policy_type, policy);
+                Policies.TryAdd(policy_type, policy.Id);
+            }
+            return Policies;
+        }
+        private IPurchasePolicy LoadIPurchasePolicy(String tag, string policy_id)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", policy_id);
+            switch (tag)
+            {
+                case "AndPolicy":
+                    return LoadAndPolicy(filter);
+
+                case "ConditionalPolicy":
+                    return LoadConditionalPolicy(filter);
+
+                case "MaxProductPolicy":
+                    return LoadMaxProductPolicy(filter);
+
+
+                case "MinAgePolicy":
+                    return LoadMinAgePolicy(filter);
+
+
+                case "MinProductPolicy":
+                    return LoadMinProductPolicy(filter);
+
+
+                case "OrPolicy":
+                    return LoadOrPolicy(filter);
+
+
+                case "RestrictedHoursPolicy":
+                    return LoadRestrictedHoursPolicy(filter);
+            }
+
+            return null;
+        }
+
+        private void DeleteIPurchasePolicy(String type, string policy_id)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", policy_id);
+            switch (type)
+            {
+                case "AndPolicy":
+                    DeleteAndPolicy(filter);
+                    break;
+
+                case "Auction":
+                    DeleteAuctionPolicy(filter);
+                    break;
+
+                case "BuyNow":
+                    DeleteBuyNowPolicy(filter);
+                    break;
+
+                case "ConditionalPolicy":
+                    DeleteConditionalPolicy(filter);
+                    break;
+
+                case "Lottery":
+                    DeleteLotteryPolicy(filter);
+                    break;
+
+                case "MaxProductPolicy":
+                    DeleteMaxProductPolicy(filter);
+                    break;
+
+                case "MinAgePolicy":
+                    DeleteMinAgePolicy(filter);
+                    break;
+
+                case "MinProductPolicy":
+                    DeleteMinProductPolicy(filter);
+                    break;
+
+                case "Offer":
+                    DeleteOfferPolicy(filter);
+                    break;
+
+                case "OrPolicy":
+                    DeleteOrPolicy(filter);
+                    break;
+
+                case "RestrictedHoursPolicy":
+                    DeleteRestrictedHoursPolicy(filter);
+                    break;
+            }
+        }
+        private void AddToDB(String type , IPurchasePolicy policy)
+        {
+            switch (type)
+            {
+                case "AndPolicy":
+                    Create((AndPolicy)policy);
+                    break;
+
+                case "Auction":
+                    Create((Auction)policy);
+                    break;
+
+                case "BuyNow":
+                    Create((BuyNow)policy);
+                    break;
+
+                case "ConditionalPolicy":
+                    Create((ConditionalPolicy)policy);
+                    break;
+
+                case "Lottery":
+                    Create((Lottery)policy);
+                    break;
+
+                case "MaxProductPolicy":
+                    Create((MaxProductPolicy)policy);
+                    break;
+
+                case "MinAgePolicy":
+                    Create((MinAgePolicy)policy);
+                    break;
+
+                case "MinProductPolicy":
+                    Create((MinProductPolicy)policy);
+                    break;
+
+                case "Offer":
+                    Create((Offer)policy);
+                    break;
+
+                case "OrPolicy":
+                    Create((OrPolicy)policy);
+                    break;
+
+                case "RestrictedHoursPolicy":
+                    Create((RestrictedHoursPolicy)policy);
+                    break;
+            }
+        }
 
         #endregion
 
@@ -514,7 +707,7 @@ namespace Terminal3.DataAccessLayer
                 return p;
             }
 
-            p = new Product(p.Id, p.Name, p.Price, p.Quantity, p.Category, p.Keywords, p.Review);
+            p = new Product(dto._id, dto.Name, dto.Price, dto.Quantity, dto.Category, dto.Keywords, dto.Review);
             // TODO - get product notification Manager and inject it
             Products.TryAdd(p.Id, p);
             return p;
@@ -591,7 +784,431 @@ namespace Terminal3.DataAccessLayer
 
         #endregion Stores
 
+        #region Policies
 
+        #region Purchase Policies
+
+        public void Create(Auction auction)
+        {
+            DAO_Auction.Create(new DTO_Auction(auction.Id, auction.ClosingTime.ToString(), auction.StartingPrice, auction.LastOffer.Item1 , auction.LastOffer.Item2));
+            Policy_Auctions.TryAdd(auction.Id, auction);
+        }
+
+        public Auction LoadAuctionPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            Auction a;
+            DTO_Auction dto = DAO_Auction.Load(filter);
+            if (Policy_Auctions.TryGetValue(dto._id, out a))
+            {
+                return a;
+            }
+
+            a = new Auction(dto._id, dto.ClosingTime, dto.StartingPrice, new Tuple<double, string>(dto.LastOffer_Price , dto.LastOffer_UserId));
+            Policy_Auctions.TryAdd(a.Id, a);
+            return a;
+        }
+
+        public void UpdateAuctionPolicy(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_Auction.Update(filter, update);
+        }
+
+        public void DeleteAuctionPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_Auction deletedAuction = DAO_Auction.Delete(filter);
+            Policy_Auctions.TryRemove(deletedAuction._id, out Auction a);
+        }
+
+
+        public void Create(Lottery lottery)
+        {
+            DAO_Lottery.Create(new DTO_Lottery(lottery.Id, lottery.Price, lottery.Participants));
+            Policy_Lotterys.TryAdd(lottery.Id, lottery);
+        }
+
+        public Lottery LoadLotteryPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            Lottery l;
+            DTO_Lottery dto = DAO_Lottery.Load(filter);
+            if (Policy_Lotterys.TryGetValue(dto._id, out l))
+            {
+                return l;
+            }
+
+            l = new Lottery(dto._id, dto.Price, dto.Participants);
+            Policy_Lotterys.TryAdd(l.Id, l);
+            return l;
+        }
+
+        public void UpdateLotteryPolicy(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_Lottery.Update(filter, update);
+        }
+
+        public void DeleteLotteryPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_Lottery deletedLottery = DAO_Lottery.Delete(filter);
+            Policy_Lotterys.TryRemove(deletedLottery._id, out Lottery l);
+        }
+
+
+        public void Create(MaxProductPolicy maxProductPolicy)
+        {            
+            DAO_MaxProductPolicy.Create(new DTO_MaxProductPolicy(maxProductPolicy.Id, maxProductPolicy.Product.Id, maxProductPolicy.Max));
+            Policy_MaxProductPolicys.TryAdd(maxProductPolicy.Id, maxProductPolicy);
+        }
+
+        public MaxProductPolicy LoadMaxProductPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            MaxProductPolicy m;
+            DTO_MaxProductPolicy dto = DAO_MaxProductPolicy.Load(filter);
+            if (Policy_MaxProductPolicys.TryGetValue(dto._id, out m))
+            {
+                return m;
+            }
+            var product_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Product);
+            m = new MaxProductPolicy(LoadProduct(product_filter), dto.Max, dto._id);
+            Policy_MaxProductPolicys.TryAdd(m.Id, m);
+            return m;
+        }
+
+        public void UpdateMaxProductPolicy(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_MaxProductPolicy.Update(filter, update);
+        }
+
+        public void DeleteMaxProductPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_MaxProductPolicy deletedMaxProductPolicy = DAO_MaxProductPolicy.Delete(filter);
+            Policy_MaxProductPolicys.TryRemove(deletedMaxProductPolicy._id, out MaxProductPolicy m);
+        }
+
+
+        public void Create(MinAgePolicy minAgePolicy)
+        {
+            DAO_MinAgePolicy.Create(new DTO_MinAgePolicy(minAgePolicy.Id, minAgePolicy.Age));
+            Policy_MinAgePolicys.TryAdd(minAgePolicy.Id, minAgePolicy);
+        }
+
+        public MinAgePolicy LoadMinAgePolicy(FilterDefinition<BsonDocument> filter)
+        {
+            MinAgePolicy m;
+            DTO_MinAgePolicy dto = DAO_MinAgePolicy.Load(filter);
+            if (Policy_MinAgePolicys.TryGetValue(dto._id, out m))
+            {
+                return m;
+            }
+            m = new MinAgePolicy(dto.Age, dto._id);
+            Policy_MinAgePolicys.TryAdd(m.Id, m);
+            return m;
+        }
+
+        public void UpdateMinAgePolicy(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_MinAgePolicy.Update(filter, update);
+        }
+
+        public void DeleteMinAgePolicy(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_MinAgePolicy deletedMinAgePolicy = DAO_MinAgePolicy.Delete(filter);
+            Policy_MinAgePolicys.TryRemove(deletedMinAgePolicy._id, out MinAgePolicy m);
+        }
+
+
+        public void Create(MinProductPolicy minProductPolicy)
+        {
+            DAO_MinProductPolicy.Create(new DTO_MinProductPolicy(minProductPolicy.Id, minProductPolicy.Product.Id , minProductPolicy.Min));
+            Policy_MinProductPolicys.TryAdd(minProductPolicy.Id, minProductPolicy);
+        }
+
+        public MinProductPolicy LoadMinProductPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            MinProductPolicy m;
+            DTO_MinProductPolicy dto = DAO_MinProductPolicy.Load(filter);
+            if (Policy_MinProductPolicys.TryGetValue(dto._id, out m))
+            {
+                return m;
+            }
+            var product_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Product);
+            m = new MinProductPolicy(LoadProduct(product_filter), dto.Min, dto._id);
+            Policy_MinProductPolicys.TryAdd(m.Id, m);
+            return m;
+        }
+
+        public void UpdateMinProductPolicy(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_MinProductPolicy.Update(filter, update);
+        }
+
+        public void DeleteMinProductPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_MinProductPolicy deletedMinProductPolicy = DAO_MinProductPolicy.Delete(filter);
+            Policy_MinProductPolicys.TryRemove(deletedMinProductPolicy._id, out MinProductPolicy m);
+        }
+
+
+        public void Create(Offer offer)
+        {
+            DAO_Offer.Create(new DTO_Offer(offer.Id, offer.LastOffer.Item1, offer.LastOffer.Item2 , offer.CounterOffer , offer.Accepted));
+            Policy_Offers.TryAdd(offer.Id, offer);
+        }
+
+        public Offer LoadOfferPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            Offer o;
+            DTO_Offer dto = DAO_Offer.Load(filter);
+            if (Policy_Offers.TryGetValue(dto._id, out o))
+            {
+                return o;
+            }
+
+            o = new Offer(dto._id , new Tuple<Double , string>(dto.LastOffer_Price , dto.LastOffer_UserId) , dto.CounterOffer , dto.Accepted);
+            Policy_Offers.TryAdd(o.Id, o);
+            return o;
+        }
+
+        public void UpdateOfferPolicy(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_Offer.Update(filter, update);
+        }
+
+        public void DeleteOfferPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_Offer deletedOffer = DAO_Offer.Delete(filter);
+            Policy_Offers.TryRemove(deletedOffer._id, out Offer o);
+        }
+
+
+        public void Create(RestrictedHoursPolicy restrictedHoursPolicy)
+        {
+            DAO_RestrictedHoursPolicy.Create(new DTO_RestrictedHoursPolicy(restrictedHoursPolicy.Id, restrictedHoursPolicy.StartRestrict.ToString(), restrictedHoursPolicy.EndRestrict.ToString(), restrictedHoursPolicy.Product.Id));
+            Policy_RestrictedHoursPolicys.TryAdd(restrictedHoursPolicy.Id, restrictedHoursPolicy);
+        }
+
+        public RestrictedHoursPolicy LoadRestrictedHoursPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            RestrictedHoursPolicy r;
+            DTO_RestrictedHoursPolicy dto = DAO_RestrictedHoursPolicy.Load(filter);
+            if (Policy_RestrictedHoursPolicys.TryGetValue(dto._id, out r))
+            {
+                return r;
+            }
+
+            var product_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Product);
+            r = new RestrictedHoursPolicy(TimeSpan.Parse(dto.StartRestrict), TimeSpan.Parse(dto.EndRestrict), LoadProduct(product_filter), dto._id);
+            Policy_RestrictedHoursPolicys.TryAdd(r.Id, r);
+            return r;
+        }
+
+        public void UpdateRestrictedHoursPolicy(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_RestrictedHoursPolicy.Update(filter, update);
+        }
+
+        public void DeleteRestrictedHoursPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_RestrictedHoursPolicy deletedRestrictedHoursPolicy = DAO_RestrictedHoursPolicy.Delete(filter);
+            Policy_RestrictedHoursPolicys.TryRemove(deletedRestrictedHoursPolicy._id, out RestrictedHoursPolicy r);
+        }
+
+        
+
+        public void Create(AndPolicy andPolicy)
+        {          
+            DAO_AndPolicy.Create(new DTO_AndPolicy(andPolicy.Id, getPoliciesIDs(andPolicy.Policies)));
+            Policy_AndPolicys.TryAdd(andPolicy.Id, andPolicy);
+        }
+
+        public AndPolicy LoadAndPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            AndPolicy a;
+            DTO_AndPolicy dto = DAO_AndPolicy.Load(filter);
+            if (Policy_AndPolicys.TryGetValue(dto._id, out a))
+            {
+                return a;
+            }
+
+            List<IPurchasePolicy> Policies = new List<IPurchasePolicy>();
+            foreach (var policy in dto.Policies)
+            {
+                IPurchasePolicy p = LoadIPurchasePolicy(policy.Key, policy.Value);
+                Policies.Add(p);
+            }
+
+            a = new AndPolicy(Policies, dto._id);
+            Policy_AndPolicys.TryAdd(a.Id, a);
+            return a;
+        }       
+
+        public void UpdateAndPolicy(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_AndPolicy.Update(filter, update);
+        }
+
+        public void DeleteAndPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_AndPolicy deletedAndPolicy = DAO_AndPolicy.Delete(filter);
+            foreach (var policy in deletedAndPolicy.Policies)
+            {
+                DeleteIPurchasePolicy(policy.Key, policy.Value);
+            }
+            Policy_AndPolicys.TryRemove(deletedAndPolicy._id, out AndPolicy a);
+        }
+
+      
+
+        public void Create(OrPolicy orPolicy)
+        {            
+            DAO_OrPolicy.Create(new DTO_OrPolicy(orPolicy.Id, getPoliciesIDs(orPolicy.Policies)));
+            Policy_OrPolicys.TryAdd(orPolicy.Id, orPolicy);
+        }
+
+        public OrPolicy LoadOrPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            OrPolicy o;
+            DTO_OrPolicy dto = DAO_OrPolicy.Load(filter);
+            if (Policy_OrPolicys.TryGetValue(dto._id, out o))
+            {
+                return o;
+            }
+
+            List<IPurchasePolicy> Policies = new List<IPurchasePolicy>();
+            foreach (var policy in dto.Policies)
+            {
+                IPurchasePolicy p = LoadIPurchasePolicy(policy.Key, policy.Value);
+                Policies.Add(p);
+            }
+
+            o = new OrPolicy(Policies, dto._id);
+            Policy_OrPolicys.TryAdd(o.Id, o);
+            return o;
+        }
+
+        public void UpdateOrPolicy(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_OrPolicy.Update(filter, update);
+        }
+
+        public void DeleteOrPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_OrPolicy deletedOrPolicy = DAO_OrPolicy.Delete(filter);
+            foreach(var policy in deletedOrPolicy.Policies)
+            {
+                DeleteIPurchasePolicy(policy.Key, policy.Value);
+            }
+            Policy_OrPolicys.TryRemove(deletedOrPolicy._id, out OrPolicy o);
+        }
+
+
+
+        public void Create(BuyNow buyNow)
+        {
+            DAO_BuyNow.Create(new DTO_BuyNow(buyNow.Id, new DTO_AndPolicy(buyNow.Policy.Id , getPoliciesIDs(buyNow.Policy.Policies))));
+            Policy_BuyNows.TryAdd(buyNow.Id, buyNow);
+        }
+
+        public BuyNow LoadBuyNowPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            BuyNow b;
+            DTO_BuyNow dto = DAO_BuyNow.Load(filter);
+            if (Policy_BuyNows.TryGetValue(dto._id, out b))
+            {
+                return b;
+            }
+
+            List<IPurchasePolicy> Policies = new List<IPurchasePolicy>();
+            foreach (var policy in dto.Policy.Policies)
+            {
+                IPurchasePolicy p = LoadIPurchasePolicy(policy.Key, policy.Value);
+                Policies.Add(p);
+            }
+
+            AndPolicy andPolicy = new AndPolicy(Policies, dto.Policy._id);
+            b = new BuyNow(andPolicy, dto._id);
+            Policy_BuyNows.TryAdd(b.Id, b);
+            return b;
+        }
+
+        public void UpdateBuyNowPolicy(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_BuyNow.Update(filter, update);
+        }
+
+        public void DeleteBuyNowPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_BuyNow deletedBuyNow = DAO_BuyNow.Delete(filter);
+            foreach (var policy in deletedBuyNow.Policy.Policies)
+            {
+                DeleteIPurchasePolicy(policy.Key, policy.Value);
+            }
+            Policy_BuyNows.TryRemove(deletedBuyNow._id, out BuyNow b);
+        }
+
+
+
+
+        public void Create(ConditionalPolicy conditionalPolicy)
+        {
+            List<IPurchasePolicy> list = new List<IPurchasePolicy>();
+            list.Add(conditionalPolicy.PreCond);
+            ConcurrentDictionary<String, String> PreCond = getPoliciesIDs(list);
+
+            List<IPurchasePolicy> list2 = new List<IPurchasePolicy>();            
+            list2.Add(conditionalPolicy.Cond);
+            ConcurrentDictionary<String, String> Cond = getPoliciesIDs(list2);
+
+
+            DAO_ConditionalPolicy.Create(new DTO_ConditionalPolicy(conditionalPolicy.Id, PreCond , Cond) );
+            Policy_ConditionalPolicys.TryAdd(conditionalPolicy.Id, conditionalPolicy);
+        }
+
+        public ConditionalPolicy LoadConditionalPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            ConditionalPolicy c;
+            DTO_ConditionalPolicy dto = DAO_ConditionalPolicy.Load(filter);
+            if (Policy_ConditionalPolicys.TryGetValue(dto._id, out c))
+            {
+                return c;
+            }
+            IPurchasePolicy pre = null;
+            foreach (var policy in dto.PreCond)
+            {
+                pre = LoadIPurchasePolicy(policy.Key, policy.Value);
+            }
+
+            IPurchasePolicy cond = null;
+            foreach (var policy in dto.Cond)
+            {
+                cond = LoadIPurchasePolicy(policy.Key, policy.Value);
+            }
+            
+            c = new ConditionalPolicy(pre, cond, dto._id);
+            Policy_ConditionalPolicys.TryAdd(c.Id, c);
+            return c;
+        }
+
+        public void UpdateConditionalPolicy(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_ConditionalPolicy.Update(filter, update);
+        }
+
+        public void DeleteConditionalPolicy(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_ConditionalPolicy deletedConditionalPolicy = DAO_ConditionalPolicy.Delete(filter);
+            foreach (var policy in deletedConditionalPolicy.PreCond)
+            {
+                DeleteIPurchasePolicy(policy.Key, policy.Value);
+            }
+            foreach (var policy in deletedConditionalPolicy.Cond)
+            {
+                DeleteIPurchasePolicy(policy.Key, policy.Value);
+            }            
+
+            Policy_ConditionalPolicys.TryRemove(deletedConditionalPolicy._id, out ConditionalPolicy c);
+        }
+        #endregion Purchase Policies
+
+        #endregion Policies
 
 
 
@@ -615,7 +1232,7 @@ namespace Terminal3.DataAccessLayer
         //                return manager;
         //            }
         //        }
-                
+
         //    }
         //    else
         //    {
