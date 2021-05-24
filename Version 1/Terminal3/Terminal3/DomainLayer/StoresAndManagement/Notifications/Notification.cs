@@ -26,11 +26,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             this.ClientId = clientId;
         }
 
+        // For loading from database
+        public Notification(Event eventName, String clientId, String msg, Boolean staff , Boolean isOpened , String date)
+        {
+            EventName = eventName;
+            this.Message = msg;
+            this.Date = DateTime.Parse(date);
+            this.isOpened = isOpened;
+            isStoreStaff = staff;
+            this.ClientId = clientId;
+        }
         public String ToString()
         {
             return $"{Date.ToString("MM/dd/yyyy HH:mm")}\nNotice:\n{Message}\n";
         }
-
 
     }
 }

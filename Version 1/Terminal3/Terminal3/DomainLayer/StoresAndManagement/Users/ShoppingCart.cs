@@ -20,6 +20,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             TotalCartPrice = 0;
         }
 
+        // For loading from database
+        public ShoppingCart( String id , ConcurrentDictionary<String, ShoppingBag> shoppingBags , Double totalCartPrice)
+        {
+            Id = id;
+            ShoppingBags =shoppingBags;
+            TotalCartPrice = totalCartPrice;
+        }
+
         public ShoppingCart(ShoppingCart original)
         {
             Id = original.Id;

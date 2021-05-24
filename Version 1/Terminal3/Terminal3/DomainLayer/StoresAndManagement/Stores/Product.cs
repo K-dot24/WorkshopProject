@@ -23,8 +23,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         //Constructor
         public Product(String name, Double price, int quantity , String category, [OptionalAttribute]LinkedList<String> Keywords)
         {
-            //Id = Service.GenerateId();
-            Id = "1";  //TODO delete
+            Id = Service.GenerateId();
+            //Id = "1";  //TODO delete
             Name = name;
             Price = price;
             Quantity = quantity;
@@ -33,7 +33,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             else { this.Keywords = Keywords; }
             Review = new ConcurrentDictionary<string, string>();
             this.NotificationManager = null;
-        }       
+        }
+
+        public Product(String id , String name, Double price, int quantity, String category, LinkedList<String> Keywords , ConcurrentDictionary<string, string> review)
+        {
+            Id = id;
+            Name = name;
+            Price = price;
+            Quantity = quantity;
+            Category = category;
+            this.Keywords = Keywords;
+            Review = review;
+            this.NotificationManager = null;
+        }
+
 
         //Method
         public Result<Double> AddRating(Double rate)

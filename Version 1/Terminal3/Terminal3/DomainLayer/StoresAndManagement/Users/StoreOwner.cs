@@ -9,7 +9,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public RegisteredUser User { get; }
         public Store Store { get; }
-        public IStoreStaff AppointedBy { get; }
+        public IStoreStaff AppointedBy { get; set; }
         public LinkedList<StoreManager> StoreManagers { get; }
         public LinkedList<StoreOwner> StoreOwners { get; }
 

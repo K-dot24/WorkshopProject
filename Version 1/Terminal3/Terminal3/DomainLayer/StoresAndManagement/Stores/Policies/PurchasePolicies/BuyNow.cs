@@ -17,7 +17,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 this.Id = Service.GenerateId();
             this.Policy = new AndPolicy();
         }
-      
+
+        public BuyNow(AndPolicy policy, string id)
+        {
+            Policy = policy;
+            Id = id;
+        }
+
         public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
         {            
             if(this.Policy.IsConditionMet(bag, user).Data)
