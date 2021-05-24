@@ -12,7 +12,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         //Properties
         public String Email { get; }
-        public String Password { get; }
+        public String Password { get; set; }        //TODO- change set;
         public Boolean LoggedIn { get; set; }
         public History History { get; set; }
         public LinkedList<Notification> PendingNotification { get; }
@@ -29,7 +29,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.NotificationCenter = NotificationCenter.GetInstance();
         }
 
-        //For test Purpose ONLY
+        // For database load
+        public RegisteredUser(String Id , String email, String password , Boolean loggedin , History history , LinkedList<Notification> notifications ) : base(Id)
+        {
+            this.Email = email;
+            this.Password = password;
+            this.LoggedIn = loggedin;
+            this.History = history;
+            this.PendingNotification = notifications;
+            this.NotificationCenter = NotificationCenter.GetInstance();
+        }
+
+
+        //For test Purpose ONLY 
         public RegisteredUser(string id, String email, String password) : base(id)
         {
             this.Email = email;

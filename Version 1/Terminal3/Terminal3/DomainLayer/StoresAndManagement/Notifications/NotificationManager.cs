@@ -18,6 +18,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             this.Store = store;
         }
 
+        // for loading from database only
+        public NotificationManager()
+        {
+        }
+
+
+
         //TODO -         [MethodImpl(MethodImplOptions.Synchronized)]
 
         // Methods
