@@ -66,9 +66,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public NotificationManager NotificationManager { get; set; }
 
         //Constructors
-        public Store(String name, RegisteredUser founder)
+        public Store(String name, RegisteredUser founder , String storeID = "-1")
         {
-            Id = Service.GenerateId();
+            if (storeID.Equals("-1"))
+                Id = Service.GenerateId();
+            else
+                Id = storeID;
             Name = name;
             Founder = new StoreOwner(founder, this, null);
             Owners = new ConcurrentDictionary<String, StoreOwner>();

@@ -21,7 +21,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
         protected User(string id)
         {
-            Id = id;
+            if (id.Equals("-1"))
+                Id = Service.GenerateId();
+            else Id = id;
             ShoppingCart = new ShoppingCart();
         }
         protected User(String id , ShoppingCart shoppingCart)

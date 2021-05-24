@@ -5,6 +5,7 @@ using System.Text;
 using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
+using System.Runtime.InteropServices;
 
 namespace Terminal3.ServiceLayer.Controllers
 {
@@ -12,7 +13,7 @@ namespace Terminal3.ServiceLayer.Controllers
     {
         Result<UserService> EnterSystem();
         void ExitSystem(String userID);
-        Result<RegisteredUserService> Register(string email, string password);
+        Result<RegisteredUserService> Register(string email, string password, string optionalID = "-1");
         Result<List<StoreService>> SearchStore(IDictionary<String, Object> details);
         Result<List<ProductService>> SearchProduct(IDictionary<String, Object> productDetails);
         Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);
@@ -44,7 +45,7 @@ namespace Terminal3.ServiceLayer.Controllers
         {
             return StoresAndManagementInterface.EnterSystem();
         }
-        public Result<RegisteredUserService> Register(string email, string password){return StoresAndManagementInterface.Register(email,password); }
+        public Result<RegisteredUserService> Register(string email, string password , string optionalID = "-1") {return StoresAndManagementInterface.Register(email,password, optionalID); }
         public Result<List<StoreService>> SearchStore(IDictionary<String, Object> details) { return StoresAndManagementInterface.SearchStore(details); }
         public Result<List<ProductService>> SearchProduct(IDictionary<String, Object> productDetails) { return StoresAndManagementInterface.SearchProduct(productDetails); }
         public Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID) { return StoresAndManagementInterface.AddProductToCart(userID, ProductID, ProductQuantity, StoreID); }   // Redundent ?

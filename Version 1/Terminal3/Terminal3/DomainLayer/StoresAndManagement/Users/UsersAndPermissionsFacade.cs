@@ -11,7 +11,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
     public interface IUsersAndPermissionsFacade
     {
-        Result<RegisteredUser> Register(String email, String password);
+        Result<RegisteredUser> Register(String email, String password, String Id);
         Result<RegisteredUser> AddSystemAdmin(String email); 
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
@@ -39,7 +39,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         private readonly object my_lock = new object();
 
         //Constructor
-        public UsersAndPermissionsFacade()
+        public UsersAndPermissionsFacade(String admin_email, String admin_password)
         {
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
             SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
@@ -47,7 +47,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
 
             //Add first system admin
-            RegisteredUser defaultUser = new RegisteredUser("-777", "Admin@terminal3", "Admin");
+            RegisteredUser defaultUser = new RegisteredUser("-777", admin_email, admin_password);
             this.SystemAdmins.TryAdd(defaultUser.Id, defaultUser );
             this.RegisteredUsers.TryAdd(defaultUser.Id, defaultUser);
 
@@ -69,7 +69,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns>Result object hold the execStatus</returns>
-        public Result<RegisteredUser> Register(String email, String password)
+        public Result<RegisteredUser> Register(String email, String password , String Id)
         {
             try
             {
@@ -78,7 +78,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 {
                     if (isUniqueEmail(email))
                     {
-                        RegisteredUser newUser = new RegisteredUser(email, password);
+                        RegisteredUser newUser; 
+                        if (Id != "-1")
+                            newUser = new RegisteredUser(email, password);
+                        else
+                            newUser = new RegisteredUser(Id , email, password);
+
                         this.RegisteredUsers.TryAdd(newUser.Id, newUser);
                         return new Result<RegisteredUser>($"{email} is registered as new user", true, newUser);
                     }

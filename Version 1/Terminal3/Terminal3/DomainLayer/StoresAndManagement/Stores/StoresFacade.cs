@@ -11,7 +11,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
     public interface IStoresFacade
     {
-        Result<Store> OpenNewStore(RegisteredUser founder, String storeName);
+        Result<Store> OpenNewStore(RegisteredUser founder, String storeName , String storeID);
         Result<Boolean> CloseStore(RegisteredUser founder, String storeId);
         Result<Store> ReOpenStore(RegisteredUser owner, String storeId);
 
@@ -214,9 +214,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<History>("Store Id does not exists\n", false, null);
         }
 
-        public Result<Store> OpenNewStore(RegisteredUser founder, string storeName)
+        public Result<Store> OpenNewStore(RegisteredUser founder, string storeName, String storeID)
         {
-            Store newStore = new Store(storeName, founder);
+            Store newStore = new Store(storeName, founder, storeID);
             Stores.TryAdd(newStore.Id, newStore);
             NotificationManager notificationManager = new NotificationManager(newStore);
             newStore.NotificationManager = notificationManager;

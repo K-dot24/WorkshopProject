@@ -56,9 +56,9 @@ namespace Terminal3.ServiceLayer
         {
             GuestUserInterface.ExitSystem(userID);
         }
-        public Result<RegisteredUserService> Register(string email, string password)
+        public Result<RegisteredUserService> Register(string email, string password, string optionalID = "-1")
         {
-            return GuestUserInterface.Register(email, password);
+            return GuestUserInterface.Register(email, password, optionalID);
         }
 
         public Result<List<StoreService>> SearchStore(IDictionary<string, object> details)
@@ -137,7 +137,7 @@ namespace Terminal3.ServiceLayer
             return result;
         }
 
-        public Result<StoreService> OpenNewStore(string storeName, string userID)
+        public Result<StoreService> OpenNewStore(string storeName, string userID, String storeID = "-1")
         {
             return RegisteredUserInterface.OpenNewStore(storeName, userID);
         }
@@ -244,7 +244,7 @@ namespace Terminal3.ServiceLayer
             Result<Boolean> res = SystemAdminInterface.ResetSystem(sysAdminID);
             if (res.ExecStatus)
             {
-                StoresAndManagementInterface StoresAndManagement = new StoresAndManagementInterface();
+                //StoresAndManagementInterface StoresAndManagement = new StoresAndManagementInterface();
                 GuestUserInterface = new GuestUserController(StoresAndManagement);
                 RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
                 StoreStaffInterface = new StoreStaffController(StoresAndManagement);

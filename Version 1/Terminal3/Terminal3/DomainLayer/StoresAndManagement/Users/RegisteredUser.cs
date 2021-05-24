@@ -41,7 +41,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
 
 
-        //For test Purpose ONLY 
         public RegisteredUser(string id, String email, String password) : base(id)
         {
             this.Email = email;
