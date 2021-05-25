@@ -15,7 +15,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<RegisteredUser> AddSystemAdmin(String email); 
         Result<RegisteredUser> RemoveSystemAdmin(String email);
         Result<RegisteredUser> Login(String email, String password);
-        Result<Boolean> LogOut(String email);
+        Result<RegisteredUser> Login(String email, String password,String GuestUserID);
+        Result<GuestUser> LogOut(String email);
         Result<Product> AddProductReview(String userID, Store store, Product product, String review);
         Result<History> GetUserPurchaseHistory(String userID);
         Result<Boolean> AddProductToCart(string userID, Product product, int productQuantity, Store store);
@@ -46,7 +47,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
 
             //Add first system admin
-            RegisteredUser defaultUser = new RegisteredUser("Admin@terminal3", "Admin");
+            RegisteredUser defaultUser = new RegisteredUser("-777", "Admin@terminal3", "Admin");
             this.SystemAdmins.TryAdd(defaultUser.Id, defaultUser );
             this.RegisteredUsers.TryAdd(defaultUser.Id, defaultUser);
 
@@ -184,7 +185,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// <param name="email"></param>
         /// <param name="table">from which table source to find the user [RegisteredUser/ SystemAdmins]</param>
         /// <returns></returns>
-        private Result<RegisteredUser> FindUserByEmail(String email, ConcurrentDictionary<String, RegisteredUser> table)
+        public Result<RegisteredUser> FindUserByEmail(String email, ConcurrentDictionary<String, RegisteredUser> table)
         {
             foreach (RegisteredUser registeredUser in table.Values)
             {
@@ -215,7 +216,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 {
                     //Delete relevant guest user from list 
                     GuestUsers.TryRemove(guestId , out GuestUser guest);
-                    guest.Active = false;
                     return res;
                 }
                 //else faild
@@ -250,7 +250,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public Result<Boolean> LogOut(String email)
+        public Result<GuestUser> LogOut(String email)
         {
             Result<RegisteredUser> searchResult = FindUserByEmail(email, RegisteredUsers);
             if (searchResult.ExecStatus)
@@ -260,15 +260,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 if (res.ExecStatus)
                 {
                     GuestUsers.TryAdd(res.Data.Id, res.Data);
-                    return new Result<Boolean>(res.Message, true, true);
+                    return new Result<GuestUser>($"{email} logged out\n", true, res.Data);
                 }
                 else
-                    return new Result<Boolean>(res.Message, false, false);
+                    return new Result<GuestUser>(res.Message, false, null);
             }
             else
             {
                 //No user if found using the given email
-                return new Result<Boolean>($"There is not user using this email:{email}\n", false, false);
+                return new Result<GuestUser>($"There is not user using this email:{email}\n", false, null);
 
             }
         }
@@ -375,7 +375,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (RegisteredUsers.ContainsKey(userID))
             {
                 //User Found
-                Double TotalPrice = RegisteredUsers[userID].ShoppingCart.GetTotalShoppingCartPrice();
+                Double TotalPrice = RegisteredUsers[userID].ShoppingCart.GetTotalShoppingCartPrice().Data;
                 return new Result<double>($"Total price of current shoppinh cart is: {TotalPrice}", true, TotalPrice);
             }
             else

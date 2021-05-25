@@ -35,7 +35,15 @@ namespace Terminal3WebAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         public IActionResult EnterSystem() {
-            return Ok("Welcome to Terminal3 system");
+            Result<UserService> result = system.EnterSystem();
+            if (result.ExecStatus)
+            {
+                return Ok(result.Data.Id);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
         }
 
         /// <summary>
@@ -87,7 +95,7 @@ namespace Terminal3WebAPI.Controllers
         /// </summary>
         /// <param name="storeDetails"></param>
         [Route("SearchStore")]
-        [HttpGet]
+        [HttpPost]
         public IActionResult SearchStore([FromBody] IDictionary<string, object> storeDetails)
         {
             Result<List<StoreService>> result = system.SearchStore(storeDetails);
@@ -113,7 +121,7 @@ namespace Terminal3WebAPI.Controllers
         /// <param name="productDetails"></param>
         /// <returns></returns>
         [Route("SearchProduct")]
-        [HttpGet]
+        [HttpPost]
         public IActionResult SearchProduct([FromBody] IDictionary<string, object> productDetails)
         {
             Result < List < ProductService >> result = system.SearchProduct(productDetails);

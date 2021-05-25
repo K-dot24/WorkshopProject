@@ -1,29 +1,64 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
-    public class DiscreetDiscount : VisibleDiscount
+    public class DiscreetDiscount : AbstractDiscountPolicy
     {
-        //TODO: Complete properly
 
         public String DiscountCode { get; }
+        public IDiscountPolicy Discount { get; }
 
-        public DiscreetDiscount(double precentege, DateTime expirationDate, String discountCode) : base(precentege, expirationDate)
+        public DiscreetDiscount(IDiscountPolicy discount, String discountCode, String id = "") : base(id)
         {
+            Discount = discount;
             DiscountCode = discountCode;
         }
 
-        public new Result<Double> CalculatePrice(Product product, User user, int quantity, String code)
+        public override Result<Dictionary<Product, double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
         {
-            //TODO: Add check if user is eligible?
             if (DiscountCode.Equals(code))
-            {
-                return base.CalculatePrice(product, user, quantity, code);
-            }
-            //else
-            return new Result<Double>($"Discount for {product.Name} is over.\n", false, product.Price * quantity);     //return -1 ?
+                return Discount.CalculateDiscount(products, code);
+            return new Result<Dictionary<Product, double>>("", false, new Dictionary<Product, double>());
         }
 
+        public override Result<bool> AddDiscount(String id, IDiscountPolicy discount)
+        {
+            if (Id.Equals(id))
+                return new Result<bool>("Can't add a discount to a visible discount with an id " + id, false, false);
+            return Discount.AddDiscount(id, discount);
+        }
+
+        public override Result<bool> RemoveDiscount(String id)
+        {
+            return Discount.RemoveDiscount(id);
+        }
+
+        public override Result<bool> AddCondition(string id, IDiscountCondition condition)
+        {
+            return new Result<bool>("", true, false);
+        }
+
+        public override Result<bool> RemoveCondition(string id)
+        {
+            return new Result<bool>("", true, false);
+        }
+
+        public override Result<IDiscountPolicyData> GetData()
+        {
+            IDiscountPolicyData discountData = null;
+            if (Discount != null)
+            {
+                Result<IDiscountPolicyData> discountDataResult = Discount.GetData();
+                if (!discountDataResult.ExecStatus)
+                    return discountDataResult;
+                discountData = discountDataResult.Data;
+            }
+
+            return new Result<IDiscountPolicyData>("", true, new DiscreetDiscountData(discountData, DiscountCode, Id));
+        }
     }
 }

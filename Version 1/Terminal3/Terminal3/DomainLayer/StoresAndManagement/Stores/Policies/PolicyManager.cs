@@ -2,64 +2,161 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 {
     public interface IPolicyManager
     {
+        double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
+        Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
+        Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount);
+        Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount, String id);
+        Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id);
+        Result<Boolean> RemoveDiscountPolicy(String id);
+        Result<Boolean> RemoveDiscountCondition(String id);
+        Result<IDiscountPolicyData> GetData();
+        Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
+        Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
+        Result<Boolean> RemovePurchasePolicy(string id);
     }
-
-    public enum Purchases : int
-    {        
-        BuyNow = 0,
-        Offer = 1,
-        Auction = 2,
-        Lottery = 3
-    }
-
-    public enum Discounts : int
-    {
-        Visible = 0,
-        Conditional = 1,
-        Discreet = 2
-    }
-
-    
 
     public class PolicyManager : IPolicyManager
     {
-        private const int PURCHASE_SIZE = 4;
-        private const int DISCOUNT_SIZE = 3;
 
-        //TODO: Complete properly
-
-        public bool[] DiscountPolicies { get; }
-        public bool[] PurchasePolicies { get; }
+        public DiscountAddition MainDiscount { get; }
+        public BuyNow MainPolicy { get; set; }
 
         public PolicyManager()
         {
-            DiscountPolicies = new bool[DISCOUNT_SIZE];
-            PurchasePolicies = new bool[PURCHASE_SIZE];
+            MainDiscount = new DiscountAddition();
+            MainPolicy = new BuyNow();
         }
 
-        public Result<Boolean> SetDiscountPolicy(Discounts policy, Boolean active)
+        public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
         {
-            DiscountPolicies[(int)policy] = active;
-            return new Result<bool>($"Discount policy was set to {active}.\n", true, true);
+            Result<Dictionary<Product, Double>> discountsResult = MainDiscount.CalculateDiscount(products, discountCode);
+            if (!discountsResult.ExecStatus)
+                return -1;
+
+            Dictionary<Product, Double> discounts = discountsResult.Data;
+            Double price = 0;
+            foreach (KeyValuePair<Product, int> entry in products)
+            {
+                if (discounts.ContainsKey(entry.Key))
+                    price += entry.Key.Price * entry.Value * (100 - discounts[entry.Key]) / 100;
+                else
+                    price += entry.Key.Price * entry.Value;
+            }
+
+            return price;
+        }
+        public Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)
+        {
+            return MainPolicy.IsConditionMet(products, user);
         }
 
-        public Result<Boolean> SetPurchasePolicy(Purchases policy, Boolean active)
+        public Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount)
         {
-            PurchasePolicies[(int)policy] = active;
-            return new Result<bool>($"Purchase policy was set to {active}.\n", true, true);
+            Result<bool> result = MainDiscount.AddDiscount(MainDiscount.Id, discount);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount has been added successfully", true, true);
+                else return new Result<bool>($"The discount could not be added", false, false);
+            }
+            return result;
         }
 
-
-        public double GetCurrentProductPrice(Product product, int quantity)
+        public Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount, String id)
         {
-            //throw new NotImplementedException();
-            return product.Price*quantity;
+            Result<bool> result = MainDiscount.AddDiscount(id, discount);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount has been added successfully", true, true);
+                else return new Result<bool>($"The discount addition failed because the discount with an id ${id} was not found", false, false);
+            }
+            return result;
+        }
+
+        public Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id)
+        {
+            Result<bool> result = MainDiscount.AddCondition(id, condition);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount condition has been added successfully", true, true);
+                else return new Result<bool>($"The discount condition addition failed because the discount condition with an id ${id} was not found", false, false);
+            }
+            return result;
+        }
+
+        public Result<bool> RemoveDiscountPolicy(string id)
+        {
+            Result<bool> result = MainDiscount.RemoveDiscount(id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount has been removed successfully", true, true);
+                else return new Result<bool>($"The discount removal failed because the discount with an id ${id} was not found", false, false);
+            }
+            return result;
+        }
+
+        public Result<bool> RemoveDiscountCondition(string id)
+        {
+            Result<bool> result = MainDiscount.RemoveCondition(id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount condition has been removed successfully", true, true);
+                else return new Result<bool>($"The discount condition removal failed because the discount condition with an id ${id} was not found", false, false);
+            }
+            return result;
+        }
+
+        public Result<IDiscountPolicyData> GetData()
+        {
+            return MainDiscount.GetData();
+        }
+
+        public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy)
+        {
+            Result<bool> result = MainPolicy.AddPolicy(policy, MainPolicy.Policy.Id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The policy has been added successfully", true, true);
+                else return new Result<bool>($"The policy could not be added", false, false);
+            }
+            return result;
+        }
+
+        public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, String id)
+        {
+            Result<bool> result = MainPolicy.AddPolicy(policy, id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The policy has been added successfully", true, true);
+                else return new Result<bool>($"The policy addition failed because the policy with an id ${id} was not found", false, false);
+            }
+            return result;
+        }
+
+        public Result<bool> RemovePurchasePolicy(string id)
+        {
+            Result<bool> result = MainPolicy.RemovePolicy(id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The policy has been removed successfully", true, true);
+                else return new Result<bool>($"The policy removal failed because the policy with an id ${id} was not found", false, false);
+            }
+            return result;
         }
     }
 }

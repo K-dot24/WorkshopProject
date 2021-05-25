@@ -71,8 +71,8 @@ export function GetPermission(userId , storeId) {
 //#region GuestUserController
 
 /// Get welcome page of the system
-export function EnterSystem( ) {
-    return fetch(`https://localhost:5000/api/GuestUser/Register`, {
+export function EnterSystem() {
+    return fetch(`https://localhost:5000/api/GuestUser`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -109,12 +109,12 @@ export function Register( data ) {
 /// NOTE: fields are optionals
 export function SearchStore( search_by ) {    //TODO - search by other params
     return fetch(`https://localhost:5000/api/GuestUser/SearchStore`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { search_by },    
+        body: JSON.stringify(search_by),    
     })
 }
 
@@ -132,12 +132,12 @@ export function SearchStore( search_by ) {    //TODO - search by other params
 /// NOTE: fields are optionals
 export function SearchProduct( search_by ) {    //TODO - search by other params
     return fetch(`https://localhost:5000/api/GuestUser/SearchProduct`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { search_by },    
+        body: JSON.stringify(search_by),    
     })
 }
 
@@ -564,14 +564,13 @@ export function AdminGetStorePurchaseHistory( data ) {
 /// Adding new system admin
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
 /// <param name="email">email of the request new system admin</param>
-export function AddSystemAdmin( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/AddSystemAdmin/${data.sysAdminID}/${data.email}`, {
+export function AddSystemAdmin( sysAdminID, email ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/AddSystemAdmin/${sysAdminID}/${email}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 

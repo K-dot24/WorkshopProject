@@ -1,26 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
-import { Products, Navbar, Cart, Action } from '../../../../components';
+import { Products, Navbar, Cart, Action, CheckboxList } from '../../../../components';
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
-        AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff } from '../../../../api/API';
+        AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct } from '../../../../api/API';
 
 
 
 const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     const [products, setProducts] = useState([]);
     const [bag, setBag] = useState({products: [], totalPrice: 0});
+    const [searchQuery, setsearchQuery] = useState('');
 
     const fetchProducts = async () => {
         GetAllProductByStoreIDToDisplay(store.id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
     }
 
-    // TODO: Fetch real data from API
-    const fetchBag = async () => { 
-    }
+    //#region Bag Functionality
 
-     // TODO: Update with real data
-     const handleAddToBag = async (productId, name, price, quantity, image) => {
+    const handleAddToBag = async (productId, name, price, quantity, image) => {
          setBag(function(prevState) {
             const productArr = prevState.products.filter(p => p.id === productId);
             
@@ -66,6 +64,8 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     const handleEmptyBag = async () => {
         setBag({products: [], totalPrice: 0});
     }
+
+    //#endregion
 
     //#region Staff Actions
 
@@ -129,17 +129,42 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
     }
 
+    const handleSetPermissions = async (permissions, managerID) => {
+        console.log(permissions, managerID);
+
+        SetPermissions({storeID: store.id, managerID: managerID.managerid, ownerID: user.id, permissions}).then(response => response.ok ?
+            response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
+    }
+
     //#endregion
+
+    // TODO: SearchStore- fix API and check
+    const searchProductsByQuery = async () => {
+        const query = {Name: searchQuery};
+        console.log(query);
+        SearchProduct(query).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+    }
+
+    const handleProductSearch = async (query) => {
+        setsearchQuery(query);
+    }
+
+    useEffect(() => {
+        // TODO: Check after API works
+        if (searchQuery !== '')
+            searchProductsByQuery();
+        // else
+        //     fetchStores();
+    }, [searchQuery]);
 
     useEffect(() => {
         fetchProducts();
-        fetchBag();
         console.log("store id: " + store.id);
     }, []);
 
     return (
         <div>
-            <Navbar storeId={store.id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} />
+            <Navbar storeId={store.id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} handleSearch={handleProductSearch} />
             <Switch>
                 <Route exact path={match.url}>
                     <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} />
@@ -202,9 +227,14 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 />
 
                 <Route exact path={match.url + `/getstorestaff`} 
-                    render={(props) => (<Action name='Get Store Stuff' 
-                                                 
+                    render={(props) => (<Action name='Get Store Stuff'     
                                                 handleAction={handleGetStoreStaff} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/setpermissions`} 
+                    render={(props) => (<Action name='Set Permissions'
+                                                fields={[{name: 'Manager ID', required: true}]}   
+                                                handleAction={handleSetPermissions} {...props} />)} 
                 />
 
             </Switch>

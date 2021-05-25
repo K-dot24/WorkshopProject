@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -28,8 +29,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public void createProducts()
         {
-            AddNewProduct("p1", 10, 10, "test1", null);
-            AddNewProduct("p2", 20, 10, "test2", null);
+            LinkedList<string> keywords = new LinkedList<string>();
+            keywords.AddLast("food");
+            keywords.AddLast("banana");
+
+            LinkedList<string> keywords2 = new LinkedList<string>();
+            keywords2.AddLast("food");
+
+            AddNewProduct("p1", 10, 10, "test1", keywords);
+            AddNewProduct("p2", 20, 10, "test2", keywords2);
             AddNewProduct("p3", 30, 10, "test3", null);
             AddNewProduct("p4", 40, 10, "test4", null);
         }
@@ -59,7 +67,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<Product> EditProduct(string productID, IDictionary<String, object> details)
         {
             if (Products.TryGetValue(productID, out Product toEdit))
-            {
+            {   
                 ObjectDictionaryMapper<Product>.SetPropertyValue(toEdit, details);
                 return new Result<Product>($"Succeded to edit product (ID: {productID}).\n", true, toEdit);
             }
@@ -106,34 +114,48 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             Boolean result = true;
             ICollection<String> properties = searchAttributes.Keys;
+            IDictionary<String, Object> lowerCaseDict = searchAttributes.ToDictionary(k => k.Key.ToLower(), k => k.Value);
+
             foreach (string property in properties)
             {
-                var value = searchAttributes[property];
+                JsonElement jsonElement = (JsonElement)lowerCaseDict[property.ToLower()];
+                Object value = null;
                 switch (property.ToLower())
                 {
                     case "name":
-                        if (!product.Name.ToLower().Contains(((string)value).ToLower())) { result = false; }
+                        value = jsonElement.GetString().ToLower();
+                        if (!product.Name.ToLower().Contains((string)value)) { result = false; }
                         break;
                     case "category":
-                        if (!product.Category.ToLower().Equals(((string)value).ToLower())) { result = false; }
+                        value = jsonElement.GetString().ToLower();
+                        if (!product.Category.ToLower().Equals((string)value)) { result = false; }
                         break;
                     case "lowprice":
+                        value = jsonElement.GetDouble();
                         if (product.Price < (Double)value) { result = false; }
                         break;
                     case "highprice":
+                        value = jsonElement.GetDouble();
                         if (product.Price > (Double)value) { result = false; }
                         break;
                     case "productrating":
+                        value = jsonElement.GetDouble();
                         if (product.Rating < (Double)value) { result = false; }
                         break;
                     case "storerating":
+                        value = jsonElement.GetDouble();
                         if (StoreRating < (Double)value) { result = false; }
                         break;
                     case "keywords":
                         bool found = false;
+                        value = jsonElement.EnumerateArray();
                         List<string> productKeywords = product.Keywords.Select(word => word.ToLower()).ToList();
-                        //foreach (string keyword in (List<String>)value)
-                        List<string> searchWords = (List<String>)value;
+                        List<string> searchWords = new List<string>();
+                        foreach (var item in (JsonElement.ArrayEnumerator)value)
+                        {
+                            searchWords.Add(item.GetString());
+                        }
+
                         for (int i=0; i<searchWords.Count && !found ; i++)
                         {
                             if (productKeywords.Contains(searchWords[i].ToLower()))

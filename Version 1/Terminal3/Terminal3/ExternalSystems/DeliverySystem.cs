@@ -9,7 +9,7 @@ namespace Terminal3.ExternalSystems
     {
         public static Boolean Deliver(IDictionary<String, Object> deliveryDetails)
         {
-            return true;
+            return deliveryDetails.Count != 0;
         }
     }
 }
