@@ -12,6 +12,8 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.ServiceLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountTargets;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -40,6 +42,9 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_OrPolicy> DAO_OrPolicy;
         public DAO<DTO_BuyNow> DAO_BuyNow;
         public DAO<DTO_ConditionalPolicy> DAO_ConditionalPolicy;
+        public DAO<DTO_VisibleDiscount> DAO_VisibleDiscount;
+        public DAO<DTO_DiscountTargetCategories> DAO_DiscountTargetCategories;
+        public DAO<DTO_DiscountTargetProducts> DAO_DiscountTargetProducts;
 
         // IdentityMaps  <Id , object>
         public ConcurrentDictionary<String, RegisteredUser> RegisteredUsers;
@@ -59,6 +64,9 @@ namespace Terminal3.DataAccessLayer
         public ConcurrentDictionary<String, OrPolicy> Policy_OrPolicys;
         public ConcurrentDictionary<String, BuyNow> Policy_BuyNows;
         public ConcurrentDictionary<String, ConditionalPolicy> Policy_ConditionalPolicys;
+        public ConcurrentDictionary<String, VisibleDiscount> Discount_VisibleDiscounts;
+        public ConcurrentDictionary<String, DiscountTargetCategories> Discount_DiscountTargetCategories;
+        public ConcurrentDictionary<String, DiscountTargetProducts> Discount_DiscountTargetProducts;
 
 
         //Constructor
@@ -85,6 +93,9 @@ namespace Terminal3.DataAccessLayer
             DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "Policies");
             DAO_BuyNow = new DAO<DTO_BuyNow>(database, "Policies");
             DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "Policies");
+            DAO_VisibleDiscount = new DAO<DTO_VisibleDiscount>(database, "Discounts");
+            DAO_DiscountTargetCategories = new DAO<DTO_DiscountTargetCategories>(database, "Discounts");
+            DAO_DiscountTargetProducts = new DAO<DTO_DiscountTargetProducts>(database, "Discounts");
 
             // IdentityMaps  <Id , object>
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
@@ -104,6 +115,9 @@ namespace Terminal3.DataAccessLayer
             Policy_OrPolicys = new ConcurrentDictionary<String, OrPolicy>();
             Policy_BuyNows = new ConcurrentDictionary<String, BuyNow>();
             Policy_ConditionalPolicys = new ConcurrentDictionary<String, ConditionalPolicy>();
+            Discount_VisibleDiscounts = new ConcurrentDictionary<String, VisibleDiscount>();
+            Discount_DiscountTargetCategories = new ConcurrentDictionary<String, DiscountTargetCategories>();
+            Discount_DiscountTargetProducts = new ConcurrentDictionary<String, DiscountTargetProducts>();
 
     }
 
@@ -255,10 +269,39 @@ namespace Terminal3.DataAccessLayer
             {
                 string[] type = policy.GetType().ToString().Split('.');
                 string policy_type = type[type.Length - 1];
-                AddToDB(policy_type, policy);
+                AddPolicyToDB(policy_type, policy);
                 Policies.TryAdd(policy_type, policy.Id);
             }
             return Policies;
+        }
+
+        private ConcurrentDictionary<String, String> getDiscountsIDs(IDiscountTarget discount)
+        {
+            ConcurrentDictionary<String, String> Discounts = new ConcurrentDictionary<String, String>();
+
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+            string id = DomainLayer.Service.GenerateId();
+            AddDiscountToDB(discount_type, discount , id);
+            Discounts.TryAdd(discount_type,  id );
+            
+            return Discounts;
+        }
+
+        private IDiscountTarget LoadIDiscountTarget(String tag, string target_id)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", target_id);
+            switch (tag)
+            {
+                case "DiscountTargetCategories":
+                    return LoadDiscountTargetCategories(filter);
+
+                case "DiscountTargetProducts":
+                    return LoadDiscountTargetProducts(filter);
+
+            }
+
+            return null;
         }
         private IPurchasePolicy LoadIPurchasePolicy(String tag, string policy_id)
         {
@@ -294,6 +337,20 @@ namespace Terminal3.DataAccessLayer
             return null;
         }
 
+        private void DeleteIDiscountTarget(String type, string discount_id)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", discount_id);
+            switch (type)
+            {
+                case "DiscountTargetCategories":
+                    DeleteDiscountTargetCategories(filter);
+                    break;
+
+                case "DiscountTargetProducts":
+                    DeleteDiscountTargetProducts(filter);
+                    break;
+            }
+        }
         private void DeleteIPurchasePolicy(String type, string policy_id)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_id", policy_id);
@@ -344,7 +401,8 @@ namespace Terminal3.DataAccessLayer
                     break;
             }
         }
-        private void AddToDB(String type , IPurchasePolicy policy)
+
+        private void AddPolicyToDB(String type , IPurchasePolicy policy)
         {
             switch (type)
             {
@@ -394,6 +452,19 @@ namespace Terminal3.DataAccessLayer
             }
         }
 
+        private void AddDiscountToDB(String type, IDiscountTarget discount , string id)
+        {
+            switch (type)
+            {
+                case "DiscountTargetCategories":
+                    Create((DiscountTargetCategories)discount , id);
+                    break;
+
+                case "DiscountTargetProducts":
+                    Create((DiscountTargetProducts)discount , id);
+                    break;
+            }
+        }
         #endregion
 
         #region User
@@ -1208,7 +1279,140 @@ namespace Terminal3.DataAccessLayer
         }
         #endregion Purchase Policies
 
+
+        #region Discounts
+
+        public void Create(VisibleDiscount visibleDiscount)
+        {
+            DAO_VisibleDiscount.Create(new DTO_VisibleDiscount(visibleDiscount.Id, visibleDiscount.ExpirationDate.ToString(), getDiscountsIDs(visibleDiscount.Target), visibleDiscount.Percentage));
+            Discount_VisibleDiscounts.TryAdd(visibleDiscount.Id, visibleDiscount);
+        }
+
+        public VisibleDiscount LoadVisibleDiscount(FilterDefinition<BsonDocument> filter)
+        {
+            VisibleDiscount v;
+            DTO_VisibleDiscount dto = DAO_VisibleDiscount.Load(filter);
+            //if (Discount_VisibleDiscounts.TryGetValue(dto._id, out v))
+            //{
+            //    return v;
+            //}
+
+            IDiscountTarget Target = null;
+            foreach (var discount in dto.Target)
+            {
+                Target = LoadIDiscountTarget(discount.Key, discount.Value);
+            }
+
+            v = new VisibleDiscount(DateTime.Parse(dto.ExpirationDate), Target, dto.Percentage, dto._id);
+            Discount_VisibleDiscounts.TryAdd(v.Id, v);
+            return v;
+        }
+
+        public void UpdateVisibleDiscount(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_VisibleDiscount.Update(filter, update);
+        }
+
+        public void DeleteVisibleDiscount(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_VisibleDiscount deletedVisibleDiscount = DAO_VisibleDiscount.Delete(filter);
+            foreach (var discount in deletedVisibleDiscount.Target)
+            {
+                DeleteIDiscountTarget(discount.Key, discount.Value);
+            }
+            Discount_VisibleDiscounts.TryRemove(deletedVisibleDiscount._id, out VisibleDiscount v);
+        }
+
+
+        #region Discount Target
+        public void Create(DiscountTargetCategories discountTargetCategories , String id)
+        {
+            DAO_DiscountTargetCategories.Create(new DTO_DiscountTargetCategories(id, discountTargetCategories.Categories));
+            Discount_DiscountTargetCategories.TryAdd(id, discountTargetCategories);
+        }
+
+        public DiscountTargetCategories LoadDiscountTargetCategories(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountTargetCategories d;
+            DTO_DiscountTargetCategories dto = DAO_DiscountTargetCategories.Load(filter);
+            //if (Discount_DiscountTargetCategories.TryGetValue(dto._id, out d))
+            //{
+            //    return d;
+            //}
+
+            d = new DiscountTargetCategories(dto.Categories);
+            Discount_DiscountTargetCategories.TryAdd(dto._id, d);
+            return d;
+        }
+
+        public void UpdateDiscountTargetCategories(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountTargetCategories.Update(filter, update);
+        }
+
+        public void DeleteDiscountTargetCategories(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountTargetCategories deletedDiscountTargetCategories = DAO_DiscountTargetCategories.Delete(filter);
+            Discount_DiscountTargetCategories.TryRemove(deletedDiscountTargetCategories._id, out DiscountTargetCategories d);
+        }
+
+
+        public void Create(DiscountTargetProducts discountTargetProducts, String id)
+        {
+
+            List<String> Products = new List<string>();
+            foreach(Product p in discountTargetProducts.Products)
+            {
+                Products.Add(p.Id);
+            }
+
+            DAO_DiscountTargetProducts.Create(new DTO_DiscountTargetProducts(id, Products));
+            Discount_DiscountTargetProducts.TryAdd(id, discountTargetProducts);
+        }
+
+        public DiscountTargetProducts LoadDiscountTargetProducts(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountTargetProducts d;
+            DTO_DiscountTargetProducts dto = DAO_DiscountTargetProducts.Load(filter);
+            //if (Discount_DiscountTargetProducts.TryGetValue(dto._id, out d))
+            //{
+            //    return d;
+            //}
+
+            List<Product> Products = new List<Product>();
+            foreach(String pid in dto.Products)
+            {
+                var p_filter = Builders<BsonDocument>.Filter.Eq("_id", pid);
+                Products.Add(LoadProduct(p_filter));
+            }
+
+            d = new DiscountTargetProducts(Products);
+            Discount_DiscountTargetProducts.TryAdd(dto._id, d);
+            return d;
+        }
+
+        public void UpdateDiscountTargetProducts(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountTargetProducts.Update(filter, update);
+        }
+
+        public void DeleteDiscountTargetProducts(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountTargetProducts deletedDiscountTargetProducts = DAO_DiscountTargetProducts.Delete(filter);
+            Discount_DiscountTargetProducts.TryRemove(deletedDiscountTargetProducts._id, out DiscountTargetProducts d);
+        }
+
+
+
+        #endregion Discount Target
+
+
+
+        #endregion Discounts
+
         #endregion Policies
+
+
 
 
 
