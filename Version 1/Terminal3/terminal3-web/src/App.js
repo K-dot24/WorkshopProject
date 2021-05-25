@@ -7,7 +7,7 @@ import { HubConnectionBuilder } from '@microsoft/signalr';
 
 import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products } from './components';
 import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
-        GetUserShoppingCart, UpdateShoppingCart, EnterSystem, SearchProduct } from './api/API';
+        GetUserShoppingCart, UpdateShoppingCart, EnterSystem, SearchProduct, GetTotalShoppingCartPrice } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -45,14 +45,16 @@ const App = () => {
         if (user.id !== -1){
             GetUserShoppingCart(user.id).then(response => response.ok ? 
                 response.json().then(data => setCart({id: data.id,
-                                                      products: data.shoppingBags.length === 0 ? [] : 
-                                                        data.shoppingBags.reduce(function(list, bag) {
-                                                            return list.concat(bag.products);
-                                                        }, []),  
-                                                      totalPrice: data.shoppingBags.reduce(function(total, bag) {
-                                                                    return total + bag.totalBagPrice;
-                                                                }, 0)
-                                                        })) : null).catch(err => console.log(err));    // TODO: Check
+                                                    products: data.shoppingBags.length === 0 ? [] : 
+                                                                data.shoppingBags.reduce(function(list, bag) {
+                                                                    return list.concat(bag.products.map(p => ({ ...p, storeID: bag.storeId })));
+                                                                }, []),
+                                                    totalPrice: data.shoppingBags.length !== 0 ? handleGetTotalShoppingCartPrice() : 0
+                                                                // data.shoppingBags.reduce(function(total, bag) {
+                                                                //                 return total + bag.totalBagPrice;
+                                                                //             }, 0)
+                                                    })) : null)
+                                .catch(err => console.log(err));
         }
     }
 
@@ -62,42 +64,64 @@ const App = () => {
 
     }
 
-    // TODO: Connect to API
-    const handleUpdateCartQuantity = async (productId, quantity) => {
+    const handleUpdateCartQuantity = async (storeID, productID, quantity) => {
+        const data = { userID: user.id, storeID, productID, quantity };
+        console.log(data);
+
+        UpdateShoppingCart(data).then(response => response.ok ? 
+            response.json().then(result => result.execStatus ? fetchCart() : console.log(result.message)) : console.log("NOT OKAY")).catch(err => alert(err));
+    }
+
+    // const handleUpdateCartQuantity = async (productId, quantity) => {
         
-        if (quantity === 0) {
-            handleRemoveFromCart(productId);
-        } else {
-            setCart(function(prevState) {
-                const product = prevState.products.filter(product => product.id === productId)[0];
-                const toAdd = quantity - product.quantity;
+    //     if (quantity === 0) {
+    //         handleRemoveFromCart(productId);
+    //     } else {
+    //         setCart(function(prevState) {
+    //             const product = prevState.products.filter(product => product.id === productId)[0];
+    //             const toAdd = quantity - product.quantity;
                 
-                return {
-                    products: prevState.products.map(
-                    p => p.id === productId ? { ...p, quantity: quantity }: p
-                    ),
-                    totalPrice: prevState.totalPrice + product.price * toAdd       
-                }
-            }); 
-        }
-    }
+    //             return {
+    //                 products: prevState.products.map(
+    //                 p => p.id === productId ? { ...p, quantity: quantity }: p
+    //                 ),
+    //                 totalPrice: prevState.totalPrice + product.price * toAdd       
+    //             }
+    //         }); 
+    //     }
+    // }
 
-    // TODO: Connect to API
-    const handleRemoveFromCart = async (productId) => {
-        setCart(function(prevState) {
-            const product = prevState.products.filter(product => product.id === productId)[0];
+    // const handleRemoveFromCart = async (productId) => {
+    //     setCart(function(prevState) {
+    //         const product = prevState.products.filter(product => product.id === productId)[0];
             
-            return {
-            products: prevState.products.filter(
-                product => product.id !== productId
-            ),
-            totalPrice: prevState.totalPrice - product.price * product.quantity       
-            }
-        }); 
+    //         return {
+    //         products: prevState.products.filter(
+    //             product => product.id !== productId
+    //         ),
+    //         totalPrice: prevState.totalPrice - product.price * product.quantity       
+    //         }
+    //     }); 
+    // }
+
+    const handleEmptyCart = () => {
+        console.log("EMPTY CART");
+        const allProducts = cart.products;
+        allProducts.map((product) => handleUpdateCartQuantity(product.storeID, product.id, 0));
+
+        // setCart({products: [], totalPrice: 0});
     }
 
-    const handleEmptyCart = async () => {
+    const fakeEmptyCart = () => {
         setCart({products: [], totalPrice: 0});
+    };
+
+    const handleGetTotalShoppingCartPrice = () => {
+        GetTotalShoppingCartPrice(user.id).then(response => response.ok ? 
+            response.json().then(result => result.execStatus ? setCart(function(prevState) {
+                return { ...prevState, totalPrice: result.data };
+
+            }) : console.log(result.message)) : console.log("NOT OKAY")).catch(err => alert(err));
     }
     //#endregion
 
@@ -120,7 +144,7 @@ const App = () => {
         Logout(user.email).then(response => response.ok ?
             response.json().then(id => 
                 reIdentify(user.id, id, 'Logout')
-                .then(() => setUser({id, email: '', loggedIn: false}) & handleEmptyCart())
+                .then(() => setUser({id, email: '', loggedIn: false}) & fakeEmptyCart())
                 .catch(err => alert(err))) : console.log("NOT OK")).catch(err => alert(err));
     }
     
@@ -266,7 +290,6 @@ const App = () => {
                                 id={0} 
                                 cart={cart} 
                                 handleUpdateCartQuantity={handleUpdateCartQuantity} 
-                                handleRemoveFromCart={handleRemoveFromCart} 
                                 handleEmptyCart={handleEmptyCart} 
                             />
                         </Route>

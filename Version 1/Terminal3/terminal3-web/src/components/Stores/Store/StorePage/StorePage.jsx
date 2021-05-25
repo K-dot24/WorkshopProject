@@ -23,13 +23,13 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             const productArr = prevState.products.filter(p => p.id === productId);
             
             return {
-                products: productArr.length === 0 ? [...prevState.products, {id: productId, name, price, quantity, image}] : handleUpdateBagQuantity(productId, productArr[0].quantity + quantity),
+                products: productArr.length === 0 ? [...prevState.products, {id: productId, name, price, quantity, image}] : handleUpdateBagQuantity(0, productId, productArr[0].quantity + quantity),
                 totalPrice: prevState.totalPrice + price*quantity      
             }
         }); 
     }
 
-    const handleUpdateBagQuantity = async (productId, quantity) => {
+    const handleUpdateBagQuantity = async (storeID, productId, quantity) => {
         if (quantity === 0) {
             handleRemoveFromBag(productId);
         } else {
@@ -138,7 +138,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     //#endregion
 
-    // TODO: SearchStore- fix API and check
+    // TODO: Change Navbar to not show search bar and remove
     const searchProductsByQuery = async () => {
         const query = {Name: searchQuery};
         console.log(query);
@@ -175,7 +175,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                         id={store.id}
                         cart={bag}
                         handleUpdateCartQuantity={handleUpdateBagQuantity} 
-                        handleRemoveFromCart={handleRemoveFromBag} 
                         handleEmptyCart={handleEmptyBag}
                         handleAddToCart={handleAddToCart}
                     />

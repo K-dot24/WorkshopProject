@@ -96,7 +96,7 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut, handleSearch }) => {
                         <img src={logo} alt="Terminal 3" height="50px" className={classes.image} />
                     </Typography>
 
-                    {/* Search bar */}
+                    {/* Search bar // TODO: Change to not show search bar at StorePage (storeID !== -1) */}
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>
                             <SearchIcon />

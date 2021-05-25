@@ -6,7 +6,7 @@ import useStyles from './styles';
 import CartItem from './CartItem/CartItem';
 import { products_image_url } from '../../api/API';
 
-const Cart = ({ id, cart, handleUpdateCartQuantity, handleRemoveFromCart, handleEmptyCart, handleAddToCart }) => {
+const Cart = ({ id, cart, handleUpdateCartQuantity, handleEmptyCart, handleAddToCart }) => {
     const classes = useStyles();
 
     const EmptyCart = () => (
@@ -24,7 +24,7 @@ const Cart = ({ id, cart, handleUpdateCartQuantity, handleRemoveFromCart, handle
             <Grid container spacing={3}>
                 {cart.products.map((item) => (
                     <Grid item xs={12} sm={4} key={item.id}>
-                        <CartItem item={item} handleUpdateCartQuantity={handleUpdateCartQuantity} handleRemoveFromCart={handleRemoveFromCart} />
+                        <CartItem item={item} handleUpdateCartQuantity={handleUpdateCartQuantity} />
                     </Grid>
                 ))}
             </Grid>

@@ -192,7 +192,7 @@ export function GetUserShoppingCart( userID ) {
 /// }
 export function UpdateShoppingCart( data ) {    
     return fetch(`https://localhost:5000/api/GuestUser/UpdateShoppingCart`, {
-        method: 'PUT',                                                                  //TODO -PUT
+        method: 'PUT',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',

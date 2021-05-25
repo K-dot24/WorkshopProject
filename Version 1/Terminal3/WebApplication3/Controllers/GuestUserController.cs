@@ -184,7 +184,7 @@ namespace Terminal3WebAPI.Controllers
         /// Template of valid JSON:
         /// {
         ///     "userID":"string",
-        ///     "shoppingBagID":"string",
+        ///     "storeID":"string",
         ///     "productID":"string",
         ///     "quantity":int
         /// }
@@ -194,7 +194,7 @@ namespace Terminal3WebAPI.Controllers
         [HttpPut]
         public IActionResult UpdateShoppingCart([FromBody] UpdateShoppingCartModel details)
         {
-            Result<Boolean> result = system.UpdateShoppingCart(details.userID, details.shoppingBagID, details.productID, details.quantity);
+            Result<Boolean> result = system.UpdateShoppingCart(details.userID, details.storeID, details.productID, details.quantity);
             if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result); }
         }
