@@ -26,9 +26,11 @@ const Product = ({ product, onAddToBag }) => {
                 <Typography variant="body2" color="textSecondary">{product.category}</Typography>
             </CardContent>
             <CardActions disableSpacing className={classes.cardActions}>
-                <IconButton aria-label="Add to Bag" onClick={() => onAddToBag(product.id, product.name, product.price, 1, products_image_url)}>
-                    <AddShoppingCart />
-                </IconButton>
+                {onAddToBag !== null &&
+                    <IconButton aria-label="Add to Bag" onClick={() => onAddToBag(product.id, product.name, product.price, 1, products_image_url)}>
+                        <AddShoppingCart />
+                    </IconButton>
+                }
             </CardActions>
         </Card>
     )

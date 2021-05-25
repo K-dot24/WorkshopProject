@@ -5,9 +5,9 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 // SignalR
 import { HubConnectionBuilder } from '@microsoft/signalr';
 
-import { Stores, Navbar, Cart, Checkout, Register, Login, Action } from './components';
+import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products } from './components';
 import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
-        GetUserShoppingCart, UpdateShoppingCart, EnterSystem } from './api/API';
+        GetUserShoppingCart, UpdateShoppingCart, EnterSystem, SearchProduct } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -26,6 +26,10 @@ const App = () => {
     const [user, setUser] = useState({id: -1, email: '', loggedIn: false});
     const [cart, setCart] = useState({id: 0, products: [], totalPrice: 0});
     const [storeSearchQuery, setStoreSearchQuery] = useState('');
+    
+    // Products Search
+    const [productSearchQuery, setProductSearchQuery] = useState('');
+    const [products, setProducts] = useState([]); 
 
     // SignalR
     const [connection, setConnection] = useState(null);
@@ -37,11 +41,8 @@ const App = () => {
 
     //#region Cart Functionality 
     
-    // TODO: Fetch from API?
     const fetchCart = async () => {
-        setCart({id: 0, products: [], totalPrice: 0});
-
-        if (user.loggedIn === true){
+        if (user.id !== -1){
             GetUserShoppingCart(user.id).then(response => response.ok ? 
                 response.json().then(data => setCart({id: data.id,
                                                       products: data.shoppingBags.length === 0 ? [] : 
@@ -57,11 +58,11 @@ const App = () => {
 
     const handleAddToCart = async (storeId, productId, name, price, quantity, image) => {
         AddProductToCart({ userID: user.id, productID: productId, ProductQuantity: quantity, storeID: storeId }).then(response => response.ok ? 
-            response.json().then(status => alert("Product added successfully")) : console.log("NOT OKAY")).catch(err => alert(err));
+            response.json().then(status => status && (alert("Product added successfully") & fetchCart())) : console.log("NOT OKAY")).catch(err => alert(err));
 
-        fetchCart();
     }
 
+    // TODO: Connect to API
     const handleUpdateCartQuantity = async (productId, quantity) => {
         if (quantity === 0) {
             handleRemoveFromCart(productId);
@@ -77,25 +78,11 @@ const App = () => {
                     totalPrice: prevState.totalPrice + product.price * toAdd       
                 }
             }); 
-
-            // setCart(prevState => ({
-            //     products: prevState.products.map(
-            //       product => product.id === productId ? { ...product, quantity: quantity }: product
-            //     ),
-            //     totalPrice: prevState.totalPrice + prevState.products.filter(product => product.id === productId)[0].price * quantity       
-            // })); 
         }
     }
 
+    // TODO: Connect to API
     const handleRemoveFromCart = async (productId) => {
-
-        // setCart(prevState => ({
-        //     products: prevState.products.filter(
-        //       product => product.id !== productId
-        //     ),
-        //     totalPrice: prevState.totalPrice - price
-        //   }));
-
         setCart(function(prevState) {
             const product = prevState.products.filter(product => product.id === productId)[0];
             
@@ -132,7 +119,7 @@ const App = () => {
         Logout(user.email).then(response => response.ok ?
             response.json().then(id => 
                 reIdentify(user.id, id, 'Logout')
-                .then(() => setUser({id, email: '', loggedIn: false}))
+                .then(() => setUser({id, email: '', loggedIn: false}) & handleEmptyCart())
                 .catch(err => alert(err))) : console.log("NOT OK")).catch(err => alert(err));
     }
     
@@ -148,6 +135,30 @@ const App = () => {
 
     const handleStoreSearch = async (query) => {
         setStoreSearchQuery(query);
+    }
+
+    const handleProductSearch = async (query) => {
+        setProductSearchQuery(query);
+    }
+
+    // Serach by keywords, if not found by category, if not found by name.
+    const searchProductsByQuery = async () => {
+        const query = {Name: productSearchQuery};
+        console.log(query);
+        SearchProduct({ Keywords: [productSearchQuery] })
+            .then(response => response.json()
+            .then(result => result.execStatus ? setProducts(result.data) 
+                                : SearchProduct({ Category: productSearchQuery })
+                                    .then(response => response.json()
+                                    .then(result => result.execStatus ? setProducts(result.data) : 
+                                                        SearchProduct({ Name: productSearchQuery })
+                                                        .then(response => response.json()
+                                                        .then(result => result.execStatus ? setProducts(result.data) : console.log(result.message)))
+                                                        .catch(err => console.log(err))))
+                                    .catch(err => console.log(err))))
+            .catch(err => console.log(err));
+
+        // SearchProduct({ Category: productSearchQuery }).then(response => response.json().then(result => result.execStatus ? setProducts(result.data) : alert(result.message))).catch(err => console.log(err));
     }
 
     //#region Signal-R Functionality
@@ -179,6 +190,13 @@ const App = () => {
         fetchCart();
         console.log(user);
     }, [user]);
+
+    useEffect(() => {
+        if (productSearchQuery !== '')
+            searchProductsByQuery();
+        else
+            setProducts([]);
+    }, [productSearchQuery]);
 
     useEffect(() => {
         console.log(cart.products);
@@ -239,7 +257,7 @@ const App = () => {
         <MuiThemeProvider theme={theme}>
             <Router>
                 <div>
-                    <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} handleSearch={handleStoreSearch} />
+                    <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} handleSearch={handleProductSearch} />
                     <Switch>
 
                         <Route exact path="/cart">
@@ -272,9 +290,11 @@ const App = () => {
                             />
                         ) } */}
                         
-                        
-                        <Route path="/" render={(props) => (<Stores user={user} searchQuery={storeSearchQuery} handleAddToCart={handleAddToCart} handleLogOut={handleLogOut} {...props} />)} />
-
+                        { products.length > 0 ? (
+                            <Products storeName={'SEARCH_RES'} products={products} onAddToBag={handleAddToCart} />
+                        ) : (
+                            <Route path="/" render={(props) => (<Stores user={user} searchQuery={storeSearchQuery} handleAddToCart={handleAddToCart} handleLogOut={handleLogOut} {...props} />)} />
+                        )}
                         
                     </Switch>
                 </div>

@@ -21,23 +21,23 @@ const Stores = ({ match, user, searchQuery, handleAddToCart, handleLogOut }) => 
         // ]);
     }
 
-    // TODO: SearchStore- fix API and check
     const searchStoresByQuery = async () => {
         const query = {Name: searchQuery};
         console.log(query);
-        SearchStore(query).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+        SearchStore(query).then(response => response.json().then(json => json.execStatus ? setStores(json.data) : alert(json.message))).catch(err => console.log(err));
     }
 
+    // On first render
     useEffect(() => { 
         fetchStores();
     }, []);
     
+    // On search query update
     useEffect(() => {
-        // TODO: Check after API works
         if (searchQuery !== '')
             searchStoresByQuery();
-        // else
-        //     fetchStores();
+        else
+            fetchStores();
     }, [searchQuery]);
 
     return (

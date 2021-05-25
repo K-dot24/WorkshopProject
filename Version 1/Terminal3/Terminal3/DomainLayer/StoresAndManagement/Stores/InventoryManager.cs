@@ -29,8 +29,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public void createProducts()
         {
-            AddNewProduct("p1", 10, 10, "test1", null);
-            AddNewProduct("p2", 20, 10, "test2", null);
+            LinkedList<string> keywords = new LinkedList<string>();
+            keywords.AddLast("food");
+            keywords.AddLast("banana");
+
+            LinkedList<string> keywords2 = new LinkedList<string>();
+            keywords2.AddLast("food");
+
+            AddNewProduct("p1", 10, 10, "test1", keywords);
+            AddNewProduct("p2", 20, 10, "test2", keywords2);
             AddNewProduct("p3", 30, 10, "test3", null);
             AddNewProduct("p4", 40, 10, "test4", null);
         }
