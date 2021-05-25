@@ -47,6 +47,7 @@ namespace WebApplication3
 
             //Dependency injection
             services.AddSingleton<IECommerceSystem, ECommerceSystem>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,7 +76,6 @@ namespace WebApplication3
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                //endpoints.MapHub<NotificationHub>("/hubs/notification");
             });
 
 
