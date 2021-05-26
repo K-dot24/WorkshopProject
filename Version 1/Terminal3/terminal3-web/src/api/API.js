@@ -229,7 +229,6 @@ export function GetUserPurchaseHistory( userID ) {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { userID }, 
     })
 }
 

@@ -9,7 +9,7 @@ import useStyles from './styles';
 
 import logo from '../../assets/terminal3_logo.png';
 
-const Navbar = ( { storeId, totalItems, user, handleLogOut, handleSearch }) => {
+const Navbar = ( { storeId, totalItems, user, handleLogOut, handleSearch, handleGetUserPurchaseHistory }) => {
     const [permissions, setPermissions] = useState([])
     
     const classes = useStyles();
@@ -52,6 +52,13 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut, handleSearch }) => {
         setAnchorEl(null);
     };
 
+    const handleHistory = (path) => {
+        handleGetUserPurchaseHistory();
+        
+        history.push(path);
+        setAnchorEl(null);
+    }
+
     useEffect(() => {
         fetchPermissions();
         console.log(user);
@@ -72,7 +79,7 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut, handleSearch }) => {
             <div>
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/review`)}>Write Review</MenuItem>
-                <MenuItem onClick={() => handleMenuClick(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
+                <MenuItem onClick={() => handleHistory(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
 
                 {/* TODO: System Admin options */}
                 {/* <MenuItem onClick={() => handleMenuClick(`/${user.id}/addsystemadmin`)}>Add System Admin</MenuItem>

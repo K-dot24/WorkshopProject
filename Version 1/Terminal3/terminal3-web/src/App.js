@@ -5,9 +5,10 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 // SignalR
 import { HubConnectionBuilder } from '@microsoft/signalr';
 
-import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products } from './components';
+import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products, Review } from './components';
 import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
-        GetUserShoppingCart, UpdateShoppingCart, EnterSystem, SearchProduct, GetTotalShoppingCartPrice } from './api/API';
+        GetUserShoppingCart, UpdateShoppingCart, EnterSystem, SearchProduct, GetTotalShoppingCartPrice,
+        GetUserPurchaseHistory } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -29,7 +30,10 @@ const App = () => {
     
     // Products Search
     const [productSearchQuery, setProductSearchQuery] = useState('');
-    const [products, setProducts] = useState([]); 
+    const [products, setProducts] = useState([]);
+    
+    // User's Purchase History
+    const [userPurchaseHistory, setUserPurchaseHistory] = useState(null);
 
     // SignalR
     const [connection, setConnection] = useState(null);
@@ -152,6 +156,11 @@ const App = () => {
         OpenNewStore({ userID: user.id, ...data }).then(response => response.json().then(message => alert(message))).catch(err => alert(err));
     }
 
+    const handleGetUserPurchaseHistory = () => {
+        GetUserPurchaseHistory(user.id).then(response => response.ok ? 
+            response.json().then(result => result.execStatus ? setUserPurchaseHistory(result.data) : console.log(result.message)) : console.log("NOT OKAY")).catch(err => alert(err));
+    }
+
     // TODO
     const handleAddSystemAdmin = async (data) => {
         console.log(data);
@@ -223,9 +232,9 @@ const App = () => {
             setProducts([]);
     }, [productSearchQuery]);
 
-    useEffect(() => {
-        console.log(cart.products);
-    }, [cart]);
+    // useEffect(() => {
+    //     console.log(cart.products);
+    // }, [cart]);
 
     useEffect(() => {
         handleEnterSystem();
@@ -282,9 +291,10 @@ const App = () => {
         <MuiThemeProvider theme={theme}>
             <Router>
                 <div>
-                    <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} handleSearch={handleProductSearch} />
+                    <Navbar storeId={-1} totalItems={cart.products.length} user={user} handleLogOut={handleLogOut} 
+                            handleSearch={handleProductSearch} handleGetUserPurchaseHistory={handleGetUserPurchaseHistory} />
+                    
                     <Switch>
-
                         <Route exact path="/cart">
                             <Cart
                                 id={0} 
@@ -306,6 +316,11 @@ const App = () => {
                                 render={(props) => (<Action name='Open New Store' fields={[{name: 'Store Name', required: true}]} 
                                                             handleAction={handleOpenNewStore} {...props} />)} 
                         />
+
+                        {/* <Route exact path={`/${user.id}/purchasehistory`} render={(() => handleGetUserPurchaseHistory())} /> */}
+
+                        <Route exact path={`/${user.id}/purchasehistory`}
+                                render = {() => (<Review checkoutToken={userPurchaseHistory} />)} />
                         
                         {/* {user.id === "-777" && (
                             <Route exact path={`/${user.id}/addsystemadmin`} 
