@@ -10,7 +10,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     {
         public string Id { get; }
 
-        public AbstractDiscountCondition(String id = "")
+        public AbstractDiscountCondition(Dictionary<string, object> info, String id = "")
         {
             if (id.Equals(""))
                 Id = Service.GenerateId();
