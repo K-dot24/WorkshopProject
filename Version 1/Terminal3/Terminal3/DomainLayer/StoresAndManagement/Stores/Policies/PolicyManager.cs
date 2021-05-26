@@ -162,8 +162,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return MainPolicy.GetData();
         }
 
-
-            public Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info)
+        public Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info)
         {
             Result<IPurchasePolicy> result = CreatePurchasePolicy(info);
             if (!result.ExecStatus)
