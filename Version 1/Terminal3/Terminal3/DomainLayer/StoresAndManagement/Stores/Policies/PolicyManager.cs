@@ -15,11 +15,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info);
         Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info, String id);
         Result<Boolean> AddDiscountCondition(Dictionary<string, object> info, String id);
+        Result<Boolean> AddDiscountPolicy(IDiscountPolicy policy);
+        Result<Boolean> AddDiscountPolicy(IDiscountPolicy policy, String id);
+        Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id);
         Result<Boolean> RemoveDiscountPolicy(String id);
         Result<Boolean> RemoveDiscountCondition(String id);
         Result<Boolean> EditDiscountPolicy(Dictionary<string, object> info, String id);
         Result<Boolean> EditDiscountCondition(Dictionary<string, object> info, String id);
-        Result<IDiscountPolicyData> GetData();
+        Result<IDiscountPolicyData> GetDiscountPolicyData();
+        Result<IPurchasePolicyData> GetPurchasePolicyData();
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
         Result<Boolean> RemovePurchasePolicy(string id);
@@ -144,9 +148,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return result;
         }
 
-        public Result<IDiscountPolicyData> GetData()
+        public Result<IDiscountPolicyData> GetDiscountPolicyData()
         {
             return MainDiscount.GetData();
+        }
+
+        public Result<IPurchasePolicyData> GetPurchasePolicyData()
+        {
+            return MainPolicy.GetData();
         }
 
         public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy)

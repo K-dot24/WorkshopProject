@@ -22,6 +22,19 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<Boolean> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID);
         Result<Boolean> CloseStore(string storeId, string userID);
         Result<StoreService> ReOpenStore(string storeId, string userID);
+        Result<bool> AddDiscountPolicy(Dictionary<string, object> info);
+        Result<bool> AddDiscountPolicy(Dictionary<string, object> info, String id);
+        Result<bool> AddDiscountCondition(Dictionary<string, object> info, String id);
+        Result<bool> RemoveDiscountPolicy(String id);
+        Result<bool> RemoveDiscountCondition(String id);
+        Result<bool> EditDiscountPolicy(Dictionary<string, object> info, String id);
+        Result<bool> EditDiscountCondition(Dictionary<string, object> info, String id);
+        Result<IDiscountPolicyData> GetDiscountPolicyData();
+        Result<IPurchasePolicyData> GetPurchasePolicyData();
+        Result<bool> AddPurchasePolicy(Dictionary<string, object> info);
+        Result<bool> AddPurchasePolicy(Dictionary<string, object> info, String id);
+        Result<bool> RemovePurchasePolicy(String id);
+
 
     }
     public class StoreStaffController : IStoreStaffInterface
@@ -55,6 +68,66 @@ namespace Terminal3.ServiceLayer.Controllers
         public Result<StoreService> ReOpenStore(string storeId, string userID)
         {
             return StoresAndManagementInterface.ReOpenStore(storeId, userID);
+        }
+
+        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info)
+        {
+            return StoresAndManagementInterface.AddDiscountPolicy(info);
+        }
+
+        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info, string id)
+        {
+            return StoresAndManagementInterface.AddDiscountPolicy(info, id);
+        }
+
+        public Result<bool> AddDiscountCondition(Dictionary<string, object> info, string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<bool> RemoveDiscountPolicy(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<bool> RemoveDiscountCondition(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<bool> EditDiscountPolicy(Dictionary<string, object> info, string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<bool> EditDiscountCondition(Dictionary<string, object> info, string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IDiscountPolicyData> GetDiscountPolicyData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IPurchasePolicyData> GetPurchasePolicyData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info, string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<bool> RemovePurchasePolicy(string id)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

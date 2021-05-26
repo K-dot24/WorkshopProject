@@ -245,6 +245,66 @@ namespace Terminal3.ServiceLayer
         {
             return StoreStaffInterface.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID);
         }
+
+        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info)
+        {
+            return StoreStaffInterface.AddDiscountPolicy(info);
+        }
+
+        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.AddDiscountPolicy(info, id);
+        }
+
+        public Result<bool> AddDiscountCondition(Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.AddDiscountCondition(info, id);
+        }
+
+        public Result<bool> RemoveDiscountPolicy(String id)
+        {
+            return StoreStaffInterface.RemoveDiscountPolicy(id);
+        }
+
+        public Result<bool> RemoveDiscountCondition(String id)
+        {
+            return StoreStaffInterface.RemoveDiscountCondition(id);
+        }
+
+        public Result<bool> EditDiscountPolicy(Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.EditDiscountPolicy(info, id);
+        }
+
+        public Result<bool> EditDiscountCondition(Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.EditDiscountCondition(info, id);
+        }
+
+        public Result<IDiscountPolicyData> GetDiscountPolicyData()
+        {
+            return StoreStaffInterface.GetDiscountPolicyData();
+        }
+
+        public Result<IPurchasePolicyData> GetPurchasePolicyData()
+        {
+            return StoreStaffInterface.GetPurchasePolicyData();
+        }
+
+        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info)
+        {
+            return StoreStaffInterface.AddPurchasePolicy(info);
+        }
+
+        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.AddPurchasePolicy(info, id);
+        }
+
+        public Result<bool> RemovePurchasePolicy(String id)
+        {
+            return StoreStaffInterface.RemovePurchasePolicy(id);
+        }
         #endregion
 
         #region System Admin Actions
