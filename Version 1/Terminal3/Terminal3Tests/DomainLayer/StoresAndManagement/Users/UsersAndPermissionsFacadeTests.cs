@@ -296,8 +296,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             bag.Products.TryAdd(product, 2);
             bag.Products.TryAdd(product2, 1);
 
-            IDictionary<String, Object> paymentDetails = new Dictionary<String , Object>();
-            IDictionary<String, Object> deliveryDetails = new Dictionary<String , Object>();
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>
+                    {
+                     { "card_number", "2222333344445555" },
+                     { "month", "4" },
+                     { "year", "2021" },
+                     { "holder", "Israel Israelovice" },
+                     { "ccv", "262" },
+                     { "id", "20444444" }
+                    };
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>
+                    {
+                     { "name", "Israel Israelovice" },
+                     { "address", "Rager Blvd 12" },
+                     { "city", "Beer Sheva" },
+                     { "country", "Israel" },
+                     { "zip", "8458527" }
+                    };
 
             Assert.Empty(founder.History.ShoppingBags);
 
@@ -343,8 +358,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             founder.ShoppingCart.ShoppingBags.TryGetValue(store2.Id, out ShoppingBag bag2);
             bag2.Products.TryAdd(product2, 1);
 
-            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>();
-            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>();
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>
+                    {
+                     { "card_number", "2222333344445555" },
+                     { "month", "4" },
+                     { "year", "2021" },
+                     { "holder", "Israel Israelovice" },
+                     { "ccv", "262" },
+                     { "id", "20444444" }
+                    };
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>
+                    {
+                     { "name", "Israel Israelovice" },
+                     { "address", "Rager Blvd 12" },
+                     { "city", "Beer Sheva" },
+                     { "country", "Israel" },
+                     { "zip", "8458527" }
+                    };
 
             Assert.Empty(founder.History.ShoppingBags);
 
