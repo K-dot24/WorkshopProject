@@ -12,13 +12,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         public Double StartingPrice { get; }
         public Tuple<Double, String> LastOffer { get; }    // Customer offer <price, UserID>
 
-        public string Id => throw new NotImplementedException();
+        public string Id { get; set; }
 
         public Auction(DateTime closingTime, Double startingPrice)
         {
+            Id = Service.GenerateId();
             ClosingTime = closingTime;
             StartingPrice = startingPrice;
             LastOffer = new Tuple<Double, String>(-1, null);
+        }
+
+        public Auction(string id , String closingTime, double startingPrice, Tuple<double, string> lastOffer)
+        {
+            Id = id;
+            ClosingTime = DateTime.Parse(closingTime);
+            StartingPrice = startingPrice;
+            LastOffer = lastOffer;
         }
 
         public Result<double> CalculatePrice(Product product, int quantity)

@@ -24,9 +24,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         Result<Boolean> EditDiscountCondition(Dictionary<string, object> info, String id);
         Result<IDiscountPolicyData> GetDiscountPolicyData();
         Result<IPurchasePolicyData> GetPurchasePolicyData();
+        Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
+        Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info, string id);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
         Result<Boolean> RemovePurchasePolicy(string id);
+        Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id);
+        Result<bool> EditPurchasePolicy(IPurchasePolicy policy, string id);
     }
 
     public class PolicyManager : IPolicyManager
@@ -158,6 +162,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return MainPolicy.GetData();
         }
 
+
+            public Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info)
+        {
+            Result<IPurchasePolicy> result = CreatePurchasePolicy(info);
+            if (!result.ExecStatus)
+                return new Result<bool>(result.Message, false, false);
+            IPurchasePolicy policy = result.Data;
+            return AddPurchasePolicy(policy);
+        }
+
         public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy)
         {
             Result<bool> result = MainPolicy.AddPolicy(policy, MainPolicy.Policy.Id);
@@ -168,6 +182,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
                 else return new Result<bool>($"The policy could not be added", false, false);
             }
             return result;
+        }
+
+        public Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info, String id)
+        {
+            Result<IPurchasePolicy> result = CreatePurchasePolicy(info);
+            if (!result.ExecStatus)
+                return new Result<bool>(result.Message, false, false);
+            IPurchasePolicy policy = result.Data;
+            return AddPurchasePolicy(policy, id);
         }
 
         public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, String id)
@@ -190,6 +213,32 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
                 if (result.Data)
                     return new Result<bool>("The policy has been removed successfully", true, true);
                 else return new Result<bool>($"The policy removal failed because the policy with an id ${id} was not found", false, false);
+            }
+            return result;
+        }
+
+        private Result<IPurchasePolicy> CreatePurchasePolicy(Dictionary<string, object> info)
+        {
+            return new Result<IPurchasePolicy>("", true, new AndPolicy());
+        }
+
+        public Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id)
+        {
+            Result<IPurchasePolicy> result = CreatePurchasePolicy(info);
+            if (!result.ExecStatus)
+                return new Result<bool>(result.Message, false, false);
+            IPurchasePolicy policy = result.Data;
+            return EditPurchasePolicy(policy, id);
+        }
+
+        public Result<bool> EditPurchasePolicy(IPurchasePolicy policy, string id)
+        {
+            Result<bool> result = MainPolicy.EditPolicy(policy, id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The policy has been edited successfully", true, true);
+                else return new Result<bool>(result.Message, false, false);
             }
             return result;
         }
