@@ -40,10 +40,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddDiscountCondition(Dictionary<string, object> info, String id);
         Result<Boolean> RemoveDiscountPolicy(String id);
         Result<Boolean> RemoveDiscountCondition(String id);
+        Result<bool> EditDiscountPolicy(Dictionary<string, object> info, String id);
+        Result<bool> EditDiscountCondition(Dictionary<string, object> info, String id);
         Result<IDiscountPolicyData> GetPoliciesData();
-        Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
-        Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
+        Result<IPurchasePolicyData> GetPurchasePolicyData();
+        Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info);
+        Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info, string id);
         Result<Boolean> RemovePurchasePolicy(string id);
+        Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id);
         #endregion
 
         #region Information        
@@ -564,21 +568,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.AddDiscountCondition(info, id);
         }
 
-        public Result<bool> AddDiscountPolicy(IDiscountPolicy policy)
-        {
-            return PolicyManager.AddDiscountPolicy(policy);
-        }
-
-        public Result<bool> AddDiscountPolicy(IDiscountPolicy policy, string id)
-        {
-            return PolicyManager.AddDiscountPolicy(policy, id);
-        }
-
-        public Result<bool> AddDiscountCondition(IDiscountCondition condition, string id)
-        {
-            return PolicyManager.AddDiscountCondition(condition, id);
-        }
-
         public Result<bool> RemoveDiscountPolicy(string id)
         {
             return PolicyManager.RemoveDiscountPolicy(id);
@@ -589,24 +578,44 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.RemoveDiscountCondition(id);
         }
 
-        public Result<IDiscountPolicyData> GetPoliciesData()
-        {
-            return PolicyManager.GetData();
-        }
-
-        public Result<bool> AddPurchasePolicy(IPurchasePolicy policy)
-        {
-            return PolicyManager.AddPurchasePolicy(policy);
-        }
-
-        public Result<bool> AddPurchasePolicy(IPurchasePolicy policy, string id)
-        {
-            return PolicyManager.AddPurchasePolicy(policy, id);
-        }
-
         public Result<bool> RemovePurchasePolicy(string id)
         {
             return PolicyManager.RemovePurchasePolicy(id);
+        }
+
+        public Result<bool> EditDiscountPolicy(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.EditDiscountPolicy(info, id);
+        }
+
+        public Result<bool> EditDiscountCondition(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.EditDiscountCondition(info, id);
+        }
+
+        public Result<IDiscountPolicyData> GetPoliciesData()
+        {
+            return PolicyManager.GetDiscountPolicyData();
+        }
+
+        public Result<IPurchasePolicyData> GetPurchasePolicyData()
+        {
+            return PolicyManager.GetPurchasePolicyData();
+        }
+
+        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info)
+        {
+            return PolicyManager.AddPurchasePolicy(info);
+        }
+
+        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.AddPurchasePolicy(info, id);
+        }
+
+        public Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.EditPurchasePolicy(info, id);
         }
     }
 }

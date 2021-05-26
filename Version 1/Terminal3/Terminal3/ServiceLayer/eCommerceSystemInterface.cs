@@ -10,6 +10,8 @@ using XUnitTestTerminal3.AcceptanceTests.Utils;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Microsoft.AspNetCore.SignalR.Client;
 using signalRgateway.Models;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 
 namespace Terminal3.ServiceLayer
 {   
@@ -245,66 +247,6 @@ namespace Terminal3.ServiceLayer
         {
             return StoreStaffInterface.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID);
         }
-
-        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info)
-        {
-            return StoreStaffInterface.AddDiscountPolicy(info);
-        }
-
-        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info, String id)
-        {
-            return StoreStaffInterface.AddDiscountPolicy(info, id);
-        }
-
-        public Result<bool> AddDiscountCondition(Dictionary<string, object> info, String id)
-        {
-            return StoreStaffInterface.AddDiscountCondition(info, id);
-        }
-
-        public Result<bool> RemoveDiscountPolicy(String id)
-        {
-            return StoreStaffInterface.RemoveDiscountPolicy(id);
-        }
-
-        public Result<bool> RemoveDiscountCondition(String id)
-        {
-            return StoreStaffInterface.RemoveDiscountCondition(id);
-        }
-
-        public Result<bool> EditDiscountPolicy(Dictionary<string, object> info, String id)
-        {
-            return StoreStaffInterface.EditDiscountPolicy(info, id);
-        }
-
-        public Result<bool> EditDiscountCondition(Dictionary<string, object> info, String id)
-        {
-            return StoreStaffInterface.EditDiscountCondition(info, id);
-        }
-
-        public Result<IDiscountPolicyData> GetDiscountPolicyData()
-        {
-            return StoreStaffInterface.GetDiscountPolicyData();
-        }
-
-        public Result<IPurchasePolicyData> GetPurchasePolicyData()
-        {
-            return StoreStaffInterface.GetPurchasePolicyData();
-        }
-
-        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info)
-        {
-            return StoreStaffInterface.AddPurchasePolicy(info);
-        }
-
-        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info, String id)
-        {
-            return StoreStaffInterface.AddPurchasePolicy(info, id);
-        }
-
-        public Result<bool> RemovePurchasePolicy(String id)
-        {
-            return StoreStaffInterface.RemovePurchasePolicy(id);
-        }
         #endregion
 
         #region System Admin Actions
@@ -365,6 +307,73 @@ namespace Terminal3.ServiceLayer
         }
         public List<Notification> GetPendingMessagesByUserID(string userId) {
             return NotificationService.GetPendingMessagesByUserID(userId);
+        }
+        #endregion
+
+        #region Policies Management
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info)
+        {
+            return StoreStaffInterface.AddDiscountPolicy(storeId, info);
+        }
+
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.AddDiscountPolicy(storeId, info, id);
+        }
+
+        public Result<bool> AddDiscountCondition(string storeId, Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.AddDiscountCondition(storeId, info, id);
+        }
+
+        public Result<bool> RemoveDiscountPolicy(string storeId, String id)
+        {
+            return StoreStaffInterface.RemoveDiscountPolicy(storeId, id);
+        }
+
+        public Result<bool> RemoveDiscountCondition(string storeId, String id)
+        {
+            return StoreStaffInterface.RemoveDiscountCondition(storeId, id);
+        }
+
+        public Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.EditDiscountPolicy(storeId, info, id);
+        }
+
+        public Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.EditDiscountCondition(storeId, info, id);
+        }
+
+        public Result<IDiscountPolicyData> GetDiscountPolicyData(string storeId)
+        {
+            return StoreStaffInterface.GetDiscountPolicyData(storeId);
+        }
+
+        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
+        {
+            return StoreStaffInterface.GetPurchasePolicyData(storeId);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info)
+        {
+            return StoreStaffInterface.AddPurchasePolicy(storeId, info);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.AddPurchasePolicy(storeId, info, id);
+        }
+
+        public Result<bool> RemovePurchasePolicy(string storeId, String id)
+        {
+            return StoreStaffInterface.RemovePurchasePolicy(storeId, id);
+        }
+
+        public Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoreStaffInterface.EditPurchasePolicy(storeId, info, id);
         }
         #endregion
     }

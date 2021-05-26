@@ -38,19 +38,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #endregion
 
         #region Policies Management
-        double GetTotalBagPrice(string storeId, ConcurrentDictionary<Product, int> products, string discountCode = "");
-        Result<bool> AdheresToPolicy(string storeId, ConcurrentDictionary<Product, int> products, User user);
-        Result<Boolean> AddDiscountPolicy(string storeId, IDiscountPolicy discount);
-        Result<Boolean> AddDiscountPolicy(string storeId, IDiscountPolicy discount, String id);
-        Result<Boolean> AddDiscountCondition(string storeId, IDiscountCondition condition, String id);
         Result<Boolean> AddDiscountPolicy(string storeId, Dictionary<string, object> info);
         Result<Boolean> AddDiscountPolicy(string storeId, Dictionary<string, object> info, String id);
         Result<Boolean> AddDiscountCondition(string storeId, Dictionary<string, object> info, String id);
         Result<Boolean> RemoveDiscountPolicy(string storeId, String id);
         Result<Boolean> RemoveDiscountCondition(string storeId, String id);
         Result<IDiscountPolicyData> GetPoliciesData(string storeId);
-        Result<Boolean> AddPurchasePolicy(string storeId, IPurchasePolicy policy);
-        Result<Boolean> AddPurchasePolicy(string storeId, IPurchasePolicy policy, string id);
+        Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId);
+        Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info);
+        Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> RemovePurchasePolicy(string storeId, string id);
         #endregion
     }
@@ -376,33 +372,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>("Store does not exists\n", false, false);
         }
 
-        public Result<bool> AddDiscountPolicy(string storeId, IDiscountPolicy policy)
-        {
-            if (Stores.TryGetValue(storeId, out Store store))
-            {
-                return store.AddDiscountPolicy(policy);
-            }
-            return new Result<bool>("Store does not exists\n", false, false);
-        }
-
-        public Result<bool> AddDiscountPolicy(string storeId, IDiscountPolicy policy, string id)
-        {
-            if (Stores.TryGetValue(storeId, out Store store))
-            {
-                return store.AddDiscountPolicy(policy, id);
-            }
-            return new Result<bool>("Store does not exists\n", false, false);
-        }
-
-        public Result<bool> AddDiscountCondition(string storeId, IDiscountCondition condition, string id)
-        {
-            if (Stores.TryGetValue(storeId, out Store store))
-            {
-                return store.AddDiscountCondition(condition, id);
-            }
-            return new Result<bool>("Store does not exists\n", false, false);
-        }
-
         public Result<bool> RemoveDiscountPolicy(string storeId, string id)
         {
             if (Stores.TryGetValue(storeId, out Store store))
@@ -430,29 +399,38 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<IDiscountPolicyData>("Store does not exists\n", false, null);
         }
 
-        public Result<bool> AddPurchasePolicy(string storeId, IPurchasePolicy policy)
-        {
-            if (Stores.TryGetValue(storeId, out Store store))
-            {
-                return store.AddPurchasePolicy(policy);
-            }
-            return new Result<bool>("Store does not exists\n", false, false);
-        }
-
-        public Result<bool> AddPurchasePolicy(string storeId, IPurchasePolicy policy, string id)
-        {
-            if (Stores.TryGetValue(storeId, out Store store))
-            {
-                return store.AddPurchasePolicy(policy, id);
-            }
-            return new Result<bool>("Store does not exists\n", false, false);
-        }
-
         public Result<bool> RemovePurchasePolicy(string storeId, string id)
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
                 return store.RemovePurchasePolicy(id);
+            }
+            return new Result<bool>("Store does not exists\n", false, false);
+        }
+
+        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
+        {
+            if (Stores.TryGetValue(storeId, out Store store))
+            {
+                return store.GetPurchasePolicyData();
+            }
+            return new Result<IPurchasePolicyData>("Store does not exists\n", false, null);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info)
+        {
+            if (Stores.TryGetValue(storeId, out Store store))
+            {
+                return store.AddPurchasePolicy(info);
+            }
+            return new Result<bool>("Store does not exists\n", false, false);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            if (Stores.TryGetValue(storeId, out Store store))
+            {
+                return store.AddPurchasePolicy(info, id);
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }

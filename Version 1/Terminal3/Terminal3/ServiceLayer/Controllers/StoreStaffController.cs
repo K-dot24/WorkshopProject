@@ -4,6 +4,8 @@ using System.Text;
 using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 
 namespace Terminal3.ServiceLayer.Controllers
 {
@@ -22,19 +24,19 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<Boolean> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID);
         Result<Boolean> CloseStore(string storeId, string userID);
         Result<StoreService> ReOpenStore(string storeId, string userID);
-        Result<bool> AddDiscountPolicy(Dictionary<string, object> info);
-        Result<bool> AddDiscountPolicy(Dictionary<string, object> info, String id);
-        Result<bool> AddDiscountCondition(Dictionary<string, object> info, String id);
-        Result<bool> RemoveDiscountPolicy(String id);
-        Result<bool> RemoveDiscountCondition(String id);
-        Result<bool> EditDiscountPolicy(Dictionary<string, object> info, String id);
-        Result<bool> EditDiscountCondition(Dictionary<string, object> info, String id);
-        Result<IDiscountPolicyData> GetDiscountPolicyData();
-        Result<IPurchasePolicyData> GetPurchasePolicyData();
-        Result<bool> AddPurchasePolicy(Dictionary<string, object> info);
-        Result<bool> AddPurchasePolicy(Dictionary<string, object> info, String id);
-        Result<bool> RemovePurchasePolicy(String id);
-
+        Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info);
+        Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info, String id);
+        Result<bool> AddDiscountCondition(string storeId, Dictionary<string, object> info, String id);
+        Result<bool> RemoveDiscountPolicy(string storeId, String id);
+        Result<bool> RemoveDiscountCondition(string storeId, String id);
+        Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, String id);
+        Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, String id);
+        Result<IDiscountPolicyData> GetDiscountPolicyData(string storeId);
+        Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId);
+        Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info);
+        Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, String id);
+        Result<bool> RemovePurchasePolicy(string storeId, String id);
+        Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
 
     }
     public class StoreStaffController : IStoreStaffInterface
@@ -70,64 +72,69 @@ namespace Terminal3.ServiceLayer.Controllers
             return StoresAndManagementInterface.ReOpenStore(storeId, userID);
         }
 
-        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info)
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info)
         {
-            return StoresAndManagementInterface.AddDiscountPolicy(info);
+            return StoresAndManagementInterface.AddDiscountPolicy(storeId, info);
         }
 
-        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info, string id)
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
         {
-            return StoresAndManagementInterface.AddDiscountPolicy(info, id);
+            return StoresAndManagementInterface.AddDiscountPolicy(storeId, info, id);
         }
 
-        public Result<bool> AddDiscountCondition(Dictionary<string, object> info, string id)
+        public Result<bool> AddDiscountCondition(string storeId, Dictionary<string, object> info, string id)
         {
-            throw new NotImplementedException();
+            return StoresAndManagementInterface.AddDiscountCondition(storeId, info, id);
         }
 
-        public Result<bool> RemoveDiscountPolicy(string id)
+        public Result<bool> RemoveDiscountPolicy(string storeId, string id)
         {
-            throw new NotImplementedException();
+            return StoresAndManagementInterface.RemoveDiscountPolicy(storeId, id);
         }
 
-        public Result<bool> RemoveDiscountCondition(string id)
+        public Result<bool> RemoveDiscountCondition(string storeId, string id)
         {
-            throw new NotImplementedException();
+            return StoresAndManagementInterface.RemoveDiscountCondition(storeId, id);
         }
 
-        public Result<bool> EditDiscountPolicy(Dictionary<string, object> info, string id)
+        public Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
         {
-            throw new NotImplementedException();
+            return StoresAndManagementInterface.EditDiscountPolicy(storeId, info, id);
         }
 
-        public Result<bool> EditDiscountCondition(Dictionary<string, object> info, string id)
+        public Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, string id)
         {
-            throw new NotImplementedException();
+            return StoresAndManagementInterface.EditDiscountCondition(storeId, info, id);
         }
 
-        public Result<IDiscountPolicyData> GetDiscountPolicyData()
+        public Result<IDiscountPolicyData> GetDiscountPolicyData(string storeId)
         {
-            throw new NotImplementedException();
+            return StoresAndManagementInterface.GetPoliciesData(storeId);
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData()
+        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
         {
-            throw new NotImplementedException();
+            return StoresAndManagementInterface.GetPurchasePolicyData(storeId);
         }
 
-        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info)
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info)
         {
-            throw new NotImplementedException();
+            return StoresAndManagementInterface.AddPurchasePolicy(storeId, info);
         }
 
-        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info, string id)
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
         {
-            throw new NotImplementedException();
+            return StoresAndManagementInterface.AddPurchasePolicy(storeId, info, id);
         }
 
-        public Result<bool> RemovePurchasePolicy(string id)
+        public Result<bool> RemovePurchasePolicy(string storeId, string id)
         {
-            throw new NotImplementedException();
+            return StoresAndManagementInterface.RemovePurchasePolicy(storeId, id);
+        }
+
+        public Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresAndManagementInterface.EditPurchasePolicy(storeId, info, id);
         }
 
         #endregion
