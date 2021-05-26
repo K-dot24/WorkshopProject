@@ -35,9 +35,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #region Policies Management
         double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
         Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
-        Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount);
-        Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount, String id);
-        Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id);
+        Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info);
+        Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info, String id);
+        Result<Boolean> AddDiscountCondition(Dictionary<string, object> info, String id);
         Result<Boolean> RemoveDiscountPolicy(String id);
         Result<Boolean> RemoveDiscountCondition(String id);
         Result<IDiscountPolicyData> GetPoliciesData();
@@ -532,14 +532,29 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.AdheresToPolicy(products, user);
         }
 
-        public Result<bool> AddDiscountPolicy(IDiscountPolicy discount)
+        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info)
         {
-            return PolicyManager.AddDiscountPolicy(discount);
+            return PolicyManager.AddDiscountPolicy(info);
         }
 
-        public Result<bool> AddDiscountPolicy(IDiscountPolicy discount, string id)
+        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info, string id)
         {
-            return PolicyManager.AddDiscountPolicy(discount, id);
+            return PolicyManager.AddDiscountPolicy(info, id);
+        }
+
+        public Result<bool> AddDiscountCondition(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.AddDiscountCondition(info, id);
+        }
+
+        public Result<bool> AddDiscountPolicy(IDiscountPolicy policy)
+        {
+            return PolicyManager.AddDiscountPolicy(policy);
+        }
+
+        public Result<bool> AddDiscountPolicy(IDiscountPolicy policy, string id)
+        {
+            return PolicyManager.AddDiscountPolicy(policy, id);
         }
 
         public Result<bool> AddDiscountCondition(IDiscountCondition condition, string id)

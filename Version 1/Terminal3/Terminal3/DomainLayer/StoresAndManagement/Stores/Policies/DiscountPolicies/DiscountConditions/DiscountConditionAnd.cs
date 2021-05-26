@@ -12,12 +12,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public List<IDiscountCondition> Conditions { get; }
 
-        public DiscountConditionAnd(String id = "") : base(id)
+        public DiscountConditionAnd(String id = "") : base(new Dictionary<string, object>(), id)
         {
             Conditions = new List<IDiscountCondition>();
         }
 
-        public DiscountConditionAnd(List<IDiscountCondition> conditions, String id = "") : base(id)
+        public DiscountConditionAnd(Dictionary<string, object> info, String id = "") : base(info, id)
+        {
+            //TO DO
+        }
+
+        public DiscountConditionAnd(List<IDiscountCondition> conditions, String id = "") : base(new Dictionary<string, object>(), id)
         {
             Conditions = conditions;
             if (Conditions == null)
