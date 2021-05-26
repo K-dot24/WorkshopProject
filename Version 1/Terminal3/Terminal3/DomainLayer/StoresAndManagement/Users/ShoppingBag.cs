@@ -24,6 +24,26 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             TotalBagPrice = 0;
         }
 
+        // For loading from database
+        public ShoppingBag(String id , User user, Store store , ConcurrentDictionary<Product, int> products , Double totalBagPrice)
+        {
+            Id = id;
+            User = user;
+            Store = store;
+            Products = products;
+            TotalBagPrice = totalBagPrice;
+        }
+
+        //TODO - delete - for testing
+        public ShoppingBag(String id, User user, ConcurrentDictionary<Product, int> products, Double totalBagPrice)
+        {
+            Id = id;
+            User = user;
+            Store = null;
+            Products = products;
+            TotalBagPrice = totalBagPrice;
+        }
+
         public Result<bool> AddProtuctToShoppingBag(Product product, int quantity)
         {
             if (product.Quantity >= quantity && quantity > 0)

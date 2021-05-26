@@ -5,6 +5,7 @@ using System.Threading;
 using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ExternalSystems;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -18,12 +19,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             Id = Service.GenerateId();
             ShoppingCart = new ShoppingCart();
         }
-        //For Test purpose ONLY
         protected User(string id)
         {
             Id = id;
             ShoppingCart = new ShoppingCart();
         }
+        protected User(String id , ShoppingCart shoppingCart)
+        {
+            Id = id;
+            ShoppingCart = shoppingCart;
+        }
+
 
         public Result<bool> AddProductToCart(Product product, int productQuantity, Store store)
         {

@@ -12,12 +12,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         public Double CounterOffer { get; set; }    // Store offer
         public Boolean Accepted { get; }
 
-        public string Id => throw new NotImplementedException();
+        public string Id { get; set; }
 
         public Offer()
         {
+            Id = Service.GenerateId();
             LastOffer = new Tuple<Double, String>(-1, null);
             Accepted = false;
+        }
+
+        public Offer(string id , Tuple<double, string> lastOffer, double counterOffer, bool accepted )
+        {
+            Id = id;
+            LastOffer = lastOffer;
+            CounterOffer = counterOffer;
+            Accepted = accepted;
         }
 
         public Result<double> CalculatePrice(Product product, int quantity)

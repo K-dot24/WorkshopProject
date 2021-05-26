@@ -11,12 +11,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         public Double Price { get; }
         public ConcurrentDictionary<String, Double> Participants { get; set; }  // <UserID, winning %>
 
-        public string Id => throw new NotImplementedException();
+        public string Id { get; set; }
 
         public Lottery(double price)
         {
+            Id = Service.GenerateId();
             Price = price;
             Participants = new ConcurrentDictionary<string, double>();
+        }
+
+        public Lottery(string id ,double price, ConcurrentDictionary<string, double> participants)
+        {
+            Id = id;
+            Price = price;
+            Participants = participants;
         }
 
         public Result<double> CalculatePrice(Product product, int quantity)
