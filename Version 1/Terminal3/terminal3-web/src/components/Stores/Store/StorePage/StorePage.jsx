@@ -76,14 +76,14 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         }
 
         // To take only product ID if needed: message.substring(message.indexOf(":") + 2)
-        AddProductToStore({ userID: user.id, storeID: store.id, ...data, keywords }).then(response => response.ok ?
-            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+        AddProductToStore({ userID: user.id, storeID: store.id, ...data, keywords })
+        .then(response => response.json().then(message => alert(message))).catch(err => console.log(err));
         
     }
 
     const handleRemoveProductFromStore = async (data) => {
-        RemoveProductFromStore(user.id, store.id, data.productid).then(response => response.ok ?
-            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+        RemoveProductFromStore(user.id, store.id, data.productid)
+        .then(response => response.json().then(message => alert(message))).catch(err => console.log(err));
     }
 
     const handleEditProductDetails = async (data) => {
