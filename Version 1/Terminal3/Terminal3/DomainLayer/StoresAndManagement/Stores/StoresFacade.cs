@@ -43,6 +43,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddDiscountPolicy(string storeId, IDiscountPolicy discount);
         Result<Boolean> AddDiscountPolicy(string storeId, IDiscountPolicy discount, String id);
         Result<Boolean> AddDiscountCondition(string storeId, IDiscountCondition condition, String id);
+        Result<Boolean> AddDiscountPolicy(string storeId, Dictionary<string, object> info);
+        Result<Boolean> AddDiscountPolicy(string storeId, Dictionary<string, object> info, String id);
+        Result<Boolean> AddDiscountCondition(string storeId, Dictionary<string, object> info, String id);
         Result<Boolean> RemoveDiscountPolicy(string storeId, String id);
         Result<Boolean> RemoveDiscountCondition(string storeId, String id);
         Result<IDiscountPolicyData> GetPoliciesData(string storeId);
@@ -346,20 +349,47 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>("Store does not exists\n", false, false);
         }
 
-        public Result<bool> AddDiscountPolicy(string storeId, IDiscountPolicy discount)
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info)
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                return store.AddDiscountPolicy(discount);
+                return store.AddDiscountPolicy(info);
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }
 
-        public Result<bool> AddDiscountPolicy(string storeId, IDiscountPolicy discount, string id)
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                return store.AddDiscountPolicy(discount, id);
+                return store.AddDiscountPolicy(info, id);
+            }
+            return new Result<bool>("Store does not exists\n", false, false);
+        }
+
+        public Result<bool> AddDiscountCondition(string storeId, Dictionary<string, object> info, string id)
+        {
+            if (Stores.TryGetValue(storeId, out Store store))
+            {
+                return store.AddDiscountCondition(info, id);
+            }
+            return new Result<bool>("Store does not exists\n", false, false);
+        }
+
+        public Result<bool> AddDiscountPolicy(string storeId, IDiscountPolicy policy)
+        {
+            if (Stores.TryGetValue(storeId, out Store store))
+            {
+                return store.AddDiscountPolicy(policy);
+            }
+            return new Result<bool>("Store does not exists\n", false, false);
+        }
+
+        public Result<bool> AddDiscountPolicy(string storeId, IDiscountPolicy policy, string id)
+        {
+            if (Stores.TryGetValue(storeId, out Store store))
+            {
+                return store.AddDiscountPolicy(policy, id);
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }
