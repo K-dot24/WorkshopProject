@@ -3,6 +3,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ServiceLayer.ServiceObjects;
 using System;
 using System.Collections.Concurrent;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -103,6 +104,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         internal Result<bool> AdheresToPolicy()
         {
             return Store.PolicyManager.AdheresToPolicy(this.Products, this.User);
+        }
+
+        public DTO_ShoppingBag getDTO()
+        {
+            ConcurrentDictionary<string, int> products_dto = new ConcurrentDictionary<string, int>();
+            foreach(var p in Products)
+            {
+                products_dto.TryAdd(p.Key.Id, p.Value);
+            }
+            return new DTO_ShoppingBag(Id, User.Id, Store.Id, products_dto, TotalBagPrice);
         }
     }
 }

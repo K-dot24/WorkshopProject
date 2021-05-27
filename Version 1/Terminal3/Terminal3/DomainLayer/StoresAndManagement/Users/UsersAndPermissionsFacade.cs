@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -36,6 +37,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public ConcurrentDictionary<String, RegisteredUser> SystemAdmins { get; }
         public ConcurrentDictionary<String, GuestUser> GuestUsers { get; }
 
+        public Mapper mapper;
+
         private readonly object my_lock = new object();
 
         //Constructor
@@ -51,6 +54,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.SystemAdmins.TryAdd(defaultUser.Id, defaultUser );
             this.RegisteredUsers.TryAdd(defaultUser.Id, defaultUser);
 
+            mapper = Mapper.getInstance();
+
+            //create in DB
+            mapper.Create(defaultUser);
         }
         //Constructor for the initializer
         public UsersAndPermissionsFacade(ConcurrentDictionary<String, RegisteredUser>  registeredUsers,
@@ -80,6 +87,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     {
                         RegisteredUser newUser = new RegisteredUser(email, password);
                         this.RegisteredUsers.TryAdd(newUser.Id, newUser);
+
+                        //create in DB
+                        mapper.Create(newUser);
+                        
                         return new Result<RegisteredUser>($"{email} is registered as new user", true, newUser);
                     }
                     else
