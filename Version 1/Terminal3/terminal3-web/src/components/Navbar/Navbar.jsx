@@ -9,7 +9,7 @@ import useStyles from './styles';
 
 import logo from '../../assets/terminal3_logo.png';
 
-const Navbar = ( { storeId, totalItems, user, handleLogOut, handleSearch, handleGetUserPurchaseHistory }) => {
+const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handleSearch, handleGetUserPurchaseHistory }) => {
     const [permissions, setPermissions] = useState([])
     
     const classes = useStyles();
@@ -77,15 +77,18 @@ const Navbar = ( { storeId, totalItems, user, handleLogOut, handleSearch, handle
         >
         {storeId === -1 ? (
             <div>
+                {isSystemAdmin &&
+                <>
+                    <MenuItem onClick={() => handleMenuClick(`/${user.id}/addsystemadmin`)}>Add System Admin</MenuItem>
+                    <MenuItem onClick={() => handleMenuClick(`/${user.id}/removesystemadmin`)}>Remove System Admin</MenuItem>
+                    <MenuItem onClick={() => handleMenuClick(`/${user.id}/resetsystem`)}>Reset System</MenuItem>
+                </>
+                }
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/review`)}>Write Review</MenuItem>
                 <MenuItem onClick={() => handleHistory(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
 
-                {/* TODO: System Admin options */}
-                {/* <MenuItem onClick={() => handleMenuClick(`/${user.id}/addsystemadmin`)}>Add System Admin</MenuItem>
-                <MenuItem onClick={() => handleMenuClick(`/${user.id}/removesystemadmin`)}>Remove System Admin</MenuItem>
-                <MenuItem onClick={() => handleMenuClick(`/${user.id}/resetsystem`)}>Reset System</MenuItem> */}
-            </div>
+                </div>
         ) : (
             <StoreActions />
         )

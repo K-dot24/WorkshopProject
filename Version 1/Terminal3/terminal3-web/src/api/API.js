@@ -534,7 +534,7 @@ export function RemoveStoreManager( storeID, currentlyOwnerID, removedManagerID 
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="userID">ID of the user to get the purchase history</param>
 export function AdminGetUserPurchaseHistory( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/GetUserPurchaseHistory/${data.sysAdminID}/${data.userID}`, {
+    return fetch(`https://localhost:5000/api/SystemAdmin/GetUserPurchaseHistory/${data.sysAdminID}/${data.userID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -549,7 +549,7 @@ export function AdminGetUserPurchaseHistory( data ) {
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="storeId">ID of the store to get the purchase history</param>
 export function AdminGetStorePurchaseHistory( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeID}`, {
+    return fetch(`https://localhost:5000/api/SystemAdmin/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -564,7 +564,7 @@ export function AdminGetStorePurchaseHistory( data ) {
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
 /// <param name="email">email of the request new system admin</param>
 export function AddSystemAdmin( sysAdminID, email ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/AddSystemAdmin/${sysAdminID}/${email}`, {
+    return fetch(`https://localhost:5000/api/SystemAdmin/AddSystemAdmin/${sysAdminID}/${email}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -577,14 +577,13 @@ export function AddSystemAdmin( sysAdminID, email ) {
 /// Removing existing system admin
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
 /// <param name="email">email of admin to be removed</param>
-export function RemoveSystemAdmin( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/RemoveSystemAdmin/${data.sysAdminID}/${data.email}`, {
-        method: 'DELETE',                                       //TODO - HTTP DELETE
+export function RemoveSystemAdmin( sysAdminID, email ) {
+    return fetch(`https://localhost:5000/api/SystemAdmin/RemoveSystemAdmin/${sysAdminID}/${email}`, {
+        method: 'DELETE',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
@@ -592,7 +591,7 @@ export function RemoveSystemAdmin( data ) {
 /// Reset the system, including all the stored data
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
 export function ResetSystem( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/ResetSystem/${data.sysAdminID}`, {
+    return fetch(`https://localhost:5000/api/SystemAdmin/ResetSystem/${data.sysAdminID}`, {
         method: 'POST',                                       
         headers: {
             'Accept': 'application/json',

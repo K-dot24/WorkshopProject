@@ -80,7 +80,7 @@ namespace Terminal3WebAPI.Controllers
         public IActionResult RemoveSystemAdmin(string sysAdminID, string email)
         {
             Result<RegisteredUserService> result = system.RemoveSystemAdmin(sysAdminID, email);
-            if (result.ExecStatus) { return Ok(result.Message); }
+            if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result.Message); }
         }
 

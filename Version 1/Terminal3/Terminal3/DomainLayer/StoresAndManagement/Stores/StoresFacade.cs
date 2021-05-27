@@ -224,7 +224,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             newStore.NotificationManager = notificationManager;
             newStore.NotificationManager.notifyStoreOpened();
 
-            return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, newStore);
+            return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder.Email}\n", true, newStore);
         }
 
         public Result<Boolean> CloseStore(RegisteredUser founder, string storeId)
