@@ -28,6 +28,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<bool>("User exit system", true, true);
         }
 
+        public DTO_GuestUser getDTO()
+        {
+            return new DTO_GuestUser(Id, ShoppingCart.getDTO(), Active);
+        }
 
         
     }

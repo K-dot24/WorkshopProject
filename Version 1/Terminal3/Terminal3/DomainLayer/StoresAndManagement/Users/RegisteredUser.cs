@@ -204,5 +204,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 }
             }
         }
+
+        public DTO_RegisteredUser getDTO()
+        {
+            LinkedList<DTO_Notification> notifications_dto = new LinkedList<DTO_Notification>();
+            foreach(var n in PendingNotification)
+            {
+                notifications_dto.AddLast(n.getDTO()); 
+            }
+            return new DTO_RegisteredUser(Id, ShoppingCart.getDTO(), Email, Password, 
+                                        LoggedIn, History.getDTO(), notifications_dto);
+
+        }
     }
 }
