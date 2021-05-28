@@ -156,6 +156,15 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 response.json().then(message => console.log(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
+    //#region Discount Policy Functions
+
+    const handleAddVisibleDiscount = (data, type) => {
+        data = { ...data, type };
+        console.log(data);
+    }
+
+    //#endregion
+
     //#endregion
 
     //#region Search (commented out)
@@ -260,6 +269,18 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                     render={(props) => (<Action name='Set Permissions'
                                                 fields={[{name: 'Manager ID', required: true}]}   
                                                 handleAction={handleSetPermissions} {...props} />)} 
+                />
+
+                <Route exact path={match.url + `/adddiscountpolicy/visiblediscount`} 
+                    render={(props) => (<Action name='Add Visible Discount'
+                                                fields={[{name: 'Expiration Date', required: true, type: 'date'},
+                                                        {name: 'Percentage', required: true, type: 'number'},
+                                                        {name: 'Categories', required: true, belongsTo: 'DiscountTargetCategories'},
+                                                        {name: 'Products Id', required: true, belongsTo: 'DiscountTargetProducts'}]}   
+                                                types={[{name: 'DiscountTargetShop'},
+                                                        {name: 'DiscountTargetCategories'},
+                                                        {name: 'DiscountTargetProducts'}]}
+                                                handleAction={handleAddVisibleDiscount} {...props} />)} 
                 />
 
             </Switch>

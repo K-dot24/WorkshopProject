@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
-import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container } from '@material-ui/core';
+import React, { useState, useEffect } from 'react'
+import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container,
+        FormControl, Select, InputLabel, FormHelperText } from '@material-ui/core';
 import { Receipt } from '@material-ui/icons';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import useStyles from './styles';
 import { CheckboxList } from '../../../components';
 
-const Action = ({ name, fields, handleAction }) => {
+const Action = ({ name, fields, handleAction, types }) => {
      // styles.js
      const classes = useStyles();
     
@@ -26,16 +27,33 @@ const Action = ({ name, fields, handleAction }) => {
          }
          else {
             // console.log(data);
-            handleAction(data);
+            if (currentType.value === '')
+                handleAction(data);
+            else
+                handleAction(data, currentType.value);
          }
  
          // redirect back to homepage
         //  history.push('/');
      }
 
-     const handleCheckBox = (checkList) => {
+    const handleCheckBox = (checkList) => {
         setCheckBoxArray(checkList);
-     }
+    }
+
+    const [currentType, setCurrentType] = useState({ value: '' });
+    
+    const handleChange = (event) => {
+        const name = event.target.name;
+        setCurrentType({
+            ...currentType,
+            [name]: event.target.value,
+        });
+    };
+
+    useEffect(() => {
+        console.log(currentType);
+    }, [currentType]);
 
     return (
         <Container component="main" maxWidth="xs">
@@ -48,8 +66,38 @@ const Action = ({ name, fields, handleAction }) => {
                         {name}
                     </Typography>
                     <form className={classes.form} onSubmit={handleSubmit}>
+
+                    {/* Type Dropdown Menu (for policies) */}
+                    {types &&
+                        (
+                        <>
+                        <FormControl className={classes.formControl}>
+                            <InputLabel htmlFor="value-native-simple">Type</InputLabel>
+                            <Select
+                                native
+                                required={true}
+                                value={currentType.value}
+                                onChange={handleChange}
+                                inputProps={{
+                                    name: 'value',
+                                    id: 'value-native-simple',
+                                }}
+                            >
+                            <option aria-label="None" value="" />
+                            {types.map((type, index) => (
+                                <option key={index} value={type.name}>{type.name}</option>
+                            ))}
+                            </Select>
+                        </FormControl>
+                        <FormHelperText>Choose type of discount target</FormHelperText>
+                        </>
+                        )
+                    }
+
+                    {/* Text Fields */}
                     {fields && 
                         fields.map((field) => (
+                            'belongsTo' in field && currentType.value !== field.belongsTo ? null :
                             <TextField
                                 key={field.name}
                                 type={field.type ? field.type : "text"}
@@ -66,7 +114,9 @@ const Action = ({ name, fields, handleAction }) => {
                             />
                         ))
                     }
+
                     {name === 'Set Permissions' && (<CheckboxList handleCheckBox={handleCheckBox} />)}
+
                     <Button
                         type="submit"
                         fullWidth

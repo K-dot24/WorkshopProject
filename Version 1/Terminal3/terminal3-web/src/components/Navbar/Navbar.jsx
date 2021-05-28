@@ -54,7 +54,9 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                 <List component="div" disablePadding>
                     {subOptions.map((option, index) => 
                         <ListItem key={index} button className={classes.nested}>
-                            <ListItemText primary={option} />
+                            <ListItemText primary={option} 
+                                onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}/${option.replace(/\s/g, "").toLowerCase()}`)} 
+                            />
                         </ListItem>
                     )}
                 </List>
@@ -73,38 +75,6 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                         )  
             )
         ];
-        
-        
-        // return (
-        //     <List
-        //     // component="nav"
-        //     // aria-labelledby="nested-list-subheader"
-        //     // subheader={
-        //     //   <ListSubheader component="div" id="nested-list-subheader">
-        //     //     Nested List Items
-        //     //   </ListSubheader>
-        //     // }
-        //     // className={classes.root}
-        //   >
-        //     <ListItem button onClick={handleClick}>
-        //         {/* <ListItemIcon>
-        //         <InboxIcon />
-        //         </ListItemIcon> */}
-        //         <ListItemText primary="Inbox" />
-        //         {open ? <ExpandLess /> : <ExpandMore />}
-        //     </ListItem>
-        //     <Collapse in={open} timeout="auto" unmountOnExit>
-        //         <List component="div" disablePadding>
-        //             <ListItem button className={classes.nested}>
-        //                 {/* <ListItemIcon>
-        //                 <StarBorder />
-        //                 </ListItemIcon> */}
-        //                 <ListItemText primary="Starred" />
-        //             </ListItem>
-        //         </List>
-        //     </Collapse>
-        // </List>
-        //   )
     };
 
     const handleMenuOpen = (event) => {
