@@ -22,13 +22,17 @@ namespace Terminal3.DataAccessLayer.DTOs
 
         //[BsonElement]
         //public DTO_PolicyManager PolicyManager { get; set;}           // TODO - need to be updated
-
+        [BsonElement]
+        public LinkedList<String> DiscountRoot { get; set; }            //list of discount policies id
+        [BsonElement]
+        public LinkedList<String> PurchaseRoot { get; set; }
         [BsonElement]
         public DTO_History History { get; set; }
         [BsonElement]
         public Double Rating { get; set; }
         [BsonElement]
         public int NumberOfRates { get; set; }
+        [BsonElement]
         public Boolean isClosed { get; set; }
 
 
