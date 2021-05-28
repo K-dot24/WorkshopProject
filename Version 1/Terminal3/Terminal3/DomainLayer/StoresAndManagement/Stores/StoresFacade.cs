@@ -426,5 +426,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }
+        public void resetSystem()
+        {
+            Stores.Clear();
+        }
     }
 }

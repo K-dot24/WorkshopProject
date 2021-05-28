@@ -595,5 +595,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Store store = StoresFacade.Stores[storeId];
             return store.EditPurchasePolicy(info, id);
         }
+
+        public void resetSystem()
+        {
+            UsersAndPermissionsFacade.resetSystem();
+            StoresFacade.resetSystem();
+        }
     }
 }

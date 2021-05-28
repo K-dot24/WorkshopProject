@@ -12,6 +12,7 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.ServiceLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using System.Reflection;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -23,7 +24,7 @@ namespace Terminal3.DataAccessLayer
         public IMongoDatabase database;
 
         // DAOs
-        public DAO<DTO_GuestUser> DAO_GuestUser;
+        // public DAO<DTO_GuestUser> DAO_GuestUser;
         public DAO<DTO_RegisteredUser> DAO_RegisteredUser;
         public DAO<DTO_Product> DAO_Product;
         public DAO<DTO_StoreManager> DAO_StoreManager;
@@ -68,7 +69,7 @@ namespace Terminal3.DataAccessLayer
             database = dbClient.GetDatabase("Terminal3-development");
 
             //DAOs
-            DAO_GuestUser = new DAO<DTO_GuestUser>(database, "Users");
+            //DAO_GuestUser = new DAO<DTO_GuestUser>(database, "Users");
             DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
             DAO_Product = new DAO<DTO_Product>(database, "Products");            
             DAO_StoreManager = new DAO<DTO_StoreManager>(database, "Users");
@@ -402,10 +403,10 @@ namespace Terminal3.DataAccessLayer
         #endregion
 
         #region User
-        #region GuestUser
+        /*#region GuestUser
         public void Create(GuestUser gu)
         {            
-            DAO_GuestUser.Create(new DTO_GuestUser(gu.Id , Get_DTO_ShoppingCart(gu), gu.Active));
+            //DAO_GuestUser.Create(new DTO_GuestUser(gu.Id , Get_DTO_ShoppingCart(gu), gu.Active));
             GuestUsers.TryAdd(gu.Id, gu);
         }
 
@@ -437,7 +438,7 @@ namespace Terminal3.DataAccessLayer
         }
 
 
-        #endregion GuestUser
+        #endregion GuestUser*/
 
         #region RegisteredUser
         public void Create(RegisteredUser ru)
@@ -1215,7 +1216,50 @@ namespace Terminal3.DataAccessLayer
 
         #endregion Policies
 
+        #region Utils
+        public void clearDB()
+        {
+            if (!(Instance is null))
+            {
+                var emptyFilter = Builders<BsonDocument>.Filter.Empty;
+                DAO_RegisteredUser.collection.DeleteMany(emptyFilter);
+                DAO_Product.collection.DeleteMany(emptyFilter);
+                DAO_StoreManager.collection.DeleteMany(emptyFilter);
+                DAO_StoreOwner.collection.DeleteMany(emptyFilter);
+                DAO_Store.collection.DeleteMany(emptyFilter);
+                DAO_Auction.collection.DeleteMany(emptyFilter);
+                DAO_Lottery.collection.DeleteMany(emptyFilter);
+                DAO_MaxProductPolicy.collection.DeleteMany(emptyFilter);
+                DAO_MinAgePolicy.collection.DeleteMany(emptyFilter);
+                DAO_MinProductPolicy.collection.DeleteMany(emptyFilter);
+                DAO_Offer.collection.DeleteMany(emptyFilter);
+                DAO_RestrictedHoursPolicy.collection.DeleteMany(emptyFilter);
+                DAO_AndPolicy.collection.DeleteMany(emptyFilter);
+                DAO_OrPolicy.collection.DeleteMany(emptyFilter);
+                DAO_BuyNow.collection.DeleteMany(emptyFilter);
+                DAO_ConditionalPolicy.collection.DeleteMany(emptyFilter);
 
+                RegisteredUsers.Clear();
+                GuestUsers.Clear();
+                Products.Clear();
+                StoreManagers.Clear();
+                StoreOwners.Clear();
+                Stores.Clear();
+                Policy_Auctions.Clear();
+                Policy_Lotterys.Clear();
+                Policy_MaxProductPolicys.Clear();
+                Policy_MinAgePolicys.Clear();
+                Policy_MinProductPolicys.Clear();
+                Policy_Offers.Clear();
+                Policy_RestrictedHoursPolicys.Clear();
+                Policy_AndPolicys.Clear();
+                Policy_OrPolicys.Clear();
+                Policy_BuyNows.Clear();
+                Policy_ConditionalPolicys.Clear();
+    }
+
+    }
+        #endregion
 
         #region Methods TO Delete
         //TODO - delete
