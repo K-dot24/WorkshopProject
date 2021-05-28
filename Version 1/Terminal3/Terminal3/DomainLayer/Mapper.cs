@@ -752,7 +752,7 @@ namespace Terminal3.DataAccessLayer
             foreach (var manager in s.Managers) { managers.AddLast(manager.Key); }
             foreach(var product in s.InventoryManager.Products) { inventory.AddLast(product.Key); }
 
-            DAO_Store.Create(new DTO_Store(s.Id, s.Name, s.Founder.GetId(), owners, managers, inventory, Get_DTO_History(s.History), s.Rating, s.NumberOfRates));
+            DAO_Store.Create(new DTO_Store(s.Id, s.Name, s.Founder.GetId(), owners, managers, inventory, Get_DTO_History(s.History), s.Rating, s.NumberOfRates,s.isClosed));
             Stores.TryAdd(s.Id, s);
         }
 

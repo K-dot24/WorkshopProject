@@ -20,7 +20,14 @@ namespace Terminal3.DataAccessLayer.DAOs
         public void Create(T dto)
         {
             var doc = dto.ToBsonDocument();
-            collection.InsertOne(doc);
+            try
+            {
+                collection.InsertOne(doc);
+            }
+            catch(MongoDB.Driver.MongoWriteException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
         public T Delete(FilterDefinition<BsonDocument> filter)
