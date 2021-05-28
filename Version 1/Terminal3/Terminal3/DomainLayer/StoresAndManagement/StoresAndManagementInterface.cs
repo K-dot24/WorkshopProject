@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
@@ -599,6 +600,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public void resetSystem()
         {
+            Mapper.getInstance().clearDB();
             UsersAndPermissionsFacade.resetSystem();
             StoresFacade.resetSystem();
         }

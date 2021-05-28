@@ -43,6 +43,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Mapper mapper;
 
         private readonly object my_lock = new object();
+        private RegisteredUser defaultUser;
 
         //Constructor
         public UsersAndPermissionsFacade(String admin_email, String admin_password)
@@ -50,29 +51,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
             SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
             GuestUsers = new ConcurrentDictionary<String, GuestUser>();
-
-
             //Add first system admin
-            RegisteredUser defaultUser = new RegisteredUser("-777", admin_email, admin_password);
-            this.SystemAdmins.TryAdd(defaultUser.Id, defaultUser );
-            this.RegisteredUsers.TryAdd(defaultUser.Id, defaultUser);
+            defaultUser = new RegisteredUser("-777", admin_email, admin_password);
+            insertInitializeData(defaultUser);
 
-            mapper = Mapper.getInstance();
-
-            // Update DB
-            DTO_RegisteredUser user_dto = defaultUser.getDTO();
-            var filter_gu = Builders<BsonDocument>.Filter.Eq("_id", "-777");
-            var update_gu = Builders<BsonDocument>.Update.Set("ShoppingCart", user_dto.ShoppingCart)
-                                                         .Set("Email", user_dto.Email)
-                                                         .Set("Password" , user_dto.Password)
-                                                         .Set("LoggedIn" , user_dto.LoggedIn)
-                                                         .Set("History" , user_dto.History)
-                                                         .Set("PendingNotification", user_dto.PendingNotification);
-            mapper.UpdateSystemAdmins(filter_gu, update_gu);
-
-            var filter_admin = Builders<BsonDocument>.Filter.Eq("_id", "");
-            var update_admin = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
-            mapper.UpdateSystemAdmins(filter_admin, update_admin);
         }
 
         //Methods
@@ -521,13 +503,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public void resetSystem()
         {
             GuestUsers.Clear();
-            RegisteredUser admin;
-            SystemAdmins.TryGetValue("-777", out admin);
             SystemAdmins.Clear();
             RegisteredUsers.Clear();
+            insertInitializeData(defaultUser);
+        }
+        private void insertInitializeData(RegisteredUser defaultUser)
+        {
+            this.SystemAdmins.TryAdd(defaultUser.Id, defaultUser);
+            this.RegisteredUsers.TryAdd(defaultUser.Id, defaultUser);
+            mapper = Mapper.getInstance();
+            // Update DB
+            DTO_RegisteredUser user_dto = defaultUser.getDTO();
+            var filter_gu = Builders<BsonDocument>.Filter.Eq("_id", "-777");
+            var update_gu = Builders<BsonDocument>.Update.Set("ShoppingCart", user_dto.ShoppingCart)
+                                                         .Set("Email", user_dto.Email)
+                                                         .Set("Password", user_dto.Password)
+                                                         .Set("LoggedIn", user_dto.LoggedIn)
+                                                         .Set("History", user_dto.History)
+                                                         .Set("PendingNotification", user_dto.PendingNotification);
+            mapper.UpdateRegisteredUser(filter_gu, update_gu, true);
 
-            RegisteredUsers.TryAdd(admin.Id, admin);
-            SystemAdmins.TryAdd(admin.Id, admin);
+            var filter_admin = Builders<BsonDocument>.Filter.Eq("_id", "");
+            var update_admin = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
+            mapper.UpdateSystemAdmins(filter_admin, update_admin, true);
+
         }
     }
 }

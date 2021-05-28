@@ -80,6 +80,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 Result<Product> res_s = store.AddNewProduct(userID, productName, price, initialQuantity, category, keywords);
 
                 // Update Store in DB
+                mapper.Create(res_s.Data);
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                 var update = Builders<BsonDocument>.Update.Set("InventoryManager", store.getDTO().InventoryManager);
                 mapper.UpdateStore(filter, update);

@@ -405,42 +405,6 @@ namespace Terminal3.DataAccessLayer
         #endregion
 
         #region User
-        /*#region GuestUser
-        public void Create(GuestUser gu)
-        {            
-            //DAO_GuestUser.Create(new DTO_GuestUser(gu.Id , Get_DTO_ShoppingCart(gu), gu.Active));
-            GuestUsers.TryAdd(gu.Id, gu);
-        }
-
-        public GuestUser LoadGuestUser(FilterDefinition<BsonDocument> filter)
-        {
-            GuestUser gu;
-            DTO_GuestUser dto = DAO_GuestUser.Load(filter);
-            if (GuestUsers.TryGetValue(dto._id, out gu))
-            {
-                return gu;
-            }
-
-            gu = new GuestUser(dto._id, dto.Active);
-            
-            gu.ShoppingCart = ToObject(dto.ShoppingCart, gu);
-            GuestUsers.TryAdd(gu.Id, gu);
-            return gu;
-        }
-
-    /*    public void UpdateGuestUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
-        {
-            DAO_GuestUser.Update(filter, update);
-        }
-
-        public void DeleteGuestUser(FilterDefinition<BsonDocument> filter)
-        {
-            DTO_GuestUser deletedGuestUser = DAO_GuestUser.Delete(filter);
-            GuestUsers.TryRemove(deletedGuestUser._id, out GuestUser gu);
-        }*/
-
-
-        //#endregion GuestUser*/
 
         #region RegisteredUser
         public void Create(RegisteredUser ru)
@@ -464,9 +428,9 @@ namespace Terminal3.DataAccessLayer
             return ru;
         }
 
-        public void UpdateRegisteredUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        public void UpdateRegisteredUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update,Boolean upsert=false )
         {
-            DAO_RegisteredUser.Update(filter, update);
+            DAO_RegisteredUser.Update(filter, update,upsert);
         }
 
         public void DeleteRegisteredUser(FilterDefinition<BsonDocument> filter)
@@ -690,9 +654,9 @@ namespace Terminal3.DataAccessLayer
         #endregion Store Owner
 
         #region System Admin
-        internal void UpdateSystemAdmins(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        internal void UpdateSystemAdmins(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update,Boolean upsert=false)
         {
-            DAO_SystemAdmins.Update(filter, update , true);
+            DAO_SystemAdmins.Update(filter, update , upsert);
         }
         #endregion  System Admin
 
@@ -1231,22 +1195,12 @@ namespace Terminal3.DataAccessLayer
             if (!(Instance is null))
             {
                 var emptyFilter = Builders<BsonDocument>.Filter.Empty;
-                DAO_RegisteredUser.collection.DeleteMany(emptyFilter);
-                DAO_Product.collection.DeleteMany(emptyFilter);
-                DAO_StoreManager.collection.DeleteMany(emptyFilter);
-                DAO_StoreOwner.collection.DeleteMany(emptyFilter);
-                DAO_Store.collection.DeleteMany(emptyFilter);
-                DAO_Auction.collection.DeleteMany(emptyFilter);
-                DAO_Lottery.collection.DeleteMany(emptyFilter);
-                DAO_MaxProductPolicy.collection.DeleteMany(emptyFilter);
-                DAO_MinAgePolicy.collection.DeleteMany(emptyFilter);
-                DAO_MinProductPolicy.collection.DeleteMany(emptyFilter);
-                DAO_Offer.collection.DeleteMany(emptyFilter);
-                DAO_RestrictedHoursPolicy.collection.DeleteMany(emptyFilter);
-                DAO_AndPolicy.collection.DeleteMany(emptyFilter);
-                DAO_OrPolicy.collection.DeleteMany(emptyFilter);
-                DAO_BuyNow.collection.DeleteMany(emptyFilter);
-                DAO_ConditionalPolicy.collection.DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Discounts").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Policies").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Products").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Stores").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("SystemAdmins").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Users").DeleteMany(emptyFilter);
 
                 RegisteredUsers.Clear();
                 GuestUsers.Clear();
