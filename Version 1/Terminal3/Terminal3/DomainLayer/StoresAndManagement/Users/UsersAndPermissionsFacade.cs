@@ -9,6 +9,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DataAccessLayer;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -58,8 +59,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             mapper = Mapper.getInstance();
 
-            //create in DB
-            mapper.Create(defaultUser);
+            // Update DB
+            var filter_gu = Builders<BsonDocument>.Filter.Eq("_id", "-777");
+            var update_gu = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
+            mapper.UpdateSystemAdmins(filter_gu, update_gu);
+
+            var filter_admin = Builders<BsonDocument>.Filter.Eq("_id", "");
+            var update_admin = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
+            mapper.UpdateSystemAdmins(filter_admin, update_admin);
         }
         //Constructor for the initializer
         public UsersAndPermissionsFacade(ConcurrentDictionary<String, RegisteredUser>  registeredUsers,
@@ -127,6 +134,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (searchResult.ExecStatus)
             {
                 this.SystemAdmins.TryAdd(searchResult.Data.Id, searchResult.Data);
+
+                // Update DB
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", "");
+                var update = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
+                mapper.UpdateSystemAdmins(filter, update);
+
                 return new Result<RegisteredUser>($"{email} has been added as system admin\n", true, searchResult.Data);
             }
             else
@@ -485,5 +498,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
         }
 
+
+        public DTO_SystemAdmins getDTO_admins()
+        {
+            LinkedList<String> admins_dto = new LinkedList<string>(); 
+
+            foreach(var admin in SystemAdmins)
+            {
+                admins_dto.AddLast(admin.Key);
+            }
+            return new DTO_SystemAdmins(admins_dto);
+        }
     }
 }

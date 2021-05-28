@@ -27,6 +27,7 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_RegisteredUser> DAO_RegisteredUser;
         public DAO<DTO_Product> DAO_Product;
         public DAO<DTO_StoreManager> DAO_StoreManager;
+        public DAO<DTO_SystemAdmins> DAO_SystemAdmins;
         public DAO<DTO_StoreOwner> DAO_StoreOwner;
         public DAO<DTO_Store> DAO_Store;
         public DAO<DTO_Auction> DAO_Auction;
@@ -73,6 +74,7 @@ namespace Terminal3.DataAccessLayer
             DAO_Product = new DAO<DTO_Product>(database, "Stores");            
             DAO_StoreManager = new DAO<DTO_StoreManager>(database, "Users");
             DAO_StoreOwner = new DAO<DTO_StoreOwner>(database, "Users");
+            DAO_SystemAdmins = new DAO<DTO_SystemAdmins>(database, "SystemAdmins");
             DAO_Store = new DAO<DTO_Store>(database, "Stores");
             DAO_Auction = new DAO<DTO_Auction>(database, "Policies");
             DAO_Lottery = new DAO<DTO_Lottery>(database, "Policies");
@@ -680,6 +682,13 @@ namespace Terminal3.DataAccessLayer
             }
         }
         #endregion Store Owner
+
+        #region System Admin
+        internal void UpdateSystemAdmins(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_SystemAdmins.Update(filter, update);
+        }
+        #endregion  System Admin
 
         #endregion User
 
