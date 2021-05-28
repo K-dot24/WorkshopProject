@@ -1217,8 +1217,6 @@ namespace Terminal3.DataAccessLayer
 
 
 
-
-
         #region Methods TO Delete
         //TODO - delete
         //private StoreManager LoadStoreManager(FilterDefinition<BsonDocument> filter)

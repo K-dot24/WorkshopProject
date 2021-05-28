@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Terminal3.DomainLayer;
 using Terminal3.ServiceLayer;
@@ -33,9 +34,41 @@ namespace Terminal3WebAPI
             StoryConfig storyConfig = JsonConvert.DeserializeObject<StoryConfig>(json);
             foreach (Story story in storyConfig.story)
             {
-                functionDict[story.function].DynamicInvoke(story.args);
+
+                functionDict[story.function].DynamicInvoke(convertArgs(functionDict[story.function], story.args));
             }
         }
+
+        public object[] convertArgs(Delegate function, object[] args)
+        {
+            object[] convertedArgs = new object[args.Length];
+            ParameterInfo[] parameterInfos = function.Method.GetParameters();
+            for(int i = 0; i < args.Length; i++)
+            {
+                if (args[i] is null) { convertedArgs[i] = null;continue; }
+                ParameterInfo parameterInfo = parameterInfos[i];
+                string type = parameterInfo.ParameterType.FullName;
+                switch (type)
+                {
+                    case "System.String":
+                        convertedArgs[i] = (String)args[i]; 
+                        break;
+                    case "System.Double":
+                        Double d;
+                        Double.TryParse((String)args[i], out d);
+                        convertedArgs[i] = d;
+                        break;
+                    case "System.Int32":
+                        Int32 integer;
+                        Int32.TryParse((String)args[i], out integer);
+                        convertedArgs[i] = integer;
+                        break;
+
+                }
+            }
+            return convertedArgs;
+        }
+
 
     }
 }

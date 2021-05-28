@@ -87,6 +87,9 @@ namespace WebApplication3
                 c.RoutePrefix = string.Empty;
             });
 
+
+            StoryExecutor storyExecutor = new StoryExecutor(app.ApplicationServices.GetService<IECommerceSystem>());
+            storyExecutor.Execute();
         }
 
     }

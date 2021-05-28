@@ -169,7 +169,7 @@ namespace Terminal3.ServiceLayer
 
         public Result<StoreService> OpenNewStore(string storeName, string userID, String storeID = "-1")
         {
-            return RegisteredUserInterface.OpenNewStore(storeName, userID);
+            return RegisteredUserInterface.OpenNewStore(storeName, userID, storeID);
         }
 
         public Result<Boolean> CloseStore(string storeId, string userID)

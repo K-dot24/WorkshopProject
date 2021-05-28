@@ -79,7 +79,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     if (isUniqueEmail(email))
                     {
                         RegisteredUser newUser; 
-                        if (Id != "-1")
+                        if (Id == "-1")
                             newUser = new RegisteredUser(email, password);
                         else
                             newUser = new RegisteredUser(Id , email, password);
