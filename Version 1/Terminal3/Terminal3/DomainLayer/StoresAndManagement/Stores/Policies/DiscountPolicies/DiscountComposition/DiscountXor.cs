@@ -15,11 +15,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public IDiscountPolicy Discount2 { get; }
         public IDiscountCondition ChoosingCondition { get; }
 
-        public DiscountXor(IDiscountPolicy discount1, IDiscountPolicy discount2, IDiscountCondition choosingCondition, String Id = "") : base(Id)
+        public DiscountXor(IDiscountPolicy discount1, IDiscountPolicy discount2, IDiscountCondition choosingCondition, String Id = "") : base(new Dictionary<string, object>(), Id)
         {
             Discount1 = discount1;
             Discount2 = discount2;
             ChoosingCondition = choosingCondition;
+        }
+
+        public DiscountXor(Dictionary<string, object> info, String id = "") : base(info, id)
+        {
+            //TO DO
         }
 
         public override Result<Dictionary<Product, double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")

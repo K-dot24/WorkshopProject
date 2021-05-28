@@ -35,15 +35,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #region Policies Management
         double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
         Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
-        Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount);
-        Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount, String id);
-        Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id);
+        Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info);
+        Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info, String id);
+        Result<Boolean> AddDiscountCondition(Dictionary<string, object> info, String id);
         Result<Boolean> RemoveDiscountPolicy(String id);
         Result<Boolean> RemoveDiscountCondition(String id);
+        Result<bool> EditDiscountPolicy(Dictionary<string, object> info, String id);
+        Result<bool> EditDiscountCondition(Dictionary<string, object> info, String id);
         Result<IDiscountPolicyData> GetPoliciesData();
-        Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
-        Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
+        Result<IPurchasePolicyData> GetPurchasePolicyData();
+        Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info);
+        Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info, string id);
         Result<Boolean> RemovePurchasePolicy(string id);
+        Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id);
         #endregion
 
         #region Information        
@@ -55,9 +59,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     {
         public String Id { get; }
         public String Name { get; }
-        public StoreOwner Founder { get; }
-        public ConcurrentDictionary<String, StoreOwner> Owners { get; }
-        public ConcurrentDictionary<String, StoreManager> Managers { get; }
+        public StoreOwner Founder { get; set; }
+        public ConcurrentDictionary<String, StoreOwner> Owners { get; set; }
+        public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; }
         public History History { get; }
@@ -83,6 +87,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //TODO: Complete when policies done properly
             //Add default policies
         }
+       
+
+        public Store(string id, string name, InventoryManager inventoryManager, History history, double rating, int numberOfRates, NotificationManager notificationManager)
+        {
+            Id = id;
+            Name = name;            
+            InventoryManager = inventoryManager;
+            //PolicyManager = policyManager;     TODO
+            History = history;
+            Rating = rating;
+            NumberOfRates = numberOfRates;
+            NotificationManager = notificationManager;
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+        }
+
+
 
         //For Testing ONLY
         public Store(string id, String name, RegisteredUser founder)
@@ -92,7 +113,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Founder = new StoreOwner(founder, this, null);
             Owners = new ConcurrentDictionary<String, StoreOwner>();
             Managers = new ConcurrentDictionary<String, StoreManager>();
-            InventoryManager = new InventoryManager();
+            InventoryManager = new InventoryManager(new ConcurrentDictionary<string, Product>());
             PolicyManager = new PolicyManager();
             History = new History();
 
@@ -532,19 +553,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.AdheresToPolicy(products, user);
         }
 
-        public Result<bool> AddDiscountPolicy(IDiscountPolicy discount)
+        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info)
         {
-            return PolicyManager.AddDiscountPolicy(discount);
+            return PolicyManager.AddDiscountPolicy(info);
         }
 
-        public Result<bool> AddDiscountPolicy(IDiscountPolicy discount, string id)
+        public Result<bool> AddDiscountPolicy(Dictionary<string, object> info, string id)
         {
-            return PolicyManager.AddDiscountPolicy(discount, id);
+            return PolicyManager.AddDiscountPolicy(info, id);
         }
 
-        public Result<bool> AddDiscountCondition(IDiscountCondition condition, string id)
+        public Result<bool> AddDiscountCondition(Dictionary<string, object> info, string id)
         {
-            return PolicyManager.AddDiscountCondition(condition, id);
+            return PolicyManager.AddDiscountCondition(info, id);
         }
 
         public Result<bool> RemoveDiscountPolicy(string id)
@@ -557,24 +578,44 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.RemoveDiscountCondition(id);
         }
 
-        public Result<IDiscountPolicyData> GetPoliciesData()
-        {
-            return PolicyManager.GetData();
-        }
-
-        public Result<bool> AddPurchasePolicy(IPurchasePolicy policy)
-        {
-            return PolicyManager.AddPurchasePolicy(policy);
-        }
-
-        public Result<bool> AddPurchasePolicy(IPurchasePolicy policy, string id)
-        {
-            return PolicyManager.AddPurchasePolicy(policy, id);
-        }
-
         public Result<bool> RemovePurchasePolicy(string id)
         {
             return PolicyManager.RemovePurchasePolicy(id);
+        }
+
+        public Result<bool> EditDiscountPolicy(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.EditDiscountPolicy(info, id);
+        }
+
+        public Result<bool> EditDiscountCondition(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.EditDiscountCondition(info, id);
+        }
+
+        public Result<IDiscountPolicyData> GetPoliciesData()
+        {
+            return PolicyManager.GetDiscountPolicyData();
+        }
+
+        public Result<IPurchasePolicyData> GetPurchasePolicyData()
+        {
+            return PolicyManager.GetPurchasePolicyData();
+        }
+
+        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info)
+        {
+            return PolicyManager.AddPurchasePolicy(info);
+        }
+
+        public Result<bool> AddPurchasePolicy(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.AddPurchasePolicy(info, id);
+        }
+
+        public Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.EditPurchasePolicy(info, id);
         }
     }
 }

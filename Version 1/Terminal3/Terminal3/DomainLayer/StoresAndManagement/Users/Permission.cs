@@ -52,6 +52,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             functionsBitMask[(int)Methods.GetStoreStaff] = true;    //requierment 4.5
         }
 
+        // For loading from database
+        public Permission(Boolean[] functionsBitMask)
+        {
+            this.isOwner = false;
+            this.functionsBitMask = functionsBitMask;
+        }
+
         public Result<Boolean> SetPermission(Methods method, Boolean active)
         {
             functionsBitMask[(int)method] = active;

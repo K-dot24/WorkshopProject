@@ -12,7 +12,7 @@ namespace Terminal3.ServiceLayer.ServiceObjects
         public String Id { get; }
         public String UserId { get; }
         public String StoreId { get; }
-        public LinkedList<Tuple< ProductService , int>> Products { get; set; }  //<productDAL , quantity>
+        public LinkedList<Tuple< ProductService , int>> Products { get; set; }  //<productDAL , quantity>  -- TODO - check why quantity here if there is a quantity field in productservice
         public Double TotalBagPrice { get; }
 
 
@@ -30,7 +30,14 @@ namespace Terminal3.ServiceLayer.ServiceObjects
         }
 
 
-        
+        public ShoppingBagService(String bagID, String userID, String storeID, LinkedList<Tuple<ProductService, int>> products, Double totalBagPrice)
+        {
+            Id = bagID;
+            UserId = userID;
+            StoreId = storeID;
+            Products = products;
+            TotalBagPrice = totalBagPrice;
+        }
 
     }
 }

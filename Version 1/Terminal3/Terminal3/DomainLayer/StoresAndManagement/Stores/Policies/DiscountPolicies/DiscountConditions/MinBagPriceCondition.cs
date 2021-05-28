@@ -11,9 +11,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public Double MinPrice { get; }
 
-        public MinBagPriceCondition(Double minPrice, String id = "") : base(id)
+        public MinBagPriceCondition(Double minPrice, String id = "") : base(new Dictionary<string, object>(), id)
         {
             MinPrice = minPrice;
+        }
+
+        public MinBagPriceCondition(Dictionary<string, object> info, String id = "") : base(info, id)
+        {
+            //TO DO
         }
 
         public override Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)

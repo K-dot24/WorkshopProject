@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Terminal3.DomainLayer;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.ServiceLayer;
 using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3WebAPI.Models;
@@ -221,6 +223,171 @@ namespace Terminal3WebAPI.Controllers
             if (result.ExecStatus) { return Ok(result.Message); }
             else { return BadRequest(result.Message); }
         }
+
+        /// <summary>
+        /// Removing excisting store owner by an owner
+        /// </summary>
+        /// <param name="storeID">StoreID</param>
+        /// <param name="currentlyOwnerID">OwnerID</param>
+        /// <param name="removedOwnerID">ID of the manager to be removed</param>
+        [Route("RemoveStoreOwner/{storeID}/{currentlyOwnerID}/{removedOwnerID}")]
+        [HttpDelete]
+        public IActionResult RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID)
+        {
+            Result<Boolean> result = system.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+
+        }
+
+        /// <summary>
+        /// Closing an active store 
+        /// </summary>
+        /// <param name="storeId">storeId</param>
+        /// <param name="userID">userID</param>
+        [Route("CloseStore/{storeId}/{userID}")]
+        [HttpDelete]
+        public IActionResult CloseStore(string storeId, string userID)
+        {
+            Result<Boolean> result = system.CloseStore(storeId, userID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        /// <summary>
+        /// ReOpenStore by storeID
+        /// </summary>
+        /// <param name="storeId"></param>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        [Route("ReOpenStore/{storeId}/{userID}")]
+        [HttpPost]
+        public IActionResult ReOpenStore(string storeId, string userID)
+        {
+            Result<StoreService> result = system.ReOpenStore(storeId, userID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+
+        }
+
+        [Route("AddDiscountPolicy")]
+        [HttpPost]
+        public IActionResult AddDiscountPolicy([FromBody] PolicyModel data)
+        {
+            Result<Boolean> result = system.AddDiscountPolicy(data.storeId, data.info);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        [Route("AddDiscountPolicy/{id}")]
+        [HttpPost]
+        public IActionResult AddDiscountPolicy([FromBody] PolicyModel data,String id)
+        {
+            Result<Boolean> result = system.AddDiscountPolicy(data.storeId, data.info,id);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        [Route("AddDiscountCondition/{id}")]
+        [HttpPost]
+        public IActionResult AddDiscountCondition([FromBody] PolicyModel data, String id)
+        {
+            Result<Boolean> result = system.AddDiscountCondition(data.storeId, data.info, id);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        [Route("RemoveDiscountPolicy/{storeId}/{id}")]
+        [HttpDelete]
+        public IActionResult RemoveDiscountPolicy(string storeId, String id)
+        {
+            Result<Boolean> result = system.RemoveDiscountPolicy(storeId, id);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        [Route("RemoveDiscountCondition/{storeId}/{id}")]
+        [HttpDelete]
+        public IActionResult RemoveDiscountCondition(string storeId, String id)
+        {
+            Result<Boolean> result = system.RemoveDiscountCondition(storeId, id);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        [Route("EditDiscountPolicy/{id}")]
+        [HttpPut]
+        public IActionResult EditDiscountPolicy([FromBody] PolicyModel data ,String id)
+        {
+            Result<Boolean> result = system.EditDiscountPolicy(data.storeId,data.info, id);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        [Route("EditDiscountCondition/{id}")]
+        [HttpPut]
+        public IActionResult EditDiscountCondition([FromBody] PolicyModel data, String id)
+        {
+            Result<Boolean> result = system.EditDiscountCondition(data.storeId, data.info, id);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        [Route("GetDiscountPolicyData/{storeId}")]
+        [HttpGet]
+        public IActionResult GetDiscountPolicyData(string storeId)
+        {
+            Result<IDiscountPolicyData> result = system.GetDiscountPolicyData(storeId);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+        [Route("GetPurchasePolicyData/{storeId}")]
+        [HttpGet]
+        public IActionResult GetPurchasePolicyData(string storeId)
+        {
+            Result<IPurchasePolicyData> result = system.GetPurchasePolicyData(storeId);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        [Route("AddPurchasePolicy")]
+        [HttpPost]
+        public IActionResult AddPurchasePolicy([FromBody] PolicyModel data)
+        {
+            Result<bool> result = system.AddPurchasePolicy(data.storeId, data.info);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        [Route("AddPurchasePolicy/{id}")]
+        [HttpPost]
+        public IActionResult AddPurchasePolicy([FromBody] PolicyModel data, String id)
+        {
+            Result<bool> result = system.AddPurchasePolicy(data.storeId, data.info,id);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+
+        [Route("RemovePurchasePolicy/{storeId}/{id}")]
+        [HttpDelete]
+        public IActionResult RemovePurchasePolicy(string storeId, String id)
+        {
+            Result<bool> result = system.RemovePurchasePolicy(storeId, id);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+
+        [Route("RemovePurchasePolicy/{id}")]
+        [HttpPut]
+        public IActionResult EditPurchasePolicy([FromBody] PolicyModel data, string id)
+        {
+            Result<bool> result = system.EditPurchasePolicy(data.storeId, data.info, id);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
         #endregion
     }
 }

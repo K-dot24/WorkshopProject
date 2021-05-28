@@ -14,7 +14,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public IDiscountTarget Target { get; }
         public Double Percentage { get; }
 
-        public VisibleDiscount(DateTime expirationDate, IDiscountTarget target, Double percentage, String id="") : base(id)
+        public VisibleDiscount(DateTime expirationDate, IDiscountTarget target, Double percentage, String id="") : base(new Dictionary<string, object>(), id)
         {
             ExpirationDate = expirationDate;
             Target = target;
@@ -24,6 +24,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 Percentage = 0;
             else
                 Percentage = percentage;
+        }
+
+        public VisibleDiscount(Dictionary<string, object> info, String id = "") : base(info, id)
+        {
+            //TO DOO
         }
 
         public override Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
