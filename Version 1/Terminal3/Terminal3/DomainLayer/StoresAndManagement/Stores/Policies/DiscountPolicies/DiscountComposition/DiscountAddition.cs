@@ -12,12 +12,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public List<IDiscountPolicy> Discounts { get; }
 
-        public DiscountAddition(String id = "") : base(id)
+        public DiscountAddition(String id = "") : base(new Dictionary<string, object>(), id)
         {
             Discounts = new List<IDiscountPolicy>();
         }
 
-        public DiscountAddition(List<IDiscountPolicy> discounts, String id = "") : base(id)
+        public DiscountAddition(Dictionary<string, object> info, String id = "") : base(info, id)
+        {
+            //TO DO
+        }
+
+        public DiscountAddition(List<IDiscountPolicy> discounts, String id = "") : base(new Dictionary<string, object>(), id)
         {
             Discounts = discounts;
             if (Discounts == null)

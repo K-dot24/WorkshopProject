@@ -13,10 +13,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public IDiscountCondition Condition { get; }
         public IDiscountPolicy Discount { get; }
 
-        public ConditionalDiscount(IDiscountPolicy discount, IDiscountCondition condition, String id = "") : base(id)
+        public ConditionalDiscount(IDiscountPolicy discount, IDiscountCondition condition, String id = "") : base(new Dictionary<string, object>(), id)
         {
             Condition = condition;
             Discount = discount;
+        }
+
+        public ConditionalDiscount(Dictionary<string, object> info, String id = "") : base(info, id)
+        {
+            //TO DOO
         }
 
         public override Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")

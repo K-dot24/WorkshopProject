@@ -13,6 +13,8 @@ using signalRgateway.Models;
 using Newtonsoft.Json;
 using Terminal3.DataAccessLayer;
 using System.IO;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 
 namespace Terminal3.ServiceLayer
 {   
@@ -307,6 +309,73 @@ namespace Terminal3.ServiceLayer
         }
         public List<Notification> GetPendingMessagesByUserID(string userId) {
             return NotificationService.GetPendingMessagesByUserID(userId);
+        }
+        #endregion
+
+        #region Policies Management
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info)
+        {
+            return StoreStaffInterface.AddDiscountPolicy(storeId, info);
+        }
+
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.AddDiscountPolicy(storeId, info, id);
+        }
+
+        public Result<bool> AddDiscountCondition(string storeId, Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.AddDiscountCondition(storeId, info, id);
+        }
+
+        public Result<bool> RemoveDiscountPolicy(string storeId, String id)
+        {
+            return StoreStaffInterface.RemoveDiscountPolicy(storeId, id);
+        }
+
+        public Result<bool> RemoveDiscountCondition(string storeId, String id)
+        {
+            return StoreStaffInterface.RemoveDiscountCondition(storeId, id);
+        }
+
+        public Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.EditDiscountPolicy(storeId, info, id);
+        }
+
+        public Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.EditDiscountCondition(storeId, info, id);
+        }
+
+        public Result<IDiscountPolicyData> GetDiscountPolicyData(string storeId)
+        {
+            return StoreStaffInterface.GetDiscountPolicyData(storeId);
+        }
+
+        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
+        {
+            return StoreStaffInterface.GetPurchasePolicyData(storeId);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info)
+        {
+            return StoreStaffInterface.AddPurchasePolicy(storeId, info);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, String id)
+        {
+            return StoreStaffInterface.AddPurchasePolicy(storeId, info, id);
+        }
+
+        public Result<bool> RemovePurchasePolicy(string storeId, String id)
+        {
+            return StoreStaffInterface.RemovePurchasePolicy(storeId, id);
+        }
+
+        public Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoreStaffInterface.EditPurchasePolicy(storeId, info, id);
         }
         #endregion
     }

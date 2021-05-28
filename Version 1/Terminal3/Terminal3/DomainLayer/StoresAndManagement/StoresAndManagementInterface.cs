@@ -6,6 +6,8 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.ServiceLayer.ServiceObjects;
 using System.Collections.Concurrent;
 using System.Linq;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
@@ -62,6 +64,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         List<StoreService> GetAllStoresToDisplay();
         List<ProductService> GetAllProductByStoreIDToDisplay(string storeID);
         Boolean[] GetPermission(string userID, string storeID);
+        #endregion
+
+        #region Policies Management
+        Result<Boolean> AddDiscountPolicy(string storeId, Dictionary<string, object> info);
+        Result<Boolean> AddDiscountPolicy(string storeId, Dictionary<string, object> info, String id);
+        Result<Boolean> AddDiscountCondition(string storeId, Dictionary<string, object> info, String id);
+        Result<Boolean> RemoveDiscountPolicy(string storeId, String id);
+        Result<Boolean> RemoveDiscountCondition(string storeId, String id);
+        Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, String id);
+        Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, String id);
+        Result<IDiscountPolicyData> GetPoliciesData(string storeId);
+        Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId);
+        Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info);
+        Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
+        Result<Boolean> RemovePurchasePolicy(string storeId, string id);
+        Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -498,6 +516,84 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public Result<RegisteredUser> FindUserByEmail(String email)
         {
             return UsersAndPermissionsFacade.FindUserByEmail(email, UsersAndPermissionsFacade.RegisteredUsers);
+        }
+
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.AddDiscountPolicy(info);
+        }
+
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.AddDiscountPolicy(info, id);
+        }
+
+        public Result<bool> AddDiscountCondition(string storeId, Dictionary<string, object> info, string id)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.AddDiscountCondition(info, id);
+        }
+
+        public Result<bool> RemoveDiscountPolicy(string storeId, string id)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.RemoveDiscountPolicy(id);
+        }
+
+        public Result<bool> RemoveDiscountCondition(string storeId, string id)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.RemoveDiscountCondition(id);
+        }
+
+        public Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.EditDiscountPolicy(info, id);
+        }
+
+        public Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, string id)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.EditDiscountCondition(info, id);
+        }
+
+        public Result<IDiscountPolicyData> GetPoliciesData(string storeId)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.GetPoliciesData();
+        }
+
+        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.GetPurchasePolicyData();
+        }
+
+        public Result<bool> RemovePurchasePolicy(string storeId, string id)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.RemovePurchasePolicy(id);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.AddPurchasePolicy(info);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.AddPurchasePolicy(info, id);
+        }
+
+        public Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            Store store = StoresFacade.Stores[storeId];
+            return store.EditPurchasePolicy(info, id);
         }
     }
 }

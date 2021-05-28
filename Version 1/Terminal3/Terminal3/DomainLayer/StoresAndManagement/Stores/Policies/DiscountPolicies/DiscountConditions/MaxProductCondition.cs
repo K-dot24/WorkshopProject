@@ -12,10 +12,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public int MaxQuantity { get; }
         public Product Product { get; }
 
-        public MaxProductCondition(Product product, int maxQuantity, String id = "") : base(id)
+        public MaxProductCondition(Product product, int maxQuantity, String id = "") : base(new Dictionary<string, object>(), id)
         {
             Product = product;
             MaxQuantity = maxQuantity;
+        }
+
+        public MaxProductCondition(Dictionary<string, object> info, String id = "") : base(info, id)
+        {
+            //TO DO
         }
 
         public override Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)
