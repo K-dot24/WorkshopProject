@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using Terminal3.DataAccessLayer;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
@@ -39,6 +40,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(string ownerID, string storeID);
         Result<History> GetStorePurchaseHistory(String userID, String storeID, bool sysAdmin);
+        Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id);
         #endregion
 
         #region Policies Management
@@ -579,6 +581,70 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
             var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", discounts);
             mapper.UpdateStore(filter, update);
+        }
+
+        // Get reciptes for owner in store 
+        public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id)
+        {
+            DateTime start = DateTime.ParseExact(start_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            DateTime end = DateTime.ParseExact(end_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+            List<Tuple<DateTime, Double>> recipts_list = new List<Tuple<DateTime, double>>(); 
+
+            if (start <= end)
+            {
+                Stores.TryGetValue(store_id, out Store store);
+                if (store.Owners.ContainsKey(owner_id)) {
+                    DateTime curr = start;
+                    while (curr <= end)
+                    {
+                        List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("dd/MM/yyyy", DateTimeFormatInfo.InvariantInfo), store_id);
+                        Double amountPerDay = 0; 
+                        foreach(DTO_Recipt dto in recipts)
+                        {
+                            amountPerDay += dto.amount;
+                        }
+                        recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
+                        curr = curr.AddDays(1);
+                    }
+
+                    return new Result<List<Tuple<DateTime, Double>>>("Income for the requested dates have been issue", true, recipts_list) ;
+                }
+                else 
+                { return new Result<List<Tuple<DateTime, Double>>>("No permissions for this account", false, null); }
+            }
+            else
+            { return new Result<List<Tuple<DateTime, Double>>>("End date cannot be before start date", false, null); }
+        }
+
+        // Get reciptes for admin in system
+        public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date)
+        {
+            DateTime start = DateTime.ParseExact(start_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            DateTime end = DateTime.ParseExact(end_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+            List<Tuple<DateTime, Double>> recipts_list = new List<Tuple<DateTime, double>>();
+
+            if (start <= end)
+            {                
+                DateTime curr = start;
+                while (curr <= end)
+                {
+                    List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("dd/MM/yyyy", DateTimeFormatInfo.InvariantInfo));
+                    Double amountPerDay = 0;
+                    foreach (DTO_Recipt dto in recipts)
+                    {
+                        amountPerDay += dto.amount;
+                    }
+                    recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
+                    curr = curr.AddDays(1);
+                }
+
+                return new Result<List<Tuple<DateTime, Double>>>("Income for the requested dates have been issue", true, recipts_list);
+               
+            }
+            else
+            { return new Result<List<Tuple<DateTime, Double>>>("End date cannot be before start date", false, null); }
         }
     }
 }

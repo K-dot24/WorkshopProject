@@ -38,6 +38,8 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<bool> RemovePurchasePolicy(string storeId, String id);
         Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
 
+        Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id); 
+
     }
     public class StoreStaffController : IStoreStaffInterface
     {
@@ -135,6 +137,11 @@ namespace Terminal3.ServiceLayer.Controllers
         public Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
         {
             return StoresAndManagementInterface.EditPurchasePolicy(storeId, info, id);
+        }
+
+        public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id)
+        {
+            return StoresAndManagementInterface.GetIncomeAmountGroupByDay(start_date, end_date, store_id, owner_id);
         }
 
         #endregion

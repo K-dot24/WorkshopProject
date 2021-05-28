@@ -13,6 +13,8 @@ using Terminal3.ServiceLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using System.Reflection;
+using Newtonsoft.Json;
+
 
 namespace Terminal3.DataAccessLayer
 {
@@ -42,6 +44,7 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_OrPolicy> DAO_OrPolicy;
         public DAO<DTO_BuyNow> DAO_BuyNow;
         public DAO<DTO_ConditionalPolicy> DAO_ConditionalPolicy;
+        public DAO<DTO_Recipt> DAO_Recipt;
 
         // IdentityMaps  <Id , object>
         public ConcurrentDictionary<String, RegisteredUser> RegisteredUsers;
@@ -88,6 +91,7 @@ namespace Terminal3.DataAccessLayer
             DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "Policies");
             DAO_BuyNow = new DAO<DTO_BuyNow>(database, "Policies");
             DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "Policies");
+            DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
 
             // IdentityMaps  <Id , object>
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
@@ -664,7 +668,35 @@ namespace Terminal3.DataAccessLayer
 
         #region Shop till you drop
 
+        public void Create(DTO_Recipt recipt)
+        {
+            DAO_Recipt.Create(recipt);
+        }
 
+        public List<DTO_Recipt> LoadRecipts(string date, string store_id = "")
+        {
+
+            var filter = Builders<BsonDocument>.Filter.Eq("date", date);
+            if (!store_id.Equals(String.Empty))
+            {
+                filter = Builders<BsonDocument>.Filter.Eq("date", date) &
+                         Builders<BsonDocument>.Filter.Eq("store_id", store_id);
+
+            }
+              
+            List<BsonDocument> docs =  DAO_Recipt.collection.Find(filter).ToList();
+
+            List<DTO_Recipt> recipts = new List<DTO_Recipt>();
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                DTO_Recipt dto = JsonConvert.DeserializeObject<DTO_Recipt>(json);
+                recipts.Add(dto);
+            }
+
+            return recipts;
+        }
 
         #endregion Shop till you drop
 
@@ -1201,6 +1233,7 @@ namespace Terminal3.DataAccessLayer
                 database.GetCollection<BsonDocument>("Stores").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("SystemAdmins").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("Users").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Recipts").DeleteMany(emptyFilter);
 
                 RegisteredUsers.Clear();
                 GuestUsers.Clear();
