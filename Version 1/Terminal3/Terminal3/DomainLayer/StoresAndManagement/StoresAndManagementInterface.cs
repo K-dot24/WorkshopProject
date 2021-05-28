@@ -13,7 +13,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface IStoresAndManagementInterface
     {
-        Result<StoreService> OpenNewStore(String storeName, String userID);
+        Result<StoreService> OpenNewStore(String storeName, String userID , String storeID);
         Result<Boolean> CloseStore(String storeId, String userID);
         Result<StoreService> ReOpenStore(string storeId, string userID);
         Result<RegisteredUser> FindUserByEmail(String email);
@@ -38,7 +38,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #endregion
 
         #region User Actions
-        Result<RegisteredUserService> Register(String email, String password);
+        Result<RegisteredUserService> Register(String email, String password, string Id);
         Result<RegisteredUserService> Login(String email, String password);
         Result<RegisteredUserService> Login(String email, String password, String guestUserID);
         Result<UserService> LogOut(String email);
@@ -88,19 +88,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public StoresFacade StoresFacade { get; }
         public UsersAndPermissionsFacade UsersAndPermissionsFacade { get; }
 
-        public StoresAndManagementInterface()
+        public StoresAndManagementInterface(String admin_email, String admin_password)
         {
             StoresFacade = new StoresFacade();
-            UsersAndPermissionsFacade = new UsersAndPermissionsFacade();
+            UsersAndPermissionsFacade = new UsersAndPermissionsFacade(admin_email, admin_password);
         }
 
         // Methods
-        public Result<StoreService> OpenNewStore(String storeName, String userID)
+        public Result<StoreService> OpenNewStore(String storeName, String userID , String storeID)
         {
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser founder))  // Check if userID is a registered user
             {
                 // Open store
-                Result<Store> res = StoresFacade.OpenNewStore(founder, storeName);
+                Result<Store> res = StoresFacade.OpenNewStore(founder, storeName, storeID);
                 if (res.ExecStatus)
                 {
                     return new Result<StoreService>(res.Message, true, res.Data.GetDAL().Data);
@@ -402,9 +402,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<Boolean>($"is {userID} is system admin? {isContains}\n", true, isContains);
         }
 
-        public Result<RegisteredUserService> Register(string email, string password)
+        public Result<RegisteredUserService> Register(string email, string password , string Id)
         {
-            Result<RegisteredUser> res = UsersAndPermissionsFacade.Register(email, password);
+            Result<RegisteredUser> res = UsersAndPermissionsFacade.Register(email, password, Id);
             if (res.ExecStatus)
             {
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);

@@ -10,6 +10,9 @@ using XUnitTestTerminal3.AcceptanceTests.Utils;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Microsoft.AspNetCore.SignalR.Client;
 using signalRgateway.Models;
+using Newtonsoft.Json;
+using Terminal3.DataAccessLayer;
+using System.IO;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 
@@ -24,7 +27,7 @@ namespace Terminal3.ServiceLayer
     public class ECommerceSystem : IECommerceSystem
     {
         //Properties
-        public StoresAndManagementInterface StoresAndManagement  { get;set;}
+        public StoresAndManagementInterface StoresAndManagement { get; set; }
         public IGuestUserInterface GuestUserInterface { get; set; }
         public IRegisteredUserInterface RegisteredUserInterface { get; set; }
         public IStoreStaffInterface StoreStaffInterface { get; set;  }
@@ -37,24 +40,26 @@ namespace Terminal3.ServiceLayer
         //Constructor
         public ECommerceSystem()
         {
-            StoresAndManagement = new StoresAndManagementInterface();
+
+            /*Initializer.init(StoresAndManagement,
+                            GuestUserInterface,
+                            RegisteredUserInterface,
+                            StoreStaffInterface,
+                            SystemAdminInterface, 
+                            DataController, 
+                            NotificationService, this.connection);*/
+
+            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(@"..\Terminal3\Config.json"));
+            Mapper.getInstance(config.mongoDB_url);
+
+            StoresAndManagement = new StoresAndManagementInterface(config.email, config.password);
             GuestUserInterface = new GuestUserController(StoresAndManagement);
             RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
             StoreStaffInterface = new StoreStaffController(StoresAndManagement);
             SystemAdminInterface = new SystemAdminController(StoresAndManagement);
             DataController = new DataController(StoresAndManagement);
 
-            //Setting up SignalR connection
-
-            //HubConnection SignalRClient = new HubConnection("http://localhost:8080/signalr");
-            //hubProxy = SignalRClient.CreateHubProxy("NotificationHub");
-            //SignalRClient.Start();
-            //while (!(SignalRClient.State == ConnectionState.Connected)) {}
-
-
-            //NotificationService = NotificationService.GetInstance();
-            //NotificationService.hubProxy = hubProxy;
-            string url = "https://localhost:4001/signalr/notification";
+            string url = config.signalRServer_url;
             connection = new HubConnectionBuilder()
                .WithUrl(url)
                .WithAutomaticReconnect()
@@ -63,9 +68,6 @@ namespace Terminal3.ServiceLayer
             while (connection.State != HubConnectionState.Connected) { }
             NotificationService = NotificationService.GetInstance();
             NotificationService.connection = connection;
-
-
-
 
         }
 
@@ -84,9 +86,9 @@ namespace Terminal3.ServiceLayer
         {
             GuestUserInterface.ExitSystem(userID);
         }
-        public Result<RegisteredUserService> Register(string email, string password)
+        public Result<RegisteredUserService> Register(string email, string password, string optionalID = "-1")
         {
-            return GuestUserInterface.Register(email, password);
+            return GuestUserInterface.Register(email, password, optionalID);
         }
 
         public Result<List<StoreService>> SearchStore(IDictionary<string, object> details)
@@ -165,9 +167,9 @@ namespace Terminal3.ServiceLayer
             return result;
         }
 
-        public Result<StoreService> OpenNewStore(string storeName, string userID)
+        public Result<StoreService> OpenNewStore(string storeName, string userID, String storeID = "-1")
         {
-            return RegisteredUserInterface.OpenNewStore(storeName, userID);
+            return RegisteredUserInterface.OpenNewStore(storeName, userID, storeID);
         }
 
         public Result<Boolean> CloseStore(string storeId, string userID)
@@ -272,7 +274,7 @@ namespace Terminal3.ServiceLayer
             Result<Boolean> res = SystemAdminInterface.ResetSystem(sysAdminID);
             if (res.ExecStatus)
             {
-                StoresAndManagementInterface StoresAndManagement = new StoresAndManagementInterface();
+                //StoresAndManagementInterface StoresAndManagement = new StoresAndManagementInterface();
                 GuestUserInterface = new GuestUserController(StoresAndManagement);
                 RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
                 StoreStaffInterface = new StoreStaffController(StoresAndManagement);

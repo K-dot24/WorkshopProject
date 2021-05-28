@@ -62,9 +62,9 @@ namespace Terminal3.DataAccessLayer
 
 
         //Constructor
-        private Mapper()
+        private Mapper(String connection_string)
         {
-            dbClient = new MongoClient("mongodb+srv://admin:terminal3@cluster0.cbdpv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+            dbClient = new MongoClient(connection_string);
             database = dbClient.GetDatabase("Terminal3-development");
 
             //DAOs
@@ -109,9 +109,14 @@ namespace Terminal3.DataAccessLayer
 
         public static Mapper getInstance()
         {
+            return Instance;
+        }
+
+        public static Mapper getInstance(String connection_string)
+        {
             if (Instance == null)
             {
-                Instance = new Mapper();
+                Instance = new Mapper(connection_string);
             }
             return Instance;
         }
@@ -1209,8 +1214,6 @@ namespace Terminal3.DataAccessLayer
         #endregion Purchase Policies
 
         #endregion Policies
-
-
 
 
 

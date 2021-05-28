@@ -1,0 +1,28 @@
+{
+  "story": [
+    {
+      "function": "Register",
+      "args": [ "user2@email.com", "password2", "user2ID" ]
+    },
+    {
+      "function": "Register",
+      "args": [ "user3@email.com", "password3", "user3ID" ]
+    },
+    {
+      "function": "Login",
+      "args": [ "user2@email.com", "password2" ]
+    },
+    {
+      "function": "OpenNewStore",
+      "args": [ "Store1", "user2ID", "StoreID1" ]
+    },
+    {
+      "function": "AddProductToStore",
+      "args": [ "user2ID", "StoreID1", "Bamba", 30.0, 20, "Snacks", null ]
+    },
+    {
+      "function": "AddStoreManager",
+      "args": [ "user3ID", "user2ID", "StoreID1" ]
+    }
+  ]
+}
