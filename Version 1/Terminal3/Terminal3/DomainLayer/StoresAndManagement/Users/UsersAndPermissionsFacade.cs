@@ -451,6 +451,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 Double TotalPrice = RegisteredUsers[userID].ShoppingCart.GetTotalShoppingCartPrice().Data;
                 return new Result<double>($"Total price of current shoppinh cart is: {TotalPrice}", true, TotalPrice);
             }
+            else if (GuestUsers.ContainsKey(userID))
+            {
+                //Guest User Found
+                Double TotalPrice = GuestUsers[userID].ShoppingCart.GetTotalShoppingCartPrice().Data;
+                return new Result<double>($"Total price of current shoppinh cart is: {TotalPrice}", true, TotalPrice);
+            }
             else
             {
                 //No user if found using the given email
