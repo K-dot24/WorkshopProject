@@ -70,7 +70,7 @@ namespace Terminal3.DataAccessLayer
             //DAOs
             DAO_GuestUser = new DAO<DTO_GuestUser>(database, "Users");
             DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
-            DAO_Product = new DAO<DTO_Product>(database, "Stores");            
+            DAO_Product = new DAO<DTO_Product>(database, "Products");            
             DAO_StoreManager = new DAO<DTO_StoreManager>(database, "Users");
             DAO_StoreOwner = new DAO<DTO_StoreOwner>(database, "Users");
             DAO_Store = new DAO<DTO_Store>(database, "Stores");
