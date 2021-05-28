@@ -122,5 +122,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             return new Result<ShoppingCart>("", true, copy);
         }
+
+        public DTO_ShoppingCart getDTO()
+        {
+            ConcurrentDictionary<string, DTO_ShoppingBag> bags = new ConcurrentDictionary<string, DTO_ShoppingBag>();
+            foreach(var sb in this.ShoppingBags)
+            {
+                bags.TryAdd(sb.Key, sb.Value.getDTO()); 
+            }
+            return new DTO_ShoppingCart(this.Id, bags , this.TotalCartPrice);
+        }
     }
 }

@@ -20,7 +20,14 @@ namespace Terminal3.DataAccessLayer.DAOs
         public void Create(T dto)
         {
             var doc = dto.ToBsonDocument();
-            collection.InsertOne(doc);
+            try
+            {
+                collection.InsertOne(doc);
+            }
+            catch(MongoDB.Driver.MongoWriteException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
         public T Delete(FilterDefinition<BsonDocument> filter)
@@ -55,9 +62,11 @@ namespace Terminal3.DataAccessLayer.DAOs
         //    return dto;
         //}
 
-        public void Update(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        public void Update(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update, Boolean upsert = false)
         {
-            collection.UpdateOne(filter, update);
+            if (upsert)
+                collection.UpdateOne(filter, update, new UpdateOptions(){ IsUpsert = upsert});
+            else collection.UpdateOne(filter, update);
         }
     }
 }

@@ -17,6 +17,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             Products = products;
         }
 
+        public static Result<IDiscountTarget> create(Dictionary<string, object> info)
+        {
+            string errorMsg = "Can't create DiscountTargetProducts: ";
+            if (!info.ContainsKey("Products"))
+                return new Result<IDiscountTarget>(errorMsg + "Products not found", false, null);
+            List<Product> products = (List<Product>)info["Products"];
+
+            return new Result<IDiscountTarget>("", true, new DiscountTargetProducts(products));
+        }
+
         public List<Product> getTargets(ConcurrentDictionary<Product, int> products)
         {
             List<Product> result = new List<Product>();

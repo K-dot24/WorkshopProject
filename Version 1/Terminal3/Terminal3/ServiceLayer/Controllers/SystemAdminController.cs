@@ -107,7 +107,9 @@ namespace Terminal3.ServiceLayer.Controllers
         {
             if (isSystemAdmin(sysAdminID))
             {
-                return Service.ResetSystem();
+                //return Service.ResetSystem();
+                StoresAndManagementInterface.resetSystem();
+                return new Result<bool>($"user:{sysAdminID} reset the system\n", true, true);
             }
             else
             {

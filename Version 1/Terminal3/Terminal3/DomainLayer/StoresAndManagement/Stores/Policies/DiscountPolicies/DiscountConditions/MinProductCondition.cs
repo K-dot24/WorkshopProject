@@ -9,8 +9,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public class MinProductCondition : AbstractDiscountCondition
     {
 
-        public int MinQuantity { get; }
-        public Product Product { get; }
+        public int MinQuantity { set; get; }
+        public Product Product { set; get; }
 
         public MinProductCondition(Product product, int minQuantity, String id = "") : base(new Dictionary<string, object>(), id)
         {
@@ -18,9 +18,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             MinQuantity = minQuantity;
         }
 
-        public MinProductCondition(Dictionary<string, object> info, String id = "") : base(info, id)
+        public static Result<IDiscountCondition> create(Dictionary<string, object> info)
         {
-            //TO DO
+            string errorMsg = "Can't create MinProductCondition: ";
+            if (!info.ContainsKey("MinQuantity"))
+                return new Result<IDiscountCondition>(errorMsg + "MinQuantity not found", false, null);
+            int minQuantity = (int)info["MinQuantity"];
+
+            if (!info.ContainsKey("Product"))
+                return new Result<IDiscountCondition>("Product not found", false, null);
+            Product product = (Product)info["Product"];
+
+            return new Result<IDiscountCondition>("", true, new MinProductCondition(product, minQuantity));
         }
 
         public override Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)
@@ -43,6 +52,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public override Result<IDiscountConditionData> GetData()
         {
             return new Result<IDiscountConditionData>("", true, new MinProductConditionData(Product.GetDAL().Data, MinQuantity, Id));
+        }
+
+        public override Result<bool> EditCondition(Dictionary<string, object> info, string id)
+        {
+            if (Id != id)
+                return new Result<bool>("", true, false);
+
+            if (info.ContainsKey("MinQuantity"))
+                MinQuantity = (int)info["MinQuantity"];
+
+            if (info.ContainsKey("Product"))
+                Product = (Product)info["Product"];
+
+            return new Result<bool>("", true, true);
         }
     }
 }
