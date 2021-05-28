@@ -8,7 +8,7 @@ import { HubConnectionBuilder } from '@microsoft/signalr';
 import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products, Review } from './components';
 import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
         GetUserShoppingCart, UpdateShoppingCart, EnterSystem, SearchProduct, GetTotalShoppingCartPrice,
-        GetUserPurchaseHistory, AddSystemAdmin, RemoveSystemAdmin } from './api/API';
+        GetUserPurchaseHistory, AddSystemAdmin, RemoveSystemAdmin, printErrorMessage } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -41,7 +41,7 @@ const App = () => {
 
     const handleEnterSystem = async () => {
         EnterSystem().then(response => response.ok ? 
-            response.json().then(id => setUser({ ...user, id }) ) : console.log("NOT OKAY")).catch(err => alert(err));
+            response.json().then(id => setUser({ ...user, id }) ) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     // TODO: Catch error messages correctly from API
@@ -67,13 +67,12 @@ const App = () => {
 
     const handleAddToCart = async (storeId, productId, name, price, quantity, image) => {
         AddProductToCart({ userID: user.id, productID: productId, ProductQuantity: quantity, storeID: storeId }).then(response => response.ok ? 
-            response.json().then(status => status && (alert("Product added successfully") & fetchCart())) : console.log("NOT OKAY")).catch(err => alert(err));
+            response.json().then(status => status && (alert("Product added successfully") & fetchCart())) : printErrorMessage(response)).catch(err => alert(err));
 
     }
 
     const handleUpdateCartQuantity = async (storeID, productID, quantity) => {
         const data = { userID: user.id, storeID, productID, quantity };
-        console.log(data);
 
         UpdateShoppingCart(data).then(response => response.ok ? 
             response.json().then(result => result.execStatus ? fetchCart() : console.log(result.message)) : console.log("NOT OKAY")).catch(err => alert(err));
@@ -139,12 +138,12 @@ const App = () => {
             response.json().then(id => 
                 reIdentify(user.id, id, 'Login')
                 .then(() => setUser({ id, email: data.email, loggedIn: true}))
-                .catch(err => alert(err))) : console.log("NOT OK")).catch(err => alert(err));
+                .catch(err => alert(err))) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     const handleRegister = async (data) => {
         RegisterAPI(data).then(response => response.ok ? 
-            response.json().then(id => console.log(id)) : console.log("NOT OK")).catch(err => alert(err));
+            response.json().then(id => console.log(id)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     const handleLogOut = () => {
@@ -152,12 +151,12 @@ const App = () => {
             response.json().then(id => 
                 reIdentify(user.id, id, 'Logout')
                 .then(() => setUser({id, email: '', loggedIn: false}) & fakeEmptyCart())
-                .catch(err => alert(err))) : console.log("NOT OK")).catch(err => alert(err));
+                .catch(err => alert(err))) : printErrorMessage(response)).catch(err => alert(err));
     }
     
     const handleOpenNewStore = async (data) => {
         OpenNewStore({ userID: user.id, ...data }).then(response => response.ok ?
-             response.json().then(message => alert(message)) : console.log("NOT OK")).catch(err => alert(err));
+             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     const handleGetUserPurchaseHistory = () => {
@@ -170,12 +169,12 @@ const App = () => {
 
     const handleAddSystemAdmin = async (data) => {
         AddSystemAdmin(user.id, data.email).then(response => response.ok ? 
-            response.json().then(id => setSystemAdmins(prev => [...prev, id]) & alert("System Admin added Successfully")) : alert("Error")).catch(err => alert(err));
+            response.json().then(id => setSystemAdmins(prev => [...prev, id]) & alert("System Admin added Successfully")) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     const handleRemoveSystemAdmin = async (data) => {
         RemoveSystemAdmin(user.id, data.email).then(response => response.ok ? 
-            response.json().then(result => setSystemAdmins(prev => prev.filter(id => id !== result.data.id)) & alert(result.message)) : alert("Error")).catch(err => alert(err));
+            response.json().then(result => setSystemAdmins(prev => prev.filter(id => id !== result.data.id)) & alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     //#endregion
@@ -308,10 +307,12 @@ const App = () => {
         <MuiThemeProvider theme={theme}>
             <Router>
                 <div>
+                    {/* Navigation Bar */}
                     <Navbar storeId={-1} totalItems={cart.products.length} user={user} isSystemAdmin={systemAdmins.includes(user.id)} handleLogOut={handleLogOut} 
                             handleSearch={handleProductSearch} handleGetUserPurchaseHistory={handleGetUserPurchaseHistory} />
                     
                     <Switch>
+                        {/* Cart Page */}
                         <Route exact path="/cart">
                             <Cart
                                 id={0} 
@@ -321,22 +322,28 @@ const App = () => {
                             />
                         </Route>
 
+                        {/* Register Page */}
                         <Route path="/register" render={(props) => (<Register handleRegister={handleRegister} {...props} />)} />
                         
+                        {/* Login Page */}
                         <Route path="/login" render={(props) => (<Login handleLogin={handleLogin} {...props} />)} />
 
+                        {/* Checkout Page */}
                         <Route exact path="/checkout">
                             <Checkout userID={user.id} cart={cart} handleEmptyCart={handleEmptyCart} />
                         </Route>
                         
+                        {/* Open New Store Page */}
                         <Route exact path={`/${user.id}/openstore`} 
                                 render={(props) => (<Action name='Open New Store' fields={[{name: 'Store Name', required: true}]} 
                                                             handleAction={handleOpenNewStore} {...props} />)} 
                         />
 
+                        {/* Purchase History Page */}
                         <Route exact path={`/${user.id}/purchasehistory`}
                                 render = {() => (<Review checkoutToken={userPurchaseHistory} />)} />
                         
+                        {/* Add System Admin Page */}
                         {systemAdmins.includes(user.id) && (
                             <Route exact path={`/${user.id}/addsystemadmin`} 
                                     render={(props) => (<Action name='Add System Admin' fields={[{name: 'Email', required: true}]} 
@@ -344,6 +351,7 @@ const App = () => {
                             />
                         )}
 
+                        {/* Remove System Admin Page */}
                         {systemAdmins.includes(user.id) && (
                             <Route exact path={`/${user.id}/removesystemadmin`} 
                                     render={(props) => (<Action name='Remove System Admin' fields={[{name: 'Email', required: true}]} 
@@ -351,6 +359,7 @@ const App = () => {
                             />
                         )}
                         
+                        {/* Main Page - Stores / Search results */}
                         { products.length > 0 ? (
                             <Products storeName={'SEARCH_RES'} products={products} onAddToBag={handleAddToCart} />
                         ) : (

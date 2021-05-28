@@ -218,7 +218,7 @@ namespace Terminal3WebAPI.Controllers
         public IActionResult RemoveStoreManager(string storeID, string currentlyOwnerID, string removedManagerID)
         {
             Result<Boolean> result = system.RemoveStoreManager(removedManagerID,currentlyOwnerID,storeID);
-            if (result.ExecStatus) { return Ok(result); }
+            if (result.ExecStatus) { return Ok(result.Message); }
             else { return BadRequest(result.Message); }
         }
         #endregion

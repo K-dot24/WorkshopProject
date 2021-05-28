@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // 
 
 import { Products, Navbar, Cart, Action, CheckboxList } from '../../../../components';
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
-        AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct } from '../../../../api/API';
+        AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct,
+        printErrorMessage, RemovePermissions, GetPermission } from '../../../../api/API';
 
 
 
@@ -102,38 +103,58 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         console.log({ userID: user.id, storeID: store.id, ...data });
 
         EditProductDetails({ userID: user.id, storeID: store.id, ...data }).then(response => response.ok ?
-            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     const handleAddStoreOwner = async (data) => {  
         AddStoreOwner({ addedOwnerID: data.newownerid, currentlyOwnerID: user.id, storeID: store.id }).then(response => response.ok ?
-            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     const handleAddStoreManager = async (data) => {
         console.log(data);
         
         AddStoreManager({ addedManagerID: data.newmanagerid, currentlyOwnerID: user.id, storeID: store.id }).then(response => response.ok ?
-            response.json().then(message => console.log(message)) : console.log("NOT OK")).catch(err => console.log(err));
+            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     const handleRemoveStoreManager = async (data) => {
-        console.log(data);
-
         RemoveStoreManager(store.id, user.id, data.removedmanagerid).then(response => response.ok ?
-            response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
+            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
+    // TODO: Show information to user
     const handleGetStoreStaff = async () => {
         GetStoreStaff(user.id, store.id).then(response => response.ok ?
-            response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
+            response.json().then(json => console.log(json)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
-    const handleSetPermissions = async (permissions, managerID) => {
-        console.log(permissions, managerID);
+    const handleSetPermissions = (permissions, managerID) => {
+        console.log(permissions);
 
-        SetPermissions({storeID: store.id, managerID: managerID.managerid, ownerID: user.id, permissions}).then(response => response.ok ?
-            response.json().then(json => console.log(json)) : console.log("NOT OK")).catch(err => console.log(err));
+        GetPermission(managerID.managerid, store.id).then(response => response.ok ? 
+            response.json().then(function(prevPermissions) {
+                const boolToNums = prevPermissions.reduce(
+                    (out, bool, index) => bool ? out.concat(index) : out, 
+                    []
+                  );
+                handleRemovePermissions(boolToNums, managerID);
+
+                return SetPermissions({storeID: store.id, managerID: managerID.managerid, ownerID: user.id, permissions})
+                        .then(response => response.ok ?
+                            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));     
+
+            }) : null).catch(err => console.log(err));
+
+        // SetPermissions({storeID: store.id, managerID: managerID.managerid, ownerID: user.id, permissions})
+        //     .then(response => response.ok ?
+        //         response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
+    }
+
+    const handleRemovePermissions = (permissions, managerID) => {
+        RemovePermissions({storeID: store.id, managerID: managerID.managerid, ownerID: user.id, permissions})
+            .then(response => response.ok ?
+                response.json().then(message => console.log(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     //#endregion
