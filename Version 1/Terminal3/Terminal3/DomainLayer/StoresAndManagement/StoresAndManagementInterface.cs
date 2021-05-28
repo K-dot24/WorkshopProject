@@ -37,6 +37,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID);
+        Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id);
+        Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date);
         #endregion
 
         #region User Actions
@@ -603,6 +605,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Mapper.getInstance().clearDB();
             UsersAndPermissionsFacade.resetSystem();
             StoresFacade.resetSystem();
+        }
+
+        public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id)
+        {
+            return StoresFacade.GetIncomeAmountGroupByDay(start_date, end_date, store_id, owner_id);
+        }
+
+        public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date)
+        {
+            return StoresFacade.GetIncomeAmountGroupByDay(start_date, end_date);
         }
     }
 }

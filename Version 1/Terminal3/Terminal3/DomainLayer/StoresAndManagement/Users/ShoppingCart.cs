@@ -116,7 +116,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             // save recipt
             foreach(ShoppingBag sb in this.ShoppingBags.Values)
             {
-                DTO_Recipt recipt = new DTO_Recipt(sb.Store.Id, sb.TotalBagPrice, DateTime.Now);
+                DTO_Recipt recipt = new DTO_Recipt(sb.Store.Id, sb.TotalBagPrice, DateTime.Now.Date);
                 Mapper.getInstance().Create(recipt); 
             }
 

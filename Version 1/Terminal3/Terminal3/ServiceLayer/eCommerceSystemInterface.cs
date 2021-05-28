@@ -249,6 +249,11 @@ namespace Terminal3.ServiceLayer
         {
             return StoreStaffInterface.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID);
         }
+
+        public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, string owner_id)
+        {
+            return StoreStaffInterface.GetIncomeAmountGroupByDay(start_date, end_date, store_id, owner_id);
+        }
         #endregion
 
         #region System Admin Actions
@@ -282,6 +287,12 @@ namespace Terminal3.ServiceLayer
             }
             return res;            
         }
+
+        public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, string admin_id)
+        {
+            return SystemAdminInterface.GetIncomeAmountGroupByDay(start_date, end_date, admin_id);
+        }
+
 
         #endregion
 
