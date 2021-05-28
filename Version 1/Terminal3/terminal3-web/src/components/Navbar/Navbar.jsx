@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, IconButton, Badge, MenuItem, Menu, Typography, Button, InputBase } from '@material-ui/core';
-import { ShoppingCart, LocalMall, Menu as MenuIcon, Notifications as NotificationsIcon, Search as SearchIcon } from '@material-ui/icons';
+import { AppBar, Toolbar, IconButton, Badge, MenuItem, Menu, Typography, Button, InputBase, 
+        List, ListItem, ListItemText, Collapse } from '@material-ui/core';
+import { ShoppingCart, LocalMall, Menu as MenuIcon, Notifications as NotificationsIcon, Search as SearchIcon,
+        ExpandLess, ExpandMore } from '@material-ui/icons';
 import { Link, useLocation, useHistory } from 'react-router-dom';
 
 import { GetPermission } from '../../api/API';
@@ -10,7 +12,7 @@ import useStyles from './styles';
 import logo from '../../assets/terminal3_logo.png';
 
 const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handleSearch, handleGetUserPurchaseHistory }) => {
-    const [permissions, setPermissions] = useState([])
+    const [permissions, setPermissions] = useState([]);
     
     const classes = useStyles();
     const location = useLocation();
@@ -20,8 +22,8 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
     const isMenuOpen = Boolean(anchorEl);
 
     const allActions = ['Add New Product', 'Remove Product', 'Edit Product Details', 'Add Store Owner', 'Add Store Manager', 'Remove Store Manager', 
-                        'Set Permissions', 'Get Store Staff', 'Set Purchase Policy At Store', 'Get Purchase Policy At Store',
-                        'Set Discount Policy At Store', 'Get Discount Policy At Store', 'Get Store Purchase History'];
+                        'Set Permissions', 'Get Store Staff', 'Add Purchase Policy', 'Get Purchase Policy',
+                        'Add Discount Policy', 'Get Discount Policy', 'Get Store Purchase History'];
     
 
     //#region API Calls
@@ -35,12 +37,74 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
 
     //#endregion
 
+    const [open, setOpen] = useState(false);
+    
+    const handleClick = () => {
+        setOpen(!open);
+    };
+
+    const PolicyDropDown = ({ action, subOptions }) => {
+        return (
+        <List>
+            <ListItem button onClick={handleClick}>
+                <ListItemText primary={action} />
+                {open ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                    {subOptions.map((option, index) => 
+                        <ListItem key={index} button className={classes.nested}>
+                            <ListItemText primary={option} />
+                        </ListItem>
+                    )}
+                </List>
+            </Collapse>
+        </List>
+        )
+    };
+
     const StoreActions = () => {
         return [
-            allActions.map((action, index) => permissions[index] &&  
-                        <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    
+            allActions.map((action, index) => permissions[index] && 
+                        (action === 'Add Discount Policy' ? 
+                            <PolicyDropDown action={action} subOptions={['Visible Discount', 'Discreet Discount']} />
+                        :
+                            <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    
+                        )  
             )
         ];
+        
+        
+        // return (
+        //     <List
+        //     // component="nav"
+        //     // aria-labelledby="nested-list-subheader"
+        //     // subheader={
+        //     //   <ListSubheader component="div" id="nested-list-subheader">
+        //     //     Nested List Items
+        //     //   </ListSubheader>
+        //     // }
+        //     // className={classes.root}
+        //   >
+        //     <ListItem button onClick={handleClick}>
+        //         {/* <ListItemIcon>
+        //         <InboxIcon />
+        //         </ListItemIcon> */}
+        //         <ListItemText primary="Inbox" />
+        //         {open ? <ExpandLess /> : <ExpandMore />}
+        //     </ListItem>
+        //     <Collapse in={open} timeout="auto" unmountOnExit>
+        //         <List component="div" disablePadding>
+        //             <ListItem button className={classes.nested}>
+        //                 {/* <ListItemIcon>
+        //                 <StarBorder />
+        //                 </ListItemIcon> */}
+        //                 <ListItemText primary="Starred" />
+        //             </ListItem>
+        //         </List>
+        //     </Collapse>
+        // </List>
+        //   )
     };
 
     const handleMenuOpen = (event) => {
@@ -88,7 +152,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/review`)}>Write Review</MenuItem>
                 <MenuItem onClick={() => handleHistory(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
 
-                </div>
+            </div>
         ) : (
             <StoreActions />
         )
