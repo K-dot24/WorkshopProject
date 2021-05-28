@@ -22,15 +22,21 @@ namespace Terminal3.DataAccessLayer.DTOs
 
         //[BsonElement]
         //public DTO_PolicyManager PolicyManager { get; set;}           // TODO - need to be updated
-
+        [BsonElement]
+        public LinkedList<String> DiscountRoot { get; set; }            //list of discount policies id
+        [BsonElement]
+        public LinkedList<String> PurchaseRoot { get; set; }
         [BsonElement]
         public DTO_History History { get; set; }
         [BsonElement]
         public Double Rating { get; set; }
         [BsonElement]
         public int NumberOfRates { get; set; }
+        [BsonElement]
+        public Boolean isClosed { get; set; }
 
-        public DTO_Store(String id, String name, String founder, LinkedList<String> owners, LinkedList<String> managers, LinkedList<String> inventoryManager, DTO_History history, Double rating, int numberOfRates)
+
+        public DTO_Store(String id, String name, String founder, LinkedList<String> owners, LinkedList<String> managers, LinkedList<String> inventoryManager, DTO_History history, Double rating, int numberOfRates, Boolean isclosed)
         {
             _id = id;
             Name = name;
@@ -41,6 +47,7 @@ namespace Terminal3.DataAccessLayer.DTOs
             History = history;
             Rating = rating;
             NumberOfRates = numberOfRates;
+            isClosed = isclosed;
         }
     }
 }

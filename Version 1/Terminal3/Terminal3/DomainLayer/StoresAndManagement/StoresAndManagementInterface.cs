@@ -8,11 +8,13 @@ using System.Collections.Concurrent;
 using System.Linq;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface IStoresAndManagementInterface
     {
+        void resetSystem();
         Result<StoreService> OpenNewStore(String storeName, String userID , String storeID);
         Result<Boolean> CloseStore(String storeId, String userID);
         Result<StoreService> ReOpenStore(string storeId, string userID);
@@ -594,6 +596,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             Store store = StoresFacade.Stores[storeId];
             return store.EditPurchasePolicy(info, id);
+        }
+
+        public void resetSystem()
+        {
+            Mapper.getInstance().clearDB();
+            UsersAndPermissionsFacade.resetSystem();
+            StoresFacade.resetSystem();
         }
     }
 }
