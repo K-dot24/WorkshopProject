@@ -12,7 +12,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<RegisteredUserService> Login(String email, String password);
         Result<RegisteredUserService> Login(String email, String password,String guestUserID);
         Result<UserService> LogOut(String email);
-        Result<StoreService> OpenNewStore(String storeName, String userID);
+        Result<StoreService> OpenNewStore(String storeName, String userID, String storeID = "-1");
         Result<ProductService> AddProductReview(String userID, String storeID, String productID, String review);
     }
 
@@ -32,7 +32,7 @@ namespace Terminal3.ServiceLayer.Controllers
             return StoresAndManagementInterface.Login(email, password, guestUserID);
         }
         public Result<UserService> LogOut(String email) { return StoresAndManagementInterface.LogOut(email); }
-        public Result<StoreService> OpenNewStore(String storeName, String userID) { return StoresAndManagementInterface.OpenNewStore(storeName, userID); }
+        public Result<StoreService> OpenNewStore(String storeName, String userID, String storeID = "-1") { return StoresAndManagementInterface.OpenNewStore(storeName, userID , storeID); }
         public Result<ProductService> AddProductReview(string userID, string storeID, string productID, string review)
         {
             return StoresAndManagementInterface.AddProductReview(userID, storeID, productID, review);

@@ -17,9 +17,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             Discounts = new List<IDiscountPolicy>();
         }
 
-        public DiscountOr(Dictionary<string, object> info, String id = "") : base(info, id)
+        public static Result<IDiscountPolicy> create(Dictionary<string, object> info)
         {
-            //TO DO
+            return new Result<IDiscountPolicy>("", true, new DiscountOr());
         }
 
         public DiscountOr(List<IDiscountPolicy> discounts, String id = "") : base(new Dictionary<string, object>(), id)
@@ -138,6 +138,37 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 discountsList.Add(discountResult.Data);
             }
             return new Result<IDiscountPolicyData>("", true, new DiscountOrData(discountsList, Id));
+        }
+
+        public override Result<bool> EditDiscount(Dictionary<string, object> info, string id)
+        {
+            if (Id != id)
+            {
+                foreach (IDiscountPolicy myDiscount in Discounts)
+                {
+                    Result<bool> result = myDiscount.EditCondition(info, id);
+                    if (result.ExecStatus && result.Data)
+                        return result;
+                    if (!result.ExecStatus)
+                        return result;
+                }
+                return new Result<bool>("", true, false);
+            }
+
+            return new Result<bool>("", true, true);
+        }
+
+        public override Result<bool> EditCondition(Dictionary<string, object> info, string id)
+        {
+            foreach (IDiscountPolicy myDiscount in Discounts)
+            {
+                Result<bool> result = myDiscount.EditCondition(info, id);
+                if (result.ExecStatus && result.Data)
+                    return result;
+                if (!result.ExecStatus)
+                    return result;
+            }
+            return new Result<bool>("", true, false);
         }
     }
 }

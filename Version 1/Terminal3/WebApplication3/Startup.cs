@@ -6,12 +6,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Terminal3.ServiceLayer;
+using Terminal3WebAPI;
 
 namespace WebApplication3
 {
@@ -45,7 +47,7 @@ namespace WebApplication3
 
             //Dependency injection
             services.AddSingleton<IECommerceSystem, ECommerceSystem>();
-
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,7 +76,6 @@ namespace WebApplication3
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                //endpoints.MapHub<NotificationHub>("/hubs/notification");
             });
 
 
@@ -85,6 +86,11 @@ namespace WebApplication3
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Terminal3 API");
                 c.RoutePrefix = string.Empty;
             });
+
+
+            StoryExecutor storyExecutor = new StoryExecutor(app.ApplicationServices.GetService<IECommerceSystem>());
+            storyExecutor.Execute();
         }
+
     }
 }

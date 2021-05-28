@@ -21,7 +21,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
         protected User(string id)
         {
-            Id = id;
+            if (id.Equals("-1"))
+                Id = Service.GenerateId();
+            else Id = id;
             ShoppingCart = new ShoppingCart();
         }
         protected User(String id , ShoppingCart shoppingCart)
@@ -31,7 +33,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
 
 
-        public Result<bool> AddProductToCart(Product product, int productQuantity, Store store)
+        public Result<ShoppingCart> AddProductToCart(Product product, int productQuantity, Store store)
         {
             try
             {
@@ -47,10 +49,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                         res = sb.AddProtuctToShoppingBag(product, productQuantity);
                         if (res.ExecStatus)
                         {
-                            return new Result<bool>($"Product {product.Name} was added successfully to shopping cart.\n", true, true);
+                            return new Result<ShoppingCart>($"Product {product.Name} was added successfully to shopping cart.\n", true, ShoppingCart);
                         }
                         //else failed
-                        return res;
+                        return new Result<ShoppingCart>(res.Message, res.ExecStatus, null);
                     }
                     //else create shopping bag for storeID
                     sb = new ShoppingBag(this, store);
@@ -58,10 +60,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     if (res.ExecStatus)
                     {
                         ShoppingCart.AddShoppingBagToCart(sb);
-                        return new Result<bool>($"Product {product.Name} was added successfully to cart.\n", true, true);
+                        return new Result<ShoppingCart>($"Product {product.Name} was added successfully to cart.\n", true, ShoppingCart);
                     }
                     // else failed
-                    return res;
+                    return new Result<ShoppingCart>(res.Message, res.ExecStatus, null);
                 }
                 finally
                 {
@@ -72,23 +74,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             {
                 Console.WriteLine("A SynchronizationLockException occurred. Message:");
                 Console.WriteLine(SyncEx.Message);
-                return new Result<bool>(SyncEx.Message, false, false);
+                return new Result<ShoppingCart>(SyncEx.Message, false, null);
             }
         }
 
-        public Result<Boolean> UpdateShoppingCart(String storeID, Product product, int quantity)
+        public Result<ShoppingCart> UpdateShoppingCart(String storeID, Product product, int quantity)
         {
             Result<ShoppingBag> resBag = ShoppingCart.GetShoppingBag(storeID);
             if (resBag.ExecStatus)
             {
                 ShoppingBag bag = resBag.Data;
-                Result<bool> res = bag.UpdateShoppingBag(product, quantity);
+                Result<ShoppingBag> res = bag.UpdateShoppingBag(product, quantity);
                 if (!bag.Products.ContainsKey(product))                   
                     ShoppingCart.ShoppingBags.TryRemove(storeID, out _);
-                return res;
+                return new Result<ShoppingCart>(res.Message, res.ExecStatus, ShoppingCart);
             }
             //else faild
-            return new Result<bool>(resBag.Message, false, false);
+            return new Result<ShoppingCart>(resBag.Message, false, null);
         }
 
         public Result<ShoppingCart> GetUserShoppingCart()
