@@ -74,14 +74,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             var update_admin = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
             mapper.UpdateSystemAdmins(filter_admin, update_admin);
         }
-        //Constructor for the initializer
-        public UsersAndPermissionsFacade(ConcurrentDictionary<String, RegisteredUser>  registeredUsers,
-                                           ConcurrentDictionary<String, RegisteredUser>  systemAdmins)
-        {
-            this.RegisteredUsers = registeredUsers;
-            this.SystemAdmins = systemAdmins;
-        }
-
 
         //Methods
         /// <summary>
@@ -524,6 +516,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 admins_dto.AddLast(admin.Key);
             }
             return new DTO_SystemAdmins(admins_dto);
+        }
+
+        public void resetSystem()
+        {
+            GuestUsers.Clear();
+            RegisteredUser admin;
+            SystemAdmins.TryGetValue("-777", out admin);
+            SystemAdmins.Clear();
+            RegisteredUsers.Clear();
+
+            RegisteredUsers.TryAdd(admin.Id, admin);
+            SystemAdmins.TryAdd(admin.Id, admin);
         }
     }
 }

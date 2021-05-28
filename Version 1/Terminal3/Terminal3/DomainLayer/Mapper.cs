@@ -431,16 +431,16 @@ namespace Terminal3.DataAccessLayer
     /*    public void UpdateGuestUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
         {
             DAO_GuestUser.Update(filter, update);
-        }*/
+        }
 
         public void DeleteGuestUser(FilterDefinition<BsonDocument> filter)
         {
             DTO_GuestUser deletedGuestUser = DAO_GuestUser.Delete(filter);
             GuestUsers.TryRemove(deletedGuestUser._id, out GuestUser gu);
-        }
+        }*/
 
 
-        #endregion GuestUser*/
+        //#endregion GuestUser*/
 
         #region RegisteredUser
         public void Create(RegisteredUser ru)

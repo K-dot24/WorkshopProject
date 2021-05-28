@@ -13,6 +13,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface IStoresAndManagementInterface
     {
+        void resetSystem();
         Result<StoreService> OpenNewStore(String storeName, String userID , String storeID);
         Result<Boolean> CloseStore(String storeId, String userID);
         Result<StoreService> ReOpenStore(string storeId, string userID);
