@@ -122,7 +122,6 @@ namespace Terminal3.ServiceLayer.Controllers
         {
             if (isSystemAdmin(admin_id))
             {
-                //return Service.ResetSystem();
                 return StoresAndManagementInterface.GetIncomeAmountGroupByDay(start_date, end_date);
             }
             else

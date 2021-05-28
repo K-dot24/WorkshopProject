@@ -675,7 +675,15 @@ namespace Terminal3.DataAccessLayer
 
         public List<DTO_Recipt> LoadRecipts(string date, string store_id = "")
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("date" , date) & Builders<BsonDocument>.Filter.Eq("store_id", store_id);
+
+            var filter = Builders<BsonDocument>.Filter.Eq("date", date);
+            if (!store_id.Equals(String.Empty))
+            {
+                filter = Builders<BsonDocument>.Filter.Eq("date", date) &
+                         Builders<BsonDocument>.Filter.Eq("store_id", store_id);
+
+            }
+              
             List<BsonDocument> docs =  DAO_Recipt.collection.Find(filter).ToList();
 
             List<DTO_Recipt> recipts = new List<DTO_Recipt>();
@@ -1225,6 +1233,7 @@ namespace Terminal3.DataAccessLayer
                 database.GetCollection<BsonDocument>("Stores").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("SystemAdmins").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("Users").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Recipts").DeleteMany(emptyFilter);
 
                 RegisteredUsers.Clear();
                 GuestUsers.Clear();
