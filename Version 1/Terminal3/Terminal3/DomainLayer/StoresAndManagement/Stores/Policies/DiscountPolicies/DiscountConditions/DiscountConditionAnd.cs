@@ -17,9 +17,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             Conditions = new List<IDiscountCondition>();
         }
 
-        public DiscountConditionAnd(Dictionary<string, object> info, String id = "") : base(info, id)
+        public static Result<IDiscountCondition> create(Dictionary<string, object> info)
         {
-            //TO DO
+            return new Result<IDiscountCondition>("", true, new DiscountConditionAnd());
         }
 
         public DiscountConditionAnd(List<IDiscountCondition> conditions, String id = "") : base(new Dictionary<string, object>(), id)
@@ -84,6 +84,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 conditionsList.Add(conditionResult.Data);
             }
             return new Result<IDiscountConditionData>("", true, new DiscountConditionAndData(conditionsList, Id));
+        }
+
+        public override Result<bool> EditCondition(Dictionary<string, object> info, string id)
+        {
+            if (Id != id)
+            {
+                foreach (IDiscountCondition myCondition in Conditions)
+                {
+                    Result<bool> result = myCondition.EditCondition(info, id);
+                    if (result.ExecStatus && result.Data)
+                        return result;
+                    if (!result.ExecStatus)
+                        return result;
+                }
+                return new Result<bool>("", true, false);
+            }
+
+            return new Result<bool>("", true, true);
         }
     }
 }

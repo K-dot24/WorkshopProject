@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountComposition;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
@@ -244,26 +246,83 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         private Result<IDiscountPolicy> CreateDiscount(Dictionary<string, object> info)
         {
-            //TO DO
+            if (!info.ContainsKey("type"))
+                return new Result<IDiscountPolicy>("Can't create a discount without a type", false, null);
 
-            return new Result<IDiscountPolicy>("", true, new VisibleDiscount(info));
+            string type = (string)info["type"];
+            switch (type)
+            {
+                case "VisibleDiscount":
+                    return VisibleDiscount.create(info);
+                case "DiscreetDiscount":
+                    return DiscreetDiscount.create(info);
+                case "ConditionalDiscount":
+                    return ConditionalDiscount.create(info);
+                case "DiscountAddition":
+                    return DiscountAddition.create(info);
+                case "DiscountAnd":
+                    return DiscountAnd.create(info);
+                case "DiscountMax":
+                    return DiscountMax.create(info);
+                case "DiscountMin":
+                    return DiscountMin.create(info);
+                case "DiscountOr":
+                    return DiscountOr.create(info);
+                case "DiscountXor":
+                    return DiscountXor.create(info);
+
+                default:
+                    return new Result<IDiscountPolicy>("Can't recognise this discount type: " + type, false, null);
+            }
         }
 
         private Result<IDiscountCondition> CreateDiscountCondition(Dictionary<string, object> info)
         {
-            //TO DO
+            if (!info.ContainsKey("type"))
+                return new Result<IDiscountCondition>("Can't create a condition without a type", false, null);
 
-            return new Result<IDiscountCondition>("", true, new DiscountConditionAnd(info));
+            string type = (string)info["type"];
+            switch (type)
+            {
+                case "DiscountConditionAnd":
+                    return DiscountConditionAnd.create(info);
+                case "DiscountConditionOr":
+                    return DiscountConditionOr.create(info);
+                case "MaxProductCondition":
+                    return MaxProductCondition.create(info);
+                case "MinProductCondition":
+                    return MinProductCondition.create(info);
+                case "MinBagPriceCondition":
+                    return MinBagPriceCondition.create(info);
+
+
+                default:
+                    return new Result<IDiscountCondition>("Can't recognise this condition type: " + type, false, null);
+            }
         }
 
         public Result<bool> EditDiscountPolicy(Dictionary<string, object> info, string id)
         {
-            throw new NotImplementedException();
+            Result<bool> result = MainDiscount.EditDiscount(info, id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount has been edited successfully", true, true);
+                else return new Result<bool>($"The discount edit failed because the discount with an id ${id} was not found", false, false);
+            }
+            return result;
         }
 
         public Result<bool> EditDiscountCondition(Dictionary<string, object> info, string id)
         {
-            throw new NotImplementedException();
+            Result<bool> result = MainDiscount.EditCondition(info, id);
+            if (result.ExecStatus)
+            {
+                if (result.Data)
+                    return new Result<bool>("The discount condition has been edited successfully", true, true);
+                else return new Result<bool>($"The discount condition edit failed because the discount condition with an id ${id} was not found", false, false);
+            }
+            return result;
         }
     }
 }

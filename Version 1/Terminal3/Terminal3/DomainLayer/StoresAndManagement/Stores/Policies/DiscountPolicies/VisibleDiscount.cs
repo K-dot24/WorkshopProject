@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountTargetsData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountTargets;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
@@ -10,9 +11,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public class VisibleDiscount : AbstractDiscountPolicy
     {
 
-        public DateTime ExpirationDate { get; }
-        public IDiscountTarget Target { get; }
-        public Double Percentage { get; }
+        public DateTime ExpirationDate { set; get; }
+        public IDiscountTarget Target { set; get; }
+        public Double Percentage { set; get; }
 
         public VisibleDiscount(DateTime expirationDate, IDiscountTarget target, Double percentage, String id="") : base(new Dictionary<string, object>(), id)
         {
@@ -26,9 +27,26 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 Percentage = percentage;
         }
 
-        public VisibleDiscount(Dictionary<string, object> info, String id = "") : base(info, id)
+        public static Result<IDiscountPolicy> create(Dictionary<string, object> info)
         {
-            //TO DOO
+            string errorMsg = "Can't create VisibleDiscount: ";
+            if (!info.ContainsKey("ExpirationDate"))
+                return new Result<IDiscountPolicy>(errorMsg + "ExpirationDate not found", false, null);
+            DateTime expirationDate = (DateTime)info["ExpirationDate"];
+
+            if (!info.ContainsKey("Percentage"))
+                return new Result<IDiscountPolicy>(errorMsg + "Percentage not found", false, null);
+            Double percentage = (Double)info["Percentage"];
+
+            if (!info.ContainsKey("Target"))
+                return new Result<IDiscountPolicy>(errorMsg + "Target not found", false, null);
+            Dictionary<string, object> targetInfo = (Dictionary<string, object>)info["Target"];
+
+            Result<IDiscountTarget> targetResult = createTarget(targetInfo);
+            if (!targetResult.ExecStatus)
+                return new Result<IDiscountPolicy>(targetResult.Message, false, null);
+
+            return new Result<IDiscountPolicy>("", true, new VisibleDiscount(expirationDate, targetResult.Data, percentage));
         }
 
         public override Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
@@ -81,6 +99,51 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             }
 
             return new Result<IDiscountPolicyData>("", true, new VisibleDiscountData(ExpirationDate, targetData, Percentage, Id));
+        }
+
+        private static Result<IDiscountTarget> createTarget(Dictionary<string, object> info)
+        {
+            if (!info.ContainsKey("type"))
+                return new Result<IDiscountTarget>("Can't create a target without a type", false, null);
+
+            string type = (string)info["type"];
+            switch (type)
+            {
+                case "DiscountTargetShop":
+                    return DiscountTargetShop.create(info);
+                case "DiscountTargetCategories":
+                    return DiscountTargetCategories.create(info);
+                case "DiscountTargetProducts":
+                    return DiscountTargetProducts.create(info);
+                default:
+                    return new Result<IDiscountTarget>("Can't recognise this target type: " + type, false, null);
+            }
+        }
+
+        public override Result<bool> EditDiscount(Dictionary<string, object> info, string id)
+        {
+            if (Id != id)
+                return new Result<bool>("", true, false);
+
+            if (info.ContainsKey("ExpirationDate"))
+                ExpirationDate = (DateTime)info["ExpirationDate"];
+
+            if (info.ContainsKey("Percentage"))
+                Percentage = (double)info["Percentage"];
+
+            if (info.ContainsKey("Target"))
+            {
+                Result<IDiscountTarget> targetResult = createTarget((Dictionary<string, object>)info["Target"]);
+                if (!targetResult.ExecStatus)
+                    return new Result<bool>(targetResult.Message, false, false);
+
+            }
+            return new Result<bool>("", true, true);
+        }
+
+        public override Result<bool> EditCondition(Dictionary<string, object> info, string id)
+        {
+            return new Result<bool>("", true, false);
         }
     }
 }
