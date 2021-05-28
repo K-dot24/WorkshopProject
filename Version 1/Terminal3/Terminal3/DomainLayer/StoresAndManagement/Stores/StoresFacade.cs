@@ -142,7 +142,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
             {
-                return store.AddStoreOwner(futureOwner, currentlyOwnerID);
+                Result<Boolean> res = store.AddStoreOwner(futureOwner, currentlyOwnerID);
+
+                if (res.ExecStatus)
+                {
+                    // Update Store in DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var update = Builders<BsonDocument>.Update.Set("Owners", store.getDTO().Owners);
+                    mapper.UpdateStore(filter, update);
+                }
+
+                return res;
             }
             //else failed
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
@@ -152,7 +162,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
             {
-                return store.AddStoreManager(futureManager, currentlyOwnerID);
+                Result<Boolean> res = store.AddStoreManager(futureManager, currentlyOwnerID);
+                if (res.ExecStatus)
+                {
+                    // Update Store in DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var update = Builders<BsonDocument>.Update.Set("Managers", store.getDTO().Managers);
+                    mapper.UpdateStore(filter, update);
+                }
+
+                return res;
             }
             //else failed
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
@@ -162,7 +181,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
             {
-                return store.RemoveStoreManager(removedManagerID, currentlyOwnerID);
+                Result<Boolean> res =  store.RemoveStoreManager(removedManagerID, currentlyOwnerID);
+                if (res.ExecStatus)
+                {
+                    // Update Store in DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var update = Builders<BsonDocument>.Update.Set("Managers", store.getDTO().Managers);
+                    mapper.UpdateStore(filter, update);
+                }
+
+                return res;
             }
             //else failed
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
@@ -172,7 +200,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
             {
-                return store.RemoveStoreOwner(removedOwnerID, currentlyOwnerID);
+                Result<Boolean> res = store.RemoveStoreOwner(removedOwnerID, currentlyOwnerID);
+                if (res.ExecStatus)
+                {
+                    // Update Store in DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var update = Builders<BsonDocument>.Update.Set("Owners", store.getDTO().Owners);
+                    mapper.UpdateStore(filter, update);
+                }
+
+                return res;
             }
             //else failed
             return new Result<Boolean>($"Store ID {storeID} not found.\n", false, false);
@@ -313,7 +350,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     DTO_StoreManager manager_dto = manager.getDTO();
                     var filter = Builders<BsonDocument>.Filter.Eq("UserId", manager_dto.UserId) & Builders<BsonDocument>.Filter.Eq("StoreId", manager_dto.StoreId); ;
                     var update = Builders<BsonDocument>.Update.Set("Permission", manager_dto.Permission);
-                    mapper.UpdateStore(filter, update);
+                    mapper.UpdateStoreManager(filter, update);
                 }
                 return res;
             }
