@@ -396,11 +396,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
             {
-                return guest_user.Purchase(paymentDetails , deliveryDetails);
+                Result<ShoppingCart> res =  guest_user.Purchase(paymentDetails , deliveryDetails);
+
+
+                return res; 
             }
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
-                return registerd_user.Purchase(paymentDetails , deliveryDetails);
+
+                Result<ShoppingCart> res = registerd_user.Purchase(paymentDetails , deliveryDetails);
+                return res;
             }
             else
             {

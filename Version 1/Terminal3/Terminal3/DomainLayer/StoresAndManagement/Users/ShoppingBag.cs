@@ -97,7 +97,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         internal double GetTotalPrice(String DiscountCode = "")
         {
-            return Store.PolicyManager.GetTotalBagPrice(this.Products, DiscountCode);
+            Double amount = Store.PolicyManager.GetTotalBagPrice(this.Products, DiscountCode);
+            this.TotalBagPrice = amount; 
+
+            return amount; 
         }
 
         internal Result<bool> AdheresToPolicy()

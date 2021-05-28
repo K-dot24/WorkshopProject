@@ -40,6 +40,7 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_OrPolicy> DAO_OrPolicy;
         public DAO<DTO_BuyNow> DAO_BuyNow;
         public DAO<DTO_ConditionalPolicy> DAO_ConditionalPolicy;
+        public DAO<DTO_Recipt> DAO_Recipt;
 
         // IdentityMaps  <Id , object>
         public ConcurrentDictionary<String, RegisteredUser> RegisteredUsers;
@@ -85,6 +86,7 @@ namespace Terminal3.DataAccessLayer
             DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "Policies");
             DAO_BuyNow = new DAO<DTO_BuyNow>(database, "Policies");
             DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "Policies");
+            DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
 
             // IdentityMaps  <Id , object>
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
@@ -690,7 +692,14 @@ namespace Terminal3.DataAccessLayer
 
         #region Shop till you drop
 
+        public void Create(DTO_Recipt recipt)
+        {
+            DAO_Recipt.Create(recipt);
+        }
 
+      /*  public LinkedList<String> LoadRecipts()
+        {
+        }*/
 
         #endregion Shop till you drop
 
