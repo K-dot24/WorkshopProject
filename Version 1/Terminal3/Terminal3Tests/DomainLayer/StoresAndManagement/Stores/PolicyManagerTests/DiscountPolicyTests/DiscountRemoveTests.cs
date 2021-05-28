@@ -33,7 +33,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Discounts.Tests
             DiscountOr p1 = new DiscountOr();
             PolicyManager.AddDiscountPolicy(p1);
             PolicyManager.RemoveDiscountPolicy(p1.Id);
-            Assert.True(PolicyManager.DiscountRoot.Discounts.Count == 0);
+            Assert.True(PolicyManager.MainDiscount.Discounts.Count == 0);
         }
 
         [Fact()]

@@ -553,7 +553,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
             // Update Store in DB
             LinkedList<String> discounts = new LinkedList<string>();
-            List<IDiscountPolicy> policies = store.PolicyManager.DiscountRoot.Discounts;
+            List<IDiscountPolicy> policies = store.PolicyManager.MainDiscount.Discounts;
             foreach (var policy in policies)
             {
                 discounts.AddLast(policy.Id); 
