@@ -11,7 +11,6 @@ import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromSt
 const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     const [products, setProducts] = useState([]);
     const [bag, setBag] = useState({products: [], totalPrice: 0});
-    const [searchQuery, setsearchQuery] = useState('');
 
     const fetchProducts = async () => {
         GetAllProductByStoreIDToDisplay(store.id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
@@ -159,24 +158,29 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     //#endregion
 
-    // TODO: Change Navbar to not show search bar and remove
-    const searchProductsByQuery = async () => {
-        const query = {Name: searchQuery};
-        console.log(query);
-        SearchProduct(query).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
-    }
+    //#region Search (commented out)
 
-    const handleProductSearch = async (query) => {
-        setsearchQuery(query);
-    }
+    // const [searchQuery, setsearchQuery] = useState('');
+    
+    // const searchProductsByQuery = async () => {
+    //     const query = {Name: searchQuery};
+    //     console.log(query);
+    //     SearchProduct(query).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
+    // }
 
-    useEffect(() => {
-        // TODO: Check after API works
-        if (searchQuery !== '')
-            searchProductsByQuery();
-        // else
-        //     fetchStores();
-    }, [searchQuery]);
+    // const handleProductSearch = async (query) => {
+    //     setsearchQuery(query);
+    // }
+
+    // useEffect(() => {
+    //     // TODO: Check after API works
+    //     if (searchQuery !== '')
+    //         searchProductsByQuery();
+    //     // else
+    //     //     fetchStores();
+    // }, [searchQuery]);
+
+    //#endregion
 
     useEffect(() => {
         fetchProducts();
@@ -185,7 +189,8 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     return (
         <div>
-            <Navbar storeId={store.id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} handleSearch={handleProductSearch} />
+            <Navbar storeId={store.id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} 
+                    /*handleSearch={handleProductSearch}*/ />
             <Switch>
                 <Route exact path={match.url}>
                     <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} />

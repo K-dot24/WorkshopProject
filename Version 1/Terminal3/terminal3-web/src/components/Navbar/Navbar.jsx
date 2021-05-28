@@ -106,21 +106,24 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                         <img src={logo} alt="Terminal 3" height="50px" className={classes.image} />
                     </Typography>
 
-                    {/* Search bar // TODO: Change to not show search bar at StorePage (storeID !== -1) */}
-                    <div className={classes.search}>
-                        <div className={classes.searchIcon}>
-                            <SearchIcon />
+                    {/* Search bar - showing only on main page */}
+                    {storeId === -1 && (
+                        <div className={classes.search}>
+                            <div className={classes.searchIcon}>
+                                <SearchIcon />
+                            </div>
+                            <InputBase
+                                placeholder="Search Products…"
+                                classes={{
+                                    root: classes.inputRoot,
+                                    input: classes.inputInput,
+                                }}
+                                inputProps={{ 'aria-label': 'search' }}
+                                onChange={(e => handleSearch(e.target.value))}
+                            />
                         </div>
-                        <InputBase
-                            placeholder="Search…"
-                            classes={{
-                                root: classes.inputRoot,
-                                input: classes.inputInput,
-                            }}
-                            inputProps={{ 'aria-label': 'search' }}
-                            onChange={(e => handleSearch(e.target.value))}
-                        />
-                    </div>
+                    )}
+                    
 
                     {/* Hello, user */}
                     {user.loggedIn &&
