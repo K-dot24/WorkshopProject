@@ -69,6 +69,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
         public NotificationManager NotificationManager { get; set; }
+        public Boolean isClosed { get; set; }
 
         //Constructors
         public Store(String name, RegisteredUser founder)
@@ -81,6 +82,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
             History = new History();
+            isClosed = false;
 
             //Add founder to list of owners
             Owners.TryAdd(founder.Id, Founder);
@@ -102,6 +104,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             NotificationManager = notificationManager;
             Owners = new ConcurrentDictionary<String, StoreOwner>();
             Managers = new ConcurrentDictionary<String, StoreManager>();
+            isClosed = false;
+
         }
 
 
@@ -117,6 +121,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             InventoryManager = new InventoryManager(new ConcurrentDictionary<string, Product>());
             PolicyManager = new PolicyManager();
             History = new History();
+            isClosed = false;
+
 
             //Add founder to list of owners
             Owners.TryAdd(founder.Id, Founder);
@@ -639,7 +645,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
 
             return new DTO_Store(Id, Name, Founder.User.Id, owners_dto, managers_dto, 
-                       inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates);
+                       inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed);
 
         } 
     }
