@@ -80,7 +80,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 Result<Product> res_s = store.AddNewProduct(userID, productName, price, initialQuantity, category, keywords);
 
                 // Update Store in DB
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", store);
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                 var update = Builders<BsonDocument>.Update.Set("InventoryManager", store.getDTO().InventoryManager);
                 mapper.UpdateStore(filter, update);
 
@@ -98,7 +98,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     if (res.ExecStatus)
                     {
                         // Update Store in DB
-                        var filter = Builders<BsonDocument>.Filter.Eq("_id", store);
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                         var update = Builders<BsonDocument>.Update.Set("InventoryManager", store.getDTO().InventoryManager);
                         mapper.UpdateStore(filter, update);
 
@@ -301,7 +301,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     store.NotificationManager.notifyStoreClosed();
 
                     // Update Store in DB
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store);
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("isClosed", true);
                     mapper.UpdateStore(filter, update);
 
@@ -324,7 +324,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     store.NotificationManager.notifyStoreOpened();
 
                     // Update Store in DB
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store);
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("isClosed", false);
                     mapper.UpdateStore(filter, update);
 
@@ -540,6 +540,40 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 return store.AddPurchasePolicy(info, id);
             }
             return new Result<bool>("Store does not exists\n", false, false);
+        }
+
+        public void updateDiscount(string storeID)
+        {
+            Stores.TryGetValue(storeID, out Store store);
+
+            // Update Store in DB
+            LinkedList<String> discounts = new LinkedList<string>();
+            List<IDiscountPolicy> policies = store.PolicyManager.DiscountRoot.Discounts;
+            foreach (var policy in policies)
+            {
+                discounts.AddLast(policy.Id); 
+            }
+
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+            var update = Builders<BsonDocument>.Update.Set("DiscountRoot", discounts);
+            mapper.UpdateStore(filter, update);
+        }
+
+        public void updatePurchase(string storeID)
+        {
+            Stores.TryGetValue(storeID, out Store store);
+
+            // Update Store in DB
+            LinkedList<String> discounts = new LinkedList<string>();
+            List<IPurchasePolicy> policies = store.PolicyManager.PurchaseRoot.Policy.Policies;
+            foreach (var policy in policies)
+            {
+                discounts.AddLast(policy.Id);
+            }
+
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+            var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", discounts);
+            mapper.UpdateStore(filter, update);
         }
     }
 }
