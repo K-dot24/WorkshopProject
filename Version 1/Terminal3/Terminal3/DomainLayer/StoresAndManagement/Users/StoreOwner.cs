@@ -53,13 +53,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
         public DTO_StoreOwner getDTO()
         {
-            LinkedList<string> managers_dto = new LinkedList<string>;
+            LinkedList<string> managers_dto = new LinkedList<string>();
             foreach(StoreManager sm in StoreManagers)
             {
                 managers_dto.AddLast(sm.GetId());
             }
 
-            LinkedList<string> owners_dto = new LinkedList<string>;
+            LinkedList<string> owners_dto = new LinkedList<string>();
             foreach (StoreOwner so in StoreOwners)
             {
                 owners_dto.AddLast(so.GetId());

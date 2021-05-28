@@ -22,7 +22,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public LinkedList<Notification> PendingNotification { get; }
         public NotificationCenter NotificationCenter {get;}
 
-        public Mapper mapper = Mapper.getInstance();
+        //public Mapper mapper = Mapper.getInstance();
         
         //Constructor
         public RegisteredUser(String email , String password) : base()
@@ -69,11 +69,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 // Correct paswword
                 LoggedIn = true;
 
-                // Update DB
+                /*// Update DB
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
                 var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
                 mapper.UpdateRegisteredUser(filter, update); 
-
+*/
                 DisplayPendingNotifications();
                 return new Result<RegisteredUser>($"{this.Email} is Logged in\n", true, this);
             }
@@ -93,12 +93,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             else 
             {
                 LoggedIn = false;
-
-                // Update DB
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
-                var update = Builders<BsonDocument>.Update.Set("LoggedIn", false);
-                mapper.UpdateRegisteredUser(filter, update);
-
                 return new Result<GuestUser>($"{this.Email} is Logged out\n", true, new GuestUser());
             }           
         }
@@ -132,6 +126,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             return new Result<History>("User history\n", true, History);
         }
+
         public Result<RegisteredUserService> GetDAL()
         {
             ShoppingCartService SCD = this.ShoppingCart.GetDAL().Data;
@@ -161,10 +156,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 History.AddPurchasedShoppingCart(ShoppingCart);
                 ShoppingCart = new ShoppingCart();          // create new shopping cart for user
 
-                // Update DB
+               /* // Update DB
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
                 var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.getDTO());
-                mapper.UpdateRegisteredUser(filter, update);
+                mapper.UpdateRegisteredUser(filter, update);*/
 
             }
             return result;

@@ -8,6 +8,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.ServiceLayer.ServiceObjects;
 using System.Threading;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -617,5 +618,29 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             return PolicyManager.EditPurchasePolicy(info, id);
         }
+
+        public DTO_Store getDTO()
+        {
+            LinkedList<String> owners_dto = new LinkedList<string>();
+            foreach(var owner in Owners)
+            {
+                owners_dto.AddLast(owner.Key);
+            }
+            LinkedList<String> managers_dto = new LinkedList<string>();
+            foreach (var manager in Managers)
+            {
+                managers_dto.AddLast(manager.Key);
+            }
+            LinkedList<String> inventoryManagerProducts_dto = new LinkedList<string>();
+            ConcurrentDictionary<String, Product> Products = InventoryManager.Products;
+            foreach(var p in Products)
+            {
+                inventoryManagerProducts_dto.AddLast(p.Key);
+            }
+
+            return new DTO_Store(Id, Name, Founder.User.Id, owners_dto, managers_dto, 
+                       inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates);
+
+        } 
     }
 }

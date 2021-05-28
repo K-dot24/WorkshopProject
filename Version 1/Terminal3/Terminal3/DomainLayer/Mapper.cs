@@ -420,10 +420,10 @@ namespace Terminal3.DataAccessLayer
             return gu;
         }
 
-        public void UpdateGuestUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+    /*    public void UpdateGuestUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
         {
             DAO_GuestUser.Update(filter, update);
-        }
+        }*/
 
         public void DeleteGuestUser(FilterDefinition<BsonDocument> filter)
         {

@@ -52,7 +52,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 foreach(var tup in sb.Products)
                 {
                     ProductService p = tup.Item1;
-                    DTO_HistoryProduct hp_dto = new DTO_HistoryProduct(p.Id, p.Name, p.Price, tup.Item2, p.Category); // TODO- item2 or product service.quatity ?
+                    DTO_HistoryProduct hp_dto = new DTO_HistoryProduct(p.Id, p.Name, p.Price, tup.Item2, p.Category); 
                     products_dto.AddLast(hp_dto);
                 }
                 hsp_dto.AddLast(new DTO_HistoryShoppingBag(sb.Id, sb.UserId, sb.StoreId, products_dto, sb.TotalBagPrice));
