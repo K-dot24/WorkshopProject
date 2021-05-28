@@ -370,7 +370,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     DTO_StoreManager manager_dto = manager.getDTO();
                     var filter = Builders<BsonDocument>.Filter.Eq("UserId", manager_dto.UserId) & Builders<BsonDocument>.Filter.Eq("StoreId", manager_dto.StoreId); ;
                     var update = Builders<BsonDocument>.Update.Set("Permission", manager_dto.Permission);
-                    mapper.UpdateStore(filter, update);
+                    mapper.UpdateStoreManager(filter, update);
                 }
                 return res;
             }
