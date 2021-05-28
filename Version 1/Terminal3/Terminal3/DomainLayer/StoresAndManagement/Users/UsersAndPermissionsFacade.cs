@@ -60,8 +60,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             mapper = Mapper.getInstance();
 
             // Update DB
+            DTO_RegisteredUser user_dto = defaultUser.getDTO();
             var filter_gu = Builders<BsonDocument>.Filter.Eq("_id", "-777");
-            var update_gu = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
+            var update_gu = Builders<BsonDocument>.Update.Set("ShoppingCart", user_dto.ShoppingCart)
+                                                         .Set("Email", user_dto.Email)
+                                                         .Set("Password" , user_dto.Password)
+                                                         .Set("LoggedIn" , user_dto.LoggedIn)
+                                                         .Set("History" , user_dto.History)
+                                                         .Set("PendingNotification", user_dto.PendingNotification);
             mapper.UpdateSystemAdmins(filter_gu, update_gu);
 
             var filter_admin = Builders<BsonDocument>.Filter.Eq("_id", "");
@@ -136,7 +142,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 this.SystemAdmins.TryAdd(searchResult.Data.Id, searchResult.Data);
 
                 // Update DB
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", "");
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", "");  //TODO Mongo _id empty 
                 var update = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
                 mapper.UpdateSystemAdmins(filter, update);
 
@@ -157,8 +163,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns>result of the operation</returns>
-        
-        //TODO DB CALLS 
+         
         public Result<RegisteredUser> RemoveSystemAdmin(String email)
         {
             Result<RegisteredUser> searchResult = FindUserByEmail(email,SystemAdmins);
@@ -170,6 +175,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 if (this.SystemAdmins.Count > 1)
                 {
                     this.SystemAdmins.TryRemove(searchResult.Data.Id, out removedUser);
+
+                    // Update DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", "");  //TODO Mongo _id empty 
+                    var update = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
+                    mapper.UpdateSystemAdmins(filter, update);
+
                     return new Result<RegisteredUser>($"{removedUser.Email} has been removed as system admin\n", true, removedUser);
                 }
 

@@ -686,7 +686,7 @@ namespace Terminal3.DataAccessLayer
         #region System Admin
         internal void UpdateSystemAdmins(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
         {
-            DAO_SystemAdmins.Update(filter, update);
+            DAO_SystemAdmins.Update(filter, update , true);
         }
         #endregion  System Admin
 
