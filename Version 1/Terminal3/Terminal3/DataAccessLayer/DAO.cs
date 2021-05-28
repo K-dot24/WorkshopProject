@@ -55,9 +55,11 @@ namespace Terminal3.DataAccessLayer.DAOs
         //    return dto;
         //}
 
-        public void Update(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        public void Update(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update, Boolean upsert = false)
         {
-            collection.UpdateOne(filter, update);
+            if (upsert)
+                collection.UpdateOne(filter, update, new UpdateOptions(){ IsUpsert = upsert});
+            else collection.UpdateOne(filter, update);
         }
     }
 }

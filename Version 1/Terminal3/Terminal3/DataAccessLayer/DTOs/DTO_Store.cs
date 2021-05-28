@@ -29,8 +29,10 @@ namespace Terminal3.DataAccessLayer.DTOs
         public Double Rating { get; set; }
         [BsonElement]
         public int NumberOfRates { get; set; }
+        public Boolean isClosed { get; set; }
 
-        public DTO_Store(String id, String name, String founder, LinkedList<String> owners, LinkedList<String> managers, LinkedList<String> inventoryManager, DTO_History history, Double rating, int numberOfRates)
+
+        public DTO_Store(String id, String name, String founder, LinkedList<String> owners, LinkedList<String> managers, LinkedList<String> inventoryManager, DTO_History history, Double rating, int numberOfRates, Boolean isclosed)
         {
             _id = id;
             Name = name;
@@ -41,6 +43,7 @@ namespace Terminal3.DataAccessLayer.DTOs
             History = history;
             Rating = rating;
             NumberOfRates = numberOfRates;
+            isClosed = isclosed;
         }
     }
 }
