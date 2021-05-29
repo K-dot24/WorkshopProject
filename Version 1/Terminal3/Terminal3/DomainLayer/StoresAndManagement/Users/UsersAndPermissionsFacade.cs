@@ -39,7 +39,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public ConcurrentDictionary<String,RegisteredUser> RegisteredUsers { get; }
         public ConcurrentDictionary<String, RegisteredUser> SystemAdmins { get; }
         public ConcurrentDictionary<String, GuestUser> GuestUsers { get; }
-
         public Mapper mapper;
 
         private readonly object my_lock = new object();
@@ -51,10 +50,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
             SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
             GuestUsers = new ConcurrentDictionary<String, GuestUser>();
+            mapper = Mapper.getInstance();
             //Add first system admin
-            defaultUser = new RegisteredUser("-777", admin_email, admin_password);
-            insertInitializeData(defaultUser);
-
+            LoadAllRegisterUsers();
+            LoadSystemAdmins();
+            if (SystemAdmins.IsEmpty)
+            {
+                defaultUser = new RegisteredUser("-777", admin_email, admin_password);
+                insertInitializeData(defaultUser);
+            }
         }
 
         //Methods
@@ -532,6 +536,29 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             var filter_admin = Builders<BsonDocument>.Filter.Eq("_id", "");
             var update_admin = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
             mapper.UpdateSystemAdmins(filter_admin, update_admin, true);
+
+        }
+
+        public void LoadAllRegisterUsers()
+        {
+            List<RegisteredUser> _registeredUsers = mapper.LoadAllRegisterUsers();
+            foreach(RegisteredUser registered in _registeredUsers)
+            {
+                RegisteredUsers.TryAdd(registered.Id, registered);
+            }
+        }
+        public void LoadSystemAdmins()
+        {
+            LinkedList<String> systemAdminsIDs = mapper.LoadAllSystemAdmins();
+            if(!(systemAdminsIDs is null))
+            {
+                foreach (string id in systemAdminsIDs)
+                {
+                    RegisteredUser user;
+                    RegisteredUsers.TryGetValue(id, out user);
+                    SystemAdmins.TryAdd(id, user);
+                }
+            }
 
         }
     }

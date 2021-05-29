@@ -664,6 +664,45 @@ namespace Terminal3.DataAccessLayer
         }
         #endregion  System Admin
 
+        public List<RegisteredUser> LoadAllRegisterUsers()
+        {
+            //load all registerUsers dto
+            var filter = Builders<BsonDocument>.Filter.Empty;
+            List<BsonDocument> docs = DAO_Store.collection.Find(filter).ToList();
+            List<DTO_RegisteredUser> registerUsersDTO = new List<DTO_RegisteredUser>();
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                DTO_RegisteredUser dto = JsonConvert.DeserializeObject<DTO_RegisteredUser>(json);
+                registerUsersDTO.Add(dto);
+            }
+            List<RegisteredUser> registeredUsers = new List<RegisteredUser>();
+            foreach (DTO_RegisteredUser dto in registerUsersDTO)
+            {
+                RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
+                registeredUsers.Add(registerUser);
+            }
+            return registeredUsers;
+        }
+        public LinkedList<String> LoadAllSystemAdmins()
+        {
+            var filter = Builders<BsonDocument>.Filter.Empty;
+            List<BsonDocument> docs = DAO_SystemAdmins.collection.Find(filter).ToList();
+            List<DTO_SystemAdmins> systemAdminDTO = new List<DTO_SystemAdmins>();
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                DTO_SystemAdmins dto = JsonConvert.DeserializeObject<DTO_SystemAdmins>(json);
+                systemAdminDTO.Add(dto);
+            }
+            if (systemAdminDTO.Count > 0)
+            {
+                return systemAdminDTO[0].SystemAdmins;
+            }
+            else { return null; }
+        }
         #endregion User
 
         #region Shop till you drop
@@ -807,7 +846,8 @@ namespace Terminal3.DataAccessLayer
             List<Store> stores = new List<Store>();
             foreach(DTO_Store dto in storesDTOs)
             {
-                Store s = LoadStore(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
+                var f = Builders<BsonDocument>.Filter.Eq("_id", dto._id);
+                Store s = LoadStore(f);
                 stores.Add(s);
             }
             return stores;
