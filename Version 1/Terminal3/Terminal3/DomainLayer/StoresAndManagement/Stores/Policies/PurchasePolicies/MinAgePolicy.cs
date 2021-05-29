@@ -50,5 +50,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         {
             return new DTO_MinAgePolicy(this.Id, this.Age);
         }
+
+        public DTO_MinAgePolicy getDTO()
+        {
+            return new DTO_MinAgePolicy(this.Id, this.Age);
+        }
     }
 }

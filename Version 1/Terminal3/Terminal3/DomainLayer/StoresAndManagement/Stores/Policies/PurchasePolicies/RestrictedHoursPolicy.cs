@@ -56,5 +56,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         {
             return new DTO_RestrictedHoursPolicy(this.Id, this.StartRestrict.ToString(), this.EndRestrict.ToString(), this.Product.Id);
         }
+
+        public DTO_RestrictedHoursPolicy getDTO()
+        {
+            return new DTO_RestrictedHoursPolicy(this.Id, this.StartRestrict.ToString(), this.EndRestrict.ToString(), this.Product.Id);
+        }
     }
 }

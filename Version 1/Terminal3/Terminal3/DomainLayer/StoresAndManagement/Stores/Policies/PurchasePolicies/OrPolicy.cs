@@ -114,5 +114,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             }
             return Policies;
         }
+
+        public DTO_OrPolicy getDTO()
+        {
+            return new DTO_OrPolicy(this.Id, getPoliciesIDs(this.Policies));
+        }
+
+        private ConcurrentDictionary<String, String> getPoliciesIDs(List<IPurchasePolicy> list)
+        {
+            ConcurrentDictionary<String, String> Policies = new ConcurrentDictionary<String, String>();
+            foreach (IPurchasePolicy policy in list)
+            {
+                string[] type = policy.GetType().ToString().Split('.');
+                string policy_type = type[type.Length - 1];
+                Policies.TryAdd(policy_type, policy.Id);
+            }
+            return Policies;
+        }
     }
 }
