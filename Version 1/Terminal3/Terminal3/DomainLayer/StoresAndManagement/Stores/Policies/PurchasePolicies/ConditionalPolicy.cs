@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
@@ -127,6 +128,32 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 return new Result<bool>("", true, false);
             }
                 return new Result<bool>("", true, true);                    
+        }
+
+        public DTO_ConditionalPolicy getDTO()
+        {
+            List<IPurchasePolicy> list = new List<IPurchasePolicy>();
+            list.Add(this.PreCond);
+            ConcurrentDictionary<String, String> PreCond = getPoliciesIDs(list);
+
+            List<IPurchasePolicy> list2 = new List<IPurchasePolicy>();
+            list2.Add(this.Cond);
+            ConcurrentDictionary<String, String> Cond = getPoliciesIDs(list2);
+
+
+            return new DTO_ConditionalPolicy(this.Id, PreCond, Cond);
+        }
+
+        private ConcurrentDictionary<String, String> getPoliciesIDs(List<IPurchasePolicy> list)
+        {
+            ConcurrentDictionary<String, String> Policies = new ConcurrentDictionary<String, String>();
+            foreach (IPurchasePolicy policy in list)
+            {
+                string[] type = policy.GetType().ToString().Split('.');
+                string policy_type = type[type.Length - 1];
+                Policies.TryAdd(policy_type, policy.Id);
+            }
+            return Policies;
         }
     }
 }

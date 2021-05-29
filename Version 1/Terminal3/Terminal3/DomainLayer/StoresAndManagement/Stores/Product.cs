@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Collections.Concurrent;
 using Terminal3.ServiceLayer.ServiceObjects;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -92,6 +93,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
             Quantity = Quantity - quantity;
             return NotificationManager.notifyStorePurchase(this, quantity);
+        }
+
+        public DTO_Product getDTO()
+        {
+            return new DTO_Product(Id, Name, Price, Quantity, Category, Rating, NumberOfRates, Keywords, Review);
         }
 
     }

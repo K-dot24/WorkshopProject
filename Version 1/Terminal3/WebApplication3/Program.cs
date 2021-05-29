@@ -14,7 +14,6 @@ namespace WebApplication3
     {
         public static void Main(string[] args)
         {
-            Thread.Sleep(1000);
             CreateHostBuilder(args).Build().Run();
         }
 

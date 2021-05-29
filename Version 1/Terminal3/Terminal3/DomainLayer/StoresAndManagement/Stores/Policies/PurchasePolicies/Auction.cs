@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
+using Terminal3.DataAccessLayer.DTOs;
+
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
@@ -59,6 +61,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
         {
             throw new NotImplementedException();
+        }
+
+        public DTO_Auction getDTO()
+        {
+            return new DTO_Auction(this.Id, this.ClosingTime.ToString(), this.StartingPrice, this.LastOffer.Item1, this.LastOffer.Item2);
         }
     }
 }

@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
+using Terminal3.DataAccessLayer.DTOs;
+
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
@@ -59,6 +61,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             if (Policy.Id.Equals(id))            
                 return new Result<bool>("Can't edit the main 'And node'", false, false);            
             return Policy.EditPolicy(info, id);
+        }
+
+        public DTO_BuyNow getDTO()
+        {
+            return new DTO_BuyNow(this.Id, new DTO_AndPolicy(this.Policy.Id, Policy.getPolicis_dto()));
         }
     }
 }

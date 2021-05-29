@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
@@ -62,6 +63,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 Age = ((JsonElement)info["Age"]).GetInt32();
 
             return new Result<bool>("", true, true);
+        }
+
+        public DTO_MinAgePolicy getDTO()
+        {
+            return new DTO_MinAgePolicy(this.Id, this.Age);
         }
     }
 }

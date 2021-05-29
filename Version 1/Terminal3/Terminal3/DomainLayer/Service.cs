@@ -18,12 +18,6 @@ namespace Terminal3.DomainLayer
             return Guid.NewGuid().ToString("N");
         }
 
-        internal static Result<bool> ResetSystem()
-        {
-            return new Result<Boolean>("The system has been reseted and cleard\n", true, true);
-            
-        }
-
     }
 
     public class Result<T>

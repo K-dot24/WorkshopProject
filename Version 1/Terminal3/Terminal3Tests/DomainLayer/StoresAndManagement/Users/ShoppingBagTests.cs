@@ -47,7 +47,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         public void UpdateShoppingBagTest(int productIndex,int quantity, bool expectedResult)
         {
             ShoppingBag.AddProtuctToShoppingBag(Products[0], 10);
-            Result<bool> res = ShoppingBag.UpdateShoppingBag(Products[productIndex], quantity);
+            Result<ShoppingBag> res = ShoppingBag.UpdateShoppingBag(Products[productIndex], quantity);
 
             Assert.Equal(expectedResult, res.ExecStatus);
             if (expectedResult)

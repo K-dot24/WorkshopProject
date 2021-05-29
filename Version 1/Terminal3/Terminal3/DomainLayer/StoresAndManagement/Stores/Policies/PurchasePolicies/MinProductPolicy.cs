@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
@@ -85,6 +86,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                     return entry.Key;
             }
             return null;
+        }
+
+        public DTO_MinProductPolicy getDTO()
+        {
+            return new DTO_MinProductPolicy(this.Id, this.ProductId, this.Min);
         }
     }
 }

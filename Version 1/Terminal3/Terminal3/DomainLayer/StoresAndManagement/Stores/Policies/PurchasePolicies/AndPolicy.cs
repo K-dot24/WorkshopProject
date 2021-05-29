@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
@@ -104,6 +105,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             }
 
             return new Result<bool>("", true, true);
+        }
+
+        public DTO_AndPolicy getDTO()
+        {           
+            return new DTO_AndPolicy(this.Id, getPolicis_dto());
+        }
+
+        public ConcurrentDictionary<String, String> getPolicis_dto()
+        {
+            ConcurrentDictionary<String, String> policies_dto = new ConcurrentDictionary<String, String>();
+            foreach (IPurchasePolicy policy in Policies)
+            {
+                string[] type = policy.GetType().ToString().Split('.');
+                string policy_type = type[type.Length - 1];
+                policies_dto.TryAdd(policy.Id, policy_type);
+            }
+
+            return policies_dto;
         }
     }
 }

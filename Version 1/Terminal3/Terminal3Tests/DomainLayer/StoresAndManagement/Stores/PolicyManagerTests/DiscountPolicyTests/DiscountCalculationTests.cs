@@ -50,8 +50,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 5, 100)]
         public void MaxProductDiscountTest(String productName, int count, Double expectedPrice)
         {
-            DiscountTargetProducts target = new DiscountTargetProducts(new List<Product>() { Products["Bread"] });
-            PolicyManager.AddDiscountPolicy(new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), new MaxProductCondition(Products["Bread"], 10)));
+            DiscountTargetProducts target = new DiscountTargetProducts(new List<string>() { Products["Bread"].Id });
+            PolicyManager.AddDiscountPolicy(new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), new MaxProductCondition(Products["Bread"].Id, 10)));
             currProducts.TryAdd(Products[productName], count);
             Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedPrice);
         }
@@ -64,8 +64,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 5, 100)]
         public void MinProductDiscountTest(String productName, int count, Double expectedPrice)
         {
-            DiscountTargetProducts target = new DiscountTargetProducts(new List<Product>() { Products["Bread"] });
-            PolicyManager.AddDiscountPolicy(new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), new MinProductCondition(Products["Bread"], 10)));
+            DiscountTargetProducts target = new DiscountTargetProducts(new List<String>() { Products["Bread"].Id });
+            PolicyManager.AddDiscountPolicy(new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), new MinProductCondition(Products["Bread"].Id, 10)));
             currProducts.TryAdd(Products[productName], count);
             Assert.Equal(PolicyManager.GetTotalBagPrice(currProducts), expectedPrice);
         }
@@ -80,10 +80,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 20, 400)]
         public void AndDiscountTest(String productName, int count, Double expectedResult)
         {
-            IDiscountTarget target = new DiscountTargetProducts(new List<Product>() { Products[productName] });
-            IDiscountCondition c1 = new MinProductCondition(Products["Bread"], 5);
+            IDiscountTarget target = new DiscountTargetProducts(new List<string>() { Products[productName].Id });
+            IDiscountCondition c1 = new MinProductCondition(Products["Bread"].Id, 5);
             IDiscountPolicy p1 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c1);
-            IDiscountCondition c2 = new MaxProductCondition(Products["Bread"], 10);
+            IDiscountCondition c2 = new MaxProductCondition(Products["Bread"].Id, 10);
             IDiscountPolicy p2 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c2);
             PolicyManager.AddDiscountPolicy(new DiscountAnd(new List<IDiscountPolicy>() { p1, p2 }));
             currProducts.TryAdd(Products[productName], count);
@@ -100,9 +100,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 20, 400)]
         public void AndDiscountConditionTest(String productName, int count, Double expectedResult)
         {
-            IDiscountTarget target = new DiscountTargetProducts(new List<Product>() { Products[productName] });
-            IDiscountCondition c1 = new MinProductCondition(Products["Bread"], 5);
-            IDiscountCondition c2 = new MaxProductCondition(Products["Bread"], 10);
+            IDiscountTarget target = new DiscountTargetProducts(new List<string>() { Products[productName].Id });
+            IDiscountCondition c1 = new MinProductCondition(Products["Bread"].Id, 5);
+            IDiscountCondition c2 = new MaxProductCondition(Products["Bread"].Id, 10);
             IDiscountCondition c = new DiscountConditionAnd(new List<IDiscountCondition>() { c1, c2 });
             IDiscountPolicy p = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c);
             PolicyManager.AddDiscountPolicy(p);
@@ -120,10 +120,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 20, 400)]
         public void OrDiscountTest(String productName, int count, Double expectedResult)
         {
-            IDiscountTarget target = new DiscountTargetProducts(new List<Product>() { Products[productName] });
-            IDiscountCondition c1 = new MinProductCondition(Products["Bread"], 10);
+            IDiscountTarget target = new DiscountTargetProducts(new List<string>() { Products[productName].Id });
+            IDiscountCondition c1 = new MinProductCondition(Products["Bread"].Id, 10);
             IDiscountPolicy p1 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c1);
-            IDiscountCondition c2 = new MaxProductCondition(Products["Bread"], 5);
+            IDiscountCondition c2 = new MaxProductCondition(Products["Bread"].Id, 5);
             IDiscountPolicy p2 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c2);
             PolicyManager.AddDiscountPolicy(new DiscountOr(new List<IDiscountPolicy>() { p1, p2 }));
             currProducts.TryAdd(Products[productName], count);
@@ -140,9 +140,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 20, 400)]
         public void OrDiscountConditionTest(String productName, int count, Double expectedResult)
         {
-            IDiscountTarget target = new DiscountTargetProducts(new List<Product>() { Products[productName] });
-            IDiscountCondition c1 = new MinProductCondition(Products["Bread"], 10);
-            IDiscountCondition c2 = new MaxProductCondition(Products["Bread"], 5);
+            IDiscountTarget target = new DiscountTargetProducts(new List<string>() { Products[productName].Id });
+            IDiscountCondition c1 = new MinProductCondition(Products["Bread"].Id, 10);
+            IDiscountCondition c2 = new MaxProductCondition(Products["Bread"].Id, 5);
             IDiscountCondition c = new DiscountConditionOr(new List<IDiscountCondition>() { c1, c2 });
             IDiscountPolicy p = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c);
             PolicyManager.AddDiscountPolicy(p);
@@ -159,9 +159,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         public void XorDiscountTest(String productName1, int count1, String productName2, int count2, Double expectedResult)
         {
             IDiscountTarget t = new DiscountTargetShop();
-            IDiscountCondition c1 = new MinProductCondition(Products[productName1], 5);
+            IDiscountCondition c1 = new MinProductCondition(Products[productName1].Id, 5);
             IDiscountPolicy p1 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, t, 10), c1);
-            IDiscountCondition c2 = new MinProductCondition(Products[productName2], 5);
+            IDiscountCondition c2 = new MinProductCondition(Products[productName2].Id, 5);
             IDiscountPolicy p2 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), c2);
             PolicyManager.AddDiscountPolicy(new DiscountXor(p1, p2, c1));
             currProducts.TryAdd(Products[productName1], count1);
@@ -177,9 +177,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         public void MaxDiscountTest(String productName, int count, Double expectedResult)
         {
             IDiscountTarget t = new DiscountTargetShop();
-            IDiscountCondition c1 = new MinProductCondition(Products[productName], 5);
+            IDiscountCondition c1 = new MinProductCondition(Products[productName].Id, 5);
             IDiscountPolicy p1 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, t, 10), c1);
-            IDiscountCondition c2 = new MinProductCondition(Products[productName], 10);
+            IDiscountCondition c2 = new MinProductCondition(Products[productName].Id, 10);
             IDiscountPolicy p2 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), c2);
             PolicyManager.AddDiscountPolicy(new DiscountMax(new List<IDiscountPolicy>() { p1, p2 }));
             currProducts.TryAdd(Products[productName], count);
@@ -194,9 +194,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         public void MinDiscountTest(String productName, int count, Double expectedResult)
         {
             IDiscountTarget t = new DiscountTargetShop();
-            IDiscountCondition c1 = new MinProductCondition(Products[productName], 5);
+            IDiscountCondition c1 = new MinProductCondition(Products[productName].Id, 5);
             IDiscountPolicy p1 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, t, 10), c1);
-            IDiscountCondition c2 = new MinProductCondition(Products[productName], 10);
+            IDiscountCondition c2 = new MinProductCondition(Products[productName].Id, 10);
             IDiscountPolicy p2 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), c2);
             PolicyManager.AddDiscountPolicy(new DiscountMin(new List<IDiscountPolicy>() { p1, p2 }));
             currProducts.TryAdd(Products[productName], count);
@@ -225,7 +225,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Cup", 1, 30)]
         public void DiscountTargetProductsTest(String productName, int count, Double expectedResult)
         {
-            IDiscountTarget t = new DiscountTargetProducts(new List<Product>() { Products["Bread"], Products["Milk"] });
+            IDiscountTarget t = new DiscountTargetProducts(new List<string>() { Products["Bread"].Id, Products["Milk"].Id });
             IDiscountCondition c = new MinBagPriceCondition(0);
             IDiscountPolicy p = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, t, 20), c);
             PolicyManager.AddDiscountPolicy(p);
