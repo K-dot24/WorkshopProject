@@ -242,11 +242,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                         {
                             newOwner = new StoreOwner(futureOwner, this, owner);
                             Owners.TryAdd(futureOwner.Id, newOwner);
-                        }
-                        else if (Managers.TryGetValue(currentlyOwnerID, out StoreManager manager) && CheckStoreManagerAndPermissions(currentlyOwnerID, Methods.AddStoreOwner))
-                        {
-                            newOwner = new StoreOwner(futureOwner, this, manager);
-                            Owners.TryAdd(futureOwner.Id, newOwner);
+                            owner.StoreOwners.AddLast(newOwner);
                         }
                         else
                         {

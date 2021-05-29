@@ -153,6 +153,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("Owners", store.getDTO().Owners);
                     mapper.UpdateStore(filter, update);
+                    if(store.Owners.TryGetValue(currentlyOwnerID,out StoreOwner owner))
+                    {
+                        //update owner record
+                        var filterowner = Builders<BsonDocument>.Filter.Eq("_id", owner.User.Id);
+                        var updateowner = Builders<BsonDocument>.Update.Set("StoreOwners", owner.getDTO().StoreOwners);
+                        mapper.UpdateStoreOwner(filter, update);
+                    }
                 }
 
                 return new Result<bool>(res.Message, res.ExecStatus, true);
@@ -173,6 +180,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("Managers", store.getDTO().Managers);
                     mapper.UpdateStore(filter, update);
+
+                    if (store.Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
+                    {
+                        //update owner record
+                        var filterowner = Builders<BsonDocument>.Filter.Eq("_id", owner.User.Id);
+                        var updateowner = Builders<BsonDocument>.Update.Set("StoreManagers", owner.getDTO().StoreManagers);
+                        mapper.UpdateStoreOwner(filter, update);
+                    }
                 }
 
                 return new Result<bool>(res.Message, res.ExecStatus, true);
@@ -288,6 +303,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Store newStore = new Store(storeName, founder, storeID);
 
             // Update in DB
+            mapper.Create(newStore.Founder);
             mapper.Create(newStore);
 
             Stores.TryAdd(newStore.Id, newStore);

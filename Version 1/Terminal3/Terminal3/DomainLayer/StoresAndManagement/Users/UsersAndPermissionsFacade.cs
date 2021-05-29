@@ -266,11 +266,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 //User Found
                 Result<RegisteredUser> res_ru =  searchResult.Data.Login(password);
 
-                // Update DB
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
-                var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
-                mapper.UpdateRegisteredUser(filter, update);
+                if (res_ru.ExecStatus)
+                {
+                    // Update DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
+                    var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
+                    mapper.UpdateRegisteredUser(filter, update);
 
+                }
                 return res_ru;
 
             }
@@ -485,10 +488,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
                 Result<ShoppingCart> ShoppingCart = registerd_user.Purchase(paymentDetails, deliveryDetails);
-                // Update DB
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
-                var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.Data.getDTO());
-                mapper.UpdateRegisteredUser(filter, update);
+                if (ShoppingCart.ExecStatus)
+                {
+                    // Update DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
+                    var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.Data.getDTO());
+                    mapper.UpdateRegisteredUser(filter, update);
+                }
 
                 return ShoppingCart; 
             }

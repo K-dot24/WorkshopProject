@@ -668,7 +668,7 @@ namespace Terminal3.DataAccessLayer
         {
             //load all registerUsers dto
             var filter = Builders<BsonDocument>.Filter.Empty;
-            List<BsonDocument> docs = DAO_Store.collection.Find(filter).ToList();
+            List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
             List<DTO_RegisteredUser> registerUsersDTO = new List<DTO_RegisteredUser>();
             foreach (BsonDocument doc in docs)
             {
