@@ -38,18 +38,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
     public class PolicyManager : IPolicyManager
     {
 
-        public DiscountAddition MainDiscount { get; }
+        public DiscountAddition DiscountRoot { get; }
         public BuyNow PurchaseRoot { get; set; }
 
         public PolicyManager()
         {
-            MainDiscount = new DiscountAddition();
+            DiscountRoot = new DiscountAddition();
             PurchaseRoot = new BuyNow();
         }
 
         public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
         {
-            Result<Dictionary<Product, Double>> discountsResult = MainDiscount.CalculateDiscount(products, discountCode);
+            Result<Dictionary<Product, Double>> discountsResult = DiscountRoot.CalculateDiscount(products, discountCode);
             if (!discountsResult.ExecStatus)
                 return -1;
 
@@ -65,6 +65,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
             return price;
         }
+   
         public Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)
         {
             return PurchaseRoot.IsConditionMet(products, user);
@@ -96,7 +97,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount)
         {
-            Result<bool> result = MainDiscount.AddDiscount(MainDiscount.Id, discount);
+            Result<bool> result = DiscountRoot.AddDiscount(DiscountRoot.Id, discount);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -108,7 +109,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount, String id)
         {
-            Result<bool> result = MainDiscount.AddDiscount(id, discount);
+            Result<bool> result = DiscountRoot.AddDiscount(id, discount);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -120,7 +121,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id)
         {
-            Result<bool> result = MainDiscount.AddCondition(id, condition);
+            Result<bool> result = DiscountRoot.AddCondition(id, condition);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -132,7 +133,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<bool> RemoveDiscountPolicy(string id)
         {
-            Result<bool> result = MainDiscount.RemoveDiscount(id);
+            Result<bool> result = DiscountRoot.RemoveDiscount(id);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -144,7 +145,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<bool> RemoveDiscountCondition(string id)
         {
-            Result<bool> result = MainDiscount.RemoveCondition(id);
+            Result<bool> result = DiscountRoot.RemoveCondition(id);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -156,7 +157,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<IDiscountPolicyData> GetDiscountPolicyData()
         {
-            return MainDiscount.GetData();
+            return DiscountRoot.GetData();
         }
 
         public Result<IPurchasePolicyData> GetPurchasePolicyData()
@@ -303,7 +304,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<bool> EditDiscountPolicy(Dictionary<string, object> info, string id)
         {
-            Result<bool> result = MainDiscount.EditDiscount(info, id);
+            Result<bool> result = DiscountRoot.EditDiscount(info, id);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -315,7 +316,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<bool> EditDiscountCondition(Dictionary<string, object> info, string id)
         {
-            Result<bool> result = MainDiscount.EditCondition(info, id);
+            Result<bool> result = DiscountRoot.EditCondition(info, id);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -325,4 +326,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return result;
         }
     }
+
+/*    // Update Store in DB
+    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+    var update = Builders<BsonDocument>.Update.Set("isClosed", false);
+    mapper.UpdateStore(filter, update);
+*/
 }

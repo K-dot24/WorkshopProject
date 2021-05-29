@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DataAccessLayer.DTOs.Policies.Discount;
 
 namespace Terminal3.DataAccessLayer.DTOs
 {
@@ -19,13 +20,6 @@ namespace Terminal3.DataAccessLayer.DTOs
         public LinkedList<String> Managers { get; set; }
         [BsonElement]
         public LinkedList<String> InventoryManager { get; set; }     //List of store products
-
-        //[BsonElement]
-        //public DTO_PolicyManager PolicyManager { get; set;}           // TODO - need to be updated
-        [BsonElement]
-        public LinkedList<String> DiscountRoot { get; set; }            //list of discount policies id
-        [BsonElement]
-        public LinkedList<String> PurchaseRoot { get; set; }
         [BsonElement]
         public DTO_History History { get; set; }
         [BsonElement]
@@ -34,9 +28,15 @@ namespace Terminal3.DataAccessLayer.DTOs
         public int NumberOfRates { get; set; }
         [BsonElement]
         public Boolean isClosed { get; set; }
+        [BsonElement]
+        public DTO_DiscountAddition DiscountRoot { get; set; } // List of IDiscountPolicy ids 
+        [BsonElement]
+        public DTO_BuyNow PurchaseRoot { get; set; }
 
 
-        public DTO_Store(String id, String name, String founder, LinkedList<String> owners, LinkedList<String> managers, LinkedList<String> inventoryManager, DTO_History history, Double rating, int numberOfRates, Boolean isclosed)
+
+        public DTO_Store(String id, String name, String founder, LinkedList<String> owners, LinkedList<String> managers, LinkedList<String> inventoryManager, DTO_History history, 
+                            Double rating, int numberOfRates, Boolean isclosed , DTO_DiscountAddition discount , DTO_BuyNow by_now)
         {
             _id = id;
             Name = name;
@@ -48,6 +48,8 @@ namespace Terminal3.DataAccessLayer.DTOs
             Rating = rating;
             NumberOfRates = numberOfRates;
             isClosed = isclosed;
+            DiscountRoot = discount;
+            PurchaseRoot = by_now;
         }
     }
 }

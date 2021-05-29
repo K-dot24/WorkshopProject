@@ -358,6 +358,7 @@ namespace Terminal3.DataAccessLayer
         }
         private void AddToDB(String type , IPurchasePolicy policy)
         {
+            // shaked 
             switch (type)
             {
                 case "AndPolicy":
@@ -748,7 +749,8 @@ namespace Terminal3.DataAccessLayer
             foreach (var manager in s.Managers) { managers.AddLast(manager.Key); }
             foreach(var product in s.InventoryManager.Products) { inventory.AddLast(product.Key); }
 
-            DAO_Store.Create(new DTO_Store(s.Id, s.Name, s.Founder.GetId(), owners, managers, inventory, Get_DTO_History(s.History), s.Rating, s.NumberOfRates , s.isClosed));
+            DAO_Store.Create(new DTO_Store(s.Id, s.Name, s.Founder.GetId(), owners, managers, inventory, Get_DTO_History(s.History),
+                                            s.Rating, s.NumberOfRates , s.isClosed, s.PolicyManager.DiscountRoot.getDTO(), s.PolicyManager.PurchaseRoot.getDTO()));
             Stores.TryAdd(s.Id, s);
         }
 
