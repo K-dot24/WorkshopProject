@@ -601,4 +601,35 @@ export function AddDiscountPolicyById( id, data ) {
     })
 }
 
+export function AddDiscountCondition( id, data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddDiscountCondition/${id}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+export function RemoveDiscountPolicy( storeID, id ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemoveDiscountPolicy/${storeID}/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
+export function RemoveDiscountCondition( storeID, id ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemoveDiscountCondition/${storeID}/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
 //#endregion

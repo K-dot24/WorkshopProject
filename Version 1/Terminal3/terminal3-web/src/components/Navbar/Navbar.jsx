@@ -23,7 +23,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
 
     const allActions = ['Add New Product', 'Remove Product', 'Edit Product Details', 'Add Store Owner', 'Add Store Manager', 'Remove Store Manager', 
                         'Set Permissions', 'Get Store Staff', 'Add Purchase Policy', 'Get Purchase Policy',
-                        'Add Discount Policy', 'Get Discount Policy', 'Get Store Purchase History'];
+                        'Discount Policy', 'Get Discount Policy', 'Get Store Purchase History'];
     
 
     //#region API Calls
@@ -68,17 +68,17 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
     const StoreActions = () => {
         return [
             allActions.map((action, index) => permissions[index] && 
-                        // (
+                        (
                             
-                        //     action === 'Add Discount Policy' ? 
-                        //     <PolicyDropDown 
-                        //         action={action} 
-                        //         subOptions={['Visible Discount', 'Discreet Discount', 'ConditionalDiscount', 'DiscountAddition',
-                        //                     'DiscountAnd']} 
-                        //     />
-                        // :
+                            action === 'Discount Policy' ? 
+                            <PolicyDropDown 
+                                action={action} 
+                                subOptions={['Add Discount Policy', 'Add Discount Condition', 
+                                            'Remove Discount Policy', 'Remove Discount Condition']} 
+                            />
+                        :
                             <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    
-                        // )  
+                        )  
             )
         ];
     };

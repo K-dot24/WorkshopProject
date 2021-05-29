@@ -4,7 +4,8 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // 
 import { Products, Navbar, Cart, Action, CheckboxList } from '../../../../components';
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
         AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct,
-        printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById } from '../../../../api/API';
+        printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
+        AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition } from '../../../../api/API';
 
 
 
@@ -172,7 +173,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 } 
                 if ('productsid' in data) {
                     const productsid_array = data.productsid.split(',');
-                    info = { ...info, Target: { ProductsId: productsid_array } };
+                    info = { ...info, Target: { ProductIds: productsid_array } };
                 }
                 break;
 
@@ -236,6 +237,44 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     //             response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
     //     }
     // }
+
+    const handleAddDiscountCondition = (data, type) => {
+        let info;
+
+        switch (type) {
+            case "MaxProductCondition":
+                info = { type, MaxQuantity: data.maxquantity, ProductId: data.productid  };
+                break;
+
+            case "MinProductCondition":
+                info = { type, MaxQuantity: data.maxquantity, ProductId: data.productid };
+                break;
+
+            case "MinBagPriceCondition":
+                info = { type, MinPrice: data.minprice };
+                break;
+
+            default:
+                info = { type };
+        }
+
+        const allData = { storeId: store.id, info };
+        console.log(allData);
+
+        AddDiscountCondition(data.nodeid, allData).then(response => response.ok ? 
+            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+
+    }
+
+    const handleRemoveDiscountPolicy = (data) => {
+        RemoveDiscountPolicy(store.id, data.nodeid).then(response => response.ok ? 
+            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+    }
+
+    const handleRemoveDiscountCondition = (data) => {
+        RemoveDiscountCondition(store.id, data.nodeid).then(response => response.ok ? 
+            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+    }
 
     //#endregion
 
@@ -345,13 +384,14 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                                                 handleAction={handleSetPermissions} {...props} />)} 
                 />
 
-                <Route exact path={match.url + `/adddiscountpolicy`} 
+                {/* Add Discount Policy */}
+                <Route exact path={match.url + `/discountpolicy/adddiscountpolicy`} 
                     render={(props) => (<Action name='Add Discount Policy'
                                                 fields={[{name: 'Expiration Date', required: true, type: 'date', belongsTo: 'VisibleDiscount'},
                                                         {name: 'Percentage', required: true, type: 'number', belongsTo: 'VisibleDiscount'},
-                                                        {name: 'Node Id', required: false},
+                                                        {name: 'Node ID', required: false},
                                                         {name: 'Categories', required: true, belongsTo: 'DiscountTargetCategories'},
-                                                        {name: 'Products Id', required: true, belongsTo: 'DiscountTargetProducts'},
+                                                        {name: 'Products ID', required: true, belongsTo: 'DiscountTargetProducts'},
                                                         {name: 'Discount Code', required: true, belongsTo: 'DiscreetDiscount'}]}   
                                                 mainTypes={[{name: 'VisibleDiscount'}, {name: 'DiscreetDiscount'},
                                                         {name: 'ConditionalDiscount'}, {name: 'DiscountAddition'},
@@ -387,6 +427,35 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                                                         {name: 'Node Id', required: false}]}
                                                 handleAction={handleAddDiscreetDiscount} {...props} />)} 
                 /> */}
+
+                {/* Add Discount Condition */}
+                <Route exact path={match.url + `/discountpolicy/adddiscountcondition`} 
+                    render={(props) => (<Action name='Add Discount Condition'
+                                                fields={[{name: 'Node ID', required: true},
+                                                        {name: 'Product ID', required: true, belongsTo: 'MaxProductCondition'},
+                                                        {name: 'Max Quantity', required: true, type: 'number', belongsTo: 'MaxProductCondition'},
+                                                        {name: 'Product ID', required: true, belongsTo: 'MinProductCondition'},
+                                                        {name: 'Min Quantity', required: true, type: 'number', belongsTo: 'MinProductCondition'},
+                                                        {name: 'Min Price', required: true, type: 'number', belongsTo: 'MinBagPriceCondition'}]}   
+                                                mainTypes={[{name: 'DiscountConditionAnd'}, {name: 'DiscountConditionOr'},
+                                                        {name: 'MaxProductCondition'}, {name: 'MinProductCondition'},
+                                                        {name: 'MinBagPriceCondition'}]}
+                                                handleAction={handleAddDiscountCondition} {...props} />)} 
+                />
+
+                { /* Remove Discount Policy */}
+                <Route exact path={match.url + `/discountpolicy/removediscountpolicy`} 
+                    render={(props) => (<Action name='Remove Discount Policy'
+                                                fields={[{name: 'Node ID', required: true}]}   
+                                                handleAction={handleRemoveDiscountPolicy} {...props} />)} 
+                />
+
+                { /* Remove Discount Condition */}
+                <Route exact path={match.url + `/discountpolicy/removediscountcondition`} 
+                    render={(props) => (<Action name='Remove Discount Condition'
+                                                fields={[{name: 'Node ID', required: true}]}   
+                                                handleAction={handleRemoveDiscountCondition} {...props} />)} 
+                />
 
             </Switch>
         </div>
