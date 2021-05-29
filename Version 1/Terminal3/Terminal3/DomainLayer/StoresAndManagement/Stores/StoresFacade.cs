@@ -461,7 +461,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.DiscountRoot.getDTO());
+                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
                 }
                 return res;
@@ -478,7 +478,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.DiscountRoot.getDTO());
+                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
                 }
                 return res;
@@ -495,7 +495,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.DiscountRoot.getDTO());
+                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
                 }
                 return res;
@@ -513,7 +513,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.DiscountRoot.getDTO());
+                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
                 }
                 return res;
@@ -530,7 +530,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.DiscountRoot.getDTO());
+                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
                 }
                 return res;
@@ -556,7 +556,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-                    var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", store.PolicyManager.PurchaseRoot.getDTO());
+                    var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);
                 }
                 return res;
@@ -582,7 +582,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-                    var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", store.PolicyManager.PurchaseRoot.getDTO());
+                    var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);
                 }
                 return res;
@@ -599,7 +599,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-                    var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", store.PolicyManager.PurchaseRoot.getDTO());
+                    var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);
                 }
                 return res;
@@ -617,7 +617,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
             // Update Store in DB
             LinkedList<String> discounts = new LinkedList<string>();
-            List<IDiscountPolicy> policies = store.PolicyManager.DiscountRoot.Discounts;
+            List<IDiscountPolicy> policies = store.PolicyManager.MainDiscount.Discounts;
             foreach (var policy in policies)
             {
                 discounts.AddLast(policy.Id); 
@@ -634,7 +634,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
             // Update Store in DB
             LinkedList<String> discounts = new LinkedList<string>();
-            List<IPurchasePolicy> policies = store.PolicyManager.PurchaseRoot.Policy.Policies;
+            List<IPurchasePolicy> policies = store.PolicyManager.MainPolicy.Policy.Policies;
             foreach (var policy in policies)
             {
                 discounts.AddLast(policy.Id);

@@ -8,11 +8,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     class DiscountTargetProductsData : IDiscountTargetData
     {
 
-        public List<ProductService> Products { get; }
+        public List<string> ProductIds { get; }
 
-        public DiscountTargetProductsData(List<ProductService> products)
+        public DiscountTargetProductsData(List<string> productIds)
         {
-            Products = products;
+            ProductIds = productIds;
         }
 
     }

@@ -29,9 +29,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         {
             IPurchasePolicy policy = new MaxProductPolicy(Products["Bread"], 10);
             PolicyManager.AddPurchasePolicy(policy);
-            Assert.Equal(PolicyManager.PurchaseRoot.Policy.Policies[0], policy);
+            Assert.Equal(PolicyManager.MainPolicy.Policy.Policies[0], policy);
             PolicyManager.RemovePurchasePolicy(policy.Id);
-            Assert.Empty(PolicyManager.PurchaseRoot.Policy.Policies);
+            Assert.Empty(PolicyManager.MainPolicy.Policy.Policies);
         }
 
         [Fact()]

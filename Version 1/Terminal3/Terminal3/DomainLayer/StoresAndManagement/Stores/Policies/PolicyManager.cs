@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountComposition;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions;
@@ -38,18 +39,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
     public class PolicyManager : IPolicyManager
     {
 
-        public DiscountAddition DiscountRoot { get; }
-        public BuyNow PurchaseRoot { get; set; }
+        public DiscountAddition MainDiscount { get; }
+        public BuyNow MainPolicy { get; set; }
 
         public PolicyManager()
         {
-            DiscountRoot = new DiscountAddition();
-            PurchaseRoot = new BuyNow();
+            MainDiscount = new DiscountAddition();
+            MainPolicy = new BuyNow();
         }
 
         public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
         {
-            Result<Dictionary<Product, Double>> discountsResult = DiscountRoot.CalculateDiscount(products, discountCode);
+            Result<Dictionary<Product, Double>> discountsResult = MainDiscount.CalculateDiscount(products, discountCode);
             if (!discountsResult.ExecStatus)
                 return -1;
 
@@ -68,7 +69,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
    
         public Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)
         {
-            return PurchaseRoot.IsConditionMet(products, user);
+            return MainPolicy.IsConditionMet(products, user);
         }
 
         public Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info)
@@ -97,7 +98,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount)
         {
-            Result<bool> result = DiscountRoot.AddDiscount(DiscountRoot.Id, discount);
+            Result<bool> result = MainDiscount.AddDiscount(MainDiscount.Id, discount);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -109,7 +110,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount, String id)
         {
-            Result<bool> result = DiscountRoot.AddDiscount(id, discount);
+            Result<bool> result = MainDiscount.AddDiscount(id, discount);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -121,7 +122,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id)
         {
-            Result<bool> result = DiscountRoot.AddCondition(id, condition);
+            Result<bool> result = MainDiscount.AddCondition(id, condition);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -133,7 +134,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<bool> RemoveDiscountPolicy(string id)
         {
-            Result<bool> result = DiscountRoot.RemoveDiscount(id);
+            Result<bool> result = MainDiscount.RemoveDiscount(id);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -145,7 +146,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<bool> RemoveDiscountCondition(string id)
         {
-            Result<bool> result = DiscountRoot.RemoveCondition(id);
+            Result<bool> result = MainDiscount.RemoveCondition(id);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -157,12 +158,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<IDiscountPolicyData> GetDiscountPolicyData()
         {
-            return DiscountRoot.GetData();
+            return MainDiscount.GetData();
         }
 
         public Result<IPurchasePolicyData> GetPurchasePolicyData()
         {
-            return PurchaseRoot.GetData();
+            return MainPolicy.GetData();
         }
 
         public Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info)
@@ -176,7 +177,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy)
         {
-            Result<bool> result = PurchaseRoot.AddPolicy(policy, PurchaseRoot.Policy.Id);
+            Result<bool> result = MainPolicy.AddPolicy(policy, MainPolicy.Policy.Id);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -197,7 +198,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, String id)
         {
-            Result<bool> result = PurchaseRoot.AddPolicy(policy, id);
+            Result<bool> result = MainPolicy.AddPolicy(policy, id);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -209,7 +210,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<bool> RemovePurchasePolicy(string id)
         {
-            Result<bool> result = PurchaseRoot.RemovePolicy(id);
+            Result<bool> result = MainPolicy.RemovePolicy(id);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -235,7 +236,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<bool> EditPurchasePolicy(IPurchasePolicy policy, string id)
         {
-            Result<bool> result = PurchaseRoot.EditPolicy(policy, id);
+            Result<bool> result = MainPolicy.EditPolicy(policy, id);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -250,7 +251,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             if (!info.ContainsKey("type"))
                 return new Result<IDiscountPolicy>("Can't create a discount without a type", false, null);
 
-            string type = (string)info["type"];
+            JsonElement JsonType = (JsonElement)info["type"];
+            string type = JsonType.GetString();
             switch (type)
             {
                 case "VisibleDiscount":
@@ -282,7 +284,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             if (!info.ContainsKey("type"))
                 return new Result<IDiscountCondition>("Can't create a condition without a type", false, null);
 
-            string type = (string)info["type"];
+            JsonElement JsonType = (JsonElement)info["type"];
+            string type = JsonType.GetString();
             switch (type)
             {
                 case "DiscountConditionAnd":
@@ -304,7 +307,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<bool> EditDiscountPolicy(Dictionary<string, object> info, string id)
         {
-            Result<bool> result = DiscountRoot.EditDiscount(info, id);
+            Result<bool> result = MainDiscount.EditDiscount(info, id);
             if (result.ExecStatus)
             {
                 if (result.Data)
@@ -316,7 +319,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<bool> EditDiscountCondition(Dictionary<string, object> info, string id)
         {
-            Result<bool> result = DiscountRoot.EditCondition(info, id);
+            Result<bool> result = MainDiscount.EditCondition(info, id);
             if (result.ExecStatus)
             {
                 if (result.Data)
