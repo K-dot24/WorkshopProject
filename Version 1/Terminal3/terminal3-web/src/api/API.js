@@ -573,18 +573,32 @@ export function ResetSystem( data ) {
     })
 }
 
-
 //#endregion
 
 
 
+//#region Discount Policy
 
+export function AddDiscountPolicy( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddDiscountPolicy`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
+export function AddDiscountPolicyById( id, data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddDiscountPolicy/${id}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
-
-
-
-
-
-
-
+//#endregion

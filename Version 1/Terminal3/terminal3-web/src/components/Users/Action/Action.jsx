@@ -7,7 +7,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import useStyles from './styles';
 import { CheckboxList } from '../../../components';
 
-const Action = ({ name, fields, handleAction, types }) => {
+const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
      // styles.js
      const classes = useStyles();
     
@@ -41,7 +41,7 @@ const Action = ({ name, fields, handleAction, types }) => {
         setCheckBoxArray(checkList);
     }
 
-    const [currentType, setCurrentType] = useState({ value: '' });
+    const [currentType, setCurrentType] = useState({ value: '', sub: '' });
     
     const handleChange = (event) => {
         const name = event.target.name;
@@ -68,7 +68,7 @@ const Action = ({ name, fields, handleAction, types }) => {
                     <form className={classes.form} onSubmit={handleSubmit}>
 
                     {/* Type Dropdown Menu (for policies) */}
-                    {types &&
+                    {mainTypes &&
                         (
                         <>
                         <FormControl className={classes.formControl}>
@@ -84,20 +84,46 @@ const Action = ({ name, fields, handleAction, types }) => {
                                 }}
                             >
                             <option aria-label="None" value="" />
-                            {types.map((type, index) => (
+                            {mainTypes.map((type, index) => (
                                 <option key={index} value={type.name}>{type.name}</option>
                             ))}
                             </Select>
                         </FormControl>
-                        <FormHelperText>Choose type of discount target</FormHelperText>
+                        <FormHelperText>Choose type of discount</FormHelperText>
                         </>
                         )
                     }
 
+                    {subTypes && (
+                        subTypes.map((subType) => subType.main === currentType.value && (
+                        <>
+                            <FormControl className={classes.formControl}>
+                                <InputLabel htmlFor="sub-native-simple"></InputLabel>
+                                <Select
+                                    native
+                                    required={true}
+                                    value={currentType.sub}
+                                    onChange={handleChange}
+                                    inputProps={{
+                                        name: 'sub',
+                                        id: 'sub-native-simple',
+                                    }}
+                                >
+                                <option aria-label="None" value="" />
+                                {subType.subs.map((type, index) => (
+                                    <option key={index} value={type.name}>{type.name}</option>
+                                ))}
+                                </Select>
+                            </FormControl>
+                            <FormHelperText>Choose type of discount target</FormHelperText>
+                        </>
+                        ))
+                    )}
+
                     {/* Text Fields */}
                     {fields && 
                         fields.map((field) => (
-                            'belongsTo' in field && currentType.value !== field.belongsTo ? null :
+                            'belongsTo' in field && (currentType.value !== field.belongsTo && currentType.sub !== field.belongsTo) ? null :
                             <TextField
                                 key={field.name}
                                 type={field.type ? field.type : "text"}

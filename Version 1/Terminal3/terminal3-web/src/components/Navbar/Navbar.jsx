@@ -68,11 +68,17 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
     const StoreActions = () => {
         return [
             allActions.map((action, index) => permissions[index] && 
-                        (action === 'Add Discount Policy' ? 
-                            <PolicyDropDown action={action} subOptions={['Visible Discount', 'Discreet Discount']} />
-                        :
+                        // (
+                            
+                        //     action === 'Add Discount Policy' ? 
+                        //     <PolicyDropDown 
+                        //         action={action} 
+                        //         subOptions={['Visible Discount', 'Discreet Discount', 'ConditionalDiscount', 'DiscountAddition',
+                        //                     'DiscountAnd']} 
+                        //     />
+                        // :
                             <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    
-                        )  
+                        // )  
             )
         ];
     };
