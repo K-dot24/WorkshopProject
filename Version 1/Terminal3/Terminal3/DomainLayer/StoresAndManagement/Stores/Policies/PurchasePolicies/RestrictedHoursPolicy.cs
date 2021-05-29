@@ -8,19 +8,37 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 {
     public class RestrictedHoursPolicy : IPurchasePolicy
     {
-        public TimeSpan StartRestrict { get; }
-        public TimeSpan EndRestrict { get; }
-        public Product Product { get; }
+        public TimeSpan StartRestrict { get; set; }
+        public TimeSpan EndRestrict { get; set; }
+        public string ProductId { get; set; }
         public string Id { get; }
 
-        public RestrictedHoursPolicy(TimeSpan startRestrict, TimeSpan endRestrict, Product product, string id = "")
+        public RestrictedHoursPolicy(TimeSpan startRestrict, TimeSpan endRestrict, string productId, string id = "")
         {
             this.Id = id;
             if (id.Equals(""))
                 this.Id = Service.GenerateId();
             this.StartRestrict = startRestrict;
             this.EndRestrict= endRestrict;
-            this.Product = product;
+            this.ProductId = productId;
+        }
+
+        public static Result<IPurchasePolicy> create(Dictionary<string, object> info)
+        {
+            string errorMsg = "Can't create RestrictedHoursPolicy: ";
+            if (!info.ContainsKey("StartRestrict"))
+                return new Result<IPurchasePolicy>(errorMsg + "StartRestrict not found", false, null);
+            TimeSpan startRestrict= (TimeSpan)info["StartRestrict"];
+
+            if (!info.ContainsKey("EndRestrict"))
+                return new Result<IPurchasePolicy>(errorMsg + "EndRestrict not found", false, null);
+            TimeSpan endRestrict = (TimeSpan)info["EndRestrict"];
+
+            if (!info.ContainsKey("ProductId"))
+                return new Result<IPurchasePolicy>(errorMsg + "ProductId not found", false, null);
+            string productId = (string)info["ProductId"];
+
+            return new Result<IPurchasePolicy>("", true, new RestrictedHoursPolicy(startRestrict, endRestrict, productId));
         }
 
         public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
@@ -43,12 +61,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
         public Result<IPurchasePolicyData> GetData()
         {
-            return new Result<IPurchasePolicyData>("", true, new RestrictedHoursPolicyData(StartRestrict, EndRestrict, Product.GetDAL().Data, Id));
+            return new Result<IPurchasePolicyData>("", true, new RestrictedHoursPolicyData(StartRestrict, EndRestrict, ProductId, Id));
         }
 
-        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
+        public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
         {
-            return new Result<bool>("", true, false);
+            if (Id != id)
+                return new Result<bool>("", true, false);
+
+            if (info.ContainsKey("StartRestrict"))
+                StartRestrict  = (TimeSpan)info["StartRestrict"];
+
+            if (info.ContainsKey("EndRestrict"))
+                EndRestrict = (TimeSpan)info["EndRestrict"];
+
+            if (info.ContainsKey("Product"))
+                ProductId = (string)info["Product"];
+
+            return new Result<bool>("", true, true);
         }
     }
 }

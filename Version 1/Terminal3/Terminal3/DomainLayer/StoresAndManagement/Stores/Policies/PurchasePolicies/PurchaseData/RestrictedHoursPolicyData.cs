@@ -9,14 +9,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
     {
         public TimeSpan StartRestrict { get; }
         public TimeSpan EndRestrict { get; }
-        public ProductService Product { get; }
+        public string ProductId { get; }
         public string Id { get; }
 
-        public RestrictedHoursPolicyData(TimeSpan startRestrict, TimeSpan endRestrict, ProductService product, string id)
+        public RestrictedHoursPolicyData(TimeSpan startRestrict, TimeSpan endRestrict, string productId, string id)
         {
             this.StartRestrict = startRestrict;
             this.EndRestrict = endRestrict;
-            this.Product = product;
+            this.ProductId = productId;
             this.Id = id;
         }
     }

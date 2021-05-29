@@ -8,24 +8,41 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 {    
     public class MaxProductPolicy : IPurchasePolicy
     {
-        public Product Product { get; }
-        public int Max { get; }
+        public string ProductId { get; set; }
+        public int Max { get; set; }
         public string Id { get; }
 
-        public MaxProductPolicy(Product product, int max, string id = "")
+        public MaxProductPolicy(string productId, int max, string id = "")
         {
             this.Id = id;
             if (id.Equals(""))
                 this.Id = Service.GenerateId();
-            this.Product = product;
+            this.ProductId = productId;
             this.Max = max;
+        }
+
+        public static Result<IPurchasePolicy> create(Dictionary<string, object> info)
+        {
+            string errorMsg = "Can't create MaxProductPolicy: ";
+            if (!info.ContainsKey("ProductId"))
+                return new Result<IPurchasePolicy>(errorMsg + "ProductId not found", false, null);
+            string productId = (string)info["ProductId"];
+
+            if (!info.ContainsKey("Max"))
+                return new Result<IPurchasePolicy>(errorMsg + "Max not found", false, null);
+            int max = (int)info["Max"];
+
+            return new Result<IPurchasePolicy>("", true, new MaxProductPolicy(productId, max));
         }
 
         public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
         {
             int count;
-            bag.TryGetValue(this.Product, out count);
-            return new Result<bool>("", true, bag.ContainsKey(this.Product) && count <= this.Max);
+            Product product = ContainsProduct(bag);
+            if (product == null)
+                return new Result<bool>("", true, false);
+            bag.TryGetValue(product, out count);
+            return new Result<bool>("", true, count <= this.Max);
         }
 
         public Result<bool> AddPolicy(IPurchasePolicy policy, string id)
@@ -42,12 +59,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
         public Result<IPurchasePolicyData> GetData()
         {
-            return new Result<IPurchasePolicyData>("", true, new MaxProductPolicyData(Product.GetDAL().Data, Max, Id));
+            return new Result<IPurchasePolicyData>("", true, new MaxProductPolicyData(ProductId, Max, Id));
         }
 
-        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
+        public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
         {
-            return new Result<bool>("", true, false);
+            if (Id != id)
+                return new Result<bool>("", true, false);
+
+            if (info.ContainsKey("Max"))
+                Max = (int)info["Max"];
+
+            if (info.ContainsKey("ProductId"))
+                ProductId = (string)info["ProductId"];
+
+            return new Result<bool>("", true, true);
+        }
+
+        private Product ContainsProduct(ConcurrentDictionary<Product, int> products)
+        {
+            foreach (KeyValuePair<Product, int> entry in products)
+            {
+                if (entry.Key.Id.Equals(ProductId))
+                    return entry.Key;
+            }
+            return null;
         }
     }
 }

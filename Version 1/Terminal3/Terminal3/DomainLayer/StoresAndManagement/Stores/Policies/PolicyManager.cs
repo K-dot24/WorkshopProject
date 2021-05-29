@@ -220,7 +220,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         private Result<IPurchasePolicy> CreatePurchasePolicy(Dictionary<string, object> info)
         {
-            return new Result<IPurchasePolicy>("", true, new AndPolicy());
+            if (!info.ContainsKey("type"))
+                return new Result<IPurchasePolicy>("Can't create a discount without a type", false, null);
+
+            string type = (string)info["type"];
+            switch (type)
+            {
+                case "AndPolicy":
+                    return AndPolicy.create(info);
+                case "OrPolicy":
+                    return OrPolicy.create(info);
+                case "ConditionalPolicy":
+                    return ConditionalPolicy.create(info);
+                case "MaxProductPolicy":
+                    return MaxProductPolicy.create(info);
+                case "MinProductPolicy":
+                    return MinProductPolicy.create(info);
+                case "MinAgePolicy":
+                    return MinAgePolicy.create(info);
+                case "RestrictedHoursPolicy":
+                    return RestrictedHoursPolicy.create(info);                 
+
+                default:
+                    return new Result<IPurchasePolicy>("Can't recognise this discount type: " + type, false, null);
+            }
         }
 
         public Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id)
