@@ -32,7 +32,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Discounts.Tests
         {
             IDiscountPolicy p = new VisibleDiscount(DateTime.MaxValue, new DiscountTargetShop(), 10);
             PolicyManager.AddDiscountPolicy(p);
-            Assert.Equal(PolicyManager.MainDiscount.Discounts[0], p);
+            Assert.Equal(PolicyManager.DiscountRoot.Discounts[0], p);
         }
 
         [Fact()]
