@@ -73,24 +73,23 @@ namespace Terminal3.DataAccessLayer
             database = dbClient.GetDatabase("Terminal3-development");
 
             //DAOs
-            //DAO_GuestUser = new DAO<DTO_GuestUser>(database, "Users");
             DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
             DAO_Product = new DAO<DTO_Product>(database, "Products");            
             DAO_StoreManager = new DAO<DTO_StoreManager>(database, "StoreStaffs");
             DAO_StoreOwner = new DAO<DTO_StoreOwner>(database, "StoreStaffs");
             DAO_SystemAdmins = new DAO<DTO_SystemAdmins>(database, "SystemAdmins");
             DAO_Store = new DAO<DTO_Store>(database, "Stores");
-            DAO_Auction = new DAO<DTO_Auction>(database, "Policies");
-            DAO_Lottery = new DAO<DTO_Lottery>(database, "Policies");
-            DAO_MaxProductPolicy = new DAO<DTO_MaxProductPolicy>(database, "Policies");
-            DAO_MinAgePolicy = new DAO<DTO_MinAgePolicy>(database, "Policies");
-            DAO_MinProductPolicy = new DAO<DTO_MinProductPolicy>(database, "Policies");
-            DAO_Offer = new DAO<DTO_Offer>(database, "Policies");
-            DAO_RestrictedHoursPolicy = new DAO<DTO_RestrictedHoursPolicy>(database, "Policies");
-            DAO_AndPolicy = new DAO<DTO_AndPolicy>(database, "Policies");
-            DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "Policies");
-            DAO_BuyNow = new DAO<DTO_BuyNow>(database, "Policies");
-            DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "Policies");
+            DAO_Auction = new DAO<DTO_Auction>(database, "PurchasePolicies");
+            DAO_Lottery = new DAO<DTO_Lottery>(database, "PurchasePolicies");
+            DAO_MaxProductPolicy = new DAO<DTO_MaxProductPolicy>(database, "PurchasePolicies");
+            DAO_MinAgePolicy = new DAO<DTO_MinAgePolicy>(database, "PurchasePolicies");
+            DAO_MinProductPolicy = new DAO<DTO_MinProductPolicy>(database, "PurchasePolicies");
+            DAO_Offer = new DAO<DTO_Offer>(database, "PurchasePolicies");
+            DAO_RestrictedHoursPolicy = new DAO<DTO_RestrictedHoursPolicy>(database, "PurchasePolicies");
+            DAO_AndPolicy = new DAO<DTO_AndPolicy>(database, "PurchasePolicies");
+            DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "PurchasePolicies");
+            DAO_BuyNow = new DAO<DTO_BuyNow>(database, "PurchasePolicies");
+            DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "PurchasePolicies");
             DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
 
             // IdentityMaps  <Id , object>
