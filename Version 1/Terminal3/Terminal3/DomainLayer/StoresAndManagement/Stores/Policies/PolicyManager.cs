@@ -14,9 +14,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
     {
         double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
         Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
-        Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info);
-        Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info, String id);
-        Result<Boolean> AddDiscountCondition(Dictionary<string, object> info, String id);
+        Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info);
+        Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info, String id);
+        Result<IDiscountCondition> AddDiscountCondition(Dictionary<string, object> info, String id);
         Result<Boolean> AddDiscountPolicy(IDiscountPolicy policy);
         Result<Boolean> AddDiscountPolicy(IDiscountPolicy policy, String id);
         Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id);
@@ -26,9 +26,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         Result<Boolean> EditDiscountCondition(Dictionary<string, object> info, String id);
         Result<IDiscountPolicyData> GetDiscountPolicyData();
         Result<IPurchasePolicyData> GetPurchasePolicyData();
-        Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info);
+        Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
-        Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info, string id);
+        Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
         Result<Boolean> RemovePurchasePolicy(string id);
         Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id);
@@ -71,28 +71,41 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return PurchaseRoot.IsConditionMet(products, user);
         }
 
-        public Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info)
+        public Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info)
         {
             Result<IDiscountPolicy> discountResult = CreateDiscount(info);
             if (discountResult.ExecStatus)
-                return AddDiscountPolicy(discountResult.Data);
-            return new Result<bool>(discountResult.Message, false, false);
+            {
+                Result<bool> res = AddDiscountPolicy(discountResult.Data);
+                if (res.ExecStatus)
+                    return new Result<IDiscountPolicy>(res.Message, res.ExecStatus, discountResult.Data);
+            }
+
+            return new Result<IDiscountPolicy>(discountResult.Message, false, null);
         }
 
-        public Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info, String id)
+        public Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info, String id)
         {
             Result<IDiscountPolicy> discountResult = CreateDiscount(info);
             if (discountResult.ExecStatus)
-                return AddDiscountPolicy(discountResult.Data, id);
-            return new Result<bool>(discountResult.Message, false, false);
+            {
+                Result<bool> res = AddDiscountPolicy(discountResult.Data, id);
+                if (res.ExecStatus)
+                    return new Result<IDiscountPolicy>(res.Message, res.ExecStatus, discountResult.Data);
+            }
+            return new Result<IDiscountPolicy>(discountResult.Message, false, null);
         }
 
-        public Result<Boolean> AddDiscountCondition(Dictionary<string, object> info, String id)
+        public Result<IDiscountCondition> AddDiscountCondition(Dictionary<string, object> info, String id)
         {
             Result<IDiscountCondition> discountConditionResult = CreateDiscountCondition(info);
             if (discountConditionResult.ExecStatus)
-                return AddDiscountCondition(discountConditionResult.Data, id);
-            return new Result<bool>(discountConditionResult.Message, false, false);
+            {
+                Result<bool> res = AddDiscountCondition(discountConditionResult.Data, id);
+                if (res.ExecStatus)
+                    return new Result<IDiscountCondition>(res.Message, res.ExecStatus, discountConditionResult.Data);
+            } 
+            return new Result<IDiscountCondition>(discountConditionResult.Message, false, null);
         }
 
         public Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount)
@@ -165,13 +178,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return PurchaseRoot.GetData();
         }
 
-        public Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info)
+        public Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info)
         {
             Result<IPurchasePolicy> result = CreatePurchasePolicy(info);
             if (!result.ExecStatus)
-                return new Result<bool>(result.Message, false, false);
+                return new Result<IPurchasePolicy>(result.Message, false, null);
+
             IPurchasePolicy policy = result.Data;
-            return AddPurchasePolicy(policy);
+            Result<bool> res = AddPurchasePolicy(policy);
+            if (res.ExecStatus)
+            {
+                return new Result<IPurchasePolicy>(res.Message, res.ExecStatus, policy);
+            }
+            return new Result<IPurchasePolicy>(res.Message, res.ExecStatus, null);
         }
 
         public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy)
@@ -186,13 +205,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return result;
         }
 
-        public Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info, String id)
+        public Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, String id)
         {
             Result<IPurchasePolicy> result = CreatePurchasePolicy(info);
             if (!result.ExecStatus)
-                return new Result<bool>(result.Message, false, false);
+                return new Result<IPurchasePolicy>(result.Message, false, null);
+
             IPurchasePolicy policy = result.Data;
-            return AddPurchasePolicy(policy, id);
+            Result<bool> res = AddPurchasePolicy(policy, id);
+            if (res.ExecStatus)
+            {
+                return new Result<IPurchasePolicy>(res.Message, res.ExecStatus, policy);
+            }
+            return new Result<IPurchasePolicy>(res.Message, res.ExecStatus, null);
         }
 
         public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, String id)

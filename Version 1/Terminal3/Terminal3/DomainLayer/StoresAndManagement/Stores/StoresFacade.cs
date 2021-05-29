@@ -49,6 +49,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddDiscountCondition(string storeId, Dictionary<string, object> info, String id);
         Result<Boolean> RemoveDiscountPolicy(string storeId, String id);
         Result<Boolean> RemoveDiscountCondition(string storeId, String id);
+        Result<Boolean> EditDiscountPolicy(string storeId, Dictionary<string, object> info, string id);
+        Result<Boolean> EditDiscountCondition(string storeId, Dictionary<string, object> info, string id);
+        Result<Boolean> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         Result<IDiscountPolicyData> GetPoliciesData(string storeId);
         Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId);
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info);
@@ -276,6 +279,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         #endregion
 
+        #region other
         public Result<History> GetStorePurchaseHistory(string userID, string storeID,bool sysAdmin)
         {
             if(Stores.TryGetValue(storeID, out Store store))
@@ -442,6 +446,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return -1;
         }
 
+        #endregion other
+
         #region Policies
         public Result<bool> AdheresToPolicy(string storeId, ConcurrentDictionary<Product, int> products, User user)
         {
@@ -456,15 +462,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                Result<bool> res = store.AddDiscountPolicy(info);
+                Result<IDiscountPolicy> res = store.AddDiscountPolicy(info);
                 if (res.ExecStatus)
                 {
                     // Update in DB
+                    //mapper.Create(res.Data);      //zoe open
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.DiscountRoot.getDTO());
                     mapper.UpdateStore(filter, update);
+                    return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
-                return res;
+                return new Result<bool>(res.Message, res.ExecStatus, false);
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }
@@ -473,15 +481,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                Result<bool> res = store.AddDiscountPolicy(info, id);
+                Result<IDiscountPolicy> res = store.AddDiscountPolicy(info, id);
                 if (res.ExecStatus)
                 {
                     // Update in DB
+                    //mapper.Create(res.Data);      //zoe open
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.DiscountRoot.getDTO());
                     mapper.UpdateStore(filter, update);
+                    return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
-                return res;
+                return new Result<bool>(res.Message, res.ExecStatus, false);
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }
@@ -490,20 +500,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                Result<bool> res =  store.AddDiscountCondition(info, id);
+                Result<IDiscountCondition> res =  store.AddDiscountCondition(info, id);
                 if (res.ExecStatus)
                 {
                     // Update in DB
+                    //mapper.Create(res.Data);      //zoe open
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.DiscountRoot.getDTO());
                     mapper.UpdateStore(filter, update);
+                    return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
-                return res;
+                return new Result<bool>(res.Message, res.ExecStatus, false);
 
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }
 
+        //TODO DELETE DB
         public Result<bool> RemoveDiscountPolicy(string storeId, string id)
         {
             if (Stores.TryGetValue(storeId, out Store store))
@@ -521,6 +534,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>("Store does not exists\n", false, false);
         }
 
+        //TODO DELETE DB
         public Result<bool> RemoveDiscountCondition(string storeId, string id)
         {
             if (Stores.TryGetValue(storeId, out Store store))
@@ -547,11 +561,63 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<IDiscountPolicyData>("Store does not exists\n", false, null);
         }
 
+        //TODO DELETE DB
         public Result<bool> RemovePurchasePolicy(string storeId, string id)
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
                 Result<bool> res =  store.RemovePurchasePolicy(id);
+                if (res.ExecStatus)
+                {
+                    // Update in DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", store.PolicyManager.PurchaseRoot.getDTO());
+                    mapper.UpdateStore(filter, update);
+                }
+                return res;
+            }
+            return new Result<bool>("Store does not exists\n", false, false);
+        }
+
+        public Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            if (Stores.TryGetValue(storeId, out Store store))
+            {
+                Result<bool> res = store.EditDiscountPolicy(info, id);
+                if (res.ExecStatus)
+                {
+                    // Update in DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.DiscountRoot.getDTO());
+                    mapper.UpdateStore(filter, update);
+                }
+                return res;
+            }
+            return new Result<bool>("Store does not exists\n", false, false);
+        }
+
+        public Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, string id)
+        {
+            if (Stores.TryGetValue(storeId, out Store store))
+            {
+                Result<bool> res = store.EditDiscountCondition(info, id);
+                if (res.ExecStatus)
+                {
+                    // Update in DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var update = Builders<BsonDocument>.Update.Set("DiscountRoot", store.PolicyManager.DiscountRoot.getDTO());
+                    mapper.UpdateStore(filter, update);
+                }
+                return res;
+            }
+            return new Result<bool>("Store does not exists\n", false, false);
+        }
+
+        public Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            if (Stores.TryGetValue(storeId, out Store store))
+            {
+                Result<bool> res = store.EditPurchasePolicy(info, id);
                 if (res.ExecStatus)
                 {
                     // Update in DB
@@ -577,15 +643,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                Result<bool> res = store.AddPurchasePolicy(info);
+                Result<IPurchasePolicy> res = store.AddPurchasePolicy(info);
                 if (res.ExecStatus)
                 {
                     // Update in DB
+                    //mapper.Create(res.Data);      //zoe open
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", store.PolicyManager.PurchaseRoot.getDTO());
                     mapper.UpdateStore(filter, update);
+                    return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
-                return res;
+                return new Result<bool>(res.Message, res.ExecStatus, false);
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }
@@ -594,56 +662,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                Result<bool> res =  store.AddPurchasePolicy(info, id);
+                Result<IPurchasePolicy> res =  store.AddPurchasePolicy(info, id);
                 if (res.ExecStatus)
                 {
                     // Update in DB
+                    //mapper.Create(res.Data);      //zoe open
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", store.PolicyManager.PurchaseRoot.getDTO());
                     mapper.UpdateStore(filter, update);
+                    return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
-                return res;
+                return new Result<bool>(res.Message, res.ExecStatus, false);
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }
+
         public void resetSystem()
         {
             Stores.Clear();
         }
 
-        public void updateDiscount(string storeID)
-        {
-            Stores.TryGetValue(storeID, out Store store);
-
-            // Update Store in DB
-            LinkedList<String> discounts = new LinkedList<string>();
-            List<IDiscountPolicy> policies = store.PolicyManager.DiscountRoot.Discounts;
-            foreach (var policy in policies)
-            {
-                discounts.AddLast(policy.Id); 
-            }
-
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-            var update = Builders<BsonDocument>.Update.Set("DiscountRoot", discounts);
-            mapper.UpdateStore(filter, update);
-        }
-
-        public void updatePurchase(string storeID)
-        {
-            Stores.TryGetValue(storeID, out Store store);
-
-            // Update Store in DB
-            LinkedList<String> discounts = new LinkedList<string>();
-            List<IPurchasePolicy> policies = store.PolicyManager.PurchaseRoot.Policy.Policies;
-            foreach (var policy in policies)
-            {
-                discounts.AddLast(policy.Id);
-            }
-
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-            var update = Builders<BsonDocument>.Update.Set("PurchaseRoot", discounts);
-            mapper.UpdateStore(filter, update);
-        }
+        #endregion Policies
 
         // Get reciptes for owner in store 
         public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id)
@@ -709,6 +748,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             { return new Result<List<Tuple<DateTime, Double>>>("End date cannot be before start date", false, null); }
         }
 
-        #endregion Policies
+       
     }
 }
