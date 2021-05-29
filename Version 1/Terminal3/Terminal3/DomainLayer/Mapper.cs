@@ -76,8 +76,8 @@ namespace Terminal3.DataAccessLayer
             //DAO_GuestUser = new DAO<DTO_GuestUser>(database, "Users");
             DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
             DAO_Product = new DAO<DTO_Product>(database, "Products");            
-            DAO_StoreManager = new DAO<DTO_StoreManager>(database, "Users");
-            DAO_StoreOwner = new DAO<DTO_StoreOwner>(database, "Users");
+            DAO_StoreManager = new DAO<DTO_StoreManager>(database, "StoreStaffs");
+            DAO_StoreOwner = new DAO<DTO_StoreOwner>(database, "StoreStaffs");
             DAO_SystemAdmins = new DAO<DTO_SystemAdmins>(database, "SystemAdmins");
             DAO_Store = new DAO<DTO_Store>(database, "Stores");
             DAO_Auction = new DAO<DTO_Auction>(database, "Policies");
@@ -791,6 +791,28 @@ namespace Terminal3.DataAccessLayer
             Stores.TryRemove(deletedStore._id, out Store s);
         }
 
+        public List<Store> LoadAllStores()
+        {
+            //load all stores dto
+            var filter = Builders<BsonDocument>.Filter.Empty;
+            List<BsonDocument> docs = DAO_Store.collection.Find(filter).ToList();
+            List<DTO_Store> storesDTOs = new List<DTO_Store>();
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                DTO_Store dto = JsonConvert.DeserializeObject<DTO_Store>(json);
+                storesDTOs.Add(dto);
+            }
+            List<Store> stores = new List<Store>();
+            foreach(DTO_Store dto in storesDTOs)
+            {
+                Store s = LoadStore(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
+                stores.Add(s);
+            }
+            return stores;
+        }
+
         #endregion Store
 
         #endregion Stores
@@ -1234,6 +1256,7 @@ namespace Terminal3.DataAccessLayer
                 database.GetCollection<BsonDocument>("SystemAdmins").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("Users").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("Recipts").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("StoreStaffs").DeleteMany(emptyFilter);
 
                 RegisteredUsers.Clear();
                 GuestUsers.Clear();

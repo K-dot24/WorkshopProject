@@ -60,16 +60,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     public class StoresFacade : IStoresFacade
     {
         public ConcurrentDictionary<String, Store> Stores { get; }
-        //public ConcurrentDictionary<String, Store> ClosedStores { get; }
-
         public Mapper mapper; 
 
         //TODO: Change constructor if needed (initializer?)
         public StoresFacade()
         {
             Stores = new ConcurrentDictionary<String, Store>();
-            //ClosedStores = new ConcurrentDictionary<String, Store>();
             mapper = Mapper.getInstance();
+            loadStores();
         }
 
         //TODO: Implement all functions
@@ -646,5 +644,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             else
             { return new Result<List<Tuple<DateTime, Double>>>("End date cannot be before start date", false, null); }
         }
+
+        public void loadStores ()
+        {
+            List<Store> storesList = mapper.LoadAllStores();
+            foreach(Store store in storesList)
+            {
+                Stores.TryAdd(store.Id, store);
+            }
+
+        }
+
     }
 }
