@@ -51,15 +51,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<bool>("", true, false);
         }
 
-        public DTO_MaxProductPolicy getDTO()
-        {
-            return new DTO_MaxProductPolicy(this.Id, this.Product.Id, this.Max);
-        }
-
-        public DTO_MaxProductPolicy getDTO()
-        {
-            return new DTO_MaxProductPolicy(this.Id, this.Product.Id, this.Max);
-        }
     }
 
 }

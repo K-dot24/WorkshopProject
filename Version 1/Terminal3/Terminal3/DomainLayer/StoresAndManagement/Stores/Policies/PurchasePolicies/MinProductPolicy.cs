@@ -55,9 +55,5 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new DTO_MinProductPolicy(this.Id, this.Product.Id, this.Min);
         }
 
-        public DTO_MinProductPolicy getDTO()
-        {
-            return new DTO_MinProductPolicy(this.Id, this.Product.Id, this.Min);
-        }
     }
 }
