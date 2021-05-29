@@ -7,13 +7,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 {
     public class MinProductPolicyData : IPurchasePolicyData
     {
-        public string ProductId { get; }
+        public ProductService Product { get; }
         public int Min { get; }
         public string Id { get; }
 
-        public MinProductPolicyData(string productId, int min, string id)
+        public MinProductPolicyData(ProductService product, int min, string id)
         {
-            this.ProductId = productId;
+            this.Product = product;
             this.Min = min;
             this.Id = id;
         }

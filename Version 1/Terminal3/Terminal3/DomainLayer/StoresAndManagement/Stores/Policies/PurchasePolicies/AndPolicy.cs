@@ -26,12 +26,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             if (policies != null)
                 this.Policies = policies;
         }
-
-        public static Result<IPurchasePolicy> create(Dictionary<string, object> info)
-        {        
-            return new Result<IPurchasePolicy>("", true, new AndPolicy());
-        }
-
+        
         public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
         {
             bool res = true;
@@ -89,22 +84,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<IPurchasePolicyData>("",true, new AndPolicyData(dataPolicies, Id));
         }
 
-        public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
+        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
         {
-            if (Id != id)
+            if (Policies.RemoveAll(p => p.Id.Equals(id)) >= 1)
             {
-                foreach (IPurchasePolicy myDiscount in Policies)
-                {
-                    Result<bool> result = myDiscount.EditPolicy(info, id);
-                    if (result.ExecStatus && result.Data)
-                        return result;
-                    if (!result.ExecStatus)
-                        return result;
-                }
-                return new Result<bool>("", true, false);
+                Policies.Add(policy);
+                return new Result<bool>("", true, true);
             }
 
-            return new Result<bool>("", true, true);
+            foreach (IPurchasePolicy p in Policies)
+            {
+                Result<bool> res = p.EditPolicy(policy, id);                
+                if (res.Data)
+                    return res;
+            }
+            return new Result<bool>("", true, false);
         }
 
         public DTO_AndPolicy getDTO()

@@ -481,10 +481,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
                 Result<ShoppingCart> ShoppingCart = registerd_user.Purchase(paymentDetails, deliveryDetails);
-                // Update DB
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
-                var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.Data.getDTO());
-                mapper.UpdateRegisteredUser(filter, update);
+                if (ShoppingCart.ExecStatus)
+                {
+                    // Update DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
+                    var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.Data.getDTO());
+                    mapper.UpdateRegisteredUser(filter, update);
+                }
 
                 return ShoppingCart; 
             }

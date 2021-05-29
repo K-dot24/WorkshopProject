@@ -9,11 +9,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     {
 
         public int MinQuantity { get; }
-        public String ProductId { get; }
+        public ProductService Product { get; }
 
-        public MinProductConditionData(String productId, int minQuantity, String id = "") : base(id)
+        public MinProductConditionData(ProductService product, int minQuantity, String id = "") : base(id)
         {
-            ProductId = productId;
+            Product = product;
             MinQuantity = minQuantity;
         }
 
