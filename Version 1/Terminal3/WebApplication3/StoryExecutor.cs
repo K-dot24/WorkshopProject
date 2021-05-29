@@ -30,13 +30,18 @@ namespace Terminal3WebAPI
                                         { "AddStoreManager",new Func< String , String , String ,Result<Boolean>>(system.AddStoreManager)}
                                     };
 
-            string json = File.ReadAllText(@"stories.json");
-            StoryConfig storyConfig = JsonConvert.DeserializeObject<StoryConfig>(json);
-            foreach (Story story in storyConfig.story)
+            string path = @"stories.json";
+            if (File.Exists(path))
             {
+                string json = File.ReadAllText(path);
+                StoryConfig storyConfig = JsonConvert.DeserializeObject<StoryConfig>(json);
+                foreach (Story story in storyConfig.story)
+                {
 
-                functionDict[story.function].DynamicInvoke(convertArgs(functionDict[story.function], story.args));
+                    functionDict[story.function].DynamicInvoke(convertArgs(functionDict[story.function], story.args));
+                }            
             }
+
         }
 
         public object[] convertArgs(Delegate function, object[] args)

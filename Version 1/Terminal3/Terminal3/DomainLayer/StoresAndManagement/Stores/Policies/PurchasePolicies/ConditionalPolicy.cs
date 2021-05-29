@@ -28,6 +28,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             this.Cond = cond;
         }
 
+        public static Result<IPurchasePolicy> create(Dictionary<string, object> info)
+        {            
+            return new Result<IPurchasePolicy>("", true, new ConditionalPolicy());
+        }
+
         public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
         {
             if(this.PreCond == null || this.Cond == null)
@@ -101,31 +106,54 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<IPurchasePolicyData>("", true, new ConditionalPolicyData(pre, cond, Id));
         }
 
-        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
+        public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
         {
-            if(PreCond != null)
+            if (Id != id)
             {
-                if (PreCond.Id.Equals(id))
-                {
-                    PreCond = policy;
-                    return new Result<bool>("", true, true);
+                if (PreCond != null) {
+                    Result<bool> result = PreCond.EditPolicy(info, id);
+                    if (result.ExecStatus && result.Data)
+                        return result;
+                    if (!result.ExecStatus)
+                        return result;
                 }
-                Result<bool> res = PreCond.EditPolicy(policy, id);
-                if (res.Data)
-                    return res;
+                if (Cond != null)
+                {
+                    Result<bool> result = Cond.EditPolicy(info, id);
+                    if (result.ExecStatus && result.Data)
+                        return result;
+                    if (!result.ExecStatus)
+                        return result;
+                }
+                return new Result<bool>("", true, false);
             }
-            if (Cond != null)
+                return new Result<bool>("", true, true);                    
+        }
+
+        public DTO_ConditionalPolicy getDTO()
+        {
+            List<IPurchasePolicy> list = new List<IPurchasePolicy>();
+            list.Add(this.PreCond);
+            ConcurrentDictionary<String, String> PreCond = getPoliciesIDs(list);
+
+            List<IPurchasePolicy> list2 = new List<IPurchasePolicy>();
+            list2.Add(this.Cond);
+            ConcurrentDictionary<String, String> Cond = getPoliciesIDs(list2);
+
+
+            return new DTO_ConditionalPolicy(this.Id, PreCond, Cond);
+        }
+
+        private ConcurrentDictionary<String, String> getPoliciesIDs(List<IPurchasePolicy> list)
+        {
+            ConcurrentDictionary<String, String> Policies = new ConcurrentDictionary<String, String>();
+            foreach (IPurchasePolicy policy in list)
             {
-                if (Cond.Id.Equals(id))
-                {
-                    Cond = policy;
-                    return new Result<bool>("", true, true);
-                }
-                Result<bool> res = Cond.EditPolicy(policy, id);
-                if (res.Data)
-                    return res;
-            }                        
-            return new Result<bool>("", true, false);
+                string[] type = policy.GetType().ToString().Split('.');
+                string policy_type = type[type.Length - 1];
+                Policies.TryAdd(policy_type, policy.Id);
+            }
+            return Policies;
         }
 
         public DTO_ConditionalPolicy getDTO()

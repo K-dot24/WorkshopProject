@@ -867,7 +867,7 @@ namespace Terminal3.DataAccessLayer
 
         public void Create(MaxProductPolicy maxProductPolicy)
         {            
-            DAO_MaxProductPolicy.Create(new DTO_MaxProductPolicy(maxProductPolicy.Id, maxProductPolicy.Product.Id, maxProductPolicy.Max));
+            DAO_MaxProductPolicy.Create(new DTO_MaxProductPolicy(maxProductPolicy.Id, maxProductPolicy.ProductId, maxProductPolicy.Max));
             Policy_MaxProductPolicys.TryAdd(maxProductPolicy.Id, maxProductPolicy);
         }
 
@@ -880,7 +880,7 @@ namespace Terminal3.DataAccessLayer
                 return m;
             }
             var product_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Product);
-            m = new MaxProductPolicy(LoadProduct(product_filter), dto.Max, dto._id);
+            m = new MaxProductPolicy(LoadProduct(product_filter).Id, dto.Max, dto._id);
             Policy_MaxProductPolicys.TryAdd(m.Id, m);
             return m;
         }
@@ -930,7 +930,7 @@ namespace Terminal3.DataAccessLayer
 
         public void Create(MinProductPolicy minProductPolicy)
         {
-            DAO_MinProductPolicy.Create(new DTO_MinProductPolicy(minProductPolicy.Id, minProductPolicy.Product.Id , minProductPolicy.Min));
+            DAO_MinProductPolicy.Create(new DTO_MinProductPolicy(minProductPolicy.Id, minProductPolicy.ProductId , minProductPolicy.Min));
             Policy_MinProductPolicys.TryAdd(minProductPolicy.Id, minProductPolicy);
         }
 
@@ -943,7 +943,7 @@ namespace Terminal3.DataAccessLayer
                 return m;
             }
             var product_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Product);
-            m = new MinProductPolicy(LoadProduct(product_filter), dto.Min, dto._id);
+            m = new MinProductPolicy(LoadProduct(product_filter).Id, dto.Min, dto._id);
             Policy_MinProductPolicys.TryAdd(m.Id, m);
             return m;
         }
@@ -994,7 +994,7 @@ namespace Terminal3.DataAccessLayer
 
         public void Create(RestrictedHoursPolicy restrictedHoursPolicy)
         {
-            DAO_RestrictedHoursPolicy.Create(new DTO_RestrictedHoursPolicy(restrictedHoursPolicy.Id, restrictedHoursPolicy.StartRestrict.ToString(), restrictedHoursPolicy.EndRestrict.ToString(), restrictedHoursPolicy.Product.Id));
+            DAO_RestrictedHoursPolicy.Create(new DTO_RestrictedHoursPolicy(restrictedHoursPolicy.Id, restrictedHoursPolicy.StartRestrict.ToString(), restrictedHoursPolicy.EndRestrict.ToString(), restrictedHoursPolicy.ProductId));
             Policy_RestrictedHoursPolicys.TryAdd(restrictedHoursPolicy.Id, restrictedHoursPolicy);
         }
 
@@ -1008,7 +1008,7 @@ namespace Terminal3.DataAccessLayer
             }
 
             var product_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Product);
-            r = new RestrictedHoursPolicy(TimeSpan.Parse(dto.StartRestrict), TimeSpan.Parse(dto.EndRestrict), LoadProduct(product_filter), dto._id);
+            r = new RestrictedHoursPolicy(DateTime.Parse(dto.StartRestrict), DateTime.Parse(dto.EndRestrict), LoadProduct(product_filter).Id, dto._id);
             Policy_RestrictedHoursPolicys.TryAdd(r.Id, r);
             return r;
         }
