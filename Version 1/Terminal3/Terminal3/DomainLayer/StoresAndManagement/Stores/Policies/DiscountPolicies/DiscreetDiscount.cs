@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
@@ -24,7 +23,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             string errorMsg = "Can't create DiscreetDiscount: ";
             if (!info.ContainsKey("DiscountCode"))
                 return new Result<IDiscountPolicy>(errorMsg + "DiscountCode not found", false, null);
-            String discountCode = ((JsonElement)info["DiscountCode"]).GetString();
+            String discountCode = (String)info["DiscountCode"];
 
             return new Result<IDiscountPolicy>("", true, new DiscreetDiscount(null, discountCode));
         }
@@ -87,7 +86,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             }
 
             if (info.ContainsKey("DiscountCode"))
-                DiscountCode = ((JsonElement)info["DiscountCode"]).GetString();
+                DiscountCode = (String)info["DiscountCode"];
 
             return new Result<bool>("", true, true);
         }

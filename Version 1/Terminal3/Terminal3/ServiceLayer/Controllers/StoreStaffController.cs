@@ -6,6 +6,7 @@ using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 
 namespace Terminal3.ServiceLayer.Controllers
 {

@@ -9,11 +9,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     {
 
         public int MaxQuantity { get; }
-        public String ProductId { get; }
+        public ProductService Product { get; }
 
-        public MaxProductConditionData(String productId, int maxQuantity, String id = "") : base(id)
+        public MaxProductConditionData(ProductService product, int maxQuantity, String id = "") : base(id)
         {
-            ProductId = productId;
+            Product = product;
             MaxQuantity = maxQuantity;
         }
 

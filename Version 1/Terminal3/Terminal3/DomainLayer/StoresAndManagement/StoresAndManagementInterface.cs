@@ -9,6 +9,7 @@ using System.Linq;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DataAccessLayer;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
@@ -524,80 +525,67 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.AddDiscountPolicy(info);
+            return StoresFacade.AddDiscountPolicy(storeId, info);
         }
 
         public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.AddDiscountPolicy(info, id);
+            return StoresFacade.AddDiscountPolicy(storeId ,info, id);
         }
 
         public Result<bool> AddDiscountCondition(string storeId, Dictionary<string, object> info, string id)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.AddDiscountCondition(info, id);
+            return StoresFacade.AddDiscountCondition(storeId, info, id);
         }
 
         public Result<bool> RemoveDiscountPolicy(string storeId, string id)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.RemoveDiscountPolicy(id);
+            return StoresFacade.RemoveDiscountPolicy(storeId,id);
         }
 
         public Result<bool> RemoveDiscountCondition(string storeId, string id)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.RemoveDiscountCondition(id);
+            return StoresFacade.RemoveDiscountCondition(storeId ,id);
         }
 
         public Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.EditDiscountPolicy(info, id);
+            return StoresFacade.EditDiscountPolicy(storeId ,info, id);
         }
 
         public Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, string id)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.EditDiscountCondition(info, id);
+            return StoresFacade.EditDiscountCondition(storeId ,info, id);
         }
 
         public Result<IDiscountPolicyData> GetPoliciesData(string storeId)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.GetPoliciesData();
+            return StoresFacade.GetPoliciesData(storeId);
         }
 
         public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.GetPurchasePolicyData();
+            return StoresFacade.GetPurchasePolicyData(storeId);
         }
 
         public Result<bool> RemovePurchasePolicy(string storeId, string id)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.RemovePurchasePolicy(id);
+            return StoresFacade.RemovePurchasePolicy(storeId , id);
         }
 
         public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.AddPurchasePolicy(info);
+            return StoresFacade.AddPurchasePolicy(storeId ,info);
         }
 
         public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.AddPurchasePolicy(info, id);
+            return StoresFacade.AddPurchasePolicy(storeId ,info, id);
         }
 
         public Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
         {
-            Store store = StoresFacade.Stores[storeId];
-            return store.EditPurchasePolicy(info, id);
+            return StoresFacade.EditPurchasePolicy(storeId ,info, id);
         }
 
         public void resetSystem()

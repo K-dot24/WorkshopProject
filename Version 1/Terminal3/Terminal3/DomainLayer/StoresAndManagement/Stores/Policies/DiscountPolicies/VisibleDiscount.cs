@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountTargetsData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountTargets;
@@ -33,34 +32,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             string errorMsg = "Can't create VisibleDiscount: ";
             if (!info.ContainsKey("ExpirationDate"))
                 return new Result<IDiscountPolicy>(errorMsg + "ExpirationDate not found", false, null);
-            DateTime expirationDate = createDateTime((JsonElement)info["ExpirationDate"]);
+            DateTime expirationDate = (DateTime)info["ExpirationDate"];
 
             if (!info.ContainsKey("Percentage"))
                 return new Result<IDiscountPolicy>(errorMsg + "Percentage not found", false, null);
-            Double percentage = ((JsonElement)info["Percentage"]).GetDouble();
+            Double percentage = (Double)info["Percentage"];
 
             if (!info.ContainsKey("Target"))
                 return new Result<IDiscountPolicy>(errorMsg + "Target not found", false, null);
+            Dictionary<string, object> targetInfo = (Dictionary<string, object>)info["Target"];
 
-            Result<IDiscountTarget> targetResult = createTarget((JsonElement)info["Target"]);
+            Result<IDiscountTarget> targetResult = createTarget(targetInfo);
             if (!targetResult.ExecStatus)
                 return new Result<IDiscountPolicy>(targetResult.Message, false, null);
 
             return new Result<IDiscountPolicy>("", true, new VisibleDiscount(expirationDate, targetResult.Data, percentage));
-        }
-
-        private static DateTime createDateTime(JsonElement timeElement)
-        {
-            String timeString = timeElement.GetString();
-            DateTime time = DateTime.ParseExact(timeString, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
-            return time;
-        }
-
-        private static Result<IDiscountTarget> createTarget(JsonElement targetElement)
-        {
-            Dictionary<string, object> targetDict = JsonSerializer.Deserialize<Dictionary<string, object>>(targetElement.GetRawText());
-
-            return createTarget(targetDict);
         }
 
         public override Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
@@ -120,7 +106,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (!info.ContainsKey("type"))
                 return new Result<IDiscountTarget>("Can't create a target without a type", false, null);
 
-            string type = ((JsonElement)info["type"]).ToString();
+            string type = (string)info["type"];
             switch (type)
             {
                 case "DiscountTargetShop":
@@ -140,15 +126,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 return new Result<bool>("", true, false);
 
             if (info.ContainsKey("ExpirationDate"))
-                //ExpirationDate = (DateTime)info["ExpirationDate"];
-                ExpirationDate = createDateTime((JsonElement)info["ExpirationDate"]);
+                ExpirationDate = (DateTime)info["ExpirationDate"];
 
             if (info.ContainsKey("Percentage"))
-                Percentage = ((JsonElement)info["Percentage"]).GetDouble();
+                Percentage = (double)info["Percentage"];
 
             if (info.ContainsKey("Target"))
             {
-                Result<IDiscountTarget> targetResult = createTarget((JsonElement)info["Target"]);
+                Result<IDiscountTarget> targetResult = createTarget((Dictionary<string, object>)info["Target"]);
                 if (!targetResult.ExecStatus)
                     return new Result<bool>(targetResult.Message, false, false);
 

@@ -28,11 +28,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             this.Cond = cond;
         }
 
-        public static Result<IPurchasePolicy> create(Dictionary<string, object> info)
-        {            
-            return new Result<IPurchasePolicy>("", true, new ConditionalPolicy());
-        }
-
         public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
         {
             if(this.PreCond == null || this.Cond == null)
@@ -106,28 +101,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<IPurchasePolicyData>("", true, new ConditionalPolicyData(pre, cond, Id));
         }
 
-        public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
+        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
         {
-            if (Id != id)
+            if(PreCond != null)
             {
-                if (PreCond != null) {
-                    Result<bool> result = PreCond.EditPolicy(info, id);
-                    if (result.ExecStatus && result.Data)
-                        return result;
-                    if (!result.ExecStatus)
-                        return result;
-                }
-                if (Cond != null)
+                if (PreCond.Id.Equals(id))
                 {
-                    Result<bool> result = Cond.EditPolicy(info, id);
-                    if (result.ExecStatus && result.Data)
-                        return result;
-                    if (!result.ExecStatus)
-                        return result;
+                    PreCond = policy;
+                    return new Result<bool>("", true, true);
                 }
-                return new Result<bool>("", true, false);
+                Result<bool> res = PreCond.EditPolicy(policy, id);
+                if (res.Data)
+                    return res;
             }
-                return new Result<bool>("", true, true);                    
+            if (Cond != null)
+            {
+                if (Cond.Id.Equals(id))
+                {
+                    Cond = policy;
+                    return new Result<bool>("", true, true);
+                }
+                Result<bool> res = Cond.EditPolicy(policy, id);
+                if (res.Data)
+                    return res;
+            }                        
+            return new Result<bool>("", true, false);
         }
 
         public DTO_ConditionalPolicy getDTO()

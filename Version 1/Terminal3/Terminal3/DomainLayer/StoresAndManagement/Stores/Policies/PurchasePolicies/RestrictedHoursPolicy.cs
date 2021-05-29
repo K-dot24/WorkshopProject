@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.Json;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
@@ -10,42 +9,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 {
     public class RestrictedHoursPolicy : IPurchasePolicy
     {
-        public DateTime StartRestrict { get; set; }
-        public DateTime EndRestrict { get; set; }
-        public string ProductId { get; set; }
+        public TimeSpan StartRestrict { get; }
+        public TimeSpan EndRestrict { get; }
+        public Product Product { get; }
         public string Id { get; }
 
-        public RestrictedHoursPolicy(DateTime startRestrict, DateTime endRestrict, string productId, string id = "")
+        public RestrictedHoursPolicy(TimeSpan startRestrict, TimeSpan endRestrict, Product product, string id = "")
         {
             this.Id = id;
             if (id.Equals(""))
                 this.Id = Service.GenerateId();
             this.StartRestrict = startRestrict;
             this.EndRestrict= endRestrict;
-            this.ProductId = productId;
-        }
-
-        public static Result<IPurchasePolicy> create(Dictionary<string, object> info)
-        {
-            string errorMsg = "Can't create RestrictedHoursPolicy: ";
-            if (!info.ContainsKey("StartRestrict"))
-                return new Result<IPurchasePolicy>(errorMsg + "StartRestrict not found", false, null);
-            DateTime startRestrict= createDateTime((JsonElement)info["StartRestrict"]);
-
-            if (!info.ContainsKey("EndRestrict"))
-                return new Result<IPurchasePolicy>(errorMsg + "EndRestrict not found", false, null);
-            DateTime endRestrict = createDateTime((JsonElement)info["EndRestrict"]);
-
-            if (!info.ContainsKey("ProductId"))
-                return new Result<IPurchasePolicy>(errorMsg + "ProductId not found", false, null);
-            string productId = (string)info["ProductId"];
-
-            return new Result<IPurchasePolicy>("", true, new RestrictedHoursPolicy(startRestrict, endRestrict, productId));
+            this.Product = product;
         }
 
         public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
         {
-            DateTime now = DateTime.Now;
+            TimeSpan now = DateTime.Now.TimeOfDay;
             return new Result<bool>("", true, now > EndRestrict && now < StartRestrict);
         }
 
@@ -63,36 +44,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
         public Result<IPurchasePolicyData> GetData()
         {
-            return new Result<IPurchasePolicyData>("", true, new RestrictedHoursPolicyData(StartRestrict, EndRestrict, ProductId, Id));
+            return new Result<IPurchasePolicyData>("", true, new RestrictedHoursPolicyData(StartRestrict, EndRestrict, Product.GetDAL().Data, Id));
         }
 
-        public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
+        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
         {
-            if (Id != id)
-                return new Result<bool>("", true, false);
-
-            if (info.ContainsKey("StartRestrict"))
-                StartRestrict  = createDateTime((JsonElement)info["StartRestrict"]);
-
-            if (info.ContainsKey("EndRestrict"))
-                EndRestrict = createDateTime((JsonElement)info["EndRestrict"]);
-
-            if (info.ContainsKey("ProductId"))
-                ProductId = ((JsonElement)info["ProductId"]).GetString();
-
-            return new Result<bool>("", true, true);
-        }
-
-        private static DateTime createDateTime(JsonElement timeElement)
-        {
-            String timeString = timeElement.GetString();
-            DateTime time = DateTime.ParseExact(timeString, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
-            return time;
+            return new Result<bool>("", true, false);
         }
 
         public DTO_RestrictedHoursPolicy getDTO()
         {
-            return new DTO_RestrictedHoursPolicy(this.Id, this.StartRestrict.ToString(), this.EndRestrict.ToString(), this.ProductId);
+            return new DTO_RestrictedHoursPolicy(this.Id, this.StartRestrict.ToString(), this.EndRestrict.ToString(), this.Product.Id);
         }
     }
 }
