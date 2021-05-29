@@ -319,7 +319,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             {
                 Console.WriteLine("A SynchronizationLockException occurred. Message:");
                 Console.WriteLine(SyncEx.Message);
-                return new Result<Boolean>(SyncEx.Message, false, false);
+                return new Result<StoreManager>(SyncEx.Message, false, null);
             }
         }
 
