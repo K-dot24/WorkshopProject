@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
@@ -47,6 +48,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
         {
             return new Result<bool>("", true, false);
+        }
+
+        public DTO_MinProductPolicy getDTO()
+        {
+            return new DTO_MinProductPolicy(this.Id, this.Product.Id, this.Min);
         }
     }
 }

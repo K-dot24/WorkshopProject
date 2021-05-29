@@ -20,4 +20,8 @@
     <ProjectReference Include="..\WebApplication1\SignalRgateway.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DataAccessLayer\DTOs\Policies\Discount\" />
+  </ItemGroup>
+
 </Project>

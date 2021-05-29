@@ -13,9 +13,9 @@ namespace Terminal3.DataAccessLayer.DTOs.Policies
         public List<String> DiscountRoot { get; set; } // List of IDiscountPolicy ids 
 
         [BsonElement]
-        public String PurchaseRoot { get; set; }  //And policy id
+        public DTO_BuyNow PurchaseRoot { get; set; }  
 
-        public DTO_PolicyManager(string id, List<String> discount, String purchase)
+        public DTO_PolicyManager(string id, List<String> discount, DTO_BuyNow purchase)
         {
             _id = id;
             DiscountRoot = discount;

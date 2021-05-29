@@ -358,6 +358,7 @@ namespace Terminal3.DataAccessLayer
         }
         private void AddToDB(String type , IPurchasePolicy policy)
         {
+            // shaked 
             switch (type)
             {
                 case "AndPolicy":
