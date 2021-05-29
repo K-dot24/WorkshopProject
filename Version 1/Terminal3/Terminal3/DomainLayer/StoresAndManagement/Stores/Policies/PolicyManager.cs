@@ -33,7 +33,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
         Result<Boolean> RemovePurchasePolicy(string id);
         Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id);
-        Result<bool> EditPurchasePolicy(IPurchasePolicy policy, string id);
     }
 
     public class PolicyManager : IPolicyManager
@@ -222,26 +221,40 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         private Result<IPurchasePolicy> CreatePurchasePolicy(Dictionary<string, object> info)
         {
-            return new Result<IPurchasePolicy>("", true, new AndPolicy());
+            if (!info.ContainsKey("type"))
+                return new Result<IPurchasePolicy>("Can't create a discount without a type", false, null);
+
+            string type = (string)info["type"];
+            switch (type)
+            {
+                case "AndPolicy":
+                    return AndPolicy.create(info);
+                case "OrPolicy":
+                    return OrPolicy.create(info);
+                case "ConditionalPolicy":
+                    return ConditionalPolicy.create(info);
+                case "MaxProductPolicy":
+                    return MaxProductPolicy.create(info);
+                case "MinProductPolicy":
+                    return MinProductPolicy.create(info);
+                case "MinAgePolicy":
+                    return MinAgePolicy.create(info);
+                case "RestrictedHoursPolicy":
+                    return RestrictedHoursPolicy.create(info);                 
+
+                default:
+                    return new Result<IPurchasePolicy>("Can't recognise this discount type: " + type, false, null);
+            }
         }
 
         public Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id)
         {
-            Result<IPurchasePolicy> result = CreatePurchasePolicy(info);
-            if (!result.ExecStatus)
-                return new Result<bool>(result.Message, false, false);
-            IPurchasePolicy policy = result.Data;
-            return EditPurchasePolicy(policy, id);
-        }
-
-        public Result<bool> EditPurchasePolicy(IPurchasePolicy policy, string id)
-        {
-            Result<bool> result = MainPolicy.EditPolicy(policy, id);
+            Result<bool> result = MainPolicy.EditPolicy(info, id);
             if (result.ExecStatus)
             {
                 if (result.Data)
-                    return new Result<bool>("The policy has been edited successfully", true, true);
-                else return new Result<bool>(result.Message, false, false);
+                    return new Result<bool>("The Purchase policy has been edited successfully", true, true);
+                else return new Result<bool>($"The Purchase policy edit failed because the policy with an id ${id} was not found", false, false);
             }
             return result;
         }

@@ -27,7 +27,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [Trait("Category", "Unit")]      
         public void AddPolicyTest()
         {
-            IPurchasePolicy policy = new MaxProductPolicy(Products["Bread"], 10);            
+            IPurchasePolicy policy = new MaxProductPolicy(Products["Bread"].Id, 10);            
             Assert.Empty(PolicyManager.MainPolicy.Policy.Policies);
             PolicyManager.AddPurchasePolicy(policy);
             Assert.Equal(PolicyManager.MainPolicy.Policy.Policies[0], policy);
@@ -37,7 +37,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [Trait("Category", "Unit")]        
         public void AddPolicyToTest()
         {
-            IPurchasePolicy policy = new MinProductPolicy(Products["Bread"], 10);
+            IPurchasePolicy policy = new MinProductPolicy(Products["Bread"].Id, 10);
             AndPolicy andPolicy = new AndPolicy();
             Assert.Empty(PolicyManager.MainPolicy.Policy.Policies);
             PolicyManager.AddPurchasePolicy(andPolicy);
@@ -49,7 +49,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [Trait("Category", "Unit")]
         public void AddPolicyToNonexistantTest()
         {
-            IPurchasePolicy policy = new MinProductPolicy(Products["Bread"], 10);
+            IPurchasePolicy policy = new MinProductPolicy(Products["Bread"].Id, 10);
             AndPolicy andPolicy = new AndPolicy();
             Assert.Empty(PolicyManager.MainPolicy.Policy.Policies);
             Result<bool> res =  PolicyManager.AddPurchasePolicy(policy, andPolicy.Id);
@@ -60,8 +60,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [Trait("Category", "Unit")]
         public void AddPolicyToIllegalPolicyTest()
         {
-            IPurchasePolicy policy1 = new MinProductPolicy(Products["Bread"], 5);
-            IPurchasePolicy policy2 = new MaxProductPolicy(Products["Bread"], 10);
+            IPurchasePolicy policy1 = new MinProductPolicy(Products["Bread"].Id, 5);
+            IPurchasePolicy policy2 = new MaxProductPolicy(Products["Bread"].Id, 10);
             Assert.Empty(PolicyManager.MainPolicy.Policy.Policies);
             PolicyManager.AddPurchasePolicy(policy1);
             Result<bool> res = PolicyManager.AddPurchasePolicy(policy2, policy1.Id);
