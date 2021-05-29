@@ -13,6 +13,8 @@ using Terminal3.ServiceLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using System.Reflection;
+using Newtonsoft.Json;
+
 
 namespace Terminal3.DataAccessLayer
 {
@@ -42,6 +44,7 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_OrPolicy> DAO_OrPolicy;
         public DAO<DTO_BuyNow> DAO_BuyNow;
         public DAO<DTO_ConditionalPolicy> DAO_ConditionalPolicy;
+        public DAO<DTO_Recipt> DAO_Recipt;
 
         // IdentityMaps  <Id , object>
         public ConcurrentDictionary<String, RegisteredUser> RegisteredUsers;
@@ -88,6 +91,7 @@ namespace Terminal3.DataAccessLayer
             DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "Policies");
             DAO_BuyNow = new DAO<DTO_BuyNow>(database, "Policies");
             DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "Policies");
+            DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
 
             // IdentityMaps  <Id , object>
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
@@ -354,6 +358,7 @@ namespace Terminal3.DataAccessLayer
         }
         private void AddToDB(String type , IPurchasePolicy policy)
         {
+            // shaked 
             switch (type)
             {
                 case "AndPolicy":
@@ -664,7 +669,35 @@ namespace Terminal3.DataAccessLayer
 
         #region Shop till you drop
 
+        public void Create(DTO_Recipt recipt)
+        {
+            DAO_Recipt.Create(recipt);
+        }
 
+        public List<DTO_Recipt> LoadRecipts(string date, string store_id = "")
+        {
+
+            var filter = Builders<BsonDocument>.Filter.Eq("date", date);
+            if (!store_id.Equals(String.Empty))
+            {
+                filter = Builders<BsonDocument>.Filter.Eq("date", date) &
+                         Builders<BsonDocument>.Filter.Eq("store_id", store_id);
+
+            }
+              
+            List<BsonDocument> docs =  DAO_Recipt.collection.Find(filter).ToList();
+
+            List<DTO_Recipt> recipts = new List<DTO_Recipt>();
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                DTO_Recipt dto = JsonConvert.DeserializeObject<DTO_Recipt>(json);
+                recipts.Add(dto);
+            }
+
+            return recipts;
+        }
 
         #endregion Shop till you drop
 
@@ -716,7 +749,8 @@ namespace Terminal3.DataAccessLayer
             foreach (var manager in s.Managers) { managers.AddLast(manager.Key); }
             foreach(var product in s.InventoryManager.Products) { inventory.AddLast(product.Key); }
 
-            DAO_Store.Create(new DTO_Store(s.Id, s.Name, s.Founder.GetId(), owners, managers, inventory, Get_DTO_History(s.History), s.Rating, s.NumberOfRates , s.isClosed));
+            DAO_Store.Create(new DTO_Store(s.Id, s.Name, s.Founder.GetId(), owners, managers, inventory, Get_DTO_History(s.History),
+                                            s.Rating, s.NumberOfRates , s.isClosed, s.PolicyManager.MainDiscount.getDTO(), s.PolicyManager.MainPolicy.getDTO()));
             Stores.TryAdd(s.Id, s);
         }
 
@@ -833,7 +867,7 @@ namespace Terminal3.DataAccessLayer
 
         public void Create(MaxProductPolicy maxProductPolicy)
         {            
-            DAO_MaxProductPolicy.Create(new DTO_MaxProductPolicy(maxProductPolicy.Id, maxProductPolicy.Product.Id, maxProductPolicy.Max));
+            DAO_MaxProductPolicy.Create(new DTO_MaxProductPolicy(maxProductPolicy.Id, maxProductPolicy.ProductId, maxProductPolicy.Max));
             Policy_MaxProductPolicys.TryAdd(maxProductPolicy.Id, maxProductPolicy);
         }
 
@@ -846,7 +880,7 @@ namespace Terminal3.DataAccessLayer
                 return m;
             }
             var product_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Product);
-            m = new MaxProductPolicy(LoadProduct(product_filter), dto.Max, dto._id);
+            m = new MaxProductPolicy(LoadProduct(product_filter).Id, dto.Max, dto._id);
             Policy_MaxProductPolicys.TryAdd(m.Id, m);
             return m;
         }
@@ -896,7 +930,7 @@ namespace Terminal3.DataAccessLayer
 
         public void Create(MinProductPolicy minProductPolicy)
         {
-            DAO_MinProductPolicy.Create(new DTO_MinProductPolicy(minProductPolicy.Id, minProductPolicy.Product.Id , minProductPolicy.Min));
+            DAO_MinProductPolicy.Create(new DTO_MinProductPolicy(minProductPolicy.Id, minProductPolicy.ProductId , minProductPolicy.Min));
             Policy_MinProductPolicys.TryAdd(minProductPolicy.Id, minProductPolicy);
         }
 
@@ -909,7 +943,7 @@ namespace Terminal3.DataAccessLayer
                 return m;
             }
             var product_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Product);
-            m = new MinProductPolicy(LoadProduct(product_filter), dto.Min, dto._id);
+            m = new MinProductPolicy(LoadProduct(product_filter).Id, dto.Min, dto._id);
             Policy_MinProductPolicys.TryAdd(m.Id, m);
             return m;
         }
@@ -960,7 +994,7 @@ namespace Terminal3.DataAccessLayer
 
         public void Create(RestrictedHoursPolicy restrictedHoursPolicy)
         {
-            DAO_RestrictedHoursPolicy.Create(new DTO_RestrictedHoursPolicy(restrictedHoursPolicy.Id, restrictedHoursPolicy.StartRestrict.ToString(), restrictedHoursPolicy.EndRestrict.ToString(), restrictedHoursPolicy.Product.Id));
+            DAO_RestrictedHoursPolicy.Create(new DTO_RestrictedHoursPolicy(restrictedHoursPolicy.Id, restrictedHoursPolicy.StartRestrict.ToString(), restrictedHoursPolicy.EndRestrict.ToString(), restrictedHoursPolicy.ProductId));
             Policy_RestrictedHoursPolicys.TryAdd(restrictedHoursPolicy.Id, restrictedHoursPolicy);
         }
 
@@ -974,7 +1008,7 @@ namespace Terminal3.DataAccessLayer
             }
 
             var product_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Product);
-            r = new RestrictedHoursPolicy(TimeSpan.Parse(dto.StartRestrict), TimeSpan.Parse(dto.EndRestrict), LoadProduct(product_filter), dto._id);
+            r = new RestrictedHoursPolicy(DateTime.Parse(dto.StartRestrict), DateTime.Parse(dto.EndRestrict), LoadProduct(product_filter).Id, dto._id);
             Policy_RestrictedHoursPolicys.TryAdd(r.Id, r);
             return r;
         }
@@ -1201,6 +1235,7 @@ namespace Terminal3.DataAccessLayer
                 database.GetCollection<BsonDocument>("Stores").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("SystemAdmins").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("Users").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Recipts").DeleteMany(emptyFilter);
 
                 RegisteredUsers.Clear();
                 GuestUsers.Clear();
