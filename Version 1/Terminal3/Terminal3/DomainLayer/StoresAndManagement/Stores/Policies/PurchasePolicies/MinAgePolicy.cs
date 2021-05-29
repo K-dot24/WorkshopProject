@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
@@ -25,7 +26,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
             if (!info.ContainsKey("Age"))
                 return new Result<IPurchasePolicy>(errorMsg + "Age not found", false, null);
-            int age = (int)info["Age"];
+            int age = ((JsonElement)info["Age"]).GetInt32();
 
             return new Result<IPurchasePolicy>("", true, new MinAgePolicy(age));
         }
@@ -58,7 +59,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 return new Result<bool>("", true, false);
 
             if (info.ContainsKey("Age"))
-                Age = (int)info["Age"];            
+                Age = ((JsonElement)info["Age"]).GetInt32();
 
             return new Result<bool>("", true, true);
         }

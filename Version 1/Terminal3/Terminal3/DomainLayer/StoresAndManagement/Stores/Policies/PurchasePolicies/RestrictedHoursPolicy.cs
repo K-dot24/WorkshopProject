@@ -2,18 +2,19 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
     public class RestrictedHoursPolicy : IPurchasePolicy
     {
-        public TimeSpan StartRestrict { get; set; }
-        public TimeSpan EndRestrict { get; set; }
+        public DateTime StartRestrict { get; set; }
+        public DateTime EndRestrict { get; set; }
         public string ProductId { get; set; }
         public string Id { get; }
 
-        public RestrictedHoursPolicy(TimeSpan startRestrict, TimeSpan endRestrict, string productId, string id = "")
+        public RestrictedHoursPolicy(DateTime startRestrict, DateTime endRestrict, string productId, string id = "")
         {
             this.Id = id;
             if (id.Equals(""))
@@ -28,11 +29,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             string errorMsg = "Can't create RestrictedHoursPolicy: ";
             if (!info.ContainsKey("StartRestrict"))
                 return new Result<IPurchasePolicy>(errorMsg + "StartRestrict not found", false, null);
-            TimeSpan startRestrict= (TimeSpan)info["StartRestrict"];
+            DateTime startRestrict= createDateTime((JsonElement)info["StartRestrict"]);
 
             if (!info.ContainsKey("EndRestrict"))
                 return new Result<IPurchasePolicy>(errorMsg + "EndRestrict not found", false, null);
-            TimeSpan endRestrict = (TimeSpan)info["EndRestrict"];
+            DateTime endRestrict = createDateTime((JsonElement)info["EndRestrict"]);
 
             if (!info.ContainsKey("ProductId"))
                 return new Result<IPurchasePolicy>(errorMsg + "ProductId not found", false, null);
@@ -43,7 +44,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
         public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
         {
-            TimeSpan now = DateTime.Now.TimeOfDay;
+            DateTime now = DateTime.Now;
             return new Result<bool>("", true, now > EndRestrict && now < StartRestrict);
         }
 
@@ -70,15 +71,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 return new Result<bool>("", true, false);
 
             if (info.ContainsKey("StartRestrict"))
-                StartRestrict  = (TimeSpan)info["StartRestrict"];
+                StartRestrict  = createDateTime((JsonElement)info["StartRestrict"]);
 
             if (info.ContainsKey("EndRestrict"))
-                EndRestrict = (TimeSpan)info["EndRestrict"];
+                EndRestrict = createDateTime((JsonElement)info["EndRestrict"]);
 
-            if (info.ContainsKey("Product"))
-                ProductId = (string)info["Product"];
+            if (info.ContainsKey("ProductId"))
+                ProductId = ((JsonElement)info["ProductId"]).GetString();
 
             return new Result<bool>("", true, true);
+        }
+
+        private static DateTime createDateTime(JsonElement timeElement)
+        {
+            String timeString = timeElement.GetString();
+            DateTime time = DateTime.ParseExact(timeString, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            return time;
         }
     }
 }

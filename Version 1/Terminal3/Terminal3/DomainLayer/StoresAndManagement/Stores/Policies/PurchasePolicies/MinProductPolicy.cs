@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
@@ -26,11 +27,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             string errorMsg = "Can't create MinProductPolicy: ";
             if (!info.ContainsKey("ProductId"))
                 return new Result<IPurchasePolicy>(errorMsg + "ProductId not found", false, null);
-            string productId = (string)info["ProductId"];
+            string productId = ((JsonElement)info["ProductId"]).GetString();
 
             if (!info.ContainsKey("Min"))
                 return new Result<IPurchasePolicy>(errorMsg + "Min not found", false, null);
-            int min = (int)info["Min"];
+            int min = ((JsonElement)info["Min"]).GetInt32();
 
             return new Result<IPurchasePolicy>("", true, new MinProductPolicy(productId, min));
         }
@@ -68,10 +69,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 return new Result<bool>("", true, false);
 
             if (info.ContainsKey("Min"))
-                Min = (int)info["Min"];
+                Min = ((JsonElement)info["Min"]).GetInt32();
 
             if (info.ContainsKey("ProductId"))
-                ProductId = (string)info["ProductId"];
+                ProductId = ((JsonElement)info["ProductId"]).GetString();
 
             return new Result<bool>("", true, true);
         }

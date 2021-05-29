@@ -7,12 +7,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 {
     public class RestrictedHoursPolicyData : IPurchasePolicyData
     {
-        public TimeSpan StartRestrict { get; }
-        public TimeSpan EndRestrict { get; }
+        public DateTime StartRestrict { get; }
+        public DateTime EndRestrict { get; }
         public string ProductId { get; }
         public string Id { get; }
 
-        public RestrictedHoursPolicyData(TimeSpan startRestrict, TimeSpan endRestrict, string productId, string id)
+        public RestrictedHoursPolicyData(DateTime startRestrict, DateTime endRestrict, string productId, string id)
         {
             this.StartRestrict = startRestrict;
             this.EndRestrict = endRestrict;
