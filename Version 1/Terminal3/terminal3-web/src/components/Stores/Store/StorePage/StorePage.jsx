@@ -159,30 +159,30 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     //#region Discount Policy Functions
 
-    const handleAddDiscountPolicy = (data, targetType) => {
+    const handleAddDiscountPolicy = (data, mainType, subType) => {
         let info;
         let allData;
         
-        switch (targetType) {
+        switch (mainType) {
             case "VisibleDiscount":
-                info = { type: targetType, ExpirationDate: data.expirationdate, Percentage: data.percentage  };
+                info = { type: mainType, ExpirationDate: data.expirationdate, Percentage: data.percentage, Target: { type: subType }  };
 
                 if ('categories' in data) {
                     const categories_array = data.categories.split(',');
-                    info = { ...info, Target: { Categories: categories_array }};
+                    info = { ...info, Target: { type: subType, Categories: categories_array }};
                 } 
                 if ('productsid' in data) {
                     const productsid_array = data.productsid.split(',');
-                    info = { ...info, Target: { ProductIds: productsid_array } };
+                    info = { ...info, Target: { type: subType, ProductIds: productsid_array } };
                 }
                 break;
 
             case "DiscreetDiscount":
-                info = { type: targetType, DiscountCode: data.discountcode };
+                info = { type: mainType, DiscountCode: data.discountcode };
                 break;
 
             default:
-                info = { type: targetType };
+                info = { type: mainType };
         }
 
         allData = { storeId: store.id, info };
@@ -238,7 +238,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     //     }
     // }
 
-    const handleAddDiscountCondition = (data, type) => {
+    const handleAddDiscountCondition = (data, type, sub) => {
         let info;
 
         switch (type) {

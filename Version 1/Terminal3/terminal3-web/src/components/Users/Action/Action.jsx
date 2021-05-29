@@ -30,7 +30,7 @@ const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
             if (currentType.value === '')
                 handleAction(data);
             else
-                handleAction(data, currentType.value);
+                handleAction(data, currentType.value, currentType.sub);
          }
  
          // redirect back to homepage
