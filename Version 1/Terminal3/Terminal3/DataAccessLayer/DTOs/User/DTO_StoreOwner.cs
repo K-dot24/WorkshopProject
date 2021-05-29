@@ -26,6 +26,6 @@ namespace Terminal3.DataAccessLayer.DTOs
             AppointedBy = appointedBy;
             StoreManagers = storeManagers;
             StoreOwners = storeOwners;
-        }
+        }       
     }
 }

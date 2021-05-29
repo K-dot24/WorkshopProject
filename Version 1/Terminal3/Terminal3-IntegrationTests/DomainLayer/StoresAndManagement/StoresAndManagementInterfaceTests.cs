@@ -20,10 +20,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
         public RegisteredUser RegisteredUser { get; }
         public GuestUser GuestUser { get; }
 
+        string adminEmail = "Admin@terminal3.com";
+        string adminPassword = "Admin123";
+
         public StoresAndManagementInterfaceTests()
         {
             // Facade to check
-            Facade = new StoresAndManagementInterface();
+            Facade = new StoresAndManagementInterface(adminEmail, adminPassword);
 
             // Facades to integrate
             StoresFacade = Facade.StoresFacade;
@@ -50,8 +53,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
         public void OpenNewStoreTest()
         {
             // Registered User can open multiple stores and with the same name
-            Assert.True(Facade.OpenNewStore("NiceToMeat", Founder.Id).ExecStatus);
-            Assert.True(Facade.OpenNewStore("NiceToMeat", Founder.Id).ExecStatus);
+            Assert.True(Facade.OpenNewStore("NiceToMeat", Founder.Id,"-1").ExecStatus);
+            Assert.True(Facade.OpenNewStore("NiceToMeat", Founder.Id, "-1").ExecStatus);
 
             // Check both stores were added and with the same name
             Assert.Equal(3, StoresFacade.Stores.Count);
@@ -68,10 +71,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
             Assert.Equal(2, count);
 
             // Registered User can open store
-            Assert.True(Facade.OpenNewStore("Store2", RegisteredUser.Id).ExecStatus);
+            Assert.True(Facade.OpenNewStore("Store2", RegisteredUser.Id, "-1").ExecStatus);
 
             // Guest User cannot open a store
-            Assert.False(Facade.OpenNewStore("NoCannot", GuestUser.Id).ExecStatus);
+            Assert.False(Facade.OpenNewStore("NoCannot", GuestUser.Id, "-1").ExecStatus);
 
             // Check number of stores are correct
             Assert.Equal(4, StoresFacade.Stores.Count);

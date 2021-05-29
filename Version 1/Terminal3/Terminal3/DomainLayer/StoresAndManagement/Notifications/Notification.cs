@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.ServiceLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
@@ -41,5 +42,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return $"{Date.ToString("MM/dd/yyyy HH:mm")}\nNotice:\n{Message}\n";
         }
 
+        public DTO_Notification getDTO()
+        {
+            return new DTO_Notification((int)EventName, Message, Date.ToString(), isOpened, isStoreStaff, ClientId);
+        }
     }
 }

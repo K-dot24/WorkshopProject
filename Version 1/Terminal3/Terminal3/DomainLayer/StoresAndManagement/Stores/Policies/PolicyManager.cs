@@ -66,6 +66,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
             return price;
         }
+   
         public Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)
         {
             return MainPolicy.IsConditionMet(products, user);
@@ -328,4 +329,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return result;
         }
     }
+
+/*    // Update Store in DB
+    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+    var update = Builders<BsonDocument>.Update.Set("isClosed", false);
+    mapper.UpdateStore(filter, update);
+*/
 }

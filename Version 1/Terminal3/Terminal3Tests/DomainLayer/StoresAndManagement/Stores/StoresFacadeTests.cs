@@ -257,7 +257,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             {
                 creator = Founder;
             }
-            Result<Store> resultOpened = Facade.OpenNewStore(creator, storeName);
+            Result<Store> resultOpened = Facade.OpenNewStore(creator, storeName, "-1");
             Assert.Equal(expectedResult, resultOpened.ExecStatus);
             if (expectedResult)
                 Assert.Equal(expectedResult, Facade.Stores.ContainsKey(resultOpened.Data.Id));
@@ -491,7 +491,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
         {
             Assert.True(Facade.CloseStore(Founder, TestStore.Id).ExecStatus);
             Assert.False(Facade.Stores.ContainsKey(TestStore.Id));
-            Assert.True(Facade.ClosedStores.ContainsKey(TestStore.Id));
+            Assert.True(TestStore.isClosed);
         }
 
         [Fact()]
@@ -511,12 +511,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             // Fail - tomer is store owner not founder
             Assert.False(Facade.CloseStore(user2, TestStore.Id).ExecStatus);
             Assert.True(Facade.Stores.ContainsKey(TestStore.Id));
-            Assert.False(Facade.ClosedStores.ContainsKey(TestStore.Id));
+            Assert.False(TestStore.isClosed);
 
             // Fail: zoe is only store manager not founder
             Assert.False(Facade.CloseStore(user3, TestStore.Id).ExecStatus);
             Assert.True(Facade.Stores.ContainsKey(TestStore.Id));
-            Assert.False(Facade.ClosedStores.ContainsKey(TestStore.Id));
+            Assert.False(TestStore.isClosed);
         }
 
         [Fact()]
@@ -525,7 +525,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             Facade.CloseStore(Founder, TestStore.Id);
             Assert.True(Facade.ReOpenStore(Founder, TestStore.Id).ExecStatus);
             Assert.True(Facade.Stores.ContainsKey(TestStore.Id));
-            Assert.False(Facade.ClosedStores.ContainsKey(TestStore.Id));            
+            Assert.False(TestStore.isClosed);            
         }
 
         [Fact()]
@@ -542,7 +542,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             // Success - tomer is store owner 
             Assert.True(Facade.ReOpenStore(user2, TestStore.Id).ExecStatus);
             Assert.True(Facade.Stores.ContainsKey(TestStore.Id));
-            Assert.False(Facade.ClosedStores.ContainsKey(TestStore.Id));
+            Assert.False(TestStore.isClosed);
 
         }
 
@@ -559,7 +559,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             // Fail: zoe is only store manager not owner
             Assert.False(Facade.ReOpenStore(user3, TestStore.Id).ExecStatus);
             Assert.False(Facade.Stores.ContainsKey(TestStore.Id));
-            Assert.True(Facade.ClosedStores.ContainsKey(TestStore.Id));
+            Assert.True(TestStore.isClosed);
         }
     }
 }

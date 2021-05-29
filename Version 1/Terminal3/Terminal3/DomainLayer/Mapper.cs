@@ -12,6 +12,9 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.ServiceLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using System.Reflection;
+using Newtonsoft.Json;
+
 
 namespace Terminal3.DataAccessLayer
 {
@@ -23,10 +26,11 @@ namespace Terminal3.DataAccessLayer
         public IMongoDatabase database;
 
         // DAOs
-        public DAO<DTO_GuestUser> DAO_GuestUser;
+        // public DAO<DTO_GuestUser> DAO_GuestUser;
         public DAO<DTO_RegisteredUser> DAO_RegisteredUser;
         public DAO<DTO_Product> DAO_Product;
         public DAO<DTO_StoreManager> DAO_StoreManager;
+        public DAO<DTO_SystemAdmins> DAO_SystemAdmins;
         public DAO<DTO_StoreOwner> DAO_StoreOwner;
         public DAO<DTO_Store> DAO_Store;
         public DAO<DTO_Auction> DAO_Auction;
@@ -40,6 +44,7 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_OrPolicy> DAO_OrPolicy;
         public DAO<DTO_BuyNow> DAO_BuyNow;
         public DAO<DTO_ConditionalPolicy> DAO_ConditionalPolicy;
+        public DAO<DTO_Recipt> DAO_Recipt;
 
         // IdentityMaps  <Id , object>
         public ConcurrentDictionary<String, RegisteredUser> RegisteredUsers;
@@ -62,17 +67,18 @@ namespace Terminal3.DataAccessLayer
 
 
         //Constructor
-        private Mapper()
+        private Mapper(String connection_string)
         {
-            dbClient = new MongoClient("mongodb+srv://admin:terminal3@cluster0.cbdpv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
+            dbClient = new MongoClient(connection_string);
             database = dbClient.GetDatabase("Terminal3-development");
 
             //DAOs
-            DAO_GuestUser = new DAO<DTO_GuestUser>(database, "Users");
+            //DAO_GuestUser = new DAO<DTO_GuestUser>(database, "Users");
             DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
-            DAO_Product = new DAO<DTO_Product>(database, "Stores");            
+            DAO_Product = new DAO<DTO_Product>(database, "Products");            
             DAO_StoreManager = new DAO<DTO_StoreManager>(database, "Users");
             DAO_StoreOwner = new DAO<DTO_StoreOwner>(database, "Users");
+            DAO_SystemAdmins = new DAO<DTO_SystemAdmins>(database, "SystemAdmins");
             DAO_Store = new DAO<DTO_Store>(database, "Stores");
             DAO_Auction = new DAO<DTO_Auction>(database, "Policies");
             DAO_Lottery = new DAO<DTO_Lottery>(database, "Policies");
@@ -85,6 +91,7 @@ namespace Terminal3.DataAccessLayer
             DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "Policies");
             DAO_BuyNow = new DAO<DTO_BuyNow>(database, "Policies");
             DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "Policies");
+            DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
 
             // IdentityMaps  <Id , object>
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
@@ -109,9 +116,14 @@ namespace Terminal3.DataAccessLayer
 
         public static Mapper getInstance()
         {
+            return Instance;
+        }
+
+        public static Mapper getInstance(String connection_string)
+        {
             if (Instance == null)
             {
-                Instance = new Mapper();
+                Instance = new Mapper(connection_string);
             }
             return Instance;
         }
@@ -346,6 +358,7 @@ namespace Terminal3.DataAccessLayer
         }
         private void AddToDB(String type , IPurchasePolicy policy)
         {
+            // shaked 
             switch (type)
             {
                 case "AndPolicy":
@@ -397,42 +410,6 @@ namespace Terminal3.DataAccessLayer
         #endregion
 
         #region User
-        #region GuestUser
-        public void Create(GuestUser gu)
-        {            
-            DAO_GuestUser.Create(new DTO_GuestUser(gu.Id , Get_DTO_ShoppingCart(gu), gu.Active));
-            GuestUsers.TryAdd(gu.Id, gu);
-        }
-
-        public GuestUser LoadGuestUser(FilterDefinition<BsonDocument> filter)
-        {
-            GuestUser gu;
-            DTO_GuestUser dto = DAO_GuestUser.Load(filter);
-            if (GuestUsers.TryGetValue(dto._id, out gu))
-            {
-                return gu;
-            }
-
-            gu = new GuestUser(dto._id, dto.Active);
-            
-            gu.ShoppingCart = ToObject(dto.ShoppingCart, gu);
-            GuestUsers.TryAdd(gu.Id, gu);
-            return gu;
-        }
-
-        public void UpdateGuestUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
-        {
-            DAO_GuestUser.Update(filter, update);
-        }
-
-        public void DeleteGuestUser(FilterDefinition<BsonDocument> filter)
-        {
-            DTO_GuestUser deletedGuestUser = DAO_GuestUser.Delete(filter);
-            GuestUsers.TryRemove(deletedGuestUser._id, out GuestUser gu);
-        }
-
-
-        #endregion GuestUser
 
         #region RegisteredUser
         public void Create(RegisteredUser ru)
@@ -456,9 +433,9 @@ namespace Terminal3.DataAccessLayer
             return ru;
         }
 
-        public void UpdateRegisteredUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        public void UpdateRegisteredUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update,Boolean upsert=false )
         {
-            DAO_RegisteredUser.Update(filter, update);
+            DAO_RegisteredUser.Update(filter, update,upsert);
         }
 
         public void DeleteRegisteredUser(FilterDefinition<BsonDocument> filter)
@@ -681,11 +658,46 @@ namespace Terminal3.DataAccessLayer
         }
         #endregion Store Owner
 
+        #region System Admin
+        internal void UpdateSystemAdmins(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update,Boolean upsert=false)
+        {
+            DAO_SystemAdmins.Update(filter, update , upsert);
+        }
+        #endregion  System Admin
+
         #endregion User
 
         #region Shop till you drop
 
+        public void Create(DTO_Recipt recipt)
+        {
+            DAO_Recipt.Create(recipt);
+        }
 
+        public List<DTO_Recipt> LoadRecipts(string date, string store_id = "")
+        {
+
+            var filter = Builders<BsonDocument>.Filter.Eq("date", date);
+            if (!store_id.Equals(String.Empty))
+            {
+                filter = Builders<BsonDocument>.Filter.Eq("date", date) &
+                         Builders<BsonDocument>.Filter.Eq("store_id", store_id);
+
+            }
+              
+            List<BsonDocument> docs =  DAO_Recipt.collection.Find(filter).ToList();
+
+            List<DTO_Recipt> recipts = new List<DTO_Recipt>();
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                DTO_Recipt dto = JsonConvert.DeserializeObject<DTO_Recipt>(json);
+                recipts.Add(dto);
+            }
+
+            return recipts;
+        }
 
         #endregion Shop till you drop
 
@@ -737,7 +749,8 @@ namespace Terminal3.DataAccessLayer
             foreach (var manager in s.Managers) { managers.AddLast(manager.Key); }
             foreach(var product in s.InventoryManager.Products) { inventory.AddLast(product.Key); }
 
-            DAO_Store.Create(new DTO_Store(s.Id, s.Name, s.Founder.GetId(), owners, managers, inventory, Get_DTO_History(s.History), s.Rating, s.NumberOfRates));
+            DAO_Store.Create(new DTO_Store(s.Id, s.Name, s.Founder.GetId(), owners, managers, inventory, Get_DTO_History(s.History),
+                                            s.Rating, s.NumberOfRates , s.isClosed, s.PolicyManager.MainDiscount.getDTO(), s.PolicyManager.MainPolicy.getDTO()));
             Stores.TryAdd(s.Id, s);
         }
 
@@ -1210,9 +1223,41 @@ namespace Terminal3.DataAccessLayer
 
         #endregion Policies
 
+        #region Utils
+        public void clearDB()
+        {
+            if (!(Instance is null))
+            {
+                var emptyFilter = Builders<BsonDocument>.Filter.Empty;
+                database.GetCollection<BsonDocument>("Discounts").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Policies").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Products").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Stores").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("SystemAdmins").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Users").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Recipts").DeleteMany(emptyFilter);
 
+                RegisteredUsers.Clear();
+                GuestUsers.Clear();
+                Products.Clear();
+                StoreManagers.Clear();
+                StoreOwners.Clear();
+                Stores.Clear();
+                Policy_Auctions.Clear();
+                Policy_Lotterys.Clear();
+                Policy_MaxProductPolicys.Clear();
+                Policy_MinAgePolicys.Clear();
+                Policy_MinProductPolicys.Clear();
+                Policy_Offers.Clear();
+                Policy_RestrictedHoursPolicys.Clear();
+                Policy_AndPolicys.Clear();
+                Policy_OrPolicys.Clear();
+                Policy_BuyNows.Clear();
+                Policy_ConditionalPolicys.Clear();
+    }
 
-
+    }
+        #endregion
 
         #region Methods TO Delete
         //TODO - delete
