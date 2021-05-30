@@ -6,14 +6,14 @@ using System.Text;
 
 namespace Terminal3.DataAccessLayer.DTOs
 {
-    public class DTO_DiscountAddition
+    public class DTO_DiscountOr
     {
         [BsonId]
         public string _id { get; set; }
         [BsonElement]
-        public ConcurrentDictionary<String, String> Discounts { get; set; } // List <IDiscountPolicy id>         
+        public ConcurrentDictionary<String, String> Discounts { get; } // List <IDiscountPolicy id>         
 
-        public DTO_DiscountAddition(string id, ConcurrentDictionary<string, string> discounts)
+        public DTO_DiscountOr(string id, ConcurrentDictionary<string, string> discounts)
         {
             _id = id;
             Discounts = discounts;

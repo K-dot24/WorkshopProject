@@ -12,6 +12,10 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.ServiceLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountTargets;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountComposition;
 using System.Reflection;
 using Newtonsoft.Json;
 
@@ -44,6 +48,22 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_OrPolicy> DAO_OrPolicy;
         public DAO<DTO_BuyNow> DAO_BuyNow;
         public DAO<DTO_ConditionalPolicy> DAO_ConditionalPolicy;
+        public DAO<DTO_VisibleDiscount> DAO_VisibleDiscount;
+        public DAO<DTO_DiscountTargetCategories> DAO_DiscountTargetCategories;
+        public DAO<DTO_DiscountTargetProducts> DAO_DiscountTargetProducts;
+        public DAO<DTO_DiscreetDiscount> DAO_DiscreetDiscount;
+        public DAO<DTO_ConditionalDiscount> DAO_ConditionalDiscount;
+        public DAO<DTO_MinProductCondition> DAO_MinProductCondition;
+        public DAO<DTO_MinBagPriceCondition> DAO_MinBagPriceCondition;
+        public DAO<DTO_MaxProductCondition> DAO_MaxProductCondition;
+        public DAO<DTO_DiscountConditionOr> DAO_DiscountConditionOr;
+        public DAO<DTO_DiscountConditionAnd> DAO_DiscountConditionAnd;
+        public DAO<DTO_DiscountXor> DAO_DiscountXor;
+        public DAO<DTO_DiscountOr> DAO_DiscountOr;
+        public DAO<DTO_DiscountMin> DAO_DiscountMin;
+        public DAO<DTO_DiscountMax> DAO_DiscountMax;
+        public DAO<DTO_DiscountAnd> DAO_DiscountAnd;
+        public DAO<DTO_DiscountAddition> DAO_DiscountAddition;
         public DAO<DTO_Recipt> DAO_Recipt;
 
         // IdentityMaps  <Id , object>
@@ -64,6 +84,23 @@ namespace Terminal3.DataAccessLayer
         public ConcurrentDictionary<String, OrPolicy> Policy_OrPolicys;
         public ConcurrentDictionary<String, BuyNow> Policy_BuyNows;
         public ConcurrentDictionary<String, ConditionalPolicy> Policy_ConditionalPolicys;
+        public ConcurrentDictionary<String, VisibleDiscount> Discount_VisibleDiscounts;
+        public ConcurrentDictionary<String, DiscountTargetCategories> Discount_DiscountTargetCategories;
+        public ConcurrentDictionary<String, DiscountTargetProducts> Discount_DiscountTargetProducts;
+        public ConcurrentDictionary<String, DiscreetDiscount> Discount_DiscreetDiscounts;
+        public ConcurrentDictionary<String, ConditionalDiscount> Discount_ConditionalDiscounts;
+        public ConcurrentDictionary<String, MinProductCondition> Discount_MinProductConditions;
+        public ConcurrentDictionary<String, MinBagPriceCondition> Discount_MinBagPriceConditions;
+        public ConcurrentDictionary<String, MaxProductCondition> Discount_MaxProductConditions;
+        public ConcurrentDictionary<String, DiscountConditionOr> Discount_DiscountConditionOrs;
+        public ConcurrentDictionary<String, DiscountConditionAnd> Discount_DiscountConditionAnds;
+        public ConcurrentDictionary<String, DiscountXor> Discount_DiscountXors;
+        public ConcurrentDictionary<String, DiscountOr> Discount_DiscountOrs;
+        public ConcurrentDictionary<String, DiscountMin> Discount_DiscountMins;
+        public ConcurrentDictionary<String, DiscountMax> Discount_DiscountMaxs;
+        public ConcurrentDictionary<String, DiscountAnd> Discount_DiscountAnds;
+        public ConcurrentDictionary<String, DiscountAddition> Discount_DiscountAdditions;
+
 
 
         //Constructor
@@ -91,6 +128,22 @@ namespace Terminal3.DataAccessLayer
             DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "Policies");
             DAO_BuyNow = new DAO<DTO_BuyNow>(database, "Policies");
             DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "Policies");
+            DAO_VisibleDiscount = new DAO<DTO_VisibleDiscount>(database, "Discounts");
+            DAO_DiscountTargetCategories = new DAO<DTO_DiscountTargetCategories>(database, "Discounts");
+            DAO_DiscountTargetProducts = new DAO<DTO_DiscountTargetProducts>(database, "Discounts");
+            DAO_DiscreetDiscount = new DAO<DTO_DiscreetDiscount>(database, "Discounts");
+            DAO_ConditionalDiscount = new DAO<DTO_ConditionalDiscount>(database, "Discounts");
+            DAO_MinProductCondition = new DAO<DTO_MinProductCondition>(database, "Discounts");
+            DAO_MinBagPriceCondition = new DAO<DTO_MinBagPriceCondition>(database, "Discounts");
+            DAO_MaxProductCondition = new DAO<DTO_MaxProductCondition>(database, "Discounts");
+            DAO_DiscountConditionOr = new DAO<DTO_DiscountConditionOr>(database, "Discounts");
+            DAO_DiscountConditionAnd = new DAO<DTO_DiscountConditionAnd>(database, "Discounts");
+            DAO_DiscountXor = new DAO<DTO_DiscountXor>(database, "Discounts");
+            DAO_DiscountOr = new DAO<DTO_DiscountOr>(database, "Discounts");
+            DAO_DiscountMin = new DAO<DTO_DiscountMin>(database, "Discounts");
+            DAO_DiscountMax = new DAO<DTO_DiscountMax>(database, "Discounts");
+            DAO_DiscountAnd = new DAO<DTO_DiscountAnd>(database, "Discounts");
+            DAO_DiscountAddition = new DAO<DTO_DiscountAddition>(database, "Discounts");
             DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
 
             // IdentityMaps  <Id , object>
@@ -111,6 +164,22 @@ namespace Terminal3.DataAccessLayer
             Policy_OrPolicys = new ConcurrentDictionary<String, OrPolicy>();
             Policy_BuyNows = new ConcurrentDictionary<String, BuyNow>();
             Policy_ConditionalPolicys = new ConcurrentDictionary<String, ConditionalPolicy>();
+            Discount_VisibleDiscounts = new ConcurrentDictionary<String, VisibleDiscount>();
+            Discount_DiscountTargetCategories = new ConcurrentDictionary<String, DiscountTargetCategories>();
+            Discount_DiscountTargetProducts = new ConcurrentDictionary<String, DiscountTargetProducts>();
+            Discount_DiscreetDiscounts = new ConcurrentDictionary<String, DiscreetDiscount>();
+            Discount_ConditionalDiscounts = new ConcurrentDictionary<String, ConditionalDiscount>();
+            Discount_MinProductConditions = new ConcurrentDictionary<String, MinProductCondition>();
+            Discount_MinBagPriceConditions = new ConcurrentDictionary<String, MinBagPriceCondition>();
+            Discount_MaxProductConditions = new ConcurrentDictionary<String, MaxProductCondition>();
+            Discount_DiscountConditionOrs = new ConcurrentDictionary<String, DiscountConditionOr>();
+            Discount_DiscountConditionAnds = new ConcurrentDictionary<String, DiscountConditionAnd>();
+            Discount_DiscountXors = new ConcurrentDictionary<String, DiscountXor>();
+            Discount_DiscountOrs = new ConcurrentDictionary<String, DiscountOr>();
+            Discount_DiscountMins = new ConcurrentDictionary<String, DiscountMin>();
+            Discount_DiscountMaxs = new ConcurrentDictionary<String, DiscountMax>();
+            Discount_DiscountAnds = new ConcurrentDictionary<String, DiscountAnd>();
+            Discount_DiscountAdditions = new ConcurrentDictionary<String, DiscountAddition>();
 
     }
 
@@ -262,16 +331,77 @@ namespace Terminal3.DataAccessLayer
 
         private ConcurrentDictionary<String, String> getPoliciesIDs(List<IPurchasePolicy> list)
         {
-            ConcurrentDictionary<String, String> Policies = new ConcurrentDictionary<String, String>();
+            ConcurrentDictionary<String, String> Policies = new ConcurrentDictionary<String, String>(); //<id , type>
             foreach (IPurchasePolicy policy in list)
             {
                 string[] type = policy.GetType().ToString().Split('.');
                 string policy_type = type[type.Length - 1];
-                AddToDB(policy_type, policy);
-                Policies.TryAdd(policy_type, policy.Id);
+                AddPolicyToDB(policy_type, policy);
+                Policies.TryAdd(policy.Id ,policy_type);
             }
             return Policies;
         }
+        private ConcurrentDictionary<String, String> getDiscountsIDs(IDiscountTarget discount)
+        {
+            ConcurrentDictionary<String, String> Discounts = new ConcurrentDictionary<String, String>();    //<id , type>
+
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+            AddDiscountToDB(discount_type, discount);
+            Discounts.TryAdd(discount.getId() ,discount_type);
+            
+            return Discounts;
+        }
+        private ConcurrentDictionary<String, String> getDiscountsIDs(IDiscountPolicy discount)
+        {
+            ConcurrentDictionary<String, String> Discounts = new ConcurrentDictionary<String, String>();    //<id , type>
+
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+            AddDiscountToDB(discount_type, discount);
+            Discounts.TryAdd(discount.Id ,discount_type);
+
+            return Discounts;
+        }
+        private ConcurrentDictionary<String, String> getDiscountsIDs(IDiscountCondition discount)
+        {
+            ConcurrentDictionary<String, String> Discounts = new ConcurrentDictionary<String, String>();    //<id , type>
+
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+            AddDiscountToDB(discount_type, discount);
+            Discounts.TryAdd(discount.Id, discount_type);
+
+            return Discounts;
+        }
+        private ConcurrentDictionary<String, String> getDiscountsIDs(List<IDiscountCondition> discounts)
+        {
+            ConcurrentDictionary<String, String> Discounts = new ConcurrentDictionary<String, String>();    //<id , type>
+
+            foreach(IDiscountCondition discountCondition in discounts)
+            {
+                string[] type = discountCondition.GetType().ToString().Split('.');
+                string discount_type = type[type.Length - 1];
+                AddDiscountToDB(discount_type, discountCondition);
+                Discounts.TryAdd(discountCondition.Id, discount_type);
+            }
+            return Discounts;
+        }
+        private ConcurrentDictionary<String, String> getDiscountsIDs(List<IDiscountPolicy> discounts)
+        {
+            ConcurrentDictionary<String, String> Discounts = new ConcurrentDictionary<String, String>();    //<id , type>
+
+            foreach (IDiscountPolicy discountCondition in discounts)
+            {
+                string[] type = discountCondition.GetType().ToString().Split('.');
+                string discount_type = type[type.Length - 1];
+                AddDiscountToDB(discount_type, discountCondition);
+                Discounts.TryAdd(discountCondition.Id, discount_type);
+            }
+            return Discounts;
+        }
+
+
         private IPurchasePolicy LoadIPurchasePolicy(String tag, string policy_id)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_id", policy_id);
@@ -305,7 +435,95 @@ namespace Terminal3.DataAccessLayer
 
             return null;
         }
+        private IDiscountTarget LoadIDiscountTarget(String tag, string target_id)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", target_id);
+            switch (tag)
+            {
+                case "DiscountTargetCategories":
+                    return LoadDiscountTargetCategories(filter);
 
+                case "DiscountTargetProducts":
+                    return LoadDiscountTargetProducts(filter);
+
+            }
+
+            return null;
+        }
+        private IDiscountPolicy LoadIDiscountPolicy(String tag, string target_id)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", target_id);
+            switch (tag)
+            {
+                case "ConditionalDiscount":
+                    return LoadConditionalDiscount(filter);                    
+
+                case "DiscountAddition":
+                    return LoadDiscountAddition(filter);                    
+
+                case "DiscountAnd":
+                    return LoadDiscountAnd(filter);                    
+
+                case "DiscountMax":
+                    return LoadDiscountMax(filter);                    
+
+                case "DiscountOr":
+                    return LoadDiscountOr(filter);                    
+
+                case "DiscountMin":
+                    return LoadDiscountMin(filter);
+
+                case "DiscountXor":
+                    return LoadDiscountXor(filter);
+
+                case "DiscreetDiscount":
+                    return LoadDiscreetDiscount(filter);
+
+                case "VisibleDiscount":
+                    return LoadVisibleDiscount(filter);
+
+            }
+
+            return null;
+        }
+        private IDiscountCondition LoadIDiscountCondition(String tag, string discount_id)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", discount_id);
+            switch (tag)
+            {
+                case "DiscountConditionAnd":
+                    return LoadDiscountConditionAnd(filter);
+
+                case "DiscountConditionOr":
+                    return LoadDiscountConditionOr(filter);
+
+                case "MaxProductCondition":
+                    return LoadMaxProductCondition(filter);
+
+                case "MinBagPriceCondition":
+                    return LoadMinBagPriceCondition(filter);
+
+                case "MinProductCondition":
+                    return LoadMinProductCondition(filter);
+            }
+
+            return null;
+        }
+
+        private void DeleteIDiscountTarget(String type, string discount_id)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", discount_id);
+            switch (type)
+            {
+                case "DiscountTargetCategories":
+                    DeleteDiscountTargetCategories(filter);
+                    break;
+
+                case "DiscountTargetProducts":
+                    DeleteDiscountTargetProducts(filter);
+                    break;
+            }
+        }        
         private void DeleteIPurchasePolicy(String type, string policy_id)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_id", policy_id);
@@ -356,7 +574,78 @@ namespace Terminal3.DataAccessLayer
                     break;
             }
         }
-        private void AddToDB(String type , IPurchasePolicy policy)
+        private void DeleteIDiscountPolicy(String type, string discount_id)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", discount_id);
+            switch (type)
+            {
+                case "ConditionalDiscount":
+                    DeleteConditionalDiscount(filter);
+                    break;
+
+                case "DiscountAddition":
+                    DeleteDiscountAddition(filter);
+                    break;
+
+                case "DiscountAnd":
+                    DeleteDiscountAnd(filter);
+                    break;
+
+                case "DiscountMax":
+                    DeleteDiscountMax(filter);
+                    break;
+
+                case "DiscountOr":
+                    DeleteDiscountOr(filter);
+                    break;
+
+                case "DiscountMin":
+                    DeleteDiscountMin(filter);
+                    break;
+
+                case "DiscountXor":
+                    DeleteDiscountXor(filter);
+                    break;
+
+                case "DiscreetDiscount":
+                    DeleteDiscreetDiscount(filter); ;
+                    break;
+
+                case "VisibleDiscount":
+                    DeleteVisibleDiscount(filter);
+                    break;
+
+            }
+        }
+        private void DeleteIDiscountCondition(String type, string discount_id)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", discount_id);
+            switch (type)
+            {
+                case "DiscountConditionAnd":
+                    DeleteDiscountConditionAnd(filter);
+                    break;
+
+                case "DiscountConditionOr":
+                    DeleteDiscountConditionOr(filter);
+                    break;
+
+                case "MaxProductCondition":
+                    DeleteMaxProductCondition(filter);
+                    break;
+
+                case "MinBagPriceCondition":
+                    DeleteMinBagPriceCondition(filter);
+                    break;
+
+                case "MinProductCondition":
+                    DeleteMinProductCondition(filter);
+                    break;
+
+            }
+        }
+
+        private void AddPolicyToDB(String type , IPurchasePolicy policy)
         {
             // shaked 
             switch (type)
@@ -406,7 +695,86 @@ namespace Terminal3.DataAccessLayer
                     break;
             }
         }
+        private void AddDiscountToDB(String type, IDiscountTarget discount)
+        {
+            switch (type)
+            {
+                case "DiscountTargetCategories":
+                    Create((DiscountTargetCategories)discount);
+                    break;
 
+                case "DiscountTargetProducts":
+                    Create((DiscountTargetProducts)discount);
+                    break;
+            }
+        }
+        private void AddDiscountToDB(String type, IDiscountPolicy discount)
+        {
+            switch (type)
+            {
+                case "ConditionalDiscount":
+                    Create((ConditionalDiscount)discount);
+                    break;
+
+                case "DiscountAddition":
+                    Create((DiscountAddition)discount);
+                    break;
+
+                case "DiscountAnd":
+                    Create((DiscountAnd)discount);
+                    break;
+
+                case "DiscountMax":
+                    Create((DiscountMax)discount);
+                    break;
+
+                case "DiscountOr":
+                    Create((DiscountOr)discount);
+                    break;
+
+                case "DiscountMin":
+                    Create((DiscountMin)discount);
+                    break;
+
+                case "DiscountXor":
+                    Create((DiscountXor)discount);
+                    break;
+
+                case "DiscreetDiscount":
+                    Create((DiscreetDiscount)discount);
+                    break;
+
+                case "VisibleDiscount":
+                    Create((VisibleDiscount)discount);
+                    break;
+
+            }
+        }
+        private void AddDiscountToDB(String type, IDiscountCondition discount)
+        {
+            switch (type)
+            {
+                case "DiscountConditionAnd":
+                    Create((DiscountConditionAnd)discount);
+                    break;
+
+                case "DiscountConditionOr":
+                    Create((DiscountConditionOr)discount);
+                    break;
+
+                case "MaxProductCondition":
+                    Create((MaxProductCondition)discount);
+                    break;
+
+                case "MinBagPriceCondition":
+                    Create((MinBagPriceCondition)discount);
+                    break;
+
+                case "MinProductCondition":
+                    Create((MinProductCondition)discount);
+                    break;
+            }
+        }
         #endregion
 
         #region User
@@ -1078,7 +1446,7 @@ namespace Terminal3.DataAccessLayer
             List<IPurchasePolicy> Policies = new List<IPurchasePolicy>();
             foreach (var policy in dto.Policies)
             {
-                IPurchasePolicy p = LoadIPurchasePolicy(policy.Key, policy.Value);
+                IPurchasePolicy p = LoadIPurchasePolicy(policy.Value ,policy.Key);
                 Policies.Add(p);
             }
 
@@ -1126,7 +1494,7 @@ namespace Terminal3.DataAccessLayer
             List<IPurchasePolicy> Policies = new List<IPurchasePolicy>();
             foreach (var policy in dto.Policies)
             {
-                IPurchasePolicy p = LoadIPurchasePolicy(policy.Key, policy.Value);
+                IPurchasePolicy p = LoadIPurchasePolicy(policy.Value ,policy.Key);
                 Policies.Add(p);
             }
 
@@ -1174,7 +1542,7 @@ namespace Terminal3.DataAccessLayer
             List<IPurchasePolicy> Policies = new List<IPurchasePolicy>();
             foreach (var policy in dto.Policy.Policies)
             {
-                IPurchasePolicy p = LoadIPurchasePolicy(policy.Key, policy.Value);
+                IPurchasePolicy p = LoadIPurchasePolicy(policy.Value ,policy.Key);
                 Policies.Add(p);
             }
 
@@ -1210,11 +1578,11 @@ namespace Terminal3.DataAccessLayer
         {
             List<IPurchasePolicy> list = new List<IPurchasePolicy>();
             list.Add(conditionalPolicy.PreCond);
-            ConcurrentDictionary<String, String> PreCond = getPoliciesIDs(list);
+            ConcurrentDictionary<String, String> PreCond = getPoliciesIDs(list);    // <id , type>
 
             List<IPurchasePolicy> list2 = new List<IPurchasePolicy>();            
             list2.Add(conditionalPolicy.Cond);
-            ConcurrentDictionary<String, String> Cond = getPoliciesIDs(list2);
+            ConcurrentDictionary<String, String> Cond = getPoliciesIDs(list2);      // <id , type>
 
 
             DAO_ConditionalPolicy.Create(new DTO_ConditionalPolicy(conditionalPolicy.Id, PreCond , Cond) );
@@ -1232,13 +1600,13 @@ namespace Terminal3.DataAccessLayer
             IPurchasePolicy pre = null;
             foreach (var policy in dto.PreCond)
             {
-                pre = LoadIPurchasePolicy(policy.Key, policy.Value);
+                pre = LoadIPurchasePolicy(policy.Value , policy.Key);
             }
 
             IPurchasePolicy cond = null;
             foreach (var policy in dto.Cond)
             {
-                cond = LoadIPurchasePolicy(policy.Key, policy.Value);
+                cond = LoadIPurchasePolicy(policy.Value , policy.Key);
             }
             
             c = new ConditionalPolicy(pre, cond, dto._id);
@@ -1270,6 +1638,675 @@ namespace Terminal3.DataAccessLayer
 
         }
         #endregion Purchase Policies
+
+
+        #region Discounts
+
+        public void Create(VisibleDiscount visibleDiscount)
+        {
+            DAO_VisibleDiscount.Create(new DTO_VisibleDiscount(visibleDiscount.Id, visibleDiscount.ExpirationDate.ToString(), getDiscountsIDs(visibleDiscount.Target), visibleDiscount.Percentage));
+            Discount_VisibleDiscounts.TryAdd(visibleDiscount.Id, visibleDiscount);
+        }
+
+        public VisibleDiscount LoadVisibleDiscount(FilterDefinition<BsonDocument> filter)
+        {
+            VisibleDiscount v;
+            DTO_VisibleDiscount dto = DAO_VisibleDiscount.Load(filter);
+            //if (Discount_VisibleDiscounts.TryGetValue(dto._id, out v))
+            //{
+            //    return v;
+            //}
+
+            IDiscountTarget Target = null;
+            foreach (var discount in dto.Target)
+            {
+                Target = LoadIDiscountTarget(discount.Value ,discount.Key);
+            }
+
+            v = new VisibleDiscount(DateTime.Parse(dto.ExpirationDate), Target, dto.Percentage, dto._id);
+            Discount_VisibleDiscounts.TryAdd(v.Id, v);
+            return v;
+        }
+
+        public void UpdateVisibleDiscount(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_VisibleDiscount.Update(filter, update);
+        }
+
+        public void DeleteVisibleDiscount(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_VisibleDiscount deletedVisibleDiscount = DAO_VisibleDiscount.Delete(filter);
+            foreach (var discount in deletedVisibleDiscount.Target)
+            {
+                DeleteIDiscountTarget(discount.Value , discount.Key);
+            }
+            Discount_VisibleDiscounts.TryRemove(deletedVisibleDiscount._id, out VisibleDiscount v);
+        }
+
+
+        public void Create(DiscountTargetCategories discountTargetCategories)
+        {
+            DAO_DiscountTargetCategories.Create(new DTO_DiscountTargetCategories(discountTargetCategories.getId(), discountTargetCategories.Categories));
+            Discount_DiscountTargetCategories.TryAdd(discountTargetCategories.getId(), discountTargetCategories);
+        }
+
+        public DiscountTargetCategories LoadDiscountTargetCategories(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountTargetCategories d;
+            DTO_DiscountTargetCategories dto = DAO_DiscountTargetCategories.Load(filter);
+            //if (Discount_DiscountTargetCategories.TryGetValue(dto._id, out d))
+            //{
+            //    return d;
+            //}
+
+            d = new DiscountTargetCategories(dto.Categories , dto._id);
+            Discount_DiscountTargetCategories.TryAdd(dto._id, d);
+            return d;
+        }
+
+        public void UpdateDiscountTargetCategories(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountTargetCategories.Update(filter, update);
+        }
+
+        public void DeleteDiscountTargetCategories(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountTargetCategories deletedDiscountTargetCategories = DAO_DiscountTargetCategories.Delete(filter);
+            Discount_DiscountTargetCategories.TryRemove(deletedDiscountTargetCategories._id, out DiscountTargetCategories d);
+        }
+
+
+        public void Create(DiscountTargetProducts discountTargetProducts)
+        {
+            DAO_DiscountTargetProducts.Create(new DTO_DiscountTargetProducts(discountTargetProducts.getId(), discountTargetProducts.ProductIds));
+            Discount_DiscountTargetProducts.TryAdd(discountTargetProducts.getId(), discountTargetProducts);
+        }
+
+        public DiscountTargetProducts LoadDiscountTargetProducts(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountTargetProducts d;
+            DTO_DiscountTargetProducts dto = DAO_DiscountTargetProducts.Load(filter);
+            if (Discount_DiscountTargetProducts.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
+            d = new DiscountTargetProducts(dto._id , dto.Products);
+            Discount_DiscountTargetProducts.TryAdd(dto._id, d);
+            return d;
+        }
+
+        public void UpdateDiscountTargetProducts(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountTargetProducts.Update(filter, update);
+        }
+
+        public void DeleteDiscountTargetProducts(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountTargetProducts deletedDiscountTargetProducts = DAO_DiscountTargetProducts.Delete(filter);
+            Discount_DiscountTargetProducts.TryRemove(deletedDiscountTargetProducts._id, out DiscountTargetProducts d);
+        }
+
+
+
+        public void Create(DiscreetDiscount discreetDiscount)
+        {
+            DAO_DiscreetDiscount.Create(new DTO_DiscreetDiscount(discreetDiscount.Id , discreetDiscount.DiscountCode , getDiscountsIDs(discreetDiscount.Discount)));
+            Discount_DiscreetDiscounts.TryAdd(discreetDiscount.Id, discreetDiscount);
+        }
+
+        public DiscreetDiscount LoadDiscreetDiscount(FilterDefinition<BsonDocument> filter)
+        {
+            DiscreetDiscount d;
+            DTO_DiscreetDiscount dto = DAO_DiscreetDiscount.Load(filter);
+            //if (Discount_DiscreetDiscounts.TryGetValue(dto._id, out d))
+            //{
+            //    return d;
+            //}
+
+            IDiscountPolicy Discount = null;
+            foreach (var discount in dto.Discount)
+            {
+                Discount = LoadIDiscountPolicy(discount.Value ,discount.Key);
+            }
+
+            d = new DiscreetDiscount(Discount, dto.DiscountCode, dto._id);
+            Discount_DiscreetDiscounts.TryAdd(d.Id, d);
+            return d;
+        }
+
+        public void UpdateDiscreetDiscount(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscreetDiscount.Update(filter, update);
+        }
+
+        public void DeleteDiscreetDiscount(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscreetDiscount deletedDiscreetDiscount = DAO_DiscreetDiscount.Delete(filter);
+            foreach (var discount in deletedDiscreetDiscount.Discount)
+            {
+                DeleteIDiscountPolicy(discount.Value , discount.Key);
+            }
+            Discount_DiscreetDiscounts.TryRemove(deletedDiscreetDiscount._id, out DiscreetDiscount d);
+        }
+
+
+
+        public void Create(ConditionalDiscount conditionalDiscount)
+        {
+            DAO_ConditionalDiscount.Create(new DTO_ConditionalDiscount(conditionalDiscount.Id, getDiscountsIDs(conditionalDiscount.Condition) ,getDiscountsIDs(conditionalDiscount.Discount)));
+            Discount_ConditionalDiscounts.TryAdd(conditionalDiscount.Id, conditionalDiscount);
+        }
+
+        public ConditionalDiscount LoadConditionalDiscount(FilterDefinition<BsonDocument> filter)
+        {
+            ConditionalDiscount c;
+            DTO_ConditionalDiscount dto = DAO_ConditionalDiscount.Load(filter);
+            //if (Discount_ConditionalDiscounts.TryGetValue(dto._id, out c))
+            //{
+            //    return c;
+            //}
+
+            IDiscountCondition Condition = null;
+            foreach (var discount in dto.Condition)
+            {
+                Condition = LoadIDiscountCondition(discount.Value, discount.Key);
+            }
+
+            IDiscountPolicy Discount = null;
+            foreach (var discount in dto.Discount)
+            {
+                Discount = LoadIDiscountPolicy(discount.Value, discount.Key);
+            }
+
+            c = new ConditionalDiscount(Discount, Condition, dto._id);
+            Discount_ConditionalDiscounts.TryAdd(c.Id, c);
+            return c;
+        }
+
+        public void UpdateConditionalDiscount(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_ConditionalDiscount.Update(filter, update);
+        }
+
+        public void DeleteConditionalDiscount(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_ConditionalDiscount deletedConditionalDiscount = DAO_ConditionalDiscount.Delete(filter);
+            foreach (var condition in deletedConditionalDiscount.Condition)
+            {
+                DeleteIDiscountCondition(condition.Value, condition.Key);
+            }
+            foreach (var discount in deletedConditionalDiscount.Discount)
+            {
+                DeleteIDiscountPolicy(discount.Value, discount.Key);
+            }
+            Discount_ConditionalDiscounts.TryRemove(deletedConditionalDiscount._id, out ConditionalDiscount c);
+        }
+
+
+        public void Create(MinProductCondition minProductCondition)
+        {
+            DAO_MinProductCondition.Create(new DTO_MinProductCondition(minProductCondition.Id, minProductCondition.MinQuantity, minProductCondition.ProductId));
+            Discount_MinProductConditions.TryAdd(minProductCondition.Id, minProductCondition);
+        }
+
+        public MinProductCondition LoadMinProductCondition(FilterDefinition<BsonDocument> filter)
+        {
+            MinProductCondition m;
+            DTO_MinProductCondition dto = DAO_MinProductCondition.Load(filter);
+            if (Discount_MinProductConditions.TryGetValue(dto._id, out m))
+            {
+                return m;
+            }
+            m = new MinProductCondition(dto.Product, dto.MinQuantity, dto._id);
+            Discount_MinProductConditions.TryAdd(m.Id, m);
+            return m;
+        }
+
+        public void UpdateMinProductCondition(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_MinProductCondition.Update(filter, update);
+        }
+
+        public void DeleteMinProductCondition(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_MinProductCondition deletedMinProductCondition = DAO_MinProductCondition.Delete(filter);
+            Discount_MinProductConditions.TryRemove(deletedMinProductCondition._id, out MinProductCondition m);
+        }
+
+
+
+        public void Create(MinBagPriceCondition minBagPriceCondition)
+        {
+            DAO_MinBagPriceCondition.Create(new DTO_MinBagPriceCondition(minBagPriceCondition.Id , minBagPriceCondition.MinPrice));
+            Discount_MinBagPriceConditions.TryAdd(minBagPriceCondition.Id, minBagPriceCondition);
+        }
+
+        public MinBagPriceCondition LoadMinBagPriceCondition(FilterDefinition<BsonDocument> filter)
+        {
+            MinBagPriceCondition m;
+            DTO_MinBagPriceCondition dto = DAO_MinBagPriceCondition.Load(filter);
+            if (Discount_MinBagPriceConditions.TryGetValue(dto._id, out m))
+            {
+                return m;
+            }
+
+            m = new MinBagPriceCondition(dto.MinPrice, dto._id);
+            Discount_MinBagPriceConditions.TryAdd(m.Id, m);
+            return m;
+        }
+
+        public void UpdateMinBagPriceCondition(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_MinBagPriceCondition.Update(filter, update);
+        }
+
+        public void DeleteMinBagPriceCondition(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_MinBagPriceCondition deletedMinBagPriceCondition = DAO_MinBagPriceCondition.Delete(filter);
+            Discount_MinBagPriceConditions.TryRemove(deletedMinBagPriceCondition._id, out MinBagPriceCondition m);
+        }
+
+
+
+        public void Create(MaxProductCondition maxProductCondition)
+        {
+            DAO_MaxProductCondition.Create(new DTO_MaxProductCondition(maxProductCondition.Id , maxProductCondition.MaxQuantity , maxProductCondition.ProductId));
+            Discount_MaxProductConditions.TryAdd(maxProductCondition.Id, maxProductCondition);
+        }
+
+        public MaxProductCondition LoadMaxProductCondition(FilterDefinition<BsonDocument> filter)
+        {
+            MaxProductCondition m;
+            DTO_MaxProductCondition dto = DAO_MaxProductCondition.Load(filter);
+            if (Discount_MaxProductConditions.TryGetValue(dto._id, out m))
+            {
+                return m;
+            }
+            m = new MaxProductCondition(dto.Product, dto.MaxQuantity, dto._id);
+            Discount_MaxProductConditions.TryAdd(m.Id, m);
+            return m;
+        }
+
+        public void UpdateMaxProductCondition(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_MaxProductCondition.Update(filter, update);
+        }
+
+        public void DeleteMaxProductCondition(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_MaxProductCondition deletedMaxProductCondition = DAO_MaxProductCondition.Delete(filter);
+            Discount_MaxProductConditions.TryRemove(deletedMaxProductCondition._id, out MaxProductCondition m);
+        }
+
+
+        public void Create(DiscountConditionOr discountConditionOr)
+        {
+            DAO_DiscountConditionOr.Create(new DTO_DiscountConditionOr(discountConditionOr.Id, getDiscountsIDs(discountConditionOr.Conditions)));
+            Discount_DiscountConditionOrs.TryAdd(discountConditionOr.Id, discountConditionOr);
+        }
+        public DiscountConditionOr LoadDiscountConditionOr(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountConditionOr d;
+            DTO_DiscountConditionOr dto = DAO_DiscountConditionOr.Load(filter);
+            if (Discount_DiscountConditionOrs.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
+            List<IDiscountCondition> Conditions = new List<IDiscountCondition>();            
+            foreach (var discount in dto.Conditions)
+            {
+                Conditions.Add(LoadIDiscountCondition(discount.Value, discount.Key));
+            }
+
+            d = new DiscountConditionOr(Conditions, dto._id);
+            Discount_DiscountConditionOrs.TryAdd(d.Id, d);
+            return d;
+        }
+        public void UpdateDiscountConditionOr(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountConditionOr.Update(filter, update);
+        }
+        public void DeleteDiscountConditionOr(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountConditionOr deletedDiscountConditionOr = DAO_DiscountConditionOr.Delete(filter);
+            foreach (var condition in deletedDiscountConditionOr.Conditions)
+            {
+                DeleteIDiscountCondition(condition.Value, condition.Key);
+            }
+
+            Discount_DiscountConditionOrs.TryRemove(deletedDiscountConditionOr._id, out DiscountConditionOr d);
+        }
+
+
+
+        public void Create(DiscountConditionAnd discountConditionAnd)
+        {
+            DAO_DiscountConditionAnd.Create(new DTO_DiscountConditionAnd(discountConditionAnd.Id, getDiscountsIDs(discountConditionAnd.Conditions)));
+            Discount_DiscountConditionAnds.TryAdd(discountConditionAnd.Id, discountConditionAnd);
+        }
+        public DiscountConditionAnd LoadDiscountConditionAnd(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountConditionAnd d;
+            DTO_DiscountConditionAnd dto = DAO_DiscountConditionAnd.Load(filter);
+            if (Discount_DiscountConditionAnds.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
+            List<IDiscountCondition> Conditions = new List<IDiscountCondition>();
+            foreach (var discount in dto.Conditions)
+            {
+                Conditions.Add(LoadIDiscountCondition(discount.Value, discount.Key));
+            }
+
+            d = new DiscountConditionAnd(Conditions, dto._id);
+            Discount_DiscountConditionAnds.TryAdd(d.Id, d);
+            return d;
+        }
+        public void UpdateDiscountConditionAnd(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountConditionAnd.Update(filter, update);
+        }
+        public void DeleteDiscountConditionAnd(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountConditionAnd deletedDiscountConditionAnd = DAO_DiscountConditionAnd.Delete(filter);
+            foreach (var condition in deletedDiscountConditionAnd.Conditions)
+            {
+                DeleteIDiscountCondition(condition.Value, condition.Key);
+            }
+
+            Discount_DiscountConditionAnds.TryRemove(deletedDiscountConditionAnd._id, out DiscountConditionAnd d);
+        }
+
+
+
+        public void Create(DiscountXor discountXor)
+        {
+            DAO_DiscountXor.Create(new DTO_DiscountXor(discountXor.Id, getDiscountsIDs(discountXor.Discount1), getDiscountsIDs(discountXor.Discount2), getDiscountsIDs(discountXor.ChoosingCondition)));
+            Discount_DiscountXors.TryAdd(discountXor.Id, discountXor);
+        }
+        public DiscountXor LoadDiscountXor(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountXor d;
+            DTO_DiscountXor dto = DAO_DiscountXor.Load(filter);
+            if (Discount_DiscountXors.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
+            IDiscountPolicy Discount1 = null;
+            foreach (var discount in dto.Discount1)
+            {
+                Discount1 = LoadIDiscountPolicy(discount.Value, discount.Key);
+            }
+            IDiscountPolicy Discount2 = null;
+            foreach (var discount in dto.Discount2)
+            {
+                Discount2 = LoadIDiscountPolicy(discount.Value, discount.Key);
+            }
+            IDiscountCondition ChoosingCondition = null;
+            foreach (var discount in dto.ChoosingCondition)
+            {
+                ChoosingCondition = LoadIDiscountCondition(discount.Value, discount.Key);
+            }
+            d = new DiscountXor(Discount1, Discount2, ChoosingCondition);
+            Discount_DiscountXors.TryAdd(d.Id, d);
+            return d;
+        }
+        public void UpdateDiscountXor(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountXor.Update(filter, update);
+        }
+        public void DeleteDiscountXor(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountXor deletedDiscountXor = DAO_DiscountXor.Delete(filter);
+            foreach (var discount in deletedDiscountXor.Discount1)
+            {
+                DeleteIDiscountPolicy(discount.Value, discount.Key);
+            }
+            foreach (var discount in deletedDiscountXor.Discount2)
+            {
+                DeleteIDiscountPolicy(discount.Value, discount.Key);
+            }
+            foreach (var condition in deletedDiscountXor.ChoosingCondition)
+            {
+                DeleteIDiscountCondition(condition.Value, condition.Key);
+            }
+
+            Discount_DiscountXors.TryRemove(deletedDiscountXor._id, out DiscountXor d);
+        }
+
+
+
+        public void Create(DiscountOr discountOr)
+        {
+            DAO_DiscountOr.Create(new DTO_DiscountOr(discountOr.Id, getDiscountsIDs(discountOr.Discounts)));
+            Discount_DiscountOrs.TryAdd(discountOr.Id, discountOr);
+        }
+        public DiscountOr LoadDiscountOr(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountOr d;
+            DTO_DiscountOr dto = DAO_DiscountOr.Load(filter);
+            if (Discount_DiscountOrs.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
+            List<IDiscountPolicy> Discounts = new List<IDiscountPolicy>() ;
+            foreach (var discount in dto.Discounts)
+            {
+                Discounts.Add(LoadIDiscountPolicy(discount.Value, discount.Key));
+            }
+
+            d = new DiscountOr(Discounts, dto._id);
+            Discount_DiscountOrs.TryAdd(d.Id, d);
+            return d;
+        }
+        public void UpdateDiscountOr(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountOr.Update(filter, update);
+        }
+        public void DeleteDiscountOr(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountOr deletedDiscountOr = DAO_DiscountOr.Delete(filter);
+            foreach (var discount in deletedDiscountOr.Discounts)
+            {
+                DeleteIDiscountPolicy(discount.Value, discount.Key);
+            }
+
+            Discount_DiscountOrs.TryRemove(deletedDiscountOr._id, out DiscountOr d);
+        }
+
+
+
+        public void Create(DiscountMin discountMin)
+        {
+            DAO_DiscountMin.Create(new DTO_DiscountMin(discountMin.Id, getDiscountsIDs(discountMin.Discounts)));
+            Discount_DiscountMins.TryAdd(discountMin.Id, discountMin);
+        }
+        public DiscountMin LoadDiscountMin(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountMin d;
+            DTO_DiscountMin dto = DAO_DiscountMin.Load(filter);
+            if (Discount_DiscountMins.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
+            List<IDiscountPolicy> Discounts = new List<IDiscountPolicy>();
+            foreach (var discount in dto.Discounts)
+            {
+                Discounts.Add(LoadIDiscountPolicy(discount.Value, discount.Key));
+            }
+
+            d = new DiscountMin(Discounts, dto._id);
+            Discount_DiscountMins.TryAdd(d.Id, d);
+            return d;
+        }
+        public void UpdateDiscountMin(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountMin.Update(filter, update);
+        }
+        public void DeleteDiscountMin(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountMin deletedDiscountMin = DAO_DiscountMin.Delete(filter);
+            foreach (var discount in deletedDiscountMin.Discounts)
+            {
+                DeleteIDiscountPolicy(discount.Value, discount.Key);
+            }
+
+            Discount_DiscountMins.TryRemove(deletedDiscountMin._id, out DiscountMin d);
+        }
+
+
+        public void Create(DiscountMax discountMax)
+        {
+            DAO_DiscountMax.Create(new DTO_DiscountMax(discountMax.Id, getDiscountsIDs(discountMax.Discounts)));
+            Discount_DiscountMaxs.TryAdd(discountMax.Id, discountMax);
+        }
+        public DiscountMax LoadDiscountMax(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountMax d;
+            DTO_DiscountMax dto = DAO_DiscountMax.Load(filter);
+            if (Discount_DiscountMaxs.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
+            List<IDiscountPolicy> Discounts = new List<IDiscountPolicy>();
+            foreach (var discount in dto.Discounts)
+            {
+                Discounts.Add(LoadIDiscountPolicy(discount.Value, discount.Key));
+            }
+
+            d = new DiscountMax(Discounts, dto._id);
+            Discount_DiscountMaxs.TryAdd(d.Id, d);
+            return d;
+        }
+        public void UpdateDiscountMax(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountMax.Update(filter, update);
+        }
+        public void DeleteDiscountMax(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountMax deletedDiscountMax = DAO_DiscountMax.Delete(filter);
+            foreach (var discount in deletedDiscountMax.Discounts)
+            {
+                DeleteIDiscountPolicy(discount.Value, discount.Key);
+            }
+
+            Discount_DiscountMaxs.TryRemove(deletedDiscountMax._id, out DiscountMax d);
+        }
+
+
+        public void Create(DiscountAnd discountAnd)
+        {
+            DAO_DiscountAnd.Create(new DTO_DiscountAnd(discountAnd.Id, getDiscountsIDs(discountAnd.Discounts)));
+            Discount_DiscountAnds.TryAdd(discountAnd.Id, discountAnd);
+        }
+        public DiscountAnd LoadDiscountAnd(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountAnd d;
+            DTO_DiscountAnd dto = DAO_DiscountAnd.Load(filter);
+            if (Discount_DiscountAnds.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
+            List<IDiscountPolicy> Discounts = new List<IDiscountPolicy>();
+            foreach (var discount in dto.Discounts)
+            {
+                Discounts.Add(LoadIDiscountPolicy(discount.Value, discount.Key));
+            }
+
+            d = new DiscountAnd(Discounts, dto._id);
+            Discount_DiscountAnds.TryAdd(d.Id, d);
+            return d;
+        }
+        public void UpdateDiscountAnd(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountAnd.Update(filter, update);
+        }
+        public void DeleteDiscountAnd(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountAnd deletedDiscountAnd = DAO_DiscountAnd.Delete(filter);
+            foreach (var discount in deletedDiscountAnd.Discounts)
+            {
+                DeleteIDiscountPolicy(discount.Value, discount.Key);
+            }
+
+            Discount_DiscountAnds.TryRemove(deletedDiscountAnd._id, out DiscountAnd d);
+        }
+
+
+
+        public void Create(DiscountAddition discountAddition)
+        {
+            DAO_DiscountAddition.Create(new DTO_DiscountAddition(discountAddition.Id, getDiscountsIDs(discountAddition.Discounts)));
+            Discount_DiscountAdditions.TryAdd(discountAddition.Id, discountAddition);
+        }
+        public DiscountAddition LoadDiscountAddition(FilterDefinition<BsonDocument> filter)
+        {
+            DiscountAddition d;
+            DTO_DiscountAddition dto = DAO_DiscountAddition.Load(filter);
+            if (Discount_DiscountAdditions.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
+            List<IDiscountPolicy> Discounts = new List<IDiscountPolicy>();
+            foreach (var discount in dto.Discounts)
+            {
+                Discounts.Add(LoadIDiscountPolicy(discount.Value, discount.Key));
+            }
+
+            d = new DiscountAddition(Discounts, dto._id);
+            Discount_DiscountAdditions.TryAdd(d.Id, d);
+            return d;
+        }
+        public void UpdateDiscountAddition(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        {
+            DAO_DiscountAddition.Update(filter, update);
+        }
+        public void DeleteDiscountAddition(FilterDefinition<BsonDocument> filter)
+        {
+            DTO_DiscountAddition deletedDiscountAddition = DAO_DiscountAddition.Delete(filter);
+            foreach (var discount in deletedDiscountAddition.Discounts)
+            {
+                DeleteIDiscountPolicy(discount.Value, discount.Key);
+            }
+
+            Discount_DiscountAdditions.TryRemove(deletedDiscountAddition._id, out DiscountAddition d);
+        }
+
+
+        #region Create from interface
+        public void Create(IPurchasePolicy purchasePolicy)
+        {            
+            string[] type = purchasePolicy.GetType().ToString().Split('.');
+            string policy_type = type[type.Length - 1];
+           
+            AddPolicyToDB(policy_type, purchasePolicy);                        
+        }
+        public void Create(IDiscountTarget discount)
+        {
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+           
+            AddDiscountToDB(discount_type, discount);
+        }
+        public void Create(IDiscountPolicy discount)
+        {
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+            
+            AddDiscountToDB(discount_type, discount);
+        }
+        public void Create(IDiscountCondition discount)
+        {
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+         
+            AddDiscountToDB(discount_type, discount);
+        }
+        #endregion Create from interface
+
+
+
+        #endregion Discounts
 
         #endregion Policies
 
@@ -1308,6 +2345,8 @@ namespace Terminal3.DataAccessLayer
 
     }
         #endregion
+
+
 
         #region Methods TO Delete
         //TODO - delete
