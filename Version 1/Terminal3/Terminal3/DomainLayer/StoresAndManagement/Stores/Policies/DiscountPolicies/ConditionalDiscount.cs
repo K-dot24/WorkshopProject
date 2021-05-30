@@ -10,17 +10,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public class ConditionalDiscount : AbstractDiscountPolicy
     {
 
-        public IDiscountCondition Condition { get; }
-        public IDiscountPolicy Discount { get; }
+        public IDiscountCondition Condition { set; get; }
+        public IDiscountPolicy Discount { set; get; }
 
-        public ConditionalDiscount(IDiscountPolicy discount, IDiscountCondition condition, String id = "") : base(id)
+        public ConditionalDiscount(IDiscountPolicy discount, IDiscountCondition condition, String id = "") : base(new Dictionary<string, object>(), id)
         {
             Condition = condition;
             Discount = discount;
         }
 
+        public static Result<IDiscountPolicy> create(Dictionary<string, object> info)
+        {
+            return new Result<IDiscountPolicy>("", true, new ConditionalDiscount(null, null));
+        }
+
         public override Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
         {
+            if(Condition == null || Discount == null)
+                return new Result<Dictionary<Product, Double>>("", true, new Dictionary<Product, Double>());
+            
             Result<bool> isEligible = Condition.isConditionMet(products);
             if (isEligible.ExecStatus && isEligible.Data)
             {
@@ -31,23 +39,38 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public override Result<bool> AddDiscount(String id, IDiscountPolicy discount)
         {
-            return Discount.AddDiscount(id, discount);
+            if (Id == id)
+                Discount = discount;
+            else if(Discount != null)
+                return Discount.AddDiscount(id, discount);
+            return new Result<bool>("", true, false);
         }
 
         public override Result<bool> RemoveDiscount(String id)
         {
-            return Discount.RemoveDiscount(id);
+            if (Discount.Id.Equals(id))
+                Discount = null;
+            else if (Discount != null)
+                return Discount.RemoveDiscount(id);
+            return new Result<bool>("", true, false);
         }
 
         public override Result<bool> AddCondition(string id, IDiscountCondition condition)
         {
-            return Condition.AddCondition(id, condition);
+            if (Id == id)
+                Condition = condition;
+            else if (Condition != null)
+                return Condition.AddCondition(id, condition);
+            return new Result<bool>("", true, false);
         }
 
         public override Result<bool> RemoveCondition(string id)
         {
+            if (Condition == null)
+                return new Result<bool>("", true, false);
             if (Condition.Id.Equals(id))
-                return new Result<bool>("Cant remove the main condition of the conditional discount yet", false, false);
+                //return new Result<bool>("Cant remove the main condition of the conditional discount yet", false, false);
+                Condition = null;
             return Condition.RemoveCondition(id);
         }
 
@@ -71,6 +94,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             }
 
             return new Result<IDiscountPolicyData>("", true, new ConditionalDiscountData(discountData, conditionData, Id));
+        }
+
+        public override Result<bool> EditDiscount(Dictionary<string, object> info, string id)
+        {
+            if (Id != id)
+            {
+                if (Discount != null)
+                    return Discount.EditDiscount(info, id);
+                return new Result<bool>("", true, false);
+            }
+
+            return new Result<bool>("", true, true);
+        }
+
+        public override Result<bool> EditCondition(Dictionary<string, object> info, string id)
+        {
+            if (Discount != null)
+                return Discount.EditCondition(info, id);
+            return new Result<bool>("", true, false);
         }
     }
 }

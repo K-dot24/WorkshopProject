@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountConditionsData;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions
@@ -9,11 +10,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public class MinBagPriceCondition : AbstractDiscountCondition
     {
 
-        public Double MinPrice { get; }
+        public Double MinPrice { set; get; }
 
-        public MinBagPriceCondition(Double minPrice, String id = "") : base(id)
+        public MinBagPriceCondition(Double minPrice, String id = "") : base(new Dictionary<string, object>(), id)
         {
             MinPrice = minPrice;
+        }
+
+        public static Result<IDiscountCondition> create(Dictionary<string, object> info)
+        {
+            string errorMsg = "Can't create MinBagPriceCondition: ";
+            if (!info.ContainsKey("MinPrice"))
+                return new Result<IDiscountCondition>(errorMsg + "MinPrice not found", false, null);
+            Double minPrice = ((JsonElement)info["MinPrice"]).GetDouble();
+
+            return new Result<IDiscountCondition>("", true, new MinBagPriceCondition(minPrice));
         }
 
         public override Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)
@@ -41,6 +52,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public override Result<IDiscountConditionData> GetData()
         {
             return new Result<IDiscountConditionData>("", true, new MinBagPriceConditionData(MinPrice, Id));
+        }
+
+        public override Result<bool> EditCondition(Dictionary<string, object> info, string id)
+        {
+            if (Id != id)
+                return new Result<bool>("", true, false);
+
+            if (info.ContainsKey("MinPrice"))
+                MinPrice = ((JsonElement)info["MinPrice"]).GetDouble();
+
+            return new Result<bool>("", true, true);
         }
     }
 }

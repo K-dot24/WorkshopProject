@@ -12,12 +12,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public List<IDiscountPolicy> Discounts { get; }
 
-        public DiscountMax(String id="") : base(id)
+        public DiscountMax(String id="") : base(new Dictionary<string, object>(), id)
         {
             Discounts = new List<IDiscountPolicy>();
         }
 
-        public DiscountMax(List<IDiscountPolicy> discounts, String id = "") : base(id)
+        public static Result<IDiscountPolicy> create(Dictionary<string, object> info)
+        {
+            return new Result<IDiscountPolicy>("", true, new DiscountMax());
+        }
+
+        public DiscountMax(List<IDiscountPolicy> discounts, String id = "") : base(new Dictionary<string, object>(), id)
         {
             Discounts = discounts;
             if (Discounts == null)
@@ -150,6 +155,37 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 discountsList.Add(discountResult.Data);
             }
             return new Result<IDiscountPolicyData>("", true, new DiscountMaxData(discountsList, Id));
+        }
+
+        public override Result<bool> EditDiscount(Dictionary<string, object> info, string id)
+        {
+            if (Id != id)
+            {
+                foreach (IDiscountPolicy myDiscount in Discounts)
+                {
+                    Result<bool> result = myDiscount.EditCondition(info, id);
+                    if (result.ExecStatus && result.Data)
+                        return result;
+                    if (!result.ExecStatus)
+                        return result;
+                }
+                return new Result<bool>("", true, false);
+            }
+
+            return new Result<bool>("", true, true);
+        }
+
+        public override Result<bool> EditCondition(Dictionary<string, object> info, string id)
+        {
+            foreach (IDiscountPolicy myDiscount in Discounts)
+            {
+                Result<bool> result = myDiscount.EditCondition(info, id);
+                if (result.ExecStatus && result.Data)
+                    return result;
+                if (!result.ExecStatus)
+                    return result;
+            }
+            return new Result<bool>("", true, false);
         }
     }
 }

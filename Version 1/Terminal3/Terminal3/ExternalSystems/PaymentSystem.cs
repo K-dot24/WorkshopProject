@@ -7,17 +7,31 @@ namespace Terminal3.ExternalSystems
     //Mock for payment system
     public static class PaymentSystem
     {
-        public static bool Pay(double amount , IDictionary<String, Object> paymentDetails)
+        public static int Pay(double amount , IDictionary<String, Object> paymentDetails)
         {
-            //bool[] bools = { true, false };
-            //return bools[new Random().Next(0, 2)];
-            return paymentDetails.Count != 0;
+            if (ExternalSystemsAPI.Handshake())
+            {                
+                String result = ExternalSystemsAPI.Pay(paymentDetails);
+                if(Int32.TryParse(result, out int id))
+                {
+                    return id;
+                }
+            }
+            return -1;
         }
 
-        public static void CancelTransaction(IDictionary<String, Object> paymentDetails)
+        public static int CancelPay(IDictionary<String, Object> paymentDetails)
         {
             // Users transaction is canceled
-
+            if (ExternalSystemsAPI.Handshake())
+            {
+                String result = ExternalSystemsAPI.CancelPay(paymentDetails);
+                if (Int32.TryParse(result, out int id))
+                {
+                    return id;
+                }
+            }
+            return -1;
         }
     }
 }

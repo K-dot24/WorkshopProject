@@ -10,7 +10,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     {
         public string Id { get; }
 
-        public AbstractDiscountCondition(String id = "")
+        public AbstractDiscountCondition(Dictionary<string, object> info, String id = "")
         {
             if (id.Equals(""))
                 Id = Service.GenerateId();
@@ -21,6 +21,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public abstract Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products);
         public abstract Result<bool> AddCondition(string id, IDiscountCondition condition);
         public abstract Result<bool> RemoveCondition(string id);
+        public abstract Result<bool> EditCondition(Dictionary<string, object> info, string id);
         public abstract Result<IDiscountConditionData> GetData();
     }
 }

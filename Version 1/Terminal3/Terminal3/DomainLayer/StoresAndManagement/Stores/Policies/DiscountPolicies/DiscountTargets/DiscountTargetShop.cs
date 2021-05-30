@@ -9,6 +9,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public class DiscountTargetShop : IDiscountTarget
     {
 
+        public static Result<IDiscountTarget> create(Dictionary<string, object> info)
+        {
+            return new Result<IDiscountTarget>("", true, new DiscountTargetShop());
+        }
+
         public List<Product> getTargets(ConcurrentDictionary<Product, int> products)
         {
             List<Product> result = new List<Product>();

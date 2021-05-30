@@ -5,6 +5,10 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.ExternalSystems;
+using Terminal3.DataAccessLayer;
+using MongoDB.Driver;
+using MongoDB.Bson;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -16,8 +20,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Boolean LoggedIn { get; set; }
         public History History { get; set; }
         public LinkedList<Notification> PendingNotification { get; }
-        public NotificationCenter NotificationCenter {get;}     
+        public NotificationCenter NotificationCenter {get;}
 
+        //public Mapper mapper = Mapper.getInstance();
+        
         //Constructor
         public RegisteredUser(String email , String password) : base()
         {
@@ -41,7 +47,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
 
 
-        //For test Purpose ONLY 
         public RegisteredUser(string id, String email, String password) : base(id)
         {
             this.Email = email;
@@ -60,8 +65,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
             if (Password.Equals(password))
             {
-                //Correct paswword
+                // Correct paswword
                 LoggedIn = true;
+
+                /*// Update DB
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
+                var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
+                mapper.UpdateRegisteredUser(filter, update); 
+*/
                 DisplayPendingNotifications();
                 return new Result<RegisteredUser>($"{this.Email} is Logged in\n", true, this);
             }
@@ -114,6 +125,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             return new Result<History>("User history\n", true, History);
         }
+
         public Result<RegisteredUserService> GetDAL()
         {
             ShoppingCartService SCD = this.ShoppingCart.GetDAL().Data;
@@ -142,6 +154,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             {
                 History.AddPurchasedShoppingCart(ShoppingCart);
                 ShoppingCart = new ShoppingCart();          // create new shopping cart for user
+
+               /* // Update DB
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
+                var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.getDTO());
+                mapper.UpdateRegisteredUser(filter, update);*/
+
             }
             return result;
         }
@@ -179,6 +197,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     PendingNotification.Remove(notification);
                 }
             }
+        }
+
+        public DTO_RegisteredUser getDTO()
+        {
+            LinkedList<DTO_Notification> notifications_dto = new LinkedList<DTO_Notification>();
+            foreach(var n in PendingNotification)
+            {
+                notifications_dto.AddLast(n.getDTO()); 
+            }
+            return new DTO_RegisteredUser(Id, ShoppingCart.getDTO(), Email, Password, 
+                                        LoggedIn, History.getDTO(), notifications_dto);
+
         }
     }
 }

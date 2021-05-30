@@ -13,11 +13,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
     {
         //Properties
         public UsersAndPermissionsFacade Facade { get; }
+        string adminEmail = "Admin@terminal3.com";
+        string adminPassword = "Admin123";
+        string user1_id = "user1_testid";
+        string user2_id = "user2_testid";
 
         //Constructor
         public UsersAndPermissionsFacadeTests()
         {
-            Facade = new UsersAndPermissionsFacade();
+            Facade = new UsersAndPermissionsFacade(adminEmail, adminPassword);
 
         }
 
@@ -28,8 +32,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         [InlineData("tomer@gmail.com", "tomer@gmail.com", false)] //trying to register with an existing email
         public void RegisterTest(String usedEmail, String requestedEmail, Boolean expectedResult)
         {
-            Assert.True(Facade.Register(usedEmail, "password").ExecStatus);
-            Result<RegisteredUser> registerResult = Facade.Register(requestedEmail, "password");
+            Assert.True(Facade.Register(usedEmail, "password",user1_id).ExecStatus);
+            Result<RegisteredUser> registerResult = Facade.Register(requestedEmail, "password",user2_id);
             Assert.Equal(expectedResult, registerResult.ExecStatus);
 
             if (expectedResult)
@@ -46,7 +50,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         //System admin need to be registered user
         public void AddSystemAdminTest(String registeredEmail, String adminEmail, Boolean expectedResult)
         {
-            Result<RegisteredUser> registerResult = Facade.Register(registeredEmail, "password");
+            Result<RegisteredUser> registerResult = Facade.Register(registeredEmail, "password",user1_id);
             Assert.Equal(expectedResult, Facade.AddSystemAdmin(adminEmail).ExecStatus);
 
             if (expectedResult)
@@ -62,8 +66,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         [InlineData("tomer@gmail.com", "raz@gmail.com", "shaked@gmail.com", false)] //user is NOT exist in SystemAdmins
         public void RemoveSystemAdminTest(String admin1, String admin2, String adminToRemove, Boolean expectedResult)
         {
-            Facade.Register(admin1, "password");
-            Facade.Register(admin2, "password");
+            Facade.Register(admin1, "password",user1_id);
+            Facade.Register(admin2, "password",user2_id);
             Facade.AddSystemAdmin(admin1);
             Facade.AddSystemAdmin(admin2);
             Assert.Equal(expectedResult, Facade.RemoveSystemAdmin(adminToRemove).ExecStatus);
@@ -87,7 +91,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         {
             String email = "tomer@gmail.com";
             String password = "password";
-            Facade.Register(email, password);
+            Facade.Register(email, password,user1_id);
             Result<RegisteredUser> loginResult = Facade.Login(email, password);
             Assert.True(loginResult.ExecStatus, "Fail to login");
             if (loginResult.ExecStatus)
@@ -101,7 +105,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         {
             String email = "tomer@gmail.com";
             String password = "password";
-            RegisteredUser user = Facade.Register(email, password).Data;
+            RegisteredUser user = Facade.Register(email, password,user2_id).Data;
             Assert.False(Facade.LogOut(email).ExecStatus, "Able to loggout twice");
             Assert.False(user.LoggedIn, "Logout returned false, but the user is actually loged in");
             Facade.Login(email, password);
@@ -120,7 +124,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         public void AddProductToCartTest(string email, int productQuantity, Boolean expectedResult, Boolean expectedResult2)
         {
             // Open store
-            RegisteredUser founder = Facade.Register(email, "password").Data;
+            RegisteredUser founder = Facade.Register(email, "password",user1_id).Data;
             Assert.NotNull(founder);
             Store store = new Store("Testore", founder);
 
@@ -158,7 +162,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         public void AddProductReviewTest1(String email, String review)
         {
             // Open store
-            RegisteredUser founder = Facade.Register(email, "password").Data;
+            RegisteredUser founder = Facade.Register(email, "password",user1_id).Data;
             Assert.NotNull(founder);
             Store store = new Store("Testore", founder);
 
@@ -189,7 +193,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         public void AddProductReviewTest2(String email, String review)
         {
             // Open store
-            RegisteredUser founder = Facade.Register(email, "password").Data;
+            RegisteredUser founder = Facade.Register(email, "password",user1_id).Data;
             Assert.NotNull(founder);
             Store store = new Store("Testore", founder);
 
@@ -220,7 +224,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         {
             string email = "igor@gmail.com";
             string password = "pass123";
-            Facade.Register(email, password);
+            Facade.Register(email, password,user1_id);
             RegisteredUser user = Facade.Login("igor@gmail.com", "pass123").Data;
             Facade.ExitSystem(user.Id);
 
@@ -296,8 +300,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             bag.Products.TryAdd(product, 2);
             bag.Products.TryAdd(product2, 1);
 
-            IDictionary<String, Object> paymentDetails = new Dictionary<String , Object>();
-            IDictionary<String, Object> deliveryDetails = new Dictionary<String , Object>();
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>
+                    {
+                     { "card_number", "2222333344445555" },
+                     { "month", "4" },
+                     { "year", "2021" },
+                     { "holder", "Israel Israelovice" },
+                     { "ccv", "262" },
+                     { "id", "20444444" }
+                    };
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>
+                    {
+                     { "name", "Israel Israelovice" },
+                     { "address", "Rager Blvd 12" },
+                     { "city", "Beer Sheva" },
+                     { "country", "Israel" },
+                     { "zip", "8458527" }
+                    };
 
             Assert.Empty(founder.History.ShoppingBags);
 
@@ -343,8 +362,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
             founder.ShoppingCart.ShoppingBags.TryGetValue(store2.Id, out ShoppingBag bag2);
             bag2.Products.TryAdd(product2, 1);
 
-            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>();
-            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>();
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>
+                    {
+                     { "card_number", "2222333344445555" },
+                     { "month", "4" },
+                     { "year", "2021" },
+                     { "holder", "Israel Israelovice" },
+                     { "ccv", "262" },
+                     { "id", "20444444" }
+                    };
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>
+                    {
+                     { "name", "Israel Israelovice" },
+                     { "address", "Rager Blvd 12" },
+                     { "city", "Beer Sheva" },
+                     { "country", "Israel" },
+                     { "zip", "8458527" }
+                    };
 
             Assert.Empty(founder.History.ShoppingBags);
 

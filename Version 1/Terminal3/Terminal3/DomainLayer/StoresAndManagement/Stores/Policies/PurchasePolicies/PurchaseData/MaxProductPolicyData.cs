@@ -7,13 +7,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 {
     public class MaxProductPolicyData : IPurchasePolicyData
     {
-        public ProductService Product { get; }
+        public string ProductId { get; }
         public int Max { get; }
         public string Id { get; }
 
-        public MaxProductPolicyData(ProductService product, int max, string id)
+        public MaxProductPolicyData(string productId, int max, string id)
         {
-            this.Product = product;
+            this.ProductId = productId;
             this.Max = max;
             this.Id = id;
         }

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
@@ -23,6 +24,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             if (policies != null)
                 this.Policies = policies;
         }
+
+        public static Result<IPurchasePolicy> create(Dictionary<string, object> info)
+        {
+            return new Result<IPurchasePolicy>("", true, new OrPolicy());
+        }
+
         public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
         {       
             foreach (IPurchasePolicy policy in Policies)
@@ -80,21 +87,39 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<IPurchasePolicyData>("", true, new OrPolicyData(dataPolicies, Id));
         }
 
-        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
+        public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
         {
-            if (Policies.RemoveAll(policy => policy.Id.Equals(id)) >= 1)
+            if (Id != id)
             {
-                Policies.Add(policy);
-                return new Result<bool>("", true, true);
+                foreach (IPurchasePolicy myDiscount in Policies)
+                {
+                    Result<bool> result = myDiscount.EditPolicy(info, id);
+                    if (result.ExecStatus && result.Data)
+                        return result;
+                    if (!result.ExecStatus)
+                        return result;
+                }
+                return new Result<bool>("", true, false);
             }
 
-            foreach (IPurchasePolicy p in Policies)
+            return new Result<bool>("", true, true);
+        }
+
+        public DTO_OrPolicy getDTO()
+        {
+            return new DTO_OrPolicy(this.Id, getPoliciesIDs(this.Policies));
+        }
+
+        private ConcurrentDictionary<String, String> getPoliciesIDs(List<IPurchasePolicy> list)
+        {
+            ConcurrentDictionary<String, String> Policies = new ConcurrentDictionary<String, String>();
+            foreach (IPurchasePolicy policy in list)
             {
-                Result<bool> res = p.EditPolicy(policy, id);                
-                if (res.Data)
-                    return res;
+                string[] type = policy.GetType().ToString().Split('.');
+                string policy_type = type[type.Length - 1];
+                Policies.TryAdd(policy_type, policy.Id);
             }
-            return new Result<bool>("", true, false);
+            return Policies;
         }
     }
 }
