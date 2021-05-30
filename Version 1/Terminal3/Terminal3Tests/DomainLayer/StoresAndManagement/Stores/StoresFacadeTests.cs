@@ -561,5 +561,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             Assert.False(Facade.Stores.ContainsKey(TestStore.Id));
             Assert.True(TestStore.isClosed);
         }
-    }
+
+        // Permission check test
+        [Fact()]
+        public void GetIncomeAmountGroupByDay_permission()
+        {
+            RegisteredUser user = new RegisteredUser("zoe@gmail.com", "SassyMoodyNasty");
+            RegisteredUser user_not_owner = new RegisteredUser("shaked@gmail.com", "Sassy");
+            Store store = new Store("test_store" , user);
+
+            Assert.False(Facade.GetIncomeAmountGroupByDay(DateTime.Now.Date.ToString(), DateTime.Now.Date.ToString(), store.Id, user_not_owner.Id).ExecStatus);   
+            Assert.True(Facade.GetIncomeAmountGroupByDay(DateTime.Now.Date.ToString(), DateTime.Now.Date.ToString(), store.Id, user.Id).ExecStatus);   
+        }
+
+    }  
 }

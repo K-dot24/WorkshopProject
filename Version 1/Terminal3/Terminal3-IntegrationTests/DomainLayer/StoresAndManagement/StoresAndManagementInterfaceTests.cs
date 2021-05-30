@@ -716,5 +716,45 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
                 Assert.Equal(owner.GetId(), owner.User.PendingNotification.First.Value.ClientId);
             }
         }
+
+
+        [Fact()]
+        public void GetIncomeAmountGroupByDay_data()
+        {
+            // Add products to store
+            Product product = new Product("Banana", 5, 1, "Fruits");
+            Product product2 = new Product("Apple", 4, 1, "Fruits");
+            TestStore.InventoryManager.Products.TryAdd(product.Id, product);
+            TestStore.InventoryManager.Products.TryAdd(product2.Id, product2);
+
+            // Add product to user shopping bag
+            Facade.AddProductToCart(RegisteredUser.Id, product.Id, 2, TestStore.Id);
+            Facade.AddProductToCart(RegisteredUser.Id, product2.Id, 1, TestStore.Id);
+
+
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>();
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>();
+
+            Result<ShoppingCartService> res = Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
+
+            Result<List<Tuple<DateTime, Double>>>  recipts_owner = StoresFacade.GetIncomeAmountGroupByDay(DateTime.Now.Date.ToString(), DateTime.Now.Date.ToString(), TestStore.Id, Founder.Id);
+            Tuple< DateTime, Double > tup = new Tuple<DateTime, Double>(DateTime.Now, 9.0);
+
+            Result<List<Tuple<DateTime, Double>>> recipts_admin = StoresFacade.GetIncomeAmountGroupByDay(DateTime.Now.Date.ToString(), DateTime.Now.Date.ToString());
+
+            Assert.True(recipts_owner.Data.Count == 1 && recipts_owner.Data.Contains(tup));
+            Assert.True(recipts_admin.Data.Count == 1 && recipts_admin.Data.Contains(tup));
+        }
+
+        [Fact()]
+        public void GetIncomeAmountGroupByDay_empty()
+        {
+            Result<List<Tuple<DateTime, Double>>> recipts_owner = StoresFacade.GetIncomeAmountGroupByDay(DateTime.Now.Date.ToString(), DateTime.Now.Date.ToString(), TestStore.Id, Founder.Id);
+            Result<List<Tuple<DateTime, Double>>> recipts_admin = StoresFacade.GetIncomeAmountGroupByDay(DateTime.Now.Date.ToString(), DateTime.Now.Date.ToString());
+
+            Assert.True(recipts_owner.Data.Count == 0);
+            Assert.True(recipts_admin.Data.Count == 0);
+        }
+
     }
 }
