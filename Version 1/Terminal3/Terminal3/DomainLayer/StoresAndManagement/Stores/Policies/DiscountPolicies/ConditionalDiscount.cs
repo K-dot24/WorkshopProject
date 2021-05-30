@@ -69,8 +69,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (Condition == null)
                 return new Result<bool>("", true, false);
             if (Condition.Id.Equals(id))
+            {
                 //return new Result<bool>("Cant remove the main condition of the conditional discount yet", false, false);
                 Condition = null;
+                return new Result<bool>("", true, true);
+            }
             return Condition.RemoveCondition(id);
         }
 

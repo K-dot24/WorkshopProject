@@ -58,17 +58,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Discounts.Tests
 
         [Fact()]
         [Trait("Category", "Unit")]
-        public void IllegalRemoveDiscountTest()
-        {
-            VisibleDiscount d = new VisibleDiscount(DateTime.MaxValue, new DiscountTargetShop(), 20);
-            DiscountXor xor = new DiscountXor(d, d, new MinBagPriceCondition(0));
-            PolicyManager.AddDiscountPolicy(xor);
-            Result<bool> result = PolicyManager.RemoveDiscountPolicy(d.Id);
-            Assert.False(result.ExecStatus);
-        }
-
-        [Fact()]
-        [Trait("Category", "Unit")]
         public void RemoveConditionTest()
         {
             MinBagPriceCondition c = new MinBagPriceCondition(0);
@@ -84,18 +73,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Discounts.Tests
         public void RemoveNonExistantConditionTest()
         {
             Result<bool> result = PolicyManager.RemoveDiscountCondition("Non existant Id");
-            Assert.False(result.ExecStatus);
-        }
-
-        [Fact()]
-        [Trait("Category", "Unit")]
-        public void IllegalRemoveConditionTest()
-        {
-            VisibleDiscount vd = new VisibleDiscount(DateTime.MaxValue, new DiscountTargetShop(), 20);
-            MinBagPriceCondition c = new MinBagPriceCondition(0);
-            ConditionalDiscount cd = new ConditionalDiscount(vd, c);
-            PolicyManager.AddDiscountPolicy(cd);
-            Result<bool> result = PolicyManager.RemoveDiscountCondition(c.Id);
             Assert.False(result.ExecStatus);
         }
 
