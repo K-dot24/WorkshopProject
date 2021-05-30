@@ -21,5 +21,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         {
             return new Result<IDiscountTargetData>("", true, new DiscountTargetShopData());
         }
+
+        public string getId()
+        {
+            return "";
+        }
     }
 }

@@ -13,5 +13,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         Result<IDiscountTargetData> GetData();
 
+        String getId();
+
     }
 }

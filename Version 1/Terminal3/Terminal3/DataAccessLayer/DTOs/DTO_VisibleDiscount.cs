@@ -13,7 +13,7 @@ namespace Terminal3.DataAccessLayer.DTOs
         [BsonElement]
         public String ExpirationDate { get; }
         [BsonElement]
-        public ConcurrentDictionary<String, String> Target { get; }
+        public ConcurrentDictionary<String, String> Target { get; }     // <type , id>
         [BsonElement]
         public Double Percentage { get; }
 

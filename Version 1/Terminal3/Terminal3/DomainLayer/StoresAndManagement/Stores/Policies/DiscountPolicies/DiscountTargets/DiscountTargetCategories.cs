@@ -9,9 +9,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public class DiscountTargetCategories : IDiscountTarget
     {
         public List<string> Categories { get; }
-
+        public string Id { get; set; }
         public DiscountTargetCategories(List<string> categories)
         {
+            Id = Service.GenerateId();
+            Categories = categories;
+        }
+
+        // for loading from db
+        public DiscountTargetCategories(List<string> categories, string id) 
+        {
+            Id = id;
             Categories = categories;
         }
 
@@ -29,6 +37,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public Result<IDiscountTargetData> GetData()
         {
             return new Result<IDiscountTargetData>("", true, new DiscountTargetCategoriesData(new List<string>(Categories)));
+        }
+
+        public string getId()
+        {
+            return this.Id;
         }
     }
 }

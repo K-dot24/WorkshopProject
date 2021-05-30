@@ -10,7 +10,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public class DiscountConditionOr : AbstractDiscountCondition
     {
 
-        public List<IDiscountCondition> Conditions { get; }
+        public List<IDiscountCondition> Conditions { get; set; }
 
         public DiscountConditionOr(String id = "") : base(id)
         {

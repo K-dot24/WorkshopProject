@@ -5,17 +5,17 @@ using System.Text;
 
 namespace Terminal3.DataAccessLayer.DTOs
 {
-    public class DTO_DiscountTargetProducts
+    public class DTO_MinBagPriceCondition
     {
         [BsonId]
         public string _id { get; set; }
         [BsonElement]
-        public List<String> Products { get; set; }      // List<ProductID>
+        public Double MinPrice { get; }
 
-        public DTO_DiscountTargetProducts(string id, List<string> products)
+        public DTO_MinBagPriceCondition(string id, double minPrice)
         {
             _id = id;
-            Products = products;
+            MinPrice = minPrice;
         }
     }
 }

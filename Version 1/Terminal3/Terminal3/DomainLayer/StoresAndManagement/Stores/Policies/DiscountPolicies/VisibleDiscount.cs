@@ -10,9 +10,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public class VisibleDiscount : AbstractDiscountPolicy
     {
 
-        public DateTime ExpirationDate { get; }
-        public IDiscountTarget Target { get; }
-        public Double Percentage { get; }
+        public DateTime ExpirationDate { get; set; }
+        public IDiscountTarget Target { get; set; }
+        public Double Percentage { get; set; }
 
         public VisibleDiscount(DateTime expirationDate, IDiscountTarget target, Double percentage, String id="") : base(id)
         {
