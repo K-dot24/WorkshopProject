@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.IO;
+using Terminal3.DomainLayer;
 
 namespace Terminal3.ExternalSystems
 {
@@ -48,42 +49,58 @@ namespace Terminal3.ExternalSystems
             string result;
             Encoding encoding = Encoding.GetEncoding("utf-8");
             HttpWebResponse response = CreatePostHttpResponse(param, encoding);
-            Stream stream = response.GetResponseStream();
-            StreamReader sr = new StreamReader(stream);
-            result = sr.ReadToEnd();           
-            return result;
+            if(!(response is null))
+            {
+                Stream stream = response.GetResponseStream();
+                StreamReader sr = new StreamReader(stream);
+                result = sr.ReadToEnd();
+                return result;
+            }
+            Logger.LogError("Could not connect to external system API");
+            return String.Empty;
+
+
         }
 
         public static HttpWebResponse CreatePostHttpResponse(IDictionary<String, Object> parameters, Encoding charset)
         {
-            HttpWebRequest request = null;
-            request = WebRequest.Create(sourceURL) as HttpWebRequest;
-            request.ProtocolVersion = HttpVersion.Version10;
-            request.Method = "POST";
-            request.ContentType = "application/x-www-form-urlencoded";
-            if (!(parameters == null || parameters.Count == 0))
+            try
             {
-                StringBuilder buffer = new StringBuilder();
-                int i = 0;
-                foreach (string key in parameters.Keys)
+                HttpWebRequest request = null;
+                request = WebRequest.Create(sourceURL) as HttpWebRequest;
+                request.ProtocolVersion = HttpVersion.Version10;
+                request.Method = "POST";
+                request.ContentType = "application/x-www-form-urlencoded";
+                if (!(parameters == null || parameters.Count == 0))
                 {
-                    if (i > 0)
+                    StringBuilder buffer = new StringBuilder();
+                    int i = 0;
+                    foreach (string key in parameters.Keys)
                     {
-                        buffer.AppendFormat("&{0}={1}", key, parameters[key]);
+                        if (i > 0)
+                        {
+                            buffer.AppendFormat("&{0}={1}", key, parameters[key]);
+                        }
+                        else
+                        {
+                            buffer.AppendFormat("{0}={1}", key, parameters[key]);
+                        }
+                        i++;
                     }
-                    else
+                    byte[] data = charset.GetBytes(buffer.ToString());
+                    using (Stream stream = request.GetRequestStream())
                     {
-                        buffer.AppendFormat("{0}={1}", key, parameters[key]);
+                        stream.Write(data, 0, data.Length);
                     }
-                    i++;
                 }
-                byte[] data = charset.GetBytes(buffer.ToString());
-                using (Stream stream = request.GetRequestStream())
-                {
-                    stream.Write(data, 0, data.Length);
-                }
+                return request.GetResponse() as HttpWebResponse;
             }
-            return request.GetResponse() as HttpWebResponse;
+            catch(WebException e)
+            {
+                Logger.LogError(e.ToString());
+                return null;
+            }
+
         }
 
     }
