@@ -11,7 +11,7 @@ namespace Terminal3.DataAccessLayer.DTOs
         [BsonId]
         public string _id { get; set; }
         [BsonElement]
-        public Double Price { get; }
+        public Double Price { get; set; }
         [BsonElement]
         public ConcurrentDictionary<String, Double> Participants { get; set; }  // <UserID, winning %>
 
