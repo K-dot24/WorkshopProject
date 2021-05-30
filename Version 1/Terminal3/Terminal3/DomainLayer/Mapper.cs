@@ -1668,14 +1668,7 @@ namespace Terminal3.DataAccessLayer
 
         public void Create(DiscountTargetProducts discountTargetProducts)
         {
-
-            List<String> Products = new List<string>();
-            foreach(Product p in discountTargetProducts.Products)
-            {
-                Products.Add(p.Id);
-            }
-
-            DAO_DiscountTargetProducts.Create(new DTO_DiscountTargetProducts(discountTargetProducts.getId(), Products));
+            DAO_DiscountTargetProducts.Create(new DTO_DiscountTargetProducts(discountTargetProducts.getId(), discountTargetProducts.ProductIds));
             Discount_DiscountTargetProducts.TryAdd(discountTargetProducts.getId(), discountTargetProducts);
         }
 
@@ -1683,19 +1676,11 @@ namespace Terminal3.DataAccessLayer
         {
             DiscountTargetProducts d;
             DTO_DiscountTargetProducts dto = DAO_DiscountTargetProducts.Load(filter);
-            //if (Discount_DiscountTargetProducts.TryGetValue(dto._id, out d))
-            //{
-            //    return d;
-            //}
-
-            List<Product> Products = new List<Product>();
-            foreach(String pid in dto.Products)
+            if (Discount_DiscountTargetProducts.TryGetValue(dto._id, out d))
             {
-                var p_filter = Builders<BsonDocument>.Filter.Eq("_id", pid);
-                Products.Add(LoadProduct(p_filter));
+                return d;
             }
-
-            d = new DiscountTargetProducts(dto._id , Products);
+            d = new DiscountTargetProducts(dto._id , dto.Products);
             Discount_DiscountTargetProducts.TryAdd(dto._id, d);
             return d;
         }
@@ -1810,7 +1795,7 @@ namespace Terminal3.DataAccessLayer
 
         public void Create(MinProductCondition minProductCondition)
         {
-            DAO_MinProductCondition.Create(new DTO_MinProductCondition(minProductCondition.Id, minProductCondition.MinQuantity, minProductCondition.Product.Id));
+            DAO_MinProductCondition.Create(new DTO_MinProductCondition(minProductCondition.Id, minProductCondition.MinQuantity, minProductCondition.ProductId));
             Discount_MinProductConditions.TryAdd(minProductCondition.Id, minProductCondition);
         }
 
@@ -1822,9 +1807,7 @@ namespace Terminal3.DataAccessLayer
             {
                 return m;
             }
-
-            var p_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Product);
-            m = new MinProductCondition(LoadProduct(p_filter), dto.MinQuantity, dto._id);
+            m = new MinProductCondition(dto.Product, dto.MinQuantity, dto._id);
             Discount_MinProductConditions.TryAdd(m.Id, m);
             return m;
         }
@@ -1877,7 +1860,7 @@ namespace Terminal3.DataAccessLayer
 
         public void Create(MaxProductCondition maxProductCondition)
         {
-            DAO_MaxProductCondition.Create(new DTO_MaxProductCondition(maxProductCondition.Id , maxProductCondition.MaxQuantity , maxProductCondition.Product.Id));
+            DAO_MaxProductCondition.Create(new DTO_MaxProductCondition(maxProductCondition.Id , maxProductCondition.MaxQuantity , maxProductCondition.ProductId));
             Discount_MaxProductConditions.TryAdd(maxProductCondition.Id, maxProductCondition);
         }
 
@@ -1889,9 +1872,7 @@ namespace Terminal3.DataAccessLayer
             {
                 return m;
             }
-
-            var p_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.Product);
-            m = new MaxProductCondition(LoadProduct(p_filter), dto.MaxQuantity, dto._id);
+            m = new MaxProductCondition(dto.Product, dto.MaxQuantity, dto._id);
             Discount_MaxProductConditions.TryAdd(m.Id, m);
             return m;
         }

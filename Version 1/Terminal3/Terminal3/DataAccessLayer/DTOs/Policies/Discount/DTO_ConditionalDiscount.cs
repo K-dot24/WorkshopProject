@@ -16,7 +16,7 @@ namespace Terminal3.DataAccessLayer.DTOs
         public ConcurrentDictionary<String, String> Discount { get; set; }          // <id , type IDiscountPolicy >
 
         public DTO_ConditionalDiscount(string id, ConcurrentDictionary<string, string> condition, ConcurrentDictionary<string, string> discount)
-        {
+        {            
             _id = id;
             Condition = condition;
             Discount = discount;
