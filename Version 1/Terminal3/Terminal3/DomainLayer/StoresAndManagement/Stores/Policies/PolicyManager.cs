@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountComposition;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions;
@@ -14,9 +15,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
     {
         double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
         Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
-        Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info);
-        Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info, String id);
-        Result<IDiscountCondition> AddDiscountCondition(Dictionary<string, object> info, String id);
+        Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info);
+        Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info, String id);
+        Result<Boolean> AddDiscountCondition(Dictionary<string, object> info, String id);
         Result<Boolean> AddDiscountPolicy(IDiscountPolicy policy);
         Result<Boolean> AddDiscountPolicy(IDiscountPolicy policy, String id);
         Result<Boolean> AddDiscountCondition(IDiscountCondition condition, String id);
@@ -26,9 +27,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         Result<Boolean> EditDiscountCondition(Dictionary<string, object> info, String id);
         Result<IDiscountPolicyData> GetDiscountPolicyData();
         Result<IPurchasePolicyData> GetPurchasePolicyData();
-        Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info);
+        Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
-        Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
+        Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info, string id);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
         Result<Boolean> RemovePurchasePolicy(string id);
         Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id);
@@ -71,41 +72,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return MainPolicy.IsConditionMet(products, user);
         }
 
-        public Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info)
+        public Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info)
         {
             Result<IDiscountPolicy> discountResult = CreateDiscount(info);
             if (discountResult.ExecStatus)
-            {
-                Result<bool> res = AddDiscountPolicy(discountResult.Data);
-                if (res.ExecStatus)
-                    return new Result<IDiscountPolicy>(res.Message, res.ExecStatus, discountResult.Data);
-            }
-
-            return new Result<IDiscountPolicy>(discountResult.Message, false, null);
+                return AddDiscountPolicy(discountResult.Data);
+            return new Result<bool>(discountResult.Message, false, false);
         }
 
-        public Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info, String id)
+        public Result<Boolean> AddDiscountPolicy(Dictionary<string, object> info, String id)
         {
             Result<IDiscountPolicy> discountResult = CreateDiscount(info);
             if (discountResult.ExecStatus)
-            {
-                Result<bool> res = AddDiscountPolicy(discountResult.Data, id);
-                if (res.ExecStatus)
-                    return new Result<IDiscountPolicy>(res.Message, res.ExecStatus, discountResult.Data);
-            }
-            return new Result<IDiscountPolicy>(discountResult.Message, false, null);
+                return AddDiscountPolicy(discountResult.Data, id);
+            return new Result<bool>(discountResult.Message, false, false);
         }
 
-        public Result<IDiscountCondition> AddDiscountCondition(Dictionary<string, object> info, String id)
+        public Result<Boolean> AddDiscountCondition(Dictionary<string, object> info, String id)
         {
             Result<IDiscountCondition> discountConditionResult = CreateDiscountCondition(info);
             if (discountConditionResult.ExecStatus)
-            {
-                Result<bool> res = AddDiscountCondition(discountConditionResult.Data, id);
-                if (res.ExecStatus)
-                    return new Result<IDiscountCondition>(res.Message, res.ExecStatus, discountConditionResult.Data);
-            } 
-            return new Result<IDiscountCondition>(discountConditionResult.Message, false, null);
+                return AddDiscountCondition(discountConditionResult.Data, id);
+            return new Result<bool>(discountConditionResult.Message, false, false);
         }
 
         public Result<Boolean> AddDiscountPolicy(IDiscountPolicy discount)
@@ -178,19 +166,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return MainPolicy.GetData();
         }
 
-        public Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info)
+        public Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info)
         {
             Result<IPurchasePolicy> result = CreatePurchasePolicy(info);
             if (!result.ExecStatus)
-                return new Result<IPurchasePolicy>(result.Message, false, null);
-
+                return new Result<bool>(result.Message, false, false);
             IPurchasePolicy policy = result.Data;
-            Result<bool> res = AddPurchasePolicy(policy);
-            if (res.ExecStatus)
-            {
-                return new Result<IPurchasePolicy>(res.Message, res.ExecStatus, policy);
-            }
-            return new Result<IPurchasePolicy>(res.Message, res.ExecStatus, null);
+            return AddPurchasePolicy(policy);
         }
 
         public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy)
@@ -205,19 +187,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return result;
         }
 
-        public Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, String id)
+        public Result<Boolean> AddPurchasePolicy(Dictionary<string, object> info, String id)
         {
             Result<IPurchasePolicy> result = CreatePurchasePolicy(info);
             if (!result.ExecStatus)
-                return new Result<IPurchasePolicy>(result.Message, false, null);
-
+                return new Result<bool>(result.Message, false, false);
             IPurchasePolicy policy = result.Data;
-            Result<bool> res = AddPurchasePolicy(policy, id);
-            if (res.ExecStatus)
-            {
-                return new Result<IPurchasePolicy>(res.Message, res.ExecStatus, policy);
-            }
-            return new Result<IPurchasePolicy>(res.Message, res.ExecStatus, null);
+            return AddPurchasePolicy(policy, id);
         }
 
         public Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, String id)
@@ -275,7 +251,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             if (!info.ContainsKey("type"))
                 return new Result<IDiscountPolicy>("Can't create a discount without a type", false, null);
 
-            string type = (string)info["type"];
+            JsonElement JsonType = (JsonElement)info["type"];
+            string type = JsonType.GetString();
             switch (type)
             {
                 case "VisibleDiscount":
@@ -307,7 +284,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             if (!info.ContainsKey("type"))
                 return new Result<IDiscountCondition>("Can't create a condition without a type", false, null);
 
-            string type = (string)info["type"];
+            JsonElement JsonType = (JsonElement)info["type"];
+            string type = JsonType.GetString();
             switch (type)
             {
                 case "DiscountConditionAnd":
