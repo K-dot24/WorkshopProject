@@ -10,11 +10,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 {
     public class DiscountTargetProducts : IDiscountTarget
     {
-
+        public String Id { get; set; }
         public List<string> ProductIds { get; }
 
         public DiscountTargetProducts(List<string> productIds)
         {
+            Id = Service.GenerateId();
+            ProductIds = productIds;
+        }
+
+        // for loading from db
+        public DiscountTargetProducts(string id, List<string> productIds)
+        {
+            Id = id;
             ProductIds = productIds;
         }
 
@@ -51,6 +59,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             foreach(string myProductId in ProductIds)
                 productList.Add(myProductId);
             return new Result<IDiscountTargetData>("", true, new DiscountTargetProductsData(productList));
+        }
+
+        public string getId()
+        {
+            return this.Id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is DiscountTargetProducts products &&
+                   Id == products.Id &&
+                   EqualityComparer<List<string>>.Default.Equals(ProductIds, products.ProductIds);
         }
     }
 }

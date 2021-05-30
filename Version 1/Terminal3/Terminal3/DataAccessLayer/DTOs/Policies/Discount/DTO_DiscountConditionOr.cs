@@ -6,17 +6,17 @@ using System.Text;
 
 namespace Terminal3.DataAccessLayer.DTOs
 {
-    public class DTO_DiscountAddition
+    public class DTO_DiscountConditionOr
     {
         [BsonId]
         public string _id { get; set; }
         [BsonElement]
-        public ConcurrentDictionary<String, String> Discounts { get; set; } // List <IDiscountPolicy id>         
+        public ConcurrentDictionary<String, String> Conditions { get; set; } //List <id of IDiscountCondition>
 
-        public DTO_DiscountAddition(string id, ConcurrentDictionary<string, string> discounts)
+        public DTO_DiscountConditionOr(string id, ConcurrentDictionary<string, string> conditions)
         {
             _id = id;
-            Discounts = discounts;
+            Conditions = conditions;
         }
     }
 }
