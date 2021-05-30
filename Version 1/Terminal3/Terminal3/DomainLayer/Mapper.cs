@@ -441,7 +441,10 @@ namespace Terminal3.DataAccessLayer
         public void DeleteRegisteredUser(FilterDefinition<BsonDocument> filter)
         {
             DTO_RegisteredUser deletedRegisteredUser = DAO_RegisteredUser.Delete(filter);
-            RegisteredUsers.TryRemove(deletedRegisteredUser._id, out RegisteredUser ru);
+            if (!(deletedRegisteredUser is null))
+            {
+                RegisteredUsers.TryRemove(deletedRegisteredUser._id, out RegisteredUser ru);
+            }
         }
 
         #endregion RegisteredUser
@@ -495,25 +498,27 @@ namespace Terminal3.DataAccessLayer
         {
             DTO_StoreManager deletedStoreManager = DAO_StoreManager.Delete(filter); // TODO - need to make sure when loading store manager the filter includes user id and store id
             StoreManager sm = null;
-            LinkedList<StoreManager> list;            
-
-            if (StoreManagers.TryGetValue(deletedStoreManager.UserId, out list))
+            LinkedList<StoreManager> list;
+            if (!(deletedStoreManager is null))
             {
-                foreach (StoreManager manager in list)
+                if (StoreManagers.TryGetValue(deletedStoreManager.UserId, out list))
                 {
-                    if (manager.Store.Id == deletedStoreManager.StoreId)
+                    foreach (StoreManager manager in list)
                     {
-                        sm = manager;
+                        if (manager.Store.Id == deletedStoreManager.StoreId)
+                        {
+                            sm = manager;
+                        }
                     }
                 }
-            }
 
-            list.Remove(sm);
-            if (list.Count == 0)
-            {
-                StoreManagers.TryRemove(sm.GetId() , out _);
+                list.Remove(sm);
+                if (list.Count == 0)
+                {
+                    StoreManagers.TryRemove(sm.GetId(), out _);
+                }
+                // else removed from list pointer
             }
-            // else removed from list pointer
         }
 
         private void AddManagerToIdentityMap(StoreManager manager)
@@ -624,21 +629,23 @@ namespace Terminal3.DataAccessLayer
             DTO_StoreOwner deletedStoreOwner = DAO_StoreOwner.Delete(filter); // TODO - need to make sure when loading store manager the filter includes user id and store id
             StoreOwner so = null;
             LinkedList<StoreOwner> list;
-
-            if (StoreOwners.TryGetValue(deletedStoreOwner.UserId, out list))
+            if (!(deletedStoreOwner is null))
             {
-                foreach (StoreOwner owner in list)
+                if (StoreOwners.TryGetValue(deletedStoreOwner.UserId, out list))
                 {
-                    if (owner.Store.Id == deletedStoreOwner.StoreId) { so = owner;  }
+                    foreach (StoreOwner owner in list)
+                    {
+                        if (owner.Store.Id == deletedStoreOwner.StoreId) { so = owner; }
+                    }
                 }
-            }
 
-            list.Remove(so);
-            if (list.Count == 0)
-            {
-                StoreOwners.TryRemove(so.GetId(), out _);
+                list.Remove(so);
+                if (list.Count == 0)
+                {
+                    StoreOwners.TryRemove(so.GetId(), out _);
+                }
+                // else removed from list pointer
             }
-            // else removed from list pointer
         }
 
         private void AddOwnerToIdentityMap(StoreOwner owner)
@@ -733,7 +740,10 @@ namespace Terminal3.DataAccessLayer
         public void DeleteProduct(FilterDefinition<BsonDocument> filter)
         {
             DTO_Product deletedProduct = DAO_Product.Delete(filter);
-            Products.TryRemove(deletedProduct._id, out Product p);
+            if(!(deletedProduct is null))
+            {
+                Products.TryRemove(deletedProduct._id, out Product p);
+            }
         }
 
         #endregion Product
@@ -790,7 +800,10 @@ namespace Terminal3.DataAccessLayer
         public void DeleteStore(FilterDefinition<BsonDocument> filter)
         {
             DTO_Store deletedStore = DAO_Store.Delete(filter);
-            Stores.TryRemove(deletedStore._id, out Store s);
+            if(!(deletedStore is null))
+            {
+                Stores.TryRemove(deletedStore._id, out Store s);
+            }
         }
 
         #endregion Store
@@ -829,7 +842,10 @@ namespace Terminal3.DataAccessLayer
         public void DeleteAuctionPolicy(FilterDefinition<BsonDocument> filter)
         {
             DTO_Auction deletedAuction = DAO_Auction.Delete(filter);
-            Policy_Auctions.TryRemove(deletedAuction._id, out Auction a);
+            if(!(deletedAuction is null))
+            {
+                Policy_Auctions.TryRemove(deletedAuction._id, out Auction a);
+            }
         }
 
 
@@ -861,7 +877,10 @@ namespace Terminal3.DataAccessLayer
         public void DeleteLotteryPolicy(FilterDefinition<BsonDocument> filter)
         {
             DTO_Lottery deletedLottery = DAO_Lottery.Delete(filter);
-            Policy_Lotterys.TryRemove(deletedLottery._id, out Lottery l);
+            if(!(deletedLottery is null))
+            {
+                Policy_Lotterys.TryRemove(deletedLottery._id, out Lottery l);
+            }
         }
 
 
@@ -893,7 +912,10 @@ namespace Terminal3.DataAccessLayer
         public void DeleteMaxProductPolicy(FilterDefinition<BsonDocument> filter)
         {
             DTO_MaxProductPolicy deletedMaxProductPolicy = DAO_MaxProductPolicy.Delete(filter);
-            Policy_MaxProductPolicys.TryRemove(deletedMaxProductPolicy._id, out MaxProductPolicy m);
+            if(!(deletedMaxProductPolicy is null))
+            {
+                Policy_MaxProductPolicys.TryRemove(deletedMaxProductPolicy._id, out MaxProductPolicy m);
+            }
         }
 
 
@@ -924,7 +946,10 @@ namespace Terminal3.DataAccessLayer
         public void DeleteMinAgePolicy(FilterDefinition<BsonDocument> filter)
         {
             DTO_MinAgePolicy deletedMinAgePolicy = DAO_MinAgePolicy.Delete(filter);
-            Policy_MinAgePolicys.TryRemove(deletedMinAgePolicy._id, out MinAgePolicy m);
+            if(!(deletedMinAgePolicy is null))
+            {
+                Policy_MinAgePolicys.TryRemove(deletedMinAgePolicy._id, out MinAgePolicy m);
+            }
         }
 
 
@@ -956,7 +981,10 @@ namespace Terminal3.DataAccessLayer
         public void DeleteMinProductPolicy(FilterDefinition<BsonDocument> filter)
         {
             DTO_MinProductPolicy deletedMinProductPolicy = DAO_MinProductPolicy.Delete(filter);
-            Policy_MinProductPolicys.TryRemove(deletedMinProductPolicy._id, out MinProductPolicy m);
+            if (!(deletedMinProductPolicy is null))
+            {
+                Policy_MinProductPolicys.TryRemove(deletedMinProductPolicy._id, out MinProductPolicy m);
+            }
         }
 
 
@@ -988,7 +1016,10 @@ namespace Terminal3.DataAccessLayer
         public void DeleteOfferPolicy(FilterDefinition<BsonDocument> filter)
         {
             DTO_Offer deletedOffer = DAO_Offer.Delete(filter);
-            Policy_Offers.TryRemove(deletedOffer._id, out Offer o);
+            if(!(deletedOffer is null))
+            {
+                Policy_Offers.TryRemove(deletedOffer._id, out Offer o);
+            }
         }
 
 
@@ -1021,7 +1052,10 @@ namespace Terminal3.DataAccessLayer
         public void DeleteRestrictedHoursPolicy(FilterDefinition<BsonDocument> filter)
         {
             DTO_RestrictedHoursPolicy deletedRestrictedHoursPolicy = DAO_RestrictedHoursPolicy.Delete(filter);
-            Policy_RestrictedHoursPolicys.TryRemove(deletedRestrictedHoursPolicy._id, out RestrictedHoursPolicy r);
+            if(!(deletedRestrictedHoursPolicy is null))
+            {
+                Policy_RestrictedHoursPolicys.TryRemove(deletedRestrictedHoursPolicy._id, out RestrictedHoursPolicy r);
+            }
         }
 
         
@@ -1061,11 +1095,15 @@ namespace Terminal3.DataAccessLayer
         public void DeleteAndPolicy(FilterDefinition<BsonDocument> filter)
         {
             DTO_AndPolicy deletedAndPolicy = DAO_AndPolicy.Delete(filter);
-            foreach (var policy in deletedAndPolicy.Policies)
+            if (!(deletedAndPolicy is null))
             {
-                DeleteIPurchasePolicy(policy.Key, policy.Value);
+                foreach (var policy in deletedAndPolicy.Policies)
+                {
+                    DeleteIPurchasePolicy(policy.Key, policy.Value);
+                }
+                Policy_AndPolicys.TryRemove(deletedAndPolicy._id, out AndPolicy a);
             }
-            Policy_AndPolicys.TryRemove(deletedAndPolicy._id, out AndPolicy a);
+
         }
 
       
@@ -1105,11 +1143,15 @@ namespace Terminal3.DataAccessLayer
         public void DeleteOrPolicy(FilterDefinition<BsonDocument> filter)
         {
             DTO_OrPolicy deletedOrPolicy = DAO_OrPolicy.Delete(filter);
-            foreach(var policy in deletedOrPolicy.Policies)
+            if(!(deletedOrPolicy is null))
             {
-                DeleteIPurchasePolicy(policy.Key, policy.Value);
+                foreach (var policy in deletedOrPolicy.Policies)
+                {
+                    DeleteIPurchasePolicy(policy.Key, policy.Value);
+                }
+                Policy_OrPolicys.TryRemove(deletedOrPolicy._id, out OrPolicy o);
             }
-            Policy_OrPolicys.TryRemove(deletedOrPolicy._id, out OrPolicy o);
+
         }
 
 
@@ -1150,11 +1192,15 @@ namespace Terminal3.DataAccessLayer
         public void DeleteBuyNowPolicy(FilterDefinition<BsonDocument> filter)
         {
             DTO_BuyNow deletedBuyNow = DAO_BuyNow.Delete(filter);
-            foreach (var policy in deletedBuyNow.Policy.Policies)
+            if(!(deletedBuyNow is null))
             {
-                DeleteIPurchasePolicy(policy.Key, policy.Value);
+                foreach (var policy in deletedBuyNow.Policy.Policies)
+                {
+                    DeleteIPurchasePolicy(policy.Key, policy.Value);
+                }
+                Policy_BuyNows.TryRemove(deletedBuyNow._id, out BuyNow b);
             }
-            Policy_BuyNows.TryRemove(deletedBuyNow._id, out BuyNow b);
+
         }
 
 
@@ -1208,16 +1254,20 @@ namespace Terminal3.DataAccessLayer
         public void DeleteConditionalPolicy(FilterDefinition<BsonDocument> filter)
         {
             DTO_ConditionalPolicy deletedConditionalPolicy = DAO_ConditionalPolicy.Delete(filter);
-            foreach (var policy in deletedConditionalPolicy.PreCond)
+            if(!(deletedConditionalPolicy is null))
             {
-                DeleteIPurchasePolicy(policy.Key, policy.Value);
-            }
-            foreach (var policy in deletedConditionalPolicy.Cond)
-            {
-                DeleteIPurchasePolicy(policy.Key, policy.Value);
-            }            
+                foreach (var policy in deletedConditionalPolicy.PreCond)
+                {
+                    DeleteIPurchasePolicy(policy.Key, policy.Value);
+                }
+                foreach (var policy in deletedConditionalPolicy.Cond)
+                {
+                    DeleteIPurchasePolicy(policy.Key, policy.Value);
+                }
 
-            Policy_ConditionalPolicys.TryRemove(deletedConditionalPolicy._id, out ConditionalPolicy c);
+                Policy_ConditionalPolicys.TryRemove(deletedConditionalPolicy._id, out ConditionalPolicy c);
+            }
+
         }
         #endregion Purchase Policies
 
