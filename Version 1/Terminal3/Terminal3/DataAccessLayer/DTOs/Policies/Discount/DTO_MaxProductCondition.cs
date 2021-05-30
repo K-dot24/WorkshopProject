@@ -10,9 +10,9 @@ namespace Terminal3.DataAccessLayer.DTOs
         [BsonId]
         public string _id { get; set; }
         [BsonElement]
-        public int MaxQuantity { get; }
+        public int MaxQuantity { get; set; }
         [BsonElement]
-        public String Product { get; }  // product id
+        public String Product { get; set; }  // product id
 
         public DTO_MaxProductCondition(string id, int maxQuantity, string product)
         {

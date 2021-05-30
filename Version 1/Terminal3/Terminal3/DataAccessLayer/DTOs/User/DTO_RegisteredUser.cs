@@ -21,7 +21,7 @@ namespace Terminal3.DataAccessLayer.DTOs
         [BsonElement]
         public DTO_History History { get; set; }
         [BsonElement]
-        public LinkedList<DTO_Notification> PendingNotification { get; }
+        public LinkedList<DTO_Notification> PendingNotification { get; set; }
 
         public DTO_RegisteredUser(String id, DTO_ShoppingCart shoppingCart, String email, String password, Boolean loggedIn, DTO_History history, LinkedList<DTO_Notification> pendingNotification)
         {

@@ -11,7 +11,7 @@ namespace Terminal3.DataAccessLayer.DTOs
         [BsonId]
         public string _id { get; set; }
         [BsonElement]
-        public ConcurrentDictionary<String, String> Discounts { get; } // List <IDiscountPolicy id>         
+        public ConcurrentDictionary<String, String> Discounts { get; set; } // List <IDiscountPolicy id>         
 
         public DTO_DiscountOr(string id, ConcurrentDictionary<string, string> discounts)
         {
