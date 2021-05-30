@@ -7,11 +7,27 @@ using Terminal3.DomainLayer;
 
 namespace Terminal3.ExternalSystems
 {
-    public static class ExternalSystemsAPI
+    public class ExternalSystemsAPI
     {
-        static String sourceURL = "https://cs-bgu-wsep.herokuapp.com/";
+        //static String sourceURL = "https://cs-bgu-wsep.herokuapp.com/";
+        string sourceURL { get; set; }
 
-        public static bool Handshake()
+        public static ExternalSystemsAPI Instance = null;
+        private ExternalSystemsAPI(string sourceURL)
+        {
+            this.sourceURL = sourceURL;
+        }
+        public static ExternalSystemsAPI getInstance(String sourceURL="") {
+            if(Instance is null)
+            {
+                Instance = new ExternalSystemsAPI(sourceURL);
+            }
+            return Instance;
+        }
+
+
+
+        public bool Handshake()
         {
             var postContent = new Dictionary<String, Object> { { "action_type", "handshake" } };
             String result = HttpClientPost(postContent);
@@ -20,31 +36,31 @@ namespace Terminal3.ExternalSystems
             return false;
         }
 
-        public static String Pay(IDictionary<String, Object> paymentDetails)
+        public String Pay(IDictionary<String, Object> paymentDetails)
         {
             paymentDetails.Add("action_type", "pay");
             return HttpClientPost(paymentDetails);         
         }
 
-        public static String CancelPay(IDictionary<String, Object> paymentDetails)
+        public String CancelPay(IDictionary<String, Object> paymentDetails)
         {
             paymentDetails.Add("action_type", "cancel_pay");
             return HttpClientPost(paymentDetails);
         }
 
-        public static String Supply(IDictionary<String, Object> paymentDetails)
+        public String Supply(IDictionary<String, Object> paymentDetails)
         {
             paymentDetails.Add("action_type", "supply");
             return HttpClientPost(paymentDetails);
         }
 
-        public static String CancelSupply(IDictionary<String, Object> paymentDetails)
+        public String CancelSupply(IDictionary<String, Object> paymentDetails)
         {
             paymentDetails.Add("action_type", "cancel_supply");
             return HttpClientPost(paymentDetails);
         }
 
-        public static string HttpClientPost(IDictionary<String, Object> param)
+        public string HttpClientPost(IDictionary<String, Object> param)
         {
             string result;
             Encoding encoding = Encoding.GetEncoding("utf-8");
@@ -62,7 +78,7 @@ namespace Terminal3.ExternalSystems
 
         }
 
-        public static HttpWebResponse CreatePostHttpResponse(IDictionary<String, Object> parameters, Encoding charset)
+        public HttpWebResponse CreatePostHttpResponse(IDictionary<String, Object> parameters, Encoding charset)
         {
             try
             {
