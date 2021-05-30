@@ -32,7 +32,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
         Result<Boolean> RemovePurchasePolicy(string id);
         Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id);
-        Result<bool> EditPurchasePolicy(IPurchasePolicy policy, string id);
     }
 
     public class PolicyManager : IPolicyManager
@@ -251,21 +250,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id)
         {
-            Result<IPurchasePolicy> result = CreatePurchasePolicy(info);
-            if (!result.ExecStatus)
-                return new Result<bool>(result.Message, false, false);
-            IPurchasePolicy policy = result.Data;
-            return EditPurchasePolicy(policy, id);
-        }
-
-        public Result<bool> EditPurchasePolicy(IPurchasePolicy policy, string id)
-        {
-            Result<bool> result = MainPolicy.EditPolicy(policy, id);
+            Result<bool> result = MainPolicy.EditPolicy(info, id);
             if (result.ExecStatus)
             {
                 if (result.Data)
                     return new Result<bool>("The policy has been edited successfully", true, true);
-                else return new Result<bool>(result.Message, false, false);
+                return new Result<bool>($"The Purchase policy edit failed because the policy with an id ${id} was not found", false, false);
             }
             return result;
         }
