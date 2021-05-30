@@ -89,15 +89,15 @@ const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
                             ))}
                             </Select>
                         </FormControl>
-                        <FormHelperText>Choose type of discount</FormHelperText>
+                        <FormHelperText>Choose type of policy</FormHelperText>
                         </>
                         )
                     }
 
                     {subTypes && (
-                        subTypes.map((subType) => subType.main === currentType.value && (
+                        subTypes.map((subType, index) => subType.main === currentType.value && (
                         <>
-                            <FormControl className={classes.formControl}>
+                            <FormControl key={index} className={classes.formControl}>
                                 <InputLabel htmlFor="sub-native-simple"></InputLabel>
                                 <Select
                                     native

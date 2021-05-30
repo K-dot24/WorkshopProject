@@ -379,10 +379,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
-                Result<ShoppingCart> res_sc = guest_user.UpdateShoppingCart(storeID, product, quantity);
+                Result<ShoppingCart> res_sc = registerd_user.UpdateShoppingCart(storeID, product, quantity);
 
                 // Update DB
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", guest_user.Id);
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
                 var update = Builders<BsonDocument>.Update.Set("ShoppingCart", res_sc.Data.getDTO());
                 mapper.UpdateRegisteredUser(filter, update);
 

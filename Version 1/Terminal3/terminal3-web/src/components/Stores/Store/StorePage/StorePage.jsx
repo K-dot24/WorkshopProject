@@ -5,7 +5,8 @@ import { Products, Navbar, Cart, Action, CheckboxList } from '../../../../compon
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
         AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct,
         printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
-        AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition } from '../../../../api/API';
+        AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition, GetDiscountPolicyData,
+        AddPurchasePolicy, AddPurchasePolicyById, RemovePurchasePolicy, GetPurchasePolicyData } from '../../../../api/API';
 
 
 
@@ -247,7 +248,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 break;
 
             case "MinProductCondition":
-                info = { type, MaxQuantity: data.maxquantity, ProductId: data.productid };
+                info = { type, MaxQuantity: data.minquantity, ProductId: data.productid };
                 break;
 
             case "MinBagPriceCondition":
@@ -273,6 +274,64 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     const handleRemoveDiscountCondition = (data) => {
         RemoveDiscountCondition(store.id, data.nodeid).then(response => response.ok ? 
+            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+    }
+
+    // TODO: Display information to user (+ check business returns actual data)
+    const handleGetDiscountPolicyData = () => {
+        GetDiscountPolicyData(store.id).then(response => response.ok ? 
+            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+    }
+
+    //#endregion
+
+    //#region Purchase Policy Functions
+
+    const handleAddPurchasePolicy = (data, mainType, subType) => {
+        let info;
+        let allData;
+        
+        switch (mainType) {
+            case "MaxProductPolicy":
+                info = { type: mainType, ProductId: data.productid, Max: data.maximumquantity };
+                break;
+
+            case "MinProductPolicy":
+                info = { type: mainType, ProductId: data.productid, Min: data.minimumquantity };
+                break;
+
+            case "MinAgePolicy":
+                info = { type: mainType, Age: data.minimumage };
+                break;
+        
+            case "RestrictedHoursPolicy":
+                info = { type: mainType, StartRestrict: data.restrictionstart, EndRestrict: data.restrictionend, ProductId: data.productid};
+                break;
+
+            default:
+                info = { type: mainType };
+        }
+
+        allData = { storeId: store.id, info };
+        console.log(allData);
+
+        if ('nodeid' in data) {
+            AddPurchasePolicyById(data.nodeid, allData).then(response => response.ok ? 
+                response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+        } else {
+            AddPurchasePolicy(allData).then(response => response.ok ? 
+                response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+        }
+    }
+
+    const handleRemovePurchasePolicy = (data) => {
+        RemovePurchasePolicy(store.id, data.nodeid).then(response => response.ok ? 
+            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+    }
+
+    // TODO: Display information to user (+ check business returns actual data)
+    const handleGetPurchasePolicyData = () => {
+        GetPurchasePolicyData(store.id).then(response => response.ok ? 
             response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
@@ -456,6 +515,45 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                                                 fields={[{name: 'Node ID', required: true}]}   
                                                 handleAction={handleRemoveDiscountCondition} {...props} />)} 
                 />
+
+                { /* Get Discount Policy Data */}
+                <Route exact path={match.url + `/getdiscountpolicy`} 
+                    render={(props) => (<Action name='Get Discount Policy Data'  
+                                                handleAction={handleGetDiscountPolicyData} {...props} />)} 
+                />
+
+                {/* Add Purchase Policy */}
+                <Route exact path={match.url + `/purchasepolicy/addpurchasepolicy`} 
+                    render={(props) => (<Action name='Add Purchase Policy'
+                                                fields={[{name: 'Node ID', required: false},
+                                                        {name: 'Product ID', required: true, belongsTo: 'MaxProductPolicy'},
+                                                        {name: 'Maximum Quantity', required: true, type: 'number', belongsTo: 'MaxProductPolicy'},
+                                                        {name: 'Product ID', required: true, belongsTo: 'MinProductPolicy'},
+                                                        {name: 'Minimum Quantity', required: true, type: 'number', belongsTo: 'MinProductPolicy'},
+                                                        {name: 'Minimum Age', required: true, type: 'number', belongsTo: 'MinAgePolicy'},
+                                                        {name: 'Product ID', required: true, belongsTo: 'RestrictedHoursPolicy'},
+                                                        {name: 'Restriction Start', required: true, type: 'date', belongsTo: 'RestrictedHoursPolicy'},
+                                                        {name: 'Restriction End', required: true, type: 'date', belongsTo: 'RestrictedHoursPolicy'}]}   
+                                                mainTypes={[{name: 'AndPolicy'}, {name: 'OrPolicy'},
+                                                        {name: 'ConditionalPolicy'}, {name: 'MaxProductPolicy'},
+                                                        {name: 'MinProductPolicy'}, {name: 'MinAgePolicy'},
+                                                        {name: 'RestrictedHoursPolicy'}]}
+                                                handleAction={handleAddPurchasePolicy} {...props} />)} 
+                />
+
+                { /* Remove Purchase Policy */}
+                <Route exact path={match.url + `/purchasepolicy/removepurchasepolicy`} 
+                    render={(props) => (<Action name='Remove Purchase Policy'
+                                                fields={[{name: 'Node ID', required: true}]}   
+                                                handleAction={handleRemovePurchasePolicy} {...props} />)} 
+                />
+
+                { /* Get Purchase Policy Data */}
+                <Route exact path={match.url + `/getpurchasepolicy`} 
+                    render={(props) => (<Action name='Get Purchase Policy Data'  
+                                                handleAction={handleGetPurchasePolicyData} {...props} />)} 
+                />
+
 
             </Switch>
         </div>

@@ -380,7 +380,7 @@ namespace Terminal3WebAPI.Controllers
         }
 
 
-        [Route("RemovePurchasePolicy/{id}")]
+        [Route("EditPurchasePolicy/{id}")]
         [HttpPut]
         public IActionResult EditPurchasePolicy([FromBody] PolicyModel data, string id)
         {

@@ -632,4 +632,60 @@ export function RemoveDiscountCondition( storeID, id ) {
     })
 }
 
+export function GetDiscountPolicyData( storeID ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetDiscountPolicyData/${storeID}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
+//#endregion
+
+//#region Purchase Policy
+
+export function AddPurchasePolicy( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddPurchasePolicy`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+export function AddPurchasePolicyById( id, data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddPurchasePolicy/${id}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+export function RemovePurchasePolicy( storeID, id ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemovePurchasePolicy/${storeID}/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
+export function GetPurchasePolicyData( storeID ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetPurchasePolicyData/${storeID}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
 //#endregion

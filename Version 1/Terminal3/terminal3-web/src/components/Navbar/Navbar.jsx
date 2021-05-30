@@ -22,8 +22,17 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
     const isMenuOpen = Boolean(anchorEl);
 
     const allActions = ['Add New Product', 'Remove Product', 'Edit Product Details', 'Add Store Owner', 'Add Store Manager', 'Remove Store Manager', 
-                        'Set Permissions', 'Get Store Staff', 'Add Purchase Policy', 'Get Purchase Policy',
+                        'Set Permissions', 'Get Store Staff', 'Purchase Policy', 'Get Purchase Policy',
                         'Discount Policy', 'Get Discount Policy', 'Get Store Purchase History'];
+
+    const discountPolicySubOptions = [
+        'Add Discount Policy', 'Add Discount Condition', 
+        'Remove Discount Policy', 'Remove Discount Condition'
+    ];
+
+    const purchasePolicySubOptions = [
+        'Add Purchase Policy', 'Remove Purchase Policy'
+    ];
     
 
     //#region API Calls
@@ -37,13 +46,17 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
 
     //#endregion
 
-    const [open, setOpen] = useState(false);
-    
-    const handleClick = () => {
-        setOpen(!open);
+    const [discountOpen, setDiscountOpen] = useState(false);
+    const handleClickDiscount = () => {
+        setDiscountOpen(!discountOpen);
     };
 
-    const PolicyDropDown = ({ action, subOptions }) => {
+    const [purchaseOpen, setPurchaseOpen] = useState(false);
+    const handleClickPurchase = () => {
+        setPurchaseOpen(!purchaseOpen);
+    };
+
+    const PolicyDropDown = ({ action, subOptions, open, handleClick }) => {
         return (
         <List>
             <ListItem button onClick={handleClick}>
@@ -69,12 +82,14 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
         return [
             allActions.map((action, index) => permissions[index] && 
                         (
-                            
                             action === 'Discount Policy' ? 
-                            <PolicyDropDown 
-                                action={action} 
-                                subOptions={['Add Discount Policy', 'Add Discount Condition', 
-                                            'Remove Discount Policy', 'Remove Discount Condition']} 
+                            <PolicyDropDown action={action} subOptions={discountPolicySubOptions}
+                                            open={discountOpen} handleClick={handleClickDiscount} 
+                            />
+                        :
+                            action === 'Purchase Policy' ?
+                            <PolicyDropDown action={action} subOptions={purchasePolicySubOptions}
+                                            open={purchaseOpen} handleClick={handleClickPurchase} 
                             />
                         :
                             <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    
@@ -147,7 +162,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                     </Typography>
 
                     {/* Search bar - showing only on main page */}
-                    {storeId === -1 && (
+                    {location.pathname === '/' && (
                         <div className={classes.search}>
                             <div className={classes.searchIcon}>
                                 <SearchIcon />
