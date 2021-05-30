@@ -1095,7 +1095,6 @@ namespace Terminal3.DataAccessLayer
             }
 
             p = new Product(dto._id, dto.Name, dto.Price, dto.Quantity, dto.Category, dto.Keywords, dto.Review);
-            // TODO - get product notification Manager and inject it
             Products.TryAdd(p.Id, p);
             return p;
         }
@@ -1149,7 +1148,7 @@ namespace Terminal3.DataAccessLayer
                 products.TryAdd(product, p);
             }
 
-            s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager);
+            s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , dto.isClosed);
 
             Stores.TryAdd(s.Id, s);
 
@@ -1652,10 +1651,10 @@ namespace Terminal3.DataAccessLayer
         {
             VisibleDiscount v;
             DTO_VisibleDiscount dto = DAO_VisibleDiscount.Load(filter);
-            //if (Discount_VisibleDiscounts.TryGetValue(dto._id, out v))
-            //{
-            //    return v;
-            //}
+            if (Discount_VisibleDiscounts.TryGetValue(dto._id, out v))
+            {
+                return v;
+            }
 
             IDiscountTarget Target = null;
             foreach (var discount in dto.Target)
@@ -1694,10 +1693,10 @@ namespace Terminal3.DataAccessLayer
         {
             DiscountTargetCategories d;
             DTO_DiscountTargetCategories dto = DAO_DiscountTargetCategories.Load(filter);
-            //if (Discount_DiscountTargetCategories.TryGetValue(dto._id, out d))
-            //{
-            //    return d;
-            //}
+            if (Discount_DiscountTargetCategories.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
 
             d = new DiscountTargetCategories(dto.Categories , dto._id);
             Discount_DiscountTargetCategories.TryAdd(dto._id, d);
@@ -1758,10 +1757,10 @@ namespace Terminal3.DataAccessLayer
         {
             DiscreetDiscount d;
             DTO_DiscreetDiscount dto = DAO_DiscreetDiscount.Load(filter);
-            //if (Discount_DiscreetDiscounts.TryGetValue(dto._id, out d))
-            //{
-            //    return d;
-            //}
+            if (Discount_DiscreetDiscounts.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
 
             IDiscountPolicy Discount = null;
             foreach (var discount in dto.Discount)
@@ -1801,10 +1800,10 @@ namespace Terminal3.DataAccessLayer
         {
             ConditionalDiscount c;
             DTO_ConditionalDiscount dto = DAO_ConditionalDiscount.Load(filter);
-            //if (Discount_ConditionalDiscounts.TryGetValue(dto._id, out c))
-            //{
-            //    return c;
-            //}
+            if (Discount_ConditionalDiscounts.TryGetValue(dto._id, out c))
+            {
+                return c;
+            }
 
             IDiscountCondition Condition = null;
             foreach (var discount in dto.Condition)
