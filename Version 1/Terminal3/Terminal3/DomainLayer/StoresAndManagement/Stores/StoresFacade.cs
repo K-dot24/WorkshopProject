@@ -189,7 +189,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                         //update owner record
                         var filterowner = Builders<BsonDocument>.Filter.Eq("UserId", owner.User.Id) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
                         var updateowner = Builders<BsonDocument>.Update.Set("StoreManagers", owner.getDTO().StoreManagers);
-                        mapper.UpdateStoreOwner(filter, update);
+                        mapper.UpdateStoreOwner(filterowner, update);
                     }
                 }
 

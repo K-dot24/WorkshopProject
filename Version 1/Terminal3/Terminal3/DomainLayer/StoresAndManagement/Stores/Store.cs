@@ -327,6 +327,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (manager.AppointedBy.Equals(owner))
                 {
                     Managers.TryRemove(removedManagerID, out _);
+                    owner.StoreManagers.Remove(manager);
                     return new Result<bool>($"User (Id: {removedManagerID}) was successfully removed from store management at {this.Name}.\n", true, true);
                 }
                 //else failed
@@ -343,6 +344,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (ownerToRemove.AppointedBy != null && ownerToRemove.AppointedBy.Equals(ownerBoss))
                 {
                     Owners.TryRemove(removedOwnerID, out StoreOwner removedOwner);
+                    ownerBoss.StoreOwners.Remove(ownerToRemove);
                     RemoveAllStaffAppointedByOwner(removedOwner);
                     return new Result<bool>($"User (Id: {removedOwnerID}) was successfully removed as store owner at {this.Name}.\n", true, true);
                 }
