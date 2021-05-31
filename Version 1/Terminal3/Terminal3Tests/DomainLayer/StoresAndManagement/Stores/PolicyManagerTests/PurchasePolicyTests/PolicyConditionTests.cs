@@ -31,7 +31,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 1, true)]
         public void MaxProductPolicyTest(String productName, int count, bool expectedResult)
         {
-            PolicyManager.AddPurchasePolicy(new MaxProductPolicy(Products[productName], 5));
+            PolicyManager.AddPurchasePolicy(new MaxProductPolicy(Products[productName].Id, 5));
             currProducts.TryAdd(Products[productName], count);
             Assert.Equal(PolicyManager.AdheresToPolicy(currProducts, null).Data, expectedResult);
         }
@@ -44,7 +44,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 1, false)]
         public void MinProductPolicyTest(String productName, int count, bool expectedResult)
         {
-            PolicyManager.AddPurchasePolicy(new MinProductPolicy(Products[productName], 5));
+            PolicyManager.AddPurchasePolicy(new MinProductPolicy(Products[productName].Id, 5));
             currProducts.TryAdd(Products[productName], count);
             Assert.Equal(PolicyManager.AdheresToPolicy(currProducts, null).Data, expectedResult);
         }
@@ -59,8 +59,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 20, false)]
         public void AndPolicyTest(String productName, int count, bool expectedResult)
         {
-            IPurchasePolicy p1 = new MinProductPolicy(Products[productName], 5);
-            IPurchasePolicy p2 = new MaxProductPolicy(Products[productName], 10);
+            IPurchasePolicy p1 = new MinProductPolicy(Products[productName].Id, 5);
+            IPurchasePolicy p2 = new MaxProductPolicy(Products[productName].Id, 10);
             List<IPurchasePolicy> pList = new List<IPurchasePolicy>();
             pList.Add(p1);
             pList.Add(p2);
@@ -77,8 +77,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Bread", 4, "Milk", 11, false)]
         public void OrPolicyTest(String productName1, int count1, String productName2, int count2, bool expectedResult)
         {
-            IPurchasePolicy p1 = new MinProductPolicy(Products[productName1], 5);
-            IPurchasePolicy p2 = new MaxProductPolicy(Products[productName2], 10);
+            IPurchasePolicy p1 = new MinProductPolicy(Products[productName1].Id, 5);
+            IPurchasePolicy p2 = new MaxProductPolicy(Products[productName2].Id, 10);
             List<IPurchasePolicy> pList = new List<IPurchasePolicy>();
             pList.Add(p1);
             pList.Add(p2);
@@ -96,8 +96,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Bread", 3, "Milk", 10, true)]
         public void ConditionalPolicyTest(String productName1, int count1, String productName2, int count2, bool expectedResult)
         {
-            IPurchasePolicy p1 = new MinProductPolicy(Products[productName1], 5);
-            IPurchasePolicy p2 = new MaxProductPolicy(Products[productName2], 10);
+            IPurchasePolicy p1 = new MinProductPolicy(Products[productName1].Id, 5);
+            IPurchasePolicy p2 = new MaxProductPolicy(Products[productName2].Id, 10);
             PolicyManager.AddPurchasePolicy(new ConditionalPolicy(p1,p2));
             currProducts.TryAdd(Products[productName1], count1);
             currProducts.TryAdd(Products[productName2], count2);

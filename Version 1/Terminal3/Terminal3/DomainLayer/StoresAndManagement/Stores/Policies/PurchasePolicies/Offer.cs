@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
@@ -45,7 +46,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             throw new NotImplementedException();
         }
 
-        public Result<bool> RemovePolicy(string id)
+        public Result<IPurchasePolicy> RemovePolicy(string id)
         {
             throw new NotImplementedException();
         }
@@ -55,7 +56,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             throw new NotImplementedException();
         }
 
-        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
+        public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
         {
             throw new NotImplementedException();
         }

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
@@ -9,7 +10,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 {
     public class MinAgePolicy : IPurchasePolicy
     {
-        public int Age { get; }
+        public int Age { get; set; }
         public string Id { get; }
 
         public MinAgePolicy(int age, string id = "")
@@ -19,6 +20,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 this.Id = Service.GenerateId();
             this.Age = age;
         }
+
+        public static Result<IPurchasePolicy> create(Dictionary<string, object> info)
+        {
+            string errorMsg = "Can't create MinAgePolicy: ";        
+
+            if (!info.ContainsKey("Age"))
+                return new Result<IPurchasePolicy>(errorMsg + "Age not found", false, null);
+            int age = ((JsonElement)info["Age"]).GetInt32();
+
+            return new Result<IPurchasePolicy>("", true, new MinAgePolicy(age));
+        }
+
         public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
         {
             return new Result<bool>("", true, true);
@@ -31,9 +44,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<bool>("", true, false);
         }
 
-        public Result<bool> RemovePolicy(string id)
+        public Result<IPurchasePolicy> RemovePolicy(string id)
         {
-            return new Result<bool>("", true,false);
+            return new Result<IPurchasePolicy>("", true,null);
         }
 
         public Result<IPurchasePolicyData> GetData()
@@ -41,9 +54,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<IPurchasePolicyData>("", true, new MinAgePolicyData(Age, Id));
         }
 
-        public Result<bool> EditPolicy(IPurchasePolicy policy, string id)
+        public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
         {
-            return new Result<bool>("", true, false);
+            if (Id != id)
+                return new Result<bool>("", true, false);
+
+            if (info.ContainsKey("Age"))
+                Age = ((JsonElement)info["Age"]).GetInt32();
+
+            return new Result<bool>("", true, true);
         }
 
         public DTO_MinAgePolicy getDTO()

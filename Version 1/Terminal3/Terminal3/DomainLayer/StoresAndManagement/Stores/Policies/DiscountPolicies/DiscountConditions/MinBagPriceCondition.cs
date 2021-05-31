@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountConditionsData;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions
@@ -21,7 +22,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             string errorMsg = "Can't create MinBagPriceCondition: ";
             if (!info.ContainsKey("MinPrice"))
                 return new Result<IDiscountCondition>(errorMsg + "MinPrice not found", false, null);
-            Double minPrice = (Double)info["MinPrice"];
+            Double minPrice = ((JsonElement)info["MinPrice"]).GetDouble();
 
             return new Result<IDiscountCondition>("", true, new MinBagPriceCondition(minPrice));
         }
@@ -43,9 +44,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountCondition>("", true, null);
         }
 
         public override Result<IDiscountConditionData> GetData()
@@ -59,7 +60,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 return new Result<bool>("", true, false);
 
             if (info.ContainsKey("MinPrice"))
-                MinPrice = (Double)info["MinPrice"];
+                MinPrice = ((JsonElement)info["MinPrice"]).GetDouble();
 
             return new Result<bool>("", true, true);
         }

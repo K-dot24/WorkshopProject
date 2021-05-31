@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
@@ -23,7 +24,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             string errorMsg = "Can't create DiscreetDiscount: ";
             if (!info.ContainsKey("DiscountCode"))
                 return new Result<IDiscountPolicy>(errorMsg + "DiscountCode not found", false, null);
-            String discountCode = (String)info["DiscountCode"];
+            String discountCode = ((JsonElement)info["DiscountCode"]).GetString();
 
             return new Result<IDiscountPolicy>("", true, new DiscreetDiscount(null, discountCode));
         }
@@ -45,11 +46,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveDiscount(String id)
+        public override Result<IDiscountPolicy> RemoveDiscount(String id)
         {
             if (Discount != null)
                 return Discount.RemoveDiscount(id);
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountPolicy>("", true, null);
         }
 
         public override Result<bool> AddCondition(string id, IDiscountCondition condition)
@@ -57,9 +58,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountCondition>("", true, null);
         }
 
         public override Result<IDiscountPolicyData> GetData()
@@ -86,7 +87,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             }
 
             if (info.ContainsKey("DiscountCode"))
-                DiscountCode = (String)info["DiscountCode"];
+                DiscountCode = ((JsonElement)info["DiscountCode"]).GetString();
 
             return new Result<bool>("", true, true);
         }

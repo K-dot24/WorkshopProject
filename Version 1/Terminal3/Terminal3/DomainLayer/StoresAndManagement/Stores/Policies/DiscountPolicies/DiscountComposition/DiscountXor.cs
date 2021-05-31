@@ -72,23 +72,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return Discount2.AddDiscount(id, discount);
         }
 
-        public override Result<bool> RemoveDiscount(string id)
+        public override Result<IDiscountPolicy> RemoveDiscount(string id)
         {
-            if (Discount1.Id.Equals(id))
+            IDiscountPolicy oldPolicy = null;
+            if (Discount1 != null && Discount1.Id.Equals(id))
             {
-                //return new Result<bool>("Can't remove a discount that is a child of xor. Id of the discount is " + id, false, false);
+                oldPolicy = Discount1;
                 Discount1 = null;
-                return new Result<bool>("", true, true);
+                return new Result<IDiscountPolicy>("", true, oldPolicy);
             }
-            if (Discount2.Id.Equals(id))
+            if (Discount2 != null && Discount2.Id.Equals(id))
             {
-                //return new Result<bool>("Can't remove a discount that is a child of xor. Id of the discount is " + id, false, false);
+                oldPolicy = Discount2;
                 Discount2 = null;
-                return new Result<bool>("", true, true);
+                return new Result<IDiscountPolicy>("", true, oldPolicy);
             }
 
-            Result<bool> result = Discount1.RemoveDiscount(id);
-            if (result.ExecStatus && result.Data)
+            Result<IDiscountPolicy> result = Discount1.RemoveDiscount(id);
+            if (result.ExecStatus && result.Data != null)
                 return result;
             if (!result.ExecStatus)
                 return result;
@@ -118,23 +119,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return Discount2.AddCondition(id, condition);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
-            if (Id == id)
+            if (ChoosingCondition != null && ChoosingCondition.Id == id)
             {
+                IDiscountCondition oldCondition = ChoosingCondition;
                 ChoosingCondition = null;
-                return new Result<bool>("", true, true);
+                return new Result<IDiscountCondition>("", true, oldCondition);
             }
             if (ChoosingCondition != null)
             {
-                Result<bool> choosingResult = ChoosingCondition.RemoveCondition(id);
-                if (choosingResult.ExecStatus && choosingResult.Data)
+                Result<IDiscountCondition> choosingResult = ChoosingCondition.RemoveCondition(id);
+                if (choosingResult.ExecStatus && choosingResult.Data != null)
                     return choosingResult;
                 if (!choosingResult.ExecStatus)
                     return choosingResult;
             }
-            Result<bool> result = Discount1.RemoveCondition(id);
-            if (result.ExecStatus && result.Data)
+            Result<IDiscountCondition> result = Discount1.RemoveCondition(id);
+            if (result.ExecStatus && result.Data != null)
                 return result;
             if (!result.ExecStatus)
                 return result;

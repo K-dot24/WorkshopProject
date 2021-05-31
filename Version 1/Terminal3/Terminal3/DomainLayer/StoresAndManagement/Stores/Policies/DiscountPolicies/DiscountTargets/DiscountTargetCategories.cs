@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountTargetsData;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
@@ -9,9 +10,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public class DiscountTargetCategories : IDiscountTarget
     {
         public List<string> Categories { get; }
-
+        public string Id { get; set; }
         public DiscountTargetCategories(List<string> categories)
         {
+            Id = Service.GenerateId();
+            Categories = categories;
+        }
+
+        // for loading from db
+        public DiscountTargetCategories(List<string> categories, string id) 
+        {
+            Id = id;
             Categories = categories;
         }
 
@@ -20,9 +29,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             string errorMsg = "Can't create DiscountTargetCategories: ";
             if (!info.ContainsKey("Categories"))
                 return new Result<IDiscountTarget>(errorMsg + "Categories not found", false, null);
-            List<string> categories = (List<string>)info["Categories"];
+            List<string> categories = createCategoriesList((JsonElement)info["Categories"]);
 
             return new Result<IDiscountTarget>("", true, new DiscountTargetCategories(categories));
+        }
+
+        private static List<string> createCategoriesList(JsonElement categoriesElement)
+        {
+            List<string> categories = JsonSerializer.Deserialize<List<string>>(categoriesElement.GetRawText());
+            return categories;
         }
 
         public List<Product> getTargets(ConcurrentDictionary<Product, int> products)
@@ -39,6 +54,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public Result<IDiscountTargetData> GetData()
         {
             return new Result<IDiscountTargetData>("", true, new DiscountTargetCategoriesData(new List<string>(Categories)));
+        }
+
+        public string getId()
+        {
+            return this.Id;
         }
     }
 }

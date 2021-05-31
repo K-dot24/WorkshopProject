@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountConditionsData;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions
@@ -10,11 +11,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     {
 
         public int MaxQuantity { set; get; }
-        public Product Product { set; get; }
+        public String ProductId { set; get; }
 
-        public MaxProductCondition(Product product, int maxQuantity, String id = "") : base(new Dictionary<string, object>(), id)
+        public MaxProductCondition(String productId, int maxQuantity, String id = "") : base(new Dictionary<string, object>(), id)
         {
-            Product = product;
+            ProductId = productId;
             MaxQuantity = maxQuantity;
         }
 
@@ -23,20 +24,32 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             string errorMsg = "Can't create MaxProductCondition: ";
             if (!info.ContainsKey("MaxQuantity"))
                 return new Result<IDiscountCondition>(errorMsg + "MaxQuantity not found", false, null);
-            int maxQuantity = (int)info["MaxQuantity"];
+            int maxQuantity = ((JsonElement)info["MaxQuantity"]).GetInt32();
 
-            if (!info.ContainsKey("Product"))
-                return new Result<IDiscountCondition>("Product not found", false, null);
-            Product product = (Product)info["Product"];
+            if (!info.ContainsKey("ProductId"))
+                return new Result<IDiscountCondition>("ProductId not found", false, null);
+            String productId = ((JsonElement)info["ProductId"]).GetString();
 
-            return new Result<IDiscountCondition>("", true, new MaxProductCondition(product, maxQuantity));
+            return new Result<IDiscountCondition>("", true, new MaxProductCondition(productId, maxQuantity));
         }
 
         public override Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)
         {
-            if (products.ContainsKey(Product) && products[Product] <= MaxQuantity)
+            Product myProduct = ContainsProduct(products);
+            if(myProduct == null)
                 return new Result<bool>("", true, true);
-            return new Result<bool>("", true, false);
+
+            return new Result<bool>("", true, products[myProduct] <= MaxQuantity);
+        }
+
+        private Product ContainsProduct(ConcurrentDictionary<Product, int> products)
+        {
+            foreach (KeyValuePair<Product, int> entry in products)
+            {
+                if (entry.Key.Id.Equals(ProductId))
+                    return entry.Key;
+            }
+            return null;
         }
 
         public override Result<bool> AddCondition(string id, IDiscountCondition condition)
@@ -44,14 +57,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountCondition>("", true, null);
         }
 
         public override Result<IDiscountConditionData> GetData()
         {
-            return new Result<IDiscountConditionData>("", true, new MaxProductConditionData(Product.GetDAL().Data, MaxQuantity, Id));
+            return new Result<IDiscountConditionData>("", true, new MaxProductConditionData(ProductId, MaxQuantity, Id));
         }
 
         public override Result<bool> EditCondition(Dictionary<string, object> info, string id)
@@ -60,10 +73,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 return new Result<bool>("", true, false);
 
             if (info.ContainsKey("MaxQuantity"))
-                MaxQuantity = (int)info["MaxQuantity"];
+                MaxQuantity = ((JsonElement)info["MaxQuantity"]).GetInt32();
 
-            if (info.ContainsKey("Product"))
-                Product = (Product)info["Product"];
+            if (info.ContainsKey("ProductId"))
+                ProductId = ((JsonElement)info["ProductId"]).GetString();
 
             return new Result<bool>("", true, true);
         }
