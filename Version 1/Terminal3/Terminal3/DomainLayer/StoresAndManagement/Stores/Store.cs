@@ -289,6 +289,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                         if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
                         {
                             newManager = new StoreManager(futureManager, this, new Permission(), owner);
+                            owner.StoreManagers.AddLast(newManager);
                             Managers.TryAdd(futureManager.Id, newManager);
                         }
                         else if (Managers.TryGetValue(currentlyOwnerID, out StoreManager manager) && CheckStoreManagerAndPermissions(currentlyOwnerID, Methods.AddStoreManager))
