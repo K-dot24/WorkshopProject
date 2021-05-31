@@ -198,47 +198,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         }
     }
 
-    // TODO: Change console.log() when API call returns OK
-    //       Check if need targetType
-    // const handleAddVisibleDiscount = (data, targetType) => {
-    //     let info = { type: 'VisibleDiscount', ExpirationDate: data.expirationdate, Percentage: data.percentage  }
-
-    //     if ('categories' in data) {
-    //         const array = data.categories.split(',');
-    //         info = { ...info, Target: { Categories: array }};
-    //     } 
-    //     if ('productsid' in data) {
-    //         const array = data.productsid.split(',');
-    //         info = { ...info, Target: { ProductsId: array } };
-    //     }
-
-    //     const allData = { storeId: store.id, info };
-    //     console.log(allData);
-
-    //     if ('nodeid' in data) {
-    //         AddDiscountPolicyById(data.nodeid, allData).then(response => response.ok ? 
-    //             response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
-    //     } else {
-    //         AddDiscountPolicy(allData).then(response => response.ok ? 
-    //             response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
-    //     }
-    // }
-
-    // const handleAddDiscreetDiscount = (data) => {
-    //     const info = { type: 'DiscreetDiscount', DiscountCode: data.discountcode };
-    //     const allData = { storeId: store.id, info };
-
-    //     console.log(allData);
-
-    //     if ('nodeid' in data) {
-    //         AddDiscountPolicyById(data.nodeid, allData).then(response => response.ok ? 
-    //             response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
-    //     } else {
-    //         AddDiscountPolicy(allData).then(response => response.ok ? 
-    //             response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
-    //     }
-    // }
-
     const handleAddDiscountCondition = (data, type, sub) => {
         let info;
 
@@ -465,27 +424,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                                                         ]}
                                                 handleAction={handleAddDiscountPolicy} {...props} />)} 
                 />
-
-                {/* AddDiscountPolicy - Visible Discount */}
-                {/* <Route exact path={match.url + `/adddiscountpolicy/visiblediscount`} 
-                    render={(props) => (<Action name='Add Visible Discount'
-                                                fields={[{name: 'Expiration Date', required: true, type: 'date'},
-                                                        {name: 'Percentage', required: true, type: 'number'},
-                                                        {name: 'Node Id', required: false},
-                                                        {name: 'Categories', required: true, belongsTo: 'DiscountTargetCategories'},
-                                                        {name: 'Products Id', required: true, belongsTo: 'DiscountTargetProducts'}]}   
-                                                types={[{name: 'DiscountTargetShop'},
-                                                        {name: 'DiscountTargetCategories'},
-                                                        {name: 'DiscountTargetProducts'}]}
-                                                handleAction={handleAddVisibleDiscount} {...props} />)} 
-                /> */}
-                {/* AddDiscountPolicy - Discreet Discount */}
-                {/* <Route exact path={match.url + `/adddiscountpolicy/discreetdiscount`} 
-                    render={(props) => (<Action name='Add Discreet Discount'
-                                                fields={[{name: 'Discount Code', required: true},
-                                                        {name: 'Node Id', required: false}]}
-                                                handleAction={handleAddDiscreetDiscount} {...props} />)} 
-                /> */}
 
                 {/* Add Discount Condition */}
                 <Route exact path={match.url + `/discountpolicy/adddiscountcondition`} 

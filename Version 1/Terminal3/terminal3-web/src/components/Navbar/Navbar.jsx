@@ -83,12 +83,12 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
             allActions.map((action, index) => permissions[index] && 
                         (
                             action === 'Discount Policy' ? 
-                            <PolicyDropDown action={action} subOptions={discountPolicySubOptions}
+                            <PolicyDropDown key={index} action={action} subOptions={discountPolicySubOptions}
                                             open={discountOpen} handleClick={handleClickDiscount} 
                             />
                         :
                             action === 'Purchase Policy' ?
-                            <PolicyDropDown action={action} subOptions={purchasePolicySubOptions}
+                            <PolicyDropDown key={index} action={action} subOptions={purchasePolicySubOptions}
                                             open={purchaseOpen} handleClick={handleClickPurchase} 
                             />
                         :
