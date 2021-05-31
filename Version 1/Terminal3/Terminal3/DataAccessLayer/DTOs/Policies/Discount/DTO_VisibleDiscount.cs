@@ -11,11 +11,11 @@ namespace Terminal3.DataAccessLayer.DTOs
         [BsonId]
         public string _id { get; set; }
         [BsonElement]
-        public String ExpirationDate { get; }
+        public String ExpirationDate { get; set; }
         [BsonElement]
         public ConcurrentDictionary<String, String> Target { get; }     // <type , id>
         [BsonElement]
-        public Double Percentage { get; }
+        public Double Percentage { get; set; }
 
         public DTO_VisibleDiscount(string id, string expirationDate, ConcurrentDictionary<string, string> target, double percentage)
         {

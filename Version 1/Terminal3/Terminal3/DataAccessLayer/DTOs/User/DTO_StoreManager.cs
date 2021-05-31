@@ -9,13 +9,13 @@ namespace Terminal3.DataAccessLayer.DTOs
     public class DTO_StoreManager
     {
         [BsonElement]
-        public String UserId { get; }
+        public String UserId { get; set; }
         [BsonElement]
-        public Boolean[] Permission { get; }
+        public Boolean[] Permission { get; set; }
         [BsonElement]
-        public String AppointedBy { get; }
+        public String AppointedBy { get; set; }
         [BsonElement]
-        public String StoreId { get; }
+        public String StoreId { get; set; }
 
         public DTO_StoreManager(String userId, Boolean[] permission, String appointedBy, String storeId)
         {

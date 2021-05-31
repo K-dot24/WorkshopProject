@@ -51,6 +51,8 @@ namespace Terminal3.ServiceLayer
 
             Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(config_path));
             Mapper.getInstance(config.mongoDB_url);
+            ExternalSystems.ExternalSystemsAPI.getInstance(config.externalSystem_url);
+            
 
             StoresAndManagement = new StoresAndManagementInterface(config.email, config.password);
             GuestUserInterface = new GuestUserController(StoresAndManagement);
