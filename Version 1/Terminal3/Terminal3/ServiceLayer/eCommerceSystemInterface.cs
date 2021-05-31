@@ -38,7 +38,7 @@ namespace Terminal3.ServiceLayer
 
 
         //Constructor
-        public ECommerceSystem()
+        public ECommerceSystem(String config_path = @"..\Terminal3\Config.json")
         {
 
             /*Initializer.init(StoresAndManagement,
@@ -49,7 +49,7 @@ namespace Terminal3.ServiceLayer
                             DataController, 
                             NotificationService, this.connection);*/
 
-            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(@"..\Terminal3\Config.json"));
+            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(config_path));
             Mapper.getInstance(config.mongoDB_url);
             ExternalSystems.ExternalSystemsAPI.getInstance(config.externalSystem_url);
             
@@ -71,11 +71,6 @@ namespace Terminal3.ServiceLayer
             NotificationService = NotificationService.GetInstance();
             NotificationService.connection = connection;
 
-        }
-
-        public void DisplaySystem()
-        {
-            // TODO - when GUI exists then display all functions according to current user role
         }
 
         //Metohds
