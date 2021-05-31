@@ -46,12 +46,12 @@ const PaymentForm = ({ userID, shippingData, checkoutToken, nextStep, backStep }
                 zip: shippingData.zip
             },
             paymentDetails: {
-                card_number: cardNumber,
+                card_number: cardNumber.replace(/ /g,''),
                 month,
                 year,
                 holder: fullName,
-                cvc: cvc,
-                id: '99999'  // TODO: check if 
+                ccv: cvc,
+                id: userID  // TODO: check if 
             }
         }
 
