@@ -46,13 +46,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveDiscount(String id)
+        public override Result<IDiscountPolicy> RemoveDiscount(String id)
         {
             if (Discount.Id.Equals(id))
+            {
+                IDiscountPolicy oldDiscount = Discount;
                 Discount = null;
+                return new Result<IDiscountPolicy>("", true, oldDiscount);
+            }
             else if (Discount != null)
                 return Discount.RemoveDiscount(id);
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountPolicy>("", true, null);
         }
 
         public override Result<bool> AddCondition(string id, IDiscountCondition condition)
@@ -64,15 +68,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
             if (Condition == null)
-                return new Result<bool>("", true, false);
+                return new Result<IDiscountCondition>("", true, null);
             if (Condition.Id.Equals(id))
             {
-                //return new Result<bool>("Cant remove the main condition of the conditional discount yet", false, false);
+                IDiscountCondition oldCondition = Condition;
                 Condition = null;
-                return new Result<bool>("", true, true);
+                return new Result<IDiscountCondition>("", true, oldCondition);
             }
             return Condition.RemoveCondition(id);
         }

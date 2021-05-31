@@ -466,7 +466,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     // Update in DB
-                    //mapper.Create(res.Data);      //zoe open
+                    mapper.Create(res.Data);      
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
@@ -485,7 +485,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     // Update in DB
-                    //mapper.Create(res.Data);      //zoe open
+                    mapper.Create(res.Data);      
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
@@ -504,7 +504,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     // Update in DB
-                    //mapper.Create(res.Data);      //zoe open
+                    mapper.Create(res.Data);      
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
@@ -521,7 +521,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                Result<bool> res = store.RemoveDiscountPolicy(id);
+                Result<IDiscountPolicy> res = store.RemoveDiscountPolicy(id);
                 if (res.ExecStatus)
                 {
                     // Update in DB
@@ -529,7 +529,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
                 }
-                return res;
+                return new Result<bool>(res.Message, false, false);
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }
@@ -539,7 +539,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                Result<bool> res = store.RemoveDiscountCondition(id);
+                Result<IDiscountCondition> res = store.RemoveDiscountCondition(id);
                 if (res.ExecStatus)
                 {
                     // Update in DB
@@ -547,7 +547,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
                 }
-                return res;
+                return new Result<bool>(res.Message, false, false);
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }
@@ -647,7 +647,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     // Update in DB
-                    //mapper.Create(res.Data);      //zoe open
+                    mapper.Create(res.Data);      
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainPolicy", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);
@@ -666,7 +666,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     // Update in DB
-                    //mapper.Create(res.Data);      //zoe open
+                    mapper.Create(res.Data);      
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainPolicy", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);

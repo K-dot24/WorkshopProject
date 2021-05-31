@@ -52,7 +52,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Discounts.Tests
         [Trait("Category", "Unit")]
         public void RemoveNonExistantDiscountTest()
         {
-            Result<bool> result = PolicyManager.RemoveDiscountPolicy("Non existant Id");
+            Result<IDiscountPolicy> result = PolicyManager.RemoveDiscountPolicy("Non existant Id");
             Assert.False(result.ExecStatus);
         }
 
@@ -72,9 +72,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Discounts.Tests
         [Trait("Category", "Unit")]
         public void RemoveNonExistantConditionTest()
         {
-            Result<bool> result = PolicyManager.RemoveDiscountCondition("Non existant Id");
+            Result<IDiscountCondition> result = PolicyManager.RemoveDiscountCondition("Non existant Id");
             Assert.False(result.ExecStatus);
         }
-
     }
 }

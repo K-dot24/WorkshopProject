@@ -12,9 +12,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
     public class VisibleDiscount : AbstractDiscountPolicy
     {
 
-        public DateTime ExpirationDate { set; get; }
-        public IDiscountTarget Target { set; get; }
-        public Double Percentage { set; get; }
+        public DateTime ExpirationDate { get; set; }
+        public IDiscountTarget Target { get; set; }
+        public Double Percentage { get; set; }
 
         public VisibleDiscount(DateTime expirationDate, IDiscountTarget target, Double percentage, String id="") : base(new Dictionary<string, object>(), id)
         {
@@ -86,9 +86,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveDiscount(String id)
+        public override Result<IDiscountPolicy> RemoveDiscount(String id)
         {
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountPolicy>("", true, null);
         }
 
         public override Result<bool> AddCondition(string id, IDiscountCondition condition)
@@ -96,9 +96,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountCondition>("", true, null);
         }
 
         public override Result<IDiscountPolicyData> GetData()
