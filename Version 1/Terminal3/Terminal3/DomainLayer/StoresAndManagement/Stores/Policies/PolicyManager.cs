@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountComposition;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions;
@@ -30,7 +31,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy, string id);
-        Result<Boolean> RemovePurchasePolicy(string id);
+        Result<IPurchasePolicy> RemovePurchasePolicy(string id);
         Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id);
     }
 
@@ -231,21 +232,44 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return result;
         }
 
-        public Result<bool> RemovePurchasePolicy(string id)
+        public Result<IPurchasePolicy> RemovePurchasePolicy(string id)
         {
-            Result<bool> result = MainPolicy.RemovePolicy(id);
+            Result<IPurchasePolicy> result = MainPolicy.RemovePolicy(id);
             if (result.ExecStatus)
             {
-                if (result.Data)
-                    return new Result<bool>("The policy has been removed successfully", true, true);
-                else return new Result<bool>($"The policy removal failed because the policy with an id ${id} was not found", false, false);
+                if (result.Data != null)
+                    return new Result<IPurchasePolicy>("The policy has been removed successfully", true, result.Data);
+                else return new Result<IPurchasePolicy>($"The policy removal failed because the policy with an id ${id} was not found", false, null);
             }
             return result;
         }
 
         private Result<IPurchasePolicy> CreatePurchasePolicy(Dictionary<string, object> info)
         {
-            return new Result<IPurchasePolicy>("", true, new AndPolicy());
+            if (!info.ContainsKey("type"))
+                return new Result<IPurchasePolicy>("Can't create a purchase Policy without a type", false, null);
+
+            string type = ((JsonElement)info["type"]).GetString();
+            switch (type)
+            {
+                case "AndPolicy":
+                    return AndPolicy.create(info);
+                case "OrPolicy":
+                    return OrPolicy.create(info);
+                case "ConditionalPolicy":
+                    return ConditionalPolicy.create(info);
+                case "MaxProductPolicy":
+                    return MaxProductPolicy.create(info);
+                case "MinProductPolicy":
+                    return MinProductPolicy.create(info);
+                case "MinAgePolicy":
+                    return MinAgePolicy.create(info);
+                case "RestrictedHoursPolicy":
+                    return RestrictedHoursPolicy.create(info);
+
+                default:
+                    return new Result<IPurchasePolicy>("Can't recognise this purchase policy type: " + type, false, null);
+            }
         }
 
         public Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id)
@@ -265,7 +289,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             if (!info.ContainsKey("type"))
                 return new Result<IDiscountPolicy>("Can't create a discount without a type", false, null);
 
-            string type = (string)info["type"];
+            string type = ((JsonElement)info["type"]).GetString();
             switch (type)
             {
                 case "VisibleDiscount":
@@ -297,7 +321,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             if (!info.ContainsKey("type"))
                 return new Result<IDiscountCondition>("Can't create a condition without a type", false, null);
 
-            string type = (string)info["type"];
+            string type = ((JsonElement)info["type"]).GetString();
             switch (type)
             {
                 case "DiscountConditionAnd":

@@ -47,7 +47,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<IPurchasePolicyData> GetPurchasePolicyData();
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info);
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
-        Result<Boolean> RemovePurchasePolicy(string id);
+        Result<IPurchasePolicy> RemovePurchasePolicy(string id);
         Result<Boolean> EditPurchasePolicy(Dictionary<string, object> info, string id);
         #endregion
 
@@ -588,7 +588,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.RemoveDiscountCondition(id);
         }
 
-        public Result<bool> RemovePurchasePolicy(string id)
+        public Result<IPurchasePolicy> RemovePurchasePolicy(string id)
         {
             return PolicyManager.RemovePurchasePolicy(id);
         }

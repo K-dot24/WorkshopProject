@@ -44,9 +44,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<bool>("", true, false);
         }
 
-        public Result<bool> RemovePolicy(string id)
+        public Result<IPurchasePolicy> RemovePolicy(string id)
         {
-            return new Result<bool>("", true,false);
+            return new Result<IPurchasePolicy>("", true,null);
         }
 
         public Result<IPurchasePolicyData> GetData()
