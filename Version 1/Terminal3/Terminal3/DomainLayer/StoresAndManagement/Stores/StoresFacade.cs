@@ -189,7 +189,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                         //update owner record
                         var filterowner = Builders<BsonDocument>.Filter.Eq("UserId", owner.User.Id) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
                         var updateowner = Builders<BsonDocument>.Update.Set("StoreManagers", owner.getDTO().StoreManagers);
-                        mapper.UpdateStoreOwner(filterowner, update);
+                        mapper.UpdateStoreOwner(filterowner, updateowner);
                     }
                 }
 
@@ -206,6 +206,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 Result<Boolean> res =  store.RemoveStoreManager(removedManagerID, currentlyOwnerID);
                 if (res.ExecStatus)
                 {
+
+                   // update store owner
+                    if(store.Owners.TryGetValue(currentlyOwnerID,out StoreOwner owner))
+                    {
+                        var filterowner = Builders<BsonDocument>.Filter.Eq("UserId", owner.User.Id) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
+                        var updateowner = Builders<BsonDocument>.Update.Set("StoreManagers", owner.getDTO().StoreManagers);
+                        mapper.UpdateStoreOwner(filterowner, updateowner);
+                    }
                     // Update Store in DB
                     var filter_manager = Builders<BsonDocument>.Filter.Eq("UserId", removedManagerID) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
                     mapper.DeleteStoreManager(filter_manager);
@@ -227,6 +235,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 Result<Boolean> res = store.RemoveStoreOwner(removedOwnerID, currentlyOwnerID);
                 if (res.ExecStatus)
                 {
+                    // update store owner
+                    if (store.Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
+                    {
+                        var filterowner = Builders<BsonDocument>.Filter.Eq("UserId", owner.User.Id) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
+                        var updateowner = Builders<BsonDocument>.Update.Set("StoreOwners", owner.getDTO().StoreOwners);
+                        mapper.UpdateStoreOwner(filterowner, updateowner);
+                    }
+
                     var filter_owner = Builders<BsonDocument>.Filter.Eq("UserId", removedOwnerID) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
                     mapper.DeleteStoreManager(filter_owner);
                     // Update Store in DB
