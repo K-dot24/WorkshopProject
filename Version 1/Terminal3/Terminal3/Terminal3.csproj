@@ -20,4 +20,13 @@
     <ProjectReference Include="..\WebApplication1\SignalRgateway.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="BadExternalSystemConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="BadMongoUrlConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

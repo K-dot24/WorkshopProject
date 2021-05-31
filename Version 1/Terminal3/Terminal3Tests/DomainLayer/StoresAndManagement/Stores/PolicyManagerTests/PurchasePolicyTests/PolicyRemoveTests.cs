@@ -42,7 +42,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
             AndPolicy andPolicy = new AndPolicy();
             PolicyManager.AddPurchasePolicy(andPolicy);
             PolicyManager.AddPurchasePolicy(policy, andPolicy.Id);
-            Result<bool> res = PolicyManager.RemovePurchasePolicy(policy.Id);
+            Result<IPurchasePolicy> res = PolicyManager.RemovePurchasePolicy(policy.Id);
             Assert.Empty(andPolicy.Policies);
         }
 
@@ -53,21 +53,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
             IPurchasePolicy policy = new MinProductPolicy(Products["Bread"].Id, 10);
             AndPolicy andPolicy = new AndPolicy();
             PolicyManager.AddPurchasePolicy(andPolicy);
-            Result<bool> res = PolicyManager.RemovePurchasePolicy(policy.Id);
-            Assert.False(res.Data);
-        }
-
-        [Fact()]
-        [Trait("Category", "Unit")]
-        public void RemoveIllegalPolicyTest()
-        {
-            IPurchasePolicy policy1 = new MinProductPolicy(Products["Bread"].Id, 5);
-            IPurchasePolicy policy2 = new MaxProductPolicy(Products["Bread"].Id, 10);
-            IPurchasePolicy condPolicy = new ConditionalPolicy(policy1, policy2);            
-            PolicyManager.AddPurchasePolicy(condPolicy);
-            Result<bool> res = PolicyManager.RemovePurchasePolicy(policy1.Id);
-
-            Assert.False(res.ExecStatus);
+            Result<IPurchasePolicy> res = PolicyManager.RemovePurchasePolicy(policy.Id);
+            Assert.False(res.Data != null);
         }
     }
 }

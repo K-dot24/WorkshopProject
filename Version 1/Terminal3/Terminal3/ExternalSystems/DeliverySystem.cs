@@ -9,9 +9,9 @@ namespace Terminal3.ExternalSystems
     {
         public static int Supply(IDictionary<String, Object> deliveryDetails)
         {
-            if (ExternalSystemsAPI.Handshake())
+            if (ExternalSystemsAPI.getInstance().Handshake())
             {
-                String result = ExternalSystemsAPI.Supply(deliveryDetails);
+                String result = ExternalSystemsAPI.getInstance().Supply(deliveryDetails);
                 if (Int32.TryParse(result, out int id))
                 {
                     return id;
@@ -22,9 +22,9 @@ namespace Terminal3.ExternalSystems
 
         public static int CancelSupply(IDictionary<String, Object> deliveryDetails)
         {
-            if (ExternalSystemsAPI.Handshake())
+            if (ExternalSystemsAPI.getInstance().Handshake())
             {
-                String result = ExternalSystemsAPI.CancelSupply(deliveryDetails);
+                String result = ExternalSystemsAPI.getInstance().CancelSupply(deliveryDetails);
                 if (Int32.TryParse(result, out int id))
                 {
                     return id;

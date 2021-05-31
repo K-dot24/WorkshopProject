@@ -76,23 +76,33 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<bool>("", true, false);
         }
 
-        public Result<bool> RemovePolicy(string id)
+        public Result<IPurchasePolicy> RemovePolicy(string id)
         {
-            if((PreCond != null && PreCond.Id.Equals(id)) || (Cond != null && Cond.Id.Equals(id)))
-                return new Result<bool>("", false, false);
+            if (PreCond != null && PreCond.Id.Equals(id))
+            {
+                IPurchasePolicy temp = PreCond;
+                PreCond = null;
+                return new Result<IPurchasePolicy>("", true, temp);
+            }
+            else if (Cond != null && Cond.Id.Equals(id))
+            {
+                IPurchasePolicy temp = Cond;
+                Cond = null;
+                return new Result<IPurchasePolicy>("", true, temp);
+            }
 
-            Result<bool> res = PreCond.RemovePolicy(id);
+            Result<IPurchasePolicy> res = PreCond.RemovePolicy(id);
             if (!res.ExecStatus)
                 return res;
-            if (res.Data)
+            if (res.Data != null)
                 return res;
 
             res = Cond.RemovePolicy(id);
             if (!res.ExecStatus)
                 return res;
-            if (res.Data)
+            if (res.Data != null)
                 return res;
-            return new Result<bool>("", true, false);
+            return new Result<IPurchasePolicy>("", true, null);
         }
 
         public Result<IPurchasePolicyData> GetData()

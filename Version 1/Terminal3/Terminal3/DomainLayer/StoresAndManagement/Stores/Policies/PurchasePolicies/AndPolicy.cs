@@ -63,20 +63,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<bool>("", true , false);
         }
 
-        public Result<bool> RemovePolicy(string id)
+        public Result<IPurchasePolicy> RemovePolicy(string id)
         {
-            if (Policies.RemoveAll(policy => policy.Id.Equals(id)) >= 1)
-                return new Result<bool>("", true, true);
-
-            foreach (IPurchasePolicy policy in Policies)
+            IPurchasePolicy policy = Policies.Find(policy => policy.Id.Equals(id));
+            if (policy != null)
             {
-                Result<bool> res = policy.RemovePolicy(id);
+                Policies.Remove(policy);
+                return new Result<IPurchasePolicy>("", true, policy);
+            }
+
+            foreach (IPurchasePolicy curr in Policies)
+            {
+                Result<IPurchasePolicy> res = curr.RemovePolicy(id);
                 if (!res.ExecStatus)
                     return res;
-                if (res.Data)
+                if (res.Data != null)
                     return res;
             }
-            return new Result<bool>("", true, false);
+            return new Result<IPurchasePolicy>("", true, null);
         }
 
         public Result<IPurchasePolicyData> GetData()

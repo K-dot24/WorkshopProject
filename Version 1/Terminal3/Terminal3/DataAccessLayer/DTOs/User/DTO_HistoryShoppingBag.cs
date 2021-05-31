@@ -8,15 +8,15 @@ namespace Terminal3.DataAccessLayer.DTOs
     public class DTO_HistoryShoppingBag
     {
         [BsonId]
-        public String _id { get; }
+        public String _id { get; set; }
         [BsonElement]
-        public String UserId { get; }
+        public String UserId { get; set; }
         [BsonElement]
-        public String StoreId { get; }
+        public String StoreId { get; set; }
         [BsonElement]
         public LinkedList<DTO_HistoryProduct> Products { get; set; }
         [BsonElement]
-        public Double TotalBagPrice { get; }
+        public Double TotalBagPrice { get; set; }
 
         public DTO_HistoryShoppingBag(String id, String userId, String storeId, LinkedList<DTO_HistoryProduct> products, Double totalBagPrice)
         {
