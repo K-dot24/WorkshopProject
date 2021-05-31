@@ -566,7 +566,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                Result<bool> res =  store.RemovePurchasePolicy(id);
+                Result<IPurchasePolicy> res =  store.RemovePurchasePolicy(id);
                 if (res.ExecStatus)
                 {
                     // Update in DB
@@ -574,7 +574,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var update = Builders<BsonDocument>.Update.Set("MainPolicy", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);
                 }
-                return res;
+                return new Result<bool>(res.Message, false, false);
             }
             return new Result<bool>("Store does not exists\n", false, false);
         }
