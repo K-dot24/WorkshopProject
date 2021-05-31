@@ -39,8 +39,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info);
         Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info, String id);
         Result<IDiscountCondition> AddDiscountCondition(Dictionary<string, object> info, String id);
-        Result<Boolean> RemoveDiscountPolicy(String id);
-        Result<Boolean> RemoveDiscountCondition(String id);
+        Result<IDiscountPolicy> RemoveDiscountPolicy(String id);
+        Result<IDiscountCondition> RemoveDiscountCondition(String id);
         Result<Boolean> EditDiscountPolicy(Dictionary<string, object> info, String id);
         Result<Boolean> EditDiscountCondition(Dictionary<string, object> info, String id);
         Result<IDiscountPolicyData> GetPoliciesData();
@@ -578,12 +578,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.AddDiscountCondition(info, id);
         }
 
-        public Result<bool> RemoveDiscountPolicy(string id)
+        public Result<IDiscountPolicy> RemoveDiscountPolicy(string id)
         {
             return PolicyManager.RemoveDiscountPolicy(id);
         }
 
-        public Result<bool> RemoveDiscountCondition(string id)
+        public Result<IDiscountCondition> RemoveDiscountCondition(string id)
         {
             return PolicyManager.RemoveDiscountCondition(id);
         }
