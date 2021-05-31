@@ -58,19 +58,33 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
-            if (Conditions.RemoveAll(condition => condition.Id.Equals(id)) >= 1)
-                return new Result<bool>("", true, true);
+            IDiscountCondition toBeRemoved = getCondition(id);
+            if (toBeRemoved != null)
+            {
+                Conditions.Remove(toBeRemoved);
+                return new Result<IDiscountCondition>("", true, toBeRemoved);
+            }
             foreach (IDiscountCondition myCondition in Conditions)
             {
-                Result<bool> result = myCondition.RemoveCondition(id);
-                if (result.ExecStatus && result.Data)
+                Result<IDiscountCondition> result = myCondition.RemoveCondition(id);
+                if (result.ExecStatus && result.Data != null)
                     return result;
                 if (!result.ExecStatus)
                     return result;
             }
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountCondition>("", true, null);
+        }
+
+        private IDiscountCondition getCondition(String id)
+        {
+            foreach (IDiscountCondition myCondition in Conditions)
+            {
+                if (myCondition.Id.Equals(id))
+                    return myCondition;
+            }
+            return null;
         }
 
         public override Result<IDiscountConditionData> GetData()
