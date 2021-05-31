@@ -95,7 +95,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
        
 
-        public Store(string id, string name, InventoryManager inventoryManager, History history, double rating, int numberOfRates, NotificationManager notificationManager)
+        public Store(string id, string name, InventoryManager inventoryManager, History history, double rating, int numberOfRates, NotificationManager notificationManager , Boolean isClosed=false)
         {
             Id = id;
             Name = name;            
@@ -107,7 +107,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             NotificationManager = notificationManager;
             Owners = new ConcurrentDictionary<String, StoreOwner>();
             Managers = new ConcurrentDictionary<String, StoreManager>();
-            isClosed = false;
+            this.isClosed = isClosed;
 
         }
 
