@@ -10,6 +10,7 @@ namespace Terminal3.ExternalSystems.Tests
         public IDictionary<String, Object> paymentDetails;
         public PaymentSystemTests()
         {
+            ExternalSystemsAPI.getInstance("https://cs-bgu-wsep.herokuapp.com/");
             paymentDetails = new Dictionary<String, Object>
                     {
                      { "card_number", "2222333344445555" },
