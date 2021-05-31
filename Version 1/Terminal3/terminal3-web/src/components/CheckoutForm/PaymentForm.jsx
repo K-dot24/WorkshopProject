@@ -51,7 +51,7 @@ const PaymentForm = ({ userID, shippingData, checkoutToken, nextStep, backStep }
                 year,
                 holder: fullName,
                 ccv: cvc,
-                id: userID  // TODO: check if 
+                id: userID
             }
         }
 
