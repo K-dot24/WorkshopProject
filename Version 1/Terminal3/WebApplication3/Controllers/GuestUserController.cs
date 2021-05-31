@@ -217,7 +217,7 @@ namespace Terminal3WebAPI.Controllers
         {
             Result<ShoppingCartService> result = system.Purchase(purchaseDetails.userID, purchaseDetails.paymentDetails, purchaseDetails.deliveryDetails);
             if (result.ExecStatus) { return Ok(result); }
-            else { return BadRequest(result); }
+            else { return BadRequest(result.Message); }
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace Terminal3WebAPI.Controllers
         {
             Result<HistoryService> result = system.GetUserPurchaseHistory(userID);
             if (result.ExecStatus) { return Ok(result); }
-            else { return BadRequest(result); }
+            else { return BadRequest(result.Message); }
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace Terminal3WebAPI.Controllers
         {
             Result<double> result = system.GetTotalShoppingCartPrice(userID);
             if (result.ExecStatus) { return Ok(result); }
-            else { return BadRequest(result); }
+            else { return BadRequest(result.Message); }
         }
 
         /// <summary>
