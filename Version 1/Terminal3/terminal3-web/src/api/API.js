@@ -79,7 +79,7 @@ export function Register( data ) {
 ///     "rating":double
 /// }
 /// NOTE: fields are optionals
-export function SearchStore( search_by ) {    //TODO - search by other params
+export function SearchStore( search_by ) {
     return fetch(`https://localhost:5000/api/GuestUser/SearchStore`, {
         method: 'POST',
         headers: {
@@ -102,7 +102,7 @@ export function SearchStore( search_by ) {    //TODO - search by other params
 ///     "Keywords":["string","string"]
 /// }
 /// NOTE: fields are optionals
-export function SearchProduct( search_by ) {    //TODO - search by other params
+export function SearchProduct( search_by ) {
     return fetch(`https://localhost:5000/api/GuestUser/SearchProduct`, {
         method: 'POST',
         headers: {
@@ -184,7 +184,7 @@ export function UpdateShoppingCart( data ) {
 /// }
 export function Purchase( data ) {    
     return fetch(`https://localhost:5000/api/GuestUser/Purchase`, {
-        method: 'PUT',                                                      //TODO -PUT
+        method: 'PUT',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',

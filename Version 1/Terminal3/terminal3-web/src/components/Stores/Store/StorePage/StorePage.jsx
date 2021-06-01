@@ -187,14 +187,14 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         }
 
         allData = { storeId: store.id, info };
-        console.log(allData);
+        // console.log(allData);
 
         if ('nodeid' in data) {
             AddDiscountPolicyById(data.nodeid, allData).then(response => response.ok ? 
-                response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
         } else {
             AddDiscountPolicy(allData).then(response => response.ok ? 
-                response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
         }
     }
 
@@ -219,21 +219,21 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         }
 
         const allData = { storeId: store.id, info };
-        console.log(allData);
+        // console.log(allData);
 
         AddDiscountCondition(data.nodeid, allData).then(response => response.ok ? 
-            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
 
     }
 
     const handleRemoveDiscountPolicy = (data) => {
         RemoveDiscountPolicy(store.id, data.nodeid).then(response => response.ok ? 
-            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     const handleRemoveDiscountCondition = (data) => {
         RemoveDiscountCondition(store.id, data.nodeid).then(response => response.ok ? 
-            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     // TODO: Display information to user (+ check business returns actual data)
@@ -272,20 +272,20 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         }
 
         allData = { storeId: store.id, info };
-        console.log(allData);
+        // console.log(allData);
 
         if ('nodeid' in data) {
             AddPurchasePolicyById(data.nodeid, allData).then(response => response.ok ? 
-                response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
         } else {
             AddPurchasePolicy(allData).then(response => response.ok ? 
-                response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
         }
     }
 
     const handleRemovePurchasePolicy = (data) => {
         RemovePurchasePolicy(store.id, data.nodeid).then(response => response.ok ? 
-            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     // TODO: Display information to user (+ check business returns actual data)
@@ -313,7 +313,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     // }
 
     // useEffect(() => {
-    //     // TODO: Check after API works
+    //     
     //     if (searchQuery !== '')
     //         searchProductsByQuery();
     //     // else
@@ -325,6 +325,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     useEffect(() => {
         fetchProducts();
         console.log("store id: " + store.id);
+        console.log(products);
     }, []);
 
     return (

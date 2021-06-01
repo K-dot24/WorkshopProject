@@ -18,7 +18,6 @@ const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
      const location = useLocation();
      let history = useHistory();    // for redirecting after login
  
-     // TODO: fetch user from API
      const handleSubmit = (e) => {
          e.preventDefault();
 
@@ -32,9 +31,11 @@ const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
             else
                 handleAction(data, currentType.value, currentType.sub);
          }
- 
-         // redirect back to homepage
-        //  history.push('/');
+
+        //  redirect back
+        //  const end = location.pathname.lastIndexOf('/');
+        //  const previousUrl = location.pathname.substring(0, end);
+        //  history.push(previousUrl);
      }
 
     const handleCheckBox = (checkList) => {
@@ -51,9 +52,9 @@ const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
         });
     };
 
-    useEffect(() => {
-        console.log(currentType);
-    }, [currentType]);
+    // useEffect(() => {
+    //     console.log(currentType);
+    // }, [currentType]);
 
     return (
         <Container component="main" maxWidth="xs">
@@ -122,10 +123,10 @@ const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
 
                     {/* Text Fields */}
                     {fields && 
-                        fields.map((field) => (
+                        fields.map((field, index) => (
                             'belongsTo' in field && (currentType.value !== field.belongsTo && currentType.sub !== field.belongsTo) ? null :
                             <TextField
-                                key={field.name}
+                                key={index}
                                 type={field.type ? field.type : "text"}
                                 variant="outlined"
                                 margin="normal"
