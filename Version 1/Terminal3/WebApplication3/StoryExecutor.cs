@@ -35,6 +35,9 @@ namespace Terminal3WebAPI
             {
                 string json = File.ReadAllText(path);
                 StoryConfig storyConfig = JsonConvert.DeserializeObject<StoryConfig>(json);
+                if (storyConfig.story is null) {
+                    System.Environment.Exit(0);
+                }
                 foreach (Story story in storyConfig.story)
                 {
 
