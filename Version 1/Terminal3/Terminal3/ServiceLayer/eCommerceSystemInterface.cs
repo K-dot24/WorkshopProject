@@ -50,6 +50,20 @@ namespace Terminal3.ServiceLayer
                             NotificationService, this.connection);*/
 
             Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(config_path));
+            //check config
+            try
+            {
+                string email = config.email;
+                string password = config.password; 
+                string mongo_url = config.mongoDB_url;
+                string signalRServer_url = config.signalRServer_url;
+                string externalSystem_url = config.externalSystem_url;
+            }
+            catch (InvalidDataException)
+            {
+                return;
+            }
+
             Mapper.getInstance(config.mongoDB_url);
             ExternalSystems.ExternalSystemsAPI.getInstance(config.externalSystem_url);
             

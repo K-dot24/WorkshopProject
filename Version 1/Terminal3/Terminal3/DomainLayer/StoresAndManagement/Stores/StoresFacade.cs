@@ -67,7 +67,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Mapper mapper; 
 
-        //TODO: Change constructor if needed (initializer?)
         public StoresFacade()
         {
             Stores = new ConcurrentDictionary<String, Store>();
