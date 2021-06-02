@@ -54,8 +54,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> EditDiscountPolicy(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> EditDiscountCondition(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
-        Result<IDiscountPolicyData> GetPoliciesData(string storeId);
-        Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId);
+        Result<IDictionary<string, object>> GetPoliciesData(string storeId);
+        Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId);
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info);
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> RemovePurchasePolicy(string storeId, string id);
@@ -560,13 +560,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>("Store does not exists\n", false, false);
         }
 
-        public Result<IDiscountPolicyData> GetPoliciesData(string storeId)
+        public Result<IDictionary<string, object>> GetPoliciesData(string storeId)
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
                 return store.GetPoliciesData();
             }
-            return new Result<IDiscountPolicyData>("Store does not exists\n", false, null);
+            return new Result<IDictionary<string, object>>("Store does not exists\n", false, null);
         }
 
         //TODO DELETE DB
@@ -638,13 +638,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>("Store does not exists\n", false, false);
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId)
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
                 return store.GetPurchasePolicyData();
             }
-            return new Result<IPurchasePolicyData>("Store does not exists\n", false, null);
+            return new Result<IDictionary<string, object>>("Store does not exists\n", false, null);
         }
 
         public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info)

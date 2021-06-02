@@ -338,7 +338,7 @@ namespace Terminal3WebAPI.Controllers
         [HttpGet]
         public IActionResult GetDiscountPolicyData(string storeId)
         {
-            Result<IDiscountPolicyData> result = system.GetDiscountPolicyData(storeId);
+            Result<IDictionary<string, object>> result = system.GetDiscountPolicyData(storeId);
             if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result.Message); }
         }
@@ -346,7 +346,7 @@ namespace Terminal3WebAPI.Controllers
         [HttpGet]
         public IActionResult GetPurchasePolicyData(string storeId)
         {
-            Result<IPurchasePolicyData> result = system.GetPurchasePolicyData(storeId);
+            Result<IDictionary<string, object>> result = system.GetPurchasePolicyData(storeId);
             if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result.Message); }
         }

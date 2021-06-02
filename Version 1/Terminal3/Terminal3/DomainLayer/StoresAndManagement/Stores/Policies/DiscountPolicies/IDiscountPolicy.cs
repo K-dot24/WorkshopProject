@@ -25,7 +25,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         Result<bool> EditCondition(Dictionary<string, object> info, string id);
 
-        Result<IDiscountPolicyData> GetData();
+        Result<IDictionary<string, object>> GetData();
 
     }
 }
