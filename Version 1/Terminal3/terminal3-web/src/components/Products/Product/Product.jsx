@@ -19,9 +19,9 @@ const Product = ({ product, onAddToBag }) => {
                     <Typography variant="h5">
                         {product.price}₪
                     </Typography>
-                    <Typography variant="subtitle2">   {/* TODO: Remove this when done with PID */}
+                    {/* <Typography variant="subtitle2">
                         {product.id}
-                    </Typography>
+                    </Typography> */}
                 </div>
                 <Typography variant="body2" color="textSecondary">{product.category}</Typography>
             </CardContent>

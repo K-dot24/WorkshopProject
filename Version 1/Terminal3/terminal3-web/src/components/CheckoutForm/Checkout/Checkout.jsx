@@ -16,7 +16,6 @@ const Checkout = ({ userID, cart, handleEmptyCart }) => {
     
     const classes = useStyles();
 
-    // TODO: fetch generate token? (02:08:00~)
     useEffect(() => {
         const generateToken = async () => {
             try {

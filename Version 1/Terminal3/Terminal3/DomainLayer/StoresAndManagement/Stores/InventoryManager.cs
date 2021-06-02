@@ -20,7 +20,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public ConcurrentDictionary<String, Product> Products { get; }
         
-        //TODO: Change constructor if needed (Initializer?)
         public InventoryManager()
         {
             Products = new ConcurrentDictionary<String, Product>();
