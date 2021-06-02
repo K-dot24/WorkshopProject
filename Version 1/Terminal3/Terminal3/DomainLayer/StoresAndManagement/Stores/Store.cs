@@ -43,8 +43,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<IDiscountCondition> RemoveDiscountCondition(String id);
         Result<Boolean> EditDiscountPolicy(Dictionary<string, object> info, String id);
         Result<Boolean> EditDiscountCondition(Dictionary<string, object> info, String id);
-        Result<IDiscountPolicyData> GetPoliciesData();
-        Result<IPurchasePolicyData> GetPurchasePolicyData();
+        Result<IDictionary<string, object>> GetPoliciesData();
+        Result<IDictionary<string, object>> GetPurchasePolicyData();
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info);
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
         Result<IPurchasePolicy> RemovePurchasePolicy(string id);
@@ -121,7 +121,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Founder = new StoreOwner(founder, this, null);
             Owners = new ConcurrentDictionary<String, StoreOwner>();
             Managers = new ConcurrentDictionary<String, StoreManager>();
-            InventoryManager = new InventoryManager(new ConcurrentDictionary<string, Product>());
+            InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
             History = new History();
             isClosed = false;
@@ -602,12 +602,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.EditDiscountCondition(info, id);
         }
 
-        public Result<IDiscountPolicyData> GetPoliciesData()
+        public Result<IDictionary<string, object>> GetPoliciesData()
         {
             return PolicyManager.GetDiscountPolicyData();
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData()
+        public Result<IDictionary<string, object>> GetPurchasePolicyData()
         {
             return PolicyManager.GetPurchasePolicyData();
         }

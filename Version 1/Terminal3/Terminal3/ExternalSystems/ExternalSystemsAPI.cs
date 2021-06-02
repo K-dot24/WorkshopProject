@@ -4,6 +4,7 @@ using System.Text;
 using System.Net;
 using System.IO;
 using Terminal3.DomainLayer;
+using System.Text.Json;
 
 namespace Terminal3.ExternalSystems
 {
@@ -78,10 +79,11 @@ namespace Terminal3.ExternalSystems
 
         }
 
-        public HttpWebResponse CreatePostHttpResponse(IDictionary<String, Object> parameters, Encoding charset)
+        public HttpWebResponse CreatePostHttpResponse(IDictionary<String, Object> parametersJson, Encoding charset)
         {
             try
             {
+                Dictionary<String, String> parameters = DictionaryFromJson(parametersJson);
                 HttpWebRequest request = null;
                 request = WebRequest.Create(sourceURL) as HttpWebRequest;
                 request.ProtocolVersion = HttpVersion.Version10;
@@ -117,6 +119,19 @@ namespace Terminal3.ExternalSystems
                 return null;
             }
 
+        }
+
+        private Dictionary<String, String> DictionaryFromJson(IDictionary<String, Object> parameters)
+        {
+            Dictionary<String, String> answer = new Dictionary<string, string>();
+            foreach(KeyValuePair<String, Object> entry in parameters)
+            {
+                if (entry.Value is JsonElement)
+                    answer.Add(entry.Key, ((JsonElement)entry.Value).ToString());
+                else
+                    answer.Add(entry.Key, (string)entry.Value);
+            }
+            return answer;
         }
 
     }

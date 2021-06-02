@@ -333,6 +333,8 @@ namespace Terminal3.DataAccessLayer
             ConcurrentDictionary<String, String> Policies = new ConcurrentDictionary<String, String>(); //<id , type>
             foreach (IPurchasePolicy policy in list)
             {
+                if (policy == null)
+                    continue;
                 string[] type = policy.GetType().ToString().Split('.');
                 string policy_type = type[type.Length - 1];
                 AddPolicyToDB(policy_type, policy);
@@ -355,6 +357,8 @@ namespace Terminal3.DataAccessLayer
         {
             ConcurrentDictionary<String, String> Discounts = new ConcurrentDictionary<String, String>();    //<id , type>
 
+            if (discount == null)
+                return Discounts;
             string[] type = discount.GetType().ToString().Split('.');
             string discount_type = type[type.Length - 1];
             AddDiscountToDB(discount_type, discount);
@@ -366,6 +370,8 @@ namespace Terminal3.DataAccessLayer
         {
             ConcurrentDictionary<String, String> Discounts = new ConcurrentDictionary<String, String>();    //<id , type>
 
+            if (discount == null)
+                return Discounts;
             string[] type = discount.GetType().ToString().Split('.');
             string discount_type = type[type.Length - 1];
             AddDiscountToDB(discount_type, discount);

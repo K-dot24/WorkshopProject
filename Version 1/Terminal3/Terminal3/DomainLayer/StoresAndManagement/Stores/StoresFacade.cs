@@ -3,6 +3,8 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Globalization;
 using Terminal3.DataAccessLayer;
 using Terminal3.DataAccessLayer.DTOs;
@@ -52,8 +54,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> EditDiscountPolicy(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> EditDiscountCondition(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
-        Result<IDiscountPolicyData> GetPoliciesData(string storeId);
-        Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId);
+        Result<IDictionary<string, object>> GetPoliciesData(string storeId);
+        Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId);
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info);
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> RemovePurchasePolicy(string storeId, string id);
@@ -65,7 +67,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, Store> Stores { get; }
         public Mapper mapper; 
 
-        //TODO: Change constructor if needed (initializer?)
         public StoresFacade()
         {
             Stores = new ConcurrentDictionary<String, Store>();
@@ -331,7 +332,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             newStore.NotificationManager = notificationManager;
             newStore.NotificationManager.notifyStoreOpened();
 
-            return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder}\n", true, newStore);
+            return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder.Email}\n", true, newStore);
         }
 
         public Result<Boolean> CloseStore(RegisteredUser founder, string storeId)
@@ -450,15 +451,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             Boolean result = true;
             ICollection<String> properties = searchAttributes.Keys;
+            IDictionary<String, Object> lowerCaseDict = searchAttributes.ToDictionary(k => k.Key.ToLower(), k => k.Value);
+
             foreach (string property in properties)
             {
-                var value = searchAttributes[property];
+                JsonElement jsonElement = (JsonElement)lowerCaseDict[property.ToLower()];
+                Object value=null;
+
                 switch (property.ToLower())
                 {
                     case "name":
-                        if (!store.Name.ToLower().Contains(((string)value).ToLower())) { result = false; }
+                        value = jsonElement.GetString().ToLower();
+                        if (!store.Name.ToLower().Contains((String)value)) { result = false; }
                         break;
                     case "rating":
+                        value = jsonElement.GetDouble();
                         if (store.Rating < (Double)value) { result = false; }
                         break;
                 }
@@ -555,6 +562,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     // Update in DB
+                    //mapper.DeleteDiscount(res.Data);
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
@@ -573,6 +581,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     // Update in DB
+                    //mapper.DeleteDiscount(res.Data);
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
@@ -582,13 +591,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>("Store does not exists\n", false, false);
         }
 
-        public Result<IDiscountPolicyData> GetPoliciesData(string storeId)
+        public Result<IDictionary<string, object>> GetPoliciesData(string storeId)
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
                 return store.GetPoliciesData();
             }
-            return new Result<IDiscountPolicyData>("Store does not exists\n", false, null);
+            return new Result<IDictionary<string, object>>("Store does not exists\n", false, null);
         }
 
         //TODO DELETE DB
@@ -600,6 +609,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     // Update in DB
+                    //mapper.DeleteDiscount(res.Data);
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainPolicy", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);
@@ -660,13 +670,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>("Store does not exists\n", false, false);
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId)
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
                 return store.GetPurchasePolicyData();
             }
-            return new Result<IPurchasePolicyData>("Store does not exists\n", false, null);
+            return new Result<IDictionary<string, object>>("Store does not exists\n", false, null);
         }
 
         public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info)

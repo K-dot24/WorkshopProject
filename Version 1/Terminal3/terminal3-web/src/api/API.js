@@ -1,36 +1,8 @@
-//#region to delete
-// import fetch from 'node-fetch';
-// import https from 'https';
-
-// const httpsAgent = new https.Agent({
-//     rejectUnauthorized: false,
-//   });
-
-
-        // option 1
-        // Axios  
-        //     .get("http://localhost:5001/api/Data/GetAllStoresToDisplay")  
-        //     .then(result => setData(result.data))
-        //     .catch((error) => {
-        //         console.log(error);
-        //     });
-        // console.log(data); 
-
-        // option 2
-        // const fetchData = async () => {
-        //     const result = await axios(
-        //       'http://localhost:5000/api/Data/GetAllStoresToDisplay',
-        //     );
-       
-        //     setData(result.data);
-        // };
-        // fetchData();
-        // console.log(data);
-//#endregion
-
 export const products_image_url = 'https://i.ibb.co/HxrQmhn/price-tag.jpg';
 
-// FuncName().then(response => response.json().then(json => setStateName(json))).catch(err => console.log(err));
+export function printErrorMessage(response) {
+    return response.json().then(message => alert(message));
+}
 
 //#region DataController
 
@@ -107,14 +79,14 @@ export function Register( data ) {
 ///     "rating":double
 /// }
 /// NOTE: fields are optionals
-export function SearchStore( search_by ) {    //TODO - search by other params
+export function SearchStore( search_by ) {
     return fetch(`https://localhost:5000/api/GuestUser/SearchStore`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { search_by },    
+        body: JSON.stringify(search_by),    
     })
 }
 
@@ -130,14 +102,14 @@ export function SearchStore( search_by ) {    //TODO - search by other params
 ///     "Keywords":["string","string"]
 /// }
 /// NOTE: fields are optionals
-export function SearchProduct( search_by ) {    //TODO - search by other params
+export function SearchProduct( search_by ) {
     return fetch(`https://localhost:5000/api/GuestUser/SearchProduct`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { search_by },    
+        body: JSON.stringify(search_by),    
     })
 }
 
@@ -192,7 +164,7 @@ export function GetUserShoppingCart( userID ) {
 /// }
 export function UpdateShoppingCart( data ) {    
     return fetch(`https://localhost:5000/api/GuestUser/UpdateShoppingCart`, {
-        method: 'PUT',                                                                  //TODO -PUT
+        method: 'PUT',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -212,7 +184,7 @@ export function UpdateShoppingCart( data ) {
 /// }
 export function Purchase( data ) {    
     return fetch(`https://localhost:5000/api/GuestUser/Purchase`, {
-        method: 'PUT',                                                      //TODO -PUT
+        method: 'PUT',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -229,7 +201,6 @@ export function GetUserPurchaseHistory( userID ) {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: { userID }, 
     })
 }
 
@@ -535,7 +506,7 @@ export function RemoveStoreManager( storeID, currentlyOwnerID, removedManagerID 
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="userID">ID of the user to get the purchase history</param>
 export function AdminGetUserPurchaseHistory( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/GetUserPurchaseHistory/${data.sysAdminID}/${data.userID}`, {
+    return fetch(`https://localhost:5000/api/SystemAdmin/GetUserPurchaseHistory/${data.sysAdminID}/${data.userID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -550,7 +521,7 @@ export function AdminGetUserPurchaseHistory( data ) {
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="storeId">ID of the store to get the purchase history</param>
 export function AdminGetStorePurchaseHistory( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeID}`, {
+    return fetch(`https://localhost:5000/api/SystemAdmin/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -565,7 +536,7 @@ export function AdminGetStorePurchaseHistory( data ) {
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
 /// <param name="email">email of the request new system admin</param>
 export function AddSystemAdmin( sysAdminID, email ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/AddSystemAdmin/${sysAdminID}/${email}`, {
+    return fetch(`https://localhost:5000/api/SystemAdmin/AddSystemAdmin/${sysAdminID}/${email}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -578,14 +549,13 @@ export function AddSystemAdmin( sysAdminID, email ) {
 /// Removing existing system admin
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
 /// <param name="email">email of admin to be removed</param>
-export function RemoveSystemAdmin( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/RemoveSystemAdmin/${data.sysAdminID}/${data.email}`, {
-        method: 'DELETE',                                       //TODO - HTTP DELETE
+export function RemoveSystemAdmin( sysAdminID, email ) {
+    return fetch(`https://localhost:5000/api/SystemAdmin/RemoveSystemAdmin/${sysAdminID}/${email}`, {
+        method: 'DELETE',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
@@ -593,7 +563,7 @@ export function RemoveSystemAdmin( data ) {
 /// Reset the system, including all the stored data
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
 export function ResetSystem( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SystemAdmin/ResetSystem/${data.sysAdminID}`, {
+    return fetch(`https://localhost:5000/api/SystemAdmin/ResetSystem/${data.sysAdminID}`, {
         method: 'POST',                                       
         headers: {
             'Accept': 'application/json',
@@ -603,18 +573,119 @@ export function ResetSystem( data ) {
     })
 }
 
-
 //#endregion
 
 
 
+//#region Discount Policy
 
+export function AddDiscountPolicy( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddDiscountPolicy`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
+export function AddDiscountPolicyById( id, data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddDiscountPolicy/${id}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
+export function AddDiscountCondition( id, data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddDiscountCondition/${id}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
+export function RemoveDiscountPolicy( storeID, id ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemoveDiscountPolicy/${storeID}/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
 
+export function RemoveDiscountCondition( storeID, id ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemoveDiscountCondition/${storeID}/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
 
+export function GetDiscountPolicyData( storeID ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetDiscountPolicyData/${storeID}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
 
+//#endregion
 
+//#region Purchase Policy
 
+export function AddPurchasePolicy( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddPurchasePolicy`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
+export function AddPurchasePolicyById( id, data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/AddPurchasePolicy/${id}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+export function RemovePurchasePolicy( storeID, id ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/RemovePurchasePolicy/${storeID}/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
+export function GetPurchasePolicyData( storeID ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetPurchasePolicyData/${storeID}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
+//#endregion

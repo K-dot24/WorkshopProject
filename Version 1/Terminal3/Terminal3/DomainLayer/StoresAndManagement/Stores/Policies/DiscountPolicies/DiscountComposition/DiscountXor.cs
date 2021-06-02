@@ -143,18 +143,36 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return Discount2.RemoveCondition(id);
         }
 
-        public override Result<IDiscountPolicyData> GetData()
+        public override Result<IDictionary<string, object>> GetData()
         {
-            Result<IDiscountPolicyData> discount1Result = Discount1.GetData();
-            if (!discount1Result.ExecStatus)
-                return new Result<IDiscountPolicyData>(discount1Result.Message, false, null);
-            Result<IDiscountPolicyData> discount2Result = Discount2.GetData();
-            if (!discount2Result.ExecStatus)
-                return new Result<IDiscountPolicyData>(discount2Result.Message, false, null);
-            Result<IDiscountConditionData> choosingConditionResult = ChoosingCondition.GetData();
-            if (!choosingConditionResult.ExecStatus)
-                return new Result<IDiscountPolicyData>(choosingConditionResult.Message, false, null);
-            return new Result<IDiscountPolicyData>("", true, new DiscountXorData(discount1Result.Data, discount2Result.Data, choosingConditionResult.Data, Id));
+            IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                {"type","DiscountXor" },
+                {"Discount1",null },
+                {"Discount2",null },
+                {"ChoosingCondition",null}
+
+            };
+            if (Discount1 != null) {
+                Result<IDictionary<string, object>> discount1Result = Discount1.GetData();
+                if (!discount1Result.ExecStatus)
+                    return discount1Result;
+                dict["Discount1"] = discount1Result.Data;
+            }
+            if (Discount2 != null)
+            {
+                Result<IDictionary<string, object>> discount2Result = Discount2.GetData();
+                if (!discount2Result.ExecStatus)
+                    return discount2Result;
+                dict["Discount2"] = discount2Result.Data;
+            }
+            if (ChoosingCondition != null)
+            {
+                Result<IDictionary<string, object>> ChoosingConditionResult = ChoosingCondition.GetData();
+                if (!ChoosingConditionResult.ExecStatus)
+                    return ChoosingConditionResult;
+                dict["ChoosingCondition"] = ChoosingConditionResult.Data;
+            }
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public override Result<bool> EditDiscount(Dictionary<string, object> info, string id)
