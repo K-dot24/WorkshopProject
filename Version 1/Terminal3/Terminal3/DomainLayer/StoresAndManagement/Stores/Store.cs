@@ -646,9 +646,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 inventoryManagerProducts_dto.AddLast(p.Key);
             }
 
-            return new DTO_Store(Id, Name, Founder.User.Id, owners_dto, managers_dto, 
-                       inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed,
-                       PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO());
+            return new DTO_Store(Id, Name, Founder.User.Id, owners_dto, managers_dto,
+                inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed,
+                PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO());
 
         } 
     }
