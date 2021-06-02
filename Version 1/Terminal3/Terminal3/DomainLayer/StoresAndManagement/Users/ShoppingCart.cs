@@ -89,7 +89,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
             if (!AdheresToPolicy().Data)
-                return new Result<ShoppingCart>("A bag in the Shopping cart doesn't adhere to it's respective store's policy", true, null);
+                return new Result<ShoppingCart>("A bag in the Shopping cart doesn't adhere to it's respective store's policy", false, null);
 
             Double amount = GetTotalShoppingCartPrice().Data;
 
@@ -97,7 +97,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             if (paymentId == -1)
             {
-                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in payment details\n", true, null);
+                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in payment details\n", false, null);
 
             }
 
@@ -108,8 +108,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 refundDetails.Add("transaction_id", paymentId.ToString());
                 int refundSuccess = PaymentSystem.CancelPay(refundDetails);
                 if(refundSuccess == -1)
-                    return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details and refund failed\n", true, null);
-                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details\n", true, null);
+                    return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details and refund failed\n", false, null);
+                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details\n", false, null);
             }
             ShoppingCart copy = new ShoppingCart(this);
 

@@ -121,7 +121,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Founder = new StoreOwner(founder, this, null);
             Owners = new ConcurrentDictionary<String, StoreOwner>();
             Managers = new ConcurrentDictionary<String, StoreManager>();
-            InventoryManager = new InventoryManager(new ConcurrentDictionary<string, Product>());
+            InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
             History = new History();
             isClosed = false;
