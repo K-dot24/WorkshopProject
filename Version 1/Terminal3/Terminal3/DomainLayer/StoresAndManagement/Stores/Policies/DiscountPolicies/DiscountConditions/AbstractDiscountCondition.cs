@@ -22,6 +22,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public abstract Result<bool> AddCondition(string id, IDiscountCondition condition);
         public abstract Result<IDiscountCondition> RemoveCondition(string id);
         public abstract Result<bool> EditCondition(Dictionary<string, object> info, string id);
-        public abstract Result<IDiscountConditionData> GetData();
+        public abstract Result<IDictionary<string, object>> GetData();
     }
 }

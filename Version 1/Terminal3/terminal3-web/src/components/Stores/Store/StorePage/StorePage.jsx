@@ -207,7 +207,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 break;
 
             case "MinProductCondition":
-                info = { type, MaxQuantity: data.minquantity, ProductId: data.productid };
+                info = { type, MinQuantity: data.minquantity, ProductId: data.productid };
                 break;
 
             case "MinBagPriceCondition":

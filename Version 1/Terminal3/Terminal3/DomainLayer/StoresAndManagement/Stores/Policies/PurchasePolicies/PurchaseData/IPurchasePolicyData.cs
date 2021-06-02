@@ -6,5 +6,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 {
     public interface IPurchasePolicyData
     {
+        string Id { get; }
     }
 }

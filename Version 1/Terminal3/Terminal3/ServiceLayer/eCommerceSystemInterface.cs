@@ -378,12 +378,12 @@ namespace Terminal3.ServiceLayer
             return StoreStaffInterface.EditDiscountCondition(storeId, info, id);
         }
 
-        public Result<IDiscountPolicyData> GetDiscountPolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetDiscountPolicyData(string storeId)
         {
             return StoreStaffInterface.GetDiscountPolicyData(storeId);
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId)
         {
             return StoreStaffInterface.GetPurchasePolicyData(storeId);
         }
