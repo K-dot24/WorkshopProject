@@ -18,7 +18,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountComposition;
 using System.Reflection;
 using Newtonsoft.Json;
-
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -1149,7 +1149,11 @@ namespace Terminal3.DataAccessLayer
                 products.TryAdd(product, p);
             }
 
-            s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager);
+            var d_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.DiscountRoot._id);
+            var p_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.PurchaseRoot._id);
+
+            PolicyManager PolicyManager = new PolicyManager(LoadDiscountAddition(d_filter) , LoadBuyNowPolicy(p_filter));
+            s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , PolicyManager);
 
             Stores.TryAdd(s.Id, s);
 

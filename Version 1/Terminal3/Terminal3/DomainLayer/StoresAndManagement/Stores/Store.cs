@@ -95,12 +95,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
        
 
-        public Store(string id, string name, InventoryManager inventoryManager, History history, double rating, int numberOfRates, NotificationManager notificationManager)
+        public Store(string id, string name, InventoryManager inventoryManager, History history, double rating, int numberOfRates, NotificationManager notificationManager , PolicyManager policyManager)
         {
             Id = id;
             Name = name;            
             InventoryManager = inventoryManager;
-            //PolicyManager = policyManager;     TODO
+            PolicyManager = policyManager;     
             History = history;
             Rating = rating;
             NumberOfRates = numberOfRates;
