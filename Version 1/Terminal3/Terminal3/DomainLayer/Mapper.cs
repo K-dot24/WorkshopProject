@@ -1195,7 +1195,7 @@ namespace Terminal3.DataAccessLayer
             s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , dto.isClosed);
 
             Stores.TryAdd(s.Id, s);
-
+            s.PolicyManager = new DomainLayer.StoresAndManagement.Stores.Policies.PolicyManager();
             StoreOwner founder = getOwnershipTree(s, dto.Founder);
 
             s.Founder = founder;
