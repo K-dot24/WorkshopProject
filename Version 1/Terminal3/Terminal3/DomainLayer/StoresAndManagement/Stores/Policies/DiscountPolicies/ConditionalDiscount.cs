@@ -62,7 +62,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public override Result<bool> AddCondition(string id, IDiscountCondition condition)
         {
             if (Id == id)
+            {
                 Condition = condition;
+                return new Result<bool>("", true, true);
+            }
             else if (Condition != null)
                 return Condition.AddCondition(id, condition);
             return new Result<bool>("", true, false);
