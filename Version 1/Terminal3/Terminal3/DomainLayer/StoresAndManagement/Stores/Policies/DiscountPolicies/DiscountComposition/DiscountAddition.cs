@@ -183,9 +183,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public DataAccessLayer.DTOs.DTO_DiscountAddition getDTO()
+        public DTO_DiscountAddition getDTO()
         {
-            return null; // TODO - DTO_DiscountAddition
+            ConcurrentDictionary<String, String> Discounts_dto = new ConcurrentDictionary<string, string>();
+            foreach (var dis in Discounts)
+            {
+                Discounts_dto.TryAdd("DiscountAddition", dis.Id);
+            }
+
+            return new DTO_DiscountAddition(this.Id, Discounts_dto);
         }
     }
 }

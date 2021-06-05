@@ -64,7 +64,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             {
                 owners_dto.AddLast(so.GetId());
             }
-            return new DTO_StoreOwner(User.Id, Store.Id, AppointedBy.GetId(), managers_dto, owners_dto);
+            if(AppointedBy is null) 
+            {
+                return new DTO_StoreOwner(User.Id, Store.Id, "", managers_dto, owners_dto);
+
+            }
+            else
+            {
+                return new DTO_StoreOwner(User.Id, Store.Id, AppointedBy.GetId(), managers_dto, owners_dto);
+
+            }
         }
     }
 }
