@@ -14,9 +14,8 @@ namespace Terminal3_E2ETests
     public class E2ETests
     {
         String BadMongoURLPath = @"..\netcoreapp3.1\BadMongoUrlConfig.json";
-        String BadExternalSystemUrlPath = @"..\netcoreapp3.1\BadExternalSystemConfig.json";
-        String InvalidConfigPath = @"..\netcoreapp3.1\InvalidConfig.json";
-        String Config = @"..\netcoreapp3.1\Config.json";
+        String BadExternalSystemUrlPath = @"..\netcoreapp3\BadExternalSystemConfig.json";
+        String InvalidConfigPath = @"..\netcoreapp3\InvalidConfig.json";
 
         public E2ETests()
         { }
