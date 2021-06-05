@@ -14,8 +14,9 @@ namespace Terminal3_E2ETests
     public class E2ETests
     {
         String BadMongoURLPath = @"..\netcoreapp3.1\BadMongoUrlConfig.json";
-        String BadExternalSystemUrlPath = @"..\netcoreapp3\BadExternalSystemConfig.json";
-        String InvalidConfigPath = @"..\netcoreapp3\InvalidConfig.json";
+        String BadExternalSystemUrlPath = @"..\netcoreapp3.1\BadExternalSystemConfig.json";
+        String InvalidConfigPath = @"..\netcoreapp3.1\InvalidConfig.json";
+        String Config = @"..\netcoreapp3.1\Config.json";
 
         public E2ETests()
         { }
@@ -67,7 +68,7 @@ namespace Terminal3_E2ETests
         [Fact()]
         public void GetIncomeAmountGroupByDay_data()
         {
-            ECommerceSystem system = new ECommerceSystem();
+            ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(Config));
 
             //purchase 1
             system.Register("shaked@gmail.com", "123");
@@ -118,7 +119,7 @@ namespace Terminal3_E2ETests
         [Fact()]
         public void GetIncomeAmountGroupByDay_empty()
         {
-             ECommerceSystem system = new ECommerceSystem();
+             ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(Config));
             system.Register("shaked@gmail.com", "123");
             Result<RegisteredUserService> user = system.Login("shaked@gmail.com", "123");
 
