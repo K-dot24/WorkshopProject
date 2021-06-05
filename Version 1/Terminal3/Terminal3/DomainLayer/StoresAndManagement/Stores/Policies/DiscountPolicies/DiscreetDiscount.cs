@@ -65,18 +65,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public override Result<IDictionary<string, object>> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() { 
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
                 {"type", "DiscreeteDiscount" }, 
                 {"Id", Id }, 
                 {"DiscountCode", DiscountCode } , 
                 {"Discount", null } 
+            };*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Discreet with a code " + DiscountCode},
+                { "children", new Dictionary<String, object>[0] }
             };
+
             if (Discount != null)
             {
                 Result<IDictionary<string, object>> discountDataResult = Discount.GetData();
                 if (!discountDataResult.ExecStatus)
                     return discountDataResult;
-                dict["Discount"] = discountDataResult.Data;
+                dict["children"] = new IDictionary<String, object>[1] { discountDataResult.Data };
                 
             }           
             return new Result<IDictionary<string, object>>("", true, dict);
