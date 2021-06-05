@@ -55,21 +55,8 @@ namespace Terminal3.ServiceLayer
             if( (config.externalSystem_url is null) || (config.mongoDB_url is null) || (config.signalRServer_url is null)
                 || (config.password is null) || (config.email is null))
             {
-                System.Environment.Exit(1);
-            }
-
-            //check config
-            try
-            {
-                string email = config.email;
-                string password = config.password; 
-                string mongo_url = config.mongoDB_url;
-                string signalRServer_url = config.signalRServer_url;
-                string externalSystem_url = config.externalSystem_url;
-            }
-            catch (InvalidDataException)
-            {
-                return;
+                Logger.LogError("Invalid JSON format - One or more missing attribute has been found in the config JSON");
+                Environment.Exit(1);
             }
 
             Mapper.getInstance(config.mongoDB_url);

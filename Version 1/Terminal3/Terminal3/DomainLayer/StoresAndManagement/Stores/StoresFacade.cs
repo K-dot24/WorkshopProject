@@ -65,15 +65,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     public class StoresFacade : IStoresFacade
     {
         public ConcurrentDictionary<String, Store> Stores { get; }
-        //public ConcurrentDictionary<String, Store> ClosedStores { get; }
-
         public Mapper mapper; 
 
         public StoresFacade()
         {
             Stores = new ConcurrentDictionary<String, Store>();
-            //ClosedStores = new ConcurrentDictionary<String, Store>();
             mapper = Mapper.getInstance();
+            loadStores();
         }
 
         //TODO: Implement all functions
@@ -159,6 +157,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("Owners", store.getDTO().Owners);
                     mapper.UpdateStore(filter, update);
+                    if(store.Owners.TryGetValue(currentlyOwnerID,out StoreOwner owner))
+                    {
+                        //update owner record
+                        var filterowner = Builders<BsonDocument>.Filter.Eq("UserId", owner.User.Id) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
+                        var updateowner = Builders<BsonDocument>.Update.Set("StoreOwners", owner.getDTO().StoreOwners);
+                        mapper.UpdateStoreOwner(filterowner, updateowner);
+                    }
                 }
 
                 return new Result<bool>(res.Message, res.ExecStatus, true);
@@ -179,6 +184,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("Managers", store.getDTO().Managers);
                     mapper.UpdateStore(filter, update);
+
+                    if (store.Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
+                    {
+                        //update owner record
+                        var filterowner = Builders<BsonDocument>.Filter.Eq("UserId", owner.User.Id) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
+                        var updateowner = Builders<BsonDocument>.Update.Set("StoreManagers", owner.getDTO().StoreManagers);
+                        mapper.UpdateStoreOwner(filterowner, updateowner);
+                    }
                 }
 
                 return new Result<bool>(res.Message, res.ExecStatus, true);
@@ -194,6 +207,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 Result<Boolean> res =  store.RemoveStoreManager(removedManagerID, currentlyOwnerID);
                 if (res.ExecStatus)
                 {
+
+                   // update store owner
+                    if(store.Owners.TryGetValue(currentlyOwnerID,out StoreOwner owner))
+                    {
+                        var filterowner = Builders<BsonDocument>.Filter.Eq("UserId", owner.User.Id) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
+                        var updateowner = Builders<BsonDocument>.Update.Set("StoreManagers", owner.getDTO().StoreManagers);
+                        mapper.UpdateStoreOwner(filterowner, updateowner);
+                    }
                     // Update Store in DB
                     var filter_manager = Builders<BsonDocument>.Filter.Eq("UserId", removedManagerID) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
                     mapper.DeleteStoreManager(filter_manager);
@@ -215,6 +236,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 Result<Boolean> res = store.RemoveStoreOwner(removedOwnerID, currentlyOwnerID);
                 if (res.ExecStatus)
                 {
+                    // update store owner
+                    if (store.Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
+                    {
+                        var filterowner = Builders<BsonDocument>.Filter.Eq("UserId", owner.User.Id) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
+                        var updateowner = Builders<BsonDocument>.Update.Set("StoreOwners", owner.getDTO().StoreOwners);
+                        mapper.UpdateStoreOwner(filterowner, updateowner);
+                    }
+
                     var filter_owner = Builders<BsonDocument>.Filter.Eq("UserId", removedOwnerID) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
                     mapper.DeleteStoreManager(filter_owner);
                     // Update Store in DB
@@ -292,17 +321,29 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Store> OpenNewStore(RegisteredUser founder, string storeName, String storeID)
         {
-            Store newStore = new Store(storeName, founder, storeID);
+            if (!Stores.ContainsKey(storeID))
+            {
 
-            // Update in DB
-            mapper.Create(newStore);
+                Store newStore = new Store(storeName, founder, storeID);
 
-            Stores.TryAdd(newStore.Id, newStore);
-            NotificationManager notificationManager = new NotificationManager(newStore);
-            newStore.NotificationManager = notificationManager;
-            newStore.NotificationManager.notifyStoreOpened();
+                // Update in DB
+                mapper.Create(newStore.Founder);
+                mapper.Create(newStore);
+                mapper.Create(newStore.PolicyManager.MainDiscount);
+                mapper.Create(newStore.PolicyManager.MainPolicy);
 
-            return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder.Email}\n", true, newStore);
+                Stores.TryAdd(newStore.Id, newStore);
+                NotificationManager notificationManager = new NotificationManager(newStore);
+                newStore.NotificationManager = notificationManager;
+                newStore.NotificationManager.notifyStoreOpened();
+
+                return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder.Email}\n", true, newStore);
+            }
+            else
+            {
+                return new Result<Store>($"StoreID {storeID} already associate with another store\n", false, null);
+            }
+
         }
 
         public Result<Boolean> CloseStore(RegisteredUser founder, string storeId)
@@ -477,6 +518,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainDiscount);
                     return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
                 return new Result<bool>(res.Message, res.ExecStatus, false);
@@ -496,6 +538,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainDiscount);
+
                     return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
                 return new Result<bool>(res.Message, res.ExecStatus, false);
@@ -515,6 +559,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainDiscount);
+
                     return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
                 return new Result<bool>(res.Message, res.ExecStatus, false);
@@ -536,6 +582,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainDiscount);
+
                 }
                 return new Result<bool>(res.Message, false, false);
             }
@@ -555,6 +603,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainDiscount);
+
                 }
                 return new Result<bool>(res.Message, false, false);
             }
@@ -583,6 +633,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainPolicy", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainPolicy);
                 }
                 return new Result<bool>(res.Message, false, false);
             }
@@ -600,6 +651,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainDiscount);
+                    
                 }
                 return res;
             }
@@ -617,6 +670,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainDiscount);
+
                 }
                 return res;
             }
@@ -634,6 +689,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainPolicy", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainPolicy);
+
                 }
                 return res;
             }
@@ -661,6 +718,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainPolicy", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainPolicy);
+
                     return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
                 return new Result<bool>(res.Message, res.ExecStatus, false);
@@ -680,6 +739,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainPolicy", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainPolicy);
+
                     return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
                 return new Result<bool>(res.Message, res.ExecStatus, false);
@@ -758,6 +819,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             { return new Result<List<Tuple<DateTime, Double>>>("End date cannot be before start date", false, null); }
         }
 
-       
+        public void loadStores (){
+            List<Store> storesList = mapper.LoadAllStores();
+            foreach(Store store in storesList)
+            {
+                Stores.TryAdd(store.Id, store);
+            }
+
+        }
+
+        private void UpdatePolicyRoot(DiscountAddition discountRoot)
+        {
+            mapper.DeleteDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", discountRoot.Id));
+            mapper.Create(discountRoot);
+        }
+        private void UpdatePolicyRoot(BuyNow purchaseRoot)
+        {
+            mapper.DeleteDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
+            mapper.Create(purchaseRoot);
+        }
     }
 }

@@ -47,6 +47,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Product> AddNewProduct(String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
+            foreach (Product product in Products.Values) {
+                if (product.Name.Equals(productName)) {
+                    return new Result<Product>($"There is already product with name {productName} in the store\n", false, null);
+                }
+            }
             Product newProduct = new Product(productName, price, initialQuantity, category, keywords);
             Products.TryAdd(newProduct.Id, newProduct);
             return new Result<Product>($"Product {newProduct.Name} was created successfully. ID: {newProduct.Id}\n", true, newProduct);
