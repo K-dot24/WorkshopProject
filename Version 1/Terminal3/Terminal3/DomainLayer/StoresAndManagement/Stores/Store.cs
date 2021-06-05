@@ -648,7 +648,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
             return new DTO_Store(Id, Name, Founder.User.Id, owners_dto, managers_dto,
                 inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed,
-                PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO());
+                PolicyManager.MainDiscount.Id, PolicyManager.MainPolicy.Id);
 
         } 
     }

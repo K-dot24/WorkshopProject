@@ -28,14 +28,14 @@ namespace Terminal3.DataAccessLayer.DTOs
         [BsonElement]
         public Boolean isClosed { get; set; }
         [BsonElement]
-        public DTO_DiscountAddition DiscountRoot { get; set; } // List of IDiscountPolicy ids 
+        public string DiscountRoot { get; set; } // List of IDiscountPolicy ids 
         [BsonElement]
-        public DTO_BuyNow PurchaseRoot { get; set; }
+        public string PurchaseRoot { get; set; }
 
 
 
         public DTO_Store(String id, String name, String founder, LinkedList<String> owners, LinkedList<String> managers, LinkedList<String> inventoryManager, DTO_History history, 
-                            Double rating, int numberOfRates, Boolean isclosed , DTO_DiscountAddition discount , DTO_BuyNow by_now)
+                            Double rating, int numberOfRates, Boolean isclosed , string discount_id , string by_now_id)
         {
             _id = id;
             Name = name;
@@ -47,8 +47,8 @@ namespace Terminal3.DataAccessLayer.DTOs
             Rating = rating;
             NumberOfRates = numberOfRates;
             isClosed = isclosed;
-            DiscountRoot = discount;
-            PurchaseRoot = by_now;
+            DiscountRoot = discount_id;
+            PurchaseRoot = by_now_id;
         }
     }
 }
