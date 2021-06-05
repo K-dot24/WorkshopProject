@@ -160,20 +160,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public override Result<IDictionary<string, object>> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() {
-                {"type", "DiscountMin" },
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                {"type", "DiscountAddition" },
                 {"Id", Id },
                 {"Discounts", null }
+            };*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Min"},
+                { "children", new Dictionary<String, object>[0] }
             };
-            List<IDictionary<string, object>> discountsList = new List<IDictionary<string, object>>();
+            List<IDictionary<string, object>> children = new List<IDictionary<string, object>>();
             foreach (IDiscountPolicy myDiscount in Discounts)
             {
                 Result<IDictionary<string, object>> discountResult = myDiscount.GetData();
                 if (!discountResult.ExecStatus)
                     return discountResult;
-                discountsList.Add(discountResult.Data);
+                children.Add(discountResult.Data);
             }
-            dict["Discounts"] = discountsList;
+            dict["children"] = children.ToArray();
             return new Result<IDictionary<string, object>>("", true, dict);
         }
 

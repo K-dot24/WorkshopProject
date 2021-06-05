@@ -51,11 +51,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public override Result<IDictionary<string, object>> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() {
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() {
                 {"type", "DiscountConditionAnd" },
                 {"Id", Id },
                 {"MinPrice", MinPrice} 
+            };*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Bag price >= " + MinPrice},
+                { "children", new Dictionary<String, object>[0] }
             };
+            return new Result<IDictionary<string, object>>("", true, dict);
             return new Result<IDictionary<string, object>>("", true, dict);
         }
 

@@ -89,10 +89,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public override Result<IDictionary<string, object>> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() {
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() {
                 {"type", "DiscountConditionAnd" },
                 {"Id", Id },
                 {"Conditions", null }
+            };*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "And"},
+                { "children", new Dictionary<String, object>[0] }
             };
             List<IDictionary<string, object>> conditionsList = new List<IDictionary<string, object>>();
             foreach (IDiscountCondition myCondition in Conditions)
@@ -102,7 +107,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                     return conditionResult;
                 conditionsList.Add(conditionResult.Data);
             }
-            dict["Conditions"] = conditionsList;
+            dict["children"] = conditionsList.ToArray();
             return new Result<IDictionary<string, object>>("", true, dict);
         }
 
