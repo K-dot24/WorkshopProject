@@ -73,7 +73,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             try
             {
-                Monitor.TryEnter(my_lock);
+                Monitor.Enter(my_lock);
                 try
                 {
                     if (isUniqueEmail(email))
@@ -266,13 +266,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 //User Found
                 Result<RegisteredUser> res_ru =  searchResult.Data.Login(password);
 
+                // Update DB
                 if (res_ru.ExecStatus)
                 {
-                    // Update DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
                     mapper.UpdateRegisteredUser(filter, update);
-
                 }
                 return res_ru;
 
@@ -331,7 +330,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     var update = Builders<BsonDocument>.Update.Set("Review", res_p.Data.Review);
                     mapper.UpdateProduct(filter, update);
                 }
-  
                 return res_p; 
             }
             return new Result<Product>("User does not exists\n", false, null);
@@ -352,14 +350,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             {
                 Result<ShoppingCart> res_sc = user.AddProductToCart(product, productQuantity, store);
 
+                // Update DB
                 if (res_sc.ExecStatus)
                 {
-                    // Update DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
                     var update = Builders<BsonDocument>.Update.Set("ShoppingCart", res_sc.Data.getDTO());
                     mapper.UpdateRegisteredUser(filter, update);
+                    return new Result<Boolean>(res_sc.Message, res_sc.ExecStatus, true);
                 }
-                return new Result<Boolean>(res_sc.Message, res_sc.ExecStatus, true);
+                return new Result<Boolean>(res_sc.Message, res_sc.ExecStatus, false);
             }
             else if (GuestUsers.TryGetValue(userID, out GuestUser guest))   // Check if active guest
             {
@@ -381,14 +380,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             {
                 Result<ShoppingCart> res_sc = registerd_user.UpdateShoppingCart(storeID, product, quantity);
 
+                // Update DB
                 if (res_sc.ExecStatus)
                 {
-                    // Update DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
                     var update = Builders<BsonDocument>.Update.Set("ShoppingCart", res_sc.Data.getDTO());
                     mapper.UpdateRegisteredUser(filter, update);
+                    return new Result<Boolean>(res_sc.Message, res_sc.ExecStatus, true);
                 }
-                  return new Result<Boolean>(res_sc.Message, res_sc.ExecStatus, true);
+                return new Result<Boolean>(res_sc.Message, res_sc.ExecStatus, false);
             }
             else
             {
