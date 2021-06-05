@@ -40,7 +40,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public override Result<bool> AddDiscount(String id, IDiscountPolicy discount)
         {
             if (Id == id)
+            {
                 Discount = discount;
+                return new Result<bool>("", true, true);
+            }
             else if(Discount != null)
                 return Discount.AddDiscount(id, discount);
             return new Result<bool>("", true, false);
