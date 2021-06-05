@@ -130,20 +130,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public override Result<IDictionary<string, object>> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() { 
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
                 {"type", "DiscountAddition" },
                 {"Id", Id },
                 {"Discounts", null }
+            };*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Add"},
+                { "children", new Dictionary<String, object>[0] }
             };
-            List<IDictionary<string, object>> discountsList = new List<IDictionary<string, object>>();
+            List<IDictionary<string, object>> children = new List<IDictionary<string, object>>();
             foreach (IDiscountPolicy myDiscount in Discounts)
             {
                 Result<IDictionary<string, object>> discountResult = myDiscount.GetData();
                 if (!discountResult.ExecStatus)
                     return discountResult;
-                discountsList.Add(discountResult.Data);
+                children.Add(discountResult.Data);
             }
-            dict["Discounts"] = discountsList;
+            dict["children"] = children.ToArray();
             return new Result<IDictionary<string, object>>("", true, dict);
         }
 
@@ -178,9 +183,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public DataAccessLayer.DTOs.DTO_DiscountAddition getDTO()
+        public DTO_DiscountAddition getDTO()
         {
-            return null; // TODO - DTO_DiscountAddition
+            ConcurrentDictionary<String, String> Discounts_dto = new ConcurrentDictionary<string, string>();
+            foreach (var dis in Discounts)
+            {
+                Discounts_dto.TryAdd("DiscountAddition", dis.Id);
+            }
+
+            return new DTO_DiscountAddition(this.Id, Discounts_dto);
         }
     }
 }

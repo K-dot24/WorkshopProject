@@ -51,13 +51,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return result;
         }
 
-        public Result<IDictionary<string, object>> GetData()
+        public Result<String> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() {
-                {"type", "DiscountTargetProducts" },
-                {"Categories", Categories }
-            };
-            return new Result<IDictionary<string, object>>("", true, dict);
+            String answer = "";
+            foreach (String category in Categories)
+                answer += category + ", ";
+            if (Categories.Count > 0)
+                answer = answer.Substring(0, answer.Length - 2);
+            return new Result<String>("", true, answer);
         }
 
         public string getId()
