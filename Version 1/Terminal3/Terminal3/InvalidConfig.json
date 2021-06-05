@@ -1,0 +1,6 @@
+{
+  "email": "Admin@terminal3.com",
+  "password": "Admin123",
+  "signalRServer_url": "https://localhost:4001/signalr/notification",
+  "externalSystem_url": ""
+}

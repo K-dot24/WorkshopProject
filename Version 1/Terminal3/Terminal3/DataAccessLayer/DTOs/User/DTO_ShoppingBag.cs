@@ -9,13 +9,13 @@ namespace Terminal3.DataAccessLayer.DTOs
     public class DTO_ShoppingBag
     {
         [BsonId]
-        public String _id { get; }
+        public String _id { get; set; }
         [BsonElement]
-        public String UserId { get; }
+        public String UserId { get; set; }
         [BsonElement]
-        public String StoreId { get; }
+        public String StoreId { get; set; }
         [BsonElement]
-        public ConcurrentDictionary<String, int> Products { get; }     // <Product id, Quantity>
+        public ConcurrentDictionary<String, int> Products { get; set; }     // <Product id, Quantity>
         [BsonElement]
         public Double TotalBagPrice { get; set; }
 

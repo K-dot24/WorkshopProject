@@ -46,11 +46,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveDiscount(String id)
+        public override Result<IDiscountPolicy> RemoveDiscount(String id)
         {
             if (Discount != null)
                 return Discount.RemoveDiscount(id);
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountPolicy>("", true, null);
         }
 
         public override Result<bool> AddCondition(string id, IDiscountCondition condition)
@@ -58,23 +58,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountCondition>("", true, null);
         }
 
-        public override Result<IDiscountPolicyData> GetData()
+        public override Result<IDictionary<string, object>> GetData()
         {
-            IDiscountPolicyData discountData = null;
+            IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                {"type", "DiscreeteDiscount" }, 
+                {"Id", Id }, 
+                {"DiscountCode", DiscountCode } , 
+                {"Discount", null } 
+            };
             if (Discount != null)
             {
-                Result<IDiscountPolicyData> discountDataResult = Discount.GetData();
+                Result<IDictionary<string, object>> discountDataResult = Discount.GetData();
                 if (!discountDataResult.ExecStatus)
                     return discountDataResult;
-                discountData = discountDataResult.Data;
-            }
-
-            return new Result<IDiscountPolicyData>("", true, new DiscreetDiscountData(discountData, DiscountCode, Id));
+                dict["Discount"] = discountDataResult.Data;
+                
+            }           
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public override Result<bool> EditDiscount(Dictionary<string, object> info, string id)

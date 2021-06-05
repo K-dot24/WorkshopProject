@@ -9,3 +9,4 @@ export { default as Register } from './Users/Register/Register';
 export { default as Login } from './Users/Login/Login';
 export { default as Action } from './Users/Action/Action';
 export { default as CheckboxList } from './Users/Action/CheckboxList';
+export { default as Review } from './CheckoutForm/Review';

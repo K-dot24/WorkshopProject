@@ -95,7 +95,7 @@ namespace Terminal3WebAPI.Controllers
         /// </summary>
         /// <param name="storeDetails"></param>
         [Route("SearchStore")]
-        [HttpGet]
+        [HttpPost]
         public IActionResult SearchStore([FromBody] IDictionary<string, object> storeDetails)
         {
             Result<List<StoreService>> result = system.SearchStore(storeDetails);
@@ -121,7 +121,7 @@ namespace Terminal3WebAPI.Controllers
         /// <param name="productDetails"></param>
         /// <returns></returns>
         [Route("SearchProduct")]
-        [HttpGet]
+        [HttpPost]
         public IActionResult SearchProduct([FromBody] IDictionary<string, object> productDetails)
         {
             Result < List < ProductService >> result = system.SearchProduct(productDetails);
@@ -184,7 +184,7 @@ namespace Terminal3WebAPI.Controllers
         /// Template of valid JSON:
         /// {
         ///     "userID":"string",
-        ///     "shoppingBagID":"string",
+        ///     "storeID":"string",
         ///     "productID":"string",
         ///     "quantity":int
         /// }
@@ -194,7 +194,7 @@ namespace Terminal3WebAPI.Controllers
         [HttpPut]
         public IActionResult UpdateShoppingCart([FromBody] UpdateShoppingCartModel details)
         {
-            Result<Boolean> result = system.UpdateShoppingCart(details.userID, details.shoppingBagID, details.productID, details.quantity);
+            Result<Boolean> result = system.UpdateShoppingCart(details.userID, details.storeID, details.productID, details.quantity);
             if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result); }
         }
@@ -217,7 +217,7 @@ namespace Terminal3WebAPI.Controllers
         {
             Result<ShoppingCartService> result = system.Purchase(purchaseDetails.userID, purchaseDetails.paymentDetails, purchaseDetails.deliveryDetails);
             if (result.ExecStatus) { return Ok(result); }
-            else { return BadRequest(result); }
+            else { return BadRequest(result.Message); }
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace Terminal3WebAPI.Controllers
         {
             Result<HistoryService> result = system.GetUserPurchaseHistory(userID);
             if (result.ExecStatus) { return Ok(result); }
-            else { return BadRequest(result); }
+            else { return BadRequest(result.Message); }
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace Terminal3WebAPI.Controllers
         {
             Result<double> result = system.GetTotalShoppingCartPrice(userID);
             if (result.ExecStatus) { return Ok(result); }
-            else { return BadRequest(result); }
+            else { return BadRequest(result.Message); }
         }
 
         /// <summary>

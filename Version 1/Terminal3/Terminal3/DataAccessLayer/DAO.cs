@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using System;
 using Terminal3.DataAccessLayer.DTOs;
+using Terminal3.DomainLayer;
 
 namespace Terminal3.DataAccessLayer.DAOs
 {
@@ -19,32 +20,67 @@ namespace Terminal3.DataAccessLayer.DAOs
 
         public void Create(T dto)
         {
-            var doc = dto.ToBsonDocument();
             try
             {
+                var doc = dto.ToBsonDocument();
                 collection.InsertOne(doc);
             }
-            catch(MongoDB.Driver.MongoWriteException e)
+            catch(MongoWriteException e)
             {
                 Console.WriteLine(e.ToString());
+                Logger.LogError(e.ToString());
+            }
+            catch(Exception e)
+            {
+                Logger.LogError(e.ToString());
             }
         }
 
         public T Delete(FilterDefinition<BsonDocument> filter)
         {
-            //collection.DeleteOne(filter);
-            BsonDocument deletedDocument = collection.FindOneAndDelete(filter);
-            T dto = JsonConvert.DeserializeObject<T>(deletedDocument.ToJson());
-            return dto;
+            try
+            {
+                //collection.DeleteOne(filter);
+                BsonDocument deletedDocument = collection.FindOneAndDelete(filter);
+                T dto = JsonConvert.DeserializeObject<T>(deletedDocument.ToJson());
+                return dto;
+            }
+            catch (MongoWriteException e)
+            {
+                Console.WriteLine(e.ToString());
+                Logger.LogError(e.ToString());
+                return default(T);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return default(T);
+            }
         }
 
         public T Load(FilterDefinition<BsonDocument> filter)
         {
-            var Document = collection.Find(filter).FirstOrDefault();                         
-            var json = Document.ToJson();
-            if(json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{"+ json.Substring(47);  }
-            T dto = JsonConvert.DeserializeObject<T>(json);
-            return dto;
+            try
+            {
+                var Document = collection.Find(filter).FirstOrDefault();
+                var json = Document.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                T dto = JsonConvert.DeserializeObject<T>(json);
+                return dto;
+            }
+            catch (MongoWriteException e)
+            {
+                Console.WriteLine(e.ToString());
+                Logger.LogError(e.ToString());
+                return default(T);
+
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return default(T);
+
+            }
         }
 
         //public T LoadComplexPolicies(FilterDefinition<BsonDocument> filter)
