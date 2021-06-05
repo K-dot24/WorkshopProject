@@ -83,14 +83,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<IPurchasePolicy>("", true, null);
         }
 
-        public Result<IPurchasePolicyData> GetData()
+        public Result<IDictionary<string, object>> GetData()
         {
-            List<IPurchasePolicyData> dataPolicies = new List<IPurchasePolicyData>();
-            foreach(IPurchasePolicy policy in Policies)
+            List<IDictionary<string, object>> dataPolicies = new List<IDictionary<string, object>>();
+            foreach (IPurchasePolicy policy in Policies)
             {
                 dataPolicies.Add(policy.GetData().Data);
             }
-            return new Result<IPurchasePolicyData>("",true, new AndPolicyData(dataPolicies, Id));
+            IDictionary<string, object> dict = new Dictionary<string, object>() { { "Type", "AndPolicy" }, { "Id", Id }, { "Policies", dataPolicies } };
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public Result<bool> EditPolicy(Dictionary<string, object> info, string id)

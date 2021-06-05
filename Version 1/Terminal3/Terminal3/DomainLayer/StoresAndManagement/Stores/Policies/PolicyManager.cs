@@ -25,8 +25,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
         Result<IDiscountCondition> RemoveDiscountCondition(String id);
         Result<Boolean> EditDiscountPolicy(Dictionary<string, object> info, String id);
         Result<Boolean> EditDiscountCondition(Dictionary<string, object> info, String id);
-        Result<IDiscountPolicyData> GetDiscountPolicyData();
-        Result<IPurchasePolicyData> GetPurchasePolicyData();
+        Result<IDictionary<string, object>> GetDiscountPolicyData();
+        Result<IDictionary<string, object>> GetPurchasePolicyData();
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info);
         Result<Boolean> AddPurchasePolicy(IPurchasePolicy policy);
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
@@ -46,6 +46,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             MainDiscount = new DiscountAddition();
             MainPolicy = new BuyNow();
         }
+        public PolicyManager(DiscountAddition mainDiscount, BuyNow mainPolicy)
+        {
+            MainDiscount = mainDiscount;
+            MainPolicy = mainPolicy;
+        }
+
 
         public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
         {
@@ -168,12 +174,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             return result;
         }
 
-        public Result<IDiscountPolicyData> GetDiscountPolicyData()
+        public Result<IDictionary<string, object>> GetDiscountPolicyData()
         {
             return MainDiscount.GetData();
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData()
+        public Result<IDictionary<string, object>> GetPurchasePolicyData()
         {
             return MainPolicy.GetData();
         }

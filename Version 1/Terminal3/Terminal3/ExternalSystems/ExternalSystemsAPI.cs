@@ -126,7 +126,10 @@ namespace Terminal3.ExternalSystems
             Dictionary<String, String> answer = new Dictionary<string, string>();
             foreach(KeyValuePair<String, Object> entry in parameters)
             {
-                answer.Add(entry.Key, ((JsonElement)entry.Value).ToString());
+                if (entry.Value is JsonElement)
+                    answer.Add(entry.Key, ((JsonElement)entry.Value).ToString());
+                else
+                    answer.Add(entry.Key, (string)entry.Value);
             }
             return answer;
         }

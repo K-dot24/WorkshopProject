@@ -101,18 +101,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<IDiscountCondition>("", true, null);
         }
 
-        public override Result<IDiscountPolicyData> GetData()
+        public override Result<IDictionary<string, object>> GetData()
         {
-            IDiscountTargetData targetData = null;
+            IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                { "type", "VisibleDiscount" }, 
+                { "Id", Id }, 
+                { "ExpirationDate", ExpirationDate }, 
+                { "percentage", Percentage }, 
+                { "Target", null } 
+            }; 
+
             if (Target != null)
             {
-                Result<IDiscountTargetData> targetDataResult = Target.GetData();
+                Result<IDictionary<string, object>> targetDataResult = Target.GetData();
                 if (!targetDataResult.ExecStatus)
-                    return new Result<IDiscountPolicyData>(targetDataResult.Message, false, null);
-                targetData = targetDataResult.Data;
+                    return targetDataResult;
+                dict["Target"] = targetDataResult.Data;
             }
 
-            return new Result<IDiscountPolicyData>("", true, new VisibleDiscountData(ExpirationDate, targetData, Percentage, Id));
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         private static Result<IDiscountTarget> createTarget(Dictionary<string, object> info)

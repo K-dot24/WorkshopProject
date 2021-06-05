@@ -28,7 +28,6 @@ const Login = ({ handleLogin }) => {
     // for redirecting after login
     let history = useHistory();
 
-    // TODO: fetch user from API
     const handleSubmit = (e) => {
         e.preventDefault();
 

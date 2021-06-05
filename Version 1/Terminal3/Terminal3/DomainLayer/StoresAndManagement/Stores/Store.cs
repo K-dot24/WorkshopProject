@@ -43,8 +43,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<IDiscountCondition> RemoveDiscountCondition(String id);
         Result<Boolean> EditDiscountPolicy(Dictionary<string, object> info, String id);
         Result<Boolean> EditDiscountCondition(Dictionary<string, object> info, String id);
-        Result<IDiscountPolicyData> GetPoliciesData();
-        Result<IPurchasePolicyData> GetPurchasePolicyData();
+        Result<IDictionary<string, object>> GetPoliciesData();
+        Result<IDictionary<string, object>> GetPurchasePolicyData();
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info);
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
         Result<IPurchasePolicy> RemovePurchasePolicy(string id);
@@ -64,7 +64,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, StoreOwner> Owners { get; set; }
         public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
-        public PolicyManager PolicyManager { get; }
+        public PolicyManager PolicyManager { get; set; }
         public History History { get; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
@@ -121,7 +121,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Founder = new StoreOwner(founder, this, null);
             Owners = new ConcurrentDictionary<String, StoreOwner>();
             Managers = new ConcurrentDictionary<String, StoreManager>();
-            InventoryManager = new InventoryManager(new ConcurrentDictionary<string, Product>());
+            InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
             History = new History();
             isClosed = false;
@@ -242,11 +242,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                         {
                             newOwner = new StoreOwner(futureOwner, this, owner);
                             Owners.TryAdd(futureOwner.Id, newOwner);
-                        }
-                        else if (Managers.TryGetValue(currentlyOwnerID, out StoreManager manager) && CheckStoreManagerAndPermissions(currentlyOwnerID, Methods.AddStoreOwner))
-                        {
-                            newOwner = new StoreOwner(futureOwner, this, manager);
-                            Owners.TryAdd(futureOwner.Id, newOwner);
+                            owner.StoreOwners.AddLast(newOwner);
                         }
                         else
                         {
@@ -293,6 +289,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                         if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner owner))
                         {
                             newManager = new StoreManager(futureManager, this, new Permission(), owner);
+                            owner.StoreManagers.AddLast(newManager);
                             Managers.TryAdd(futureManager.Id, newManager);
                         }
                         else if (Managers.TryGetValue(currentlyOwnerID, out StoreManager manager) && CheckStoreManagerAndPermissions(currentlyOwnerID, Methods.AddStoreManager))
@@ -330,6 +327,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (manager.AppointedBy.Equals(owner))
                 {
                     Managers.TryRemove(removedManagerID, out _);
+                    owner.StoreManagers.Remove(manager);
                     return new Result<bool>($"User (Id: {removedManagerID}) was successfully removed from store management at {this.Name}.\n", true, true);
                 }
                 //else failed
@@ -346,6 +344,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (ownerToRemove.AppointedBy != null && ownerToRemove.AppointedBy.Equals(ownerBoss))
                 {
                     Owners.TryRemove(removedOwnerID, out StoreOwner removedOwner);
+                    ownerBoss.StoreOwners.Remove(ownerToRemove);
                     RemoveAllStaffAppointedByOwner(removedOwner);
                     return new Result<bool>($"User (Id: {removedOwnerID}) was successfully removed as store owner at {this.Name}.\n", true, true);
                 }
@@ -603,12 +602,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.EditDiscountCondition(info, id);
         }
 
-        public Result<IDiscountPolicyData> GetPoliciesData()
+        public Result<IDictionary<string, object>> GetPoliciesData()
         {
             return PolicyManager.GetDiscountPolicyData();
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData()
+        public Result<IDictionary<string, object>> GetPurchasePolicyData()
         {
             return PolicyManager.GetPurchasePolicyData();
         }
@@ -647,9 +646,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 inventoryManagerProducts_dto.AddLast(p.Key);
             }
 
-            return new DTO_Store(Id, Name, Founder.User.Id, owners_dto, managers_dto, 
-                       inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed,
-                       PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO());
+            return new DTO_Store(Id, Name, Founder.User.Id, owners_dto, managers_dto,
+                inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed,
+                PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO());
 
         } 
     }

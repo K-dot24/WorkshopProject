@@ -63,9 +63,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<IDiscountCondition>("", true, null);
         }
 
-        public override Result<IDiscountConditionData> GetData()
+        public override Result<IDictionary<string, object>> GetData()
         {
-            return new Result<IDiscountConditionData>("", true, new MinProductConditionData(ProductId, MinQuantity, Id));
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                {"type", "DiscountConditionAnd" },
+                {"Id", Id },
+                {"MinQuantity", MinQuantity},
+                {"ProductId", ProductId }
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public override Result<bool> EditCondition(Dictionary<string, object> info, string id)

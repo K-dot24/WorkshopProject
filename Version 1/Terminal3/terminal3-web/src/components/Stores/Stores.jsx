@@ -3,10 +3,10 @@ import { Grid } from '@material-ui/core';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
  
 import { Store, StorePage } from '../../components';
-import { GetAllStoresToDisplay } from '../../api/API';
+import { GetAllStoresToDisplay, SearchStore } from '../../api/API';
 import useStyles from './styles';
 
-const Stores = ({ match, user, handleAddToCart, handleLogOut }) => {
+const Stores = ({ match, user, searchQuery, handleAddToCart, handleLogOut }) => {
     const [stores, setStores] = useState([]);
 
     const classes = useStyles();
@@ -21,9 +21,24 @@ const Stores = ({ match, user, handleAddToCart, handleLogOut }) => {
         // ]);
     }
 
+    const searchStoresByQuery = async () => {
+        const query = {Name: searchQuery};
+        console.log(query);
+        SearchStore(query).then(response => response.json().then(json => json.execStatus ? setStores(json.data) : alert(json.message))).catch(err => console.log(err));
+    }
+
+    // On first render
     useEffect(() => { 
         fetchStores();
-    }, []);  
+    }, []);
+    
+    // On search query update
+    useEffect(() => {
+        if (searchQuery !== '')
+            searchStoresByQuery();
+        else
+            fetchStores();
+    }, [searchQuery]);
 
     return (
         <div>
