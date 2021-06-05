@@ -106,8 +106,35 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         }
 
         public Result<IDictionary<string, object>> GetData()
-        {            
-            IDictionary<string, object> dict = new Dictionary<string, object>() { { "Type", "ConditionalPolicy" }, { "Id", Id }, { "PreCond", PreCond.GetData().Data}, { "Cond", Cond.GetData().Data } };
+        {
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                { "Type", "ConditionalPolicy" }, 
+                { "Id", Id }, 
+                { "PreCond", PreCond.GetData().Data}, 
+                { "Cond", Cond.GetData().Data } 
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Conditional"},
+                { "children", new Dictionary<String, object>[0] }
+            };
+            List<IDictionary<string, object>> children = new List<IDictionary<string, object>>();            
+            if (PreCond != null)
+            {
+                Result<IDictionary<string, object>> PreCondResult = PreCond.GetData();
+                if (!PreCondResult.ExecStatus)
+                    return PreCondResult;
+                children.Add(PreCondResult.Data);
+            }
+            if (Cond != null)
+            {
+                Result<IDictionary<string, object>> CondResult = Cond.GetData();
+                if (!CondResult.ExecStatus)
+                    return CondResult;
+                children.Add(CondResult.Data);
+            }
+            dict["children"] = children.ToArray();
             return new Result<IDictionary<string, object>>("", true, dict);
         }
 

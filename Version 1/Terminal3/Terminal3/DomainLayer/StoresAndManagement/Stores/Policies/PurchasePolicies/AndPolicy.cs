@@ -85,12 +85,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
         public Result<IDictionary<string, object>> GetData()
         {
-            List<IDictionary<string, object>> dataPolicies = new List<IDictionary<string, object>>();
+            /*List<IDictionary<string, object>> dataPolicies = new List<IDictionary<string, object>>();
             foreach (IPurchasePolicy policy in Policies)
             {
                 dataPolicies.Add(policy.GetData().Data);
             }
-            IDictionary<string, object> dict = new Dictionary<string, object>() { { "Type", "AndPolicy" }, { "Id", Id }, { "Policies", dataPolicies } };
+            IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                { "Type", "AndPolicy" }, 
+                { "Id", Id }, 
+                { "Policies", dataPolicies } 
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "And"},
+                { "children", new Dictionary<String, object>[0] }
+            };
+            List<IDictionary<string, object>> children = new List<IDictionary<string, object>>();
+            foreach (IPurchasePolicy myPolicy in Policies)
+            {
+                Result<IDictionary<string, object>> purchasePolicyResult = myPolicy.GetData();
+                if (!purchasePolicyResult.ExecStatus)
+                    return purchasePolicyResult;
+                children.Add(purchasePolicyResult.Data);
+            }
+            dict["children"] = children.ToArray();
             return new Result<IDictionary<string, object>>("", true, dict);
         }
 

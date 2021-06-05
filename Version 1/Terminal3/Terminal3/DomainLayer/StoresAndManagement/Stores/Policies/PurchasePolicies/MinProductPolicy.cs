@@ -61,7 +61,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
         public Result<IDictionary<string, object>> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() { { "Type", "MinProductPolicy" }, { "Id", Id }, { "Min", Min }, { "ProductId", ProductId } };
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                { "Type", "MinProductPolicy" }, 
+                { "Id", Id }, 
+                { "Min", Min }, 
+                { "ProductId", ProductId } 
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", ProductId + " >= " + Min },
+                { "children", new Dictionary<String, object>[0] }
+            };
             return new Result<IDictionary<string, object>>("", true, dict);
         }
 
