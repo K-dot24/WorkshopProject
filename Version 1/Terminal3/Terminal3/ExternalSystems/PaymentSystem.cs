@@ -9,9 +9,9 @@ namespace Terminal3.ExternalSystems
     {
         public static int Pay(double amount , IDictionary<String, Object> paymentDetails)
         {
-            if (ExternalSystemsAPI.Handshake())
+            if (ExternalSystemsAPI.getInstance().Handshake())
             {                
-                String result = ExternalSystemsAPI.Pay(paymentDetails);
+                String result = ExternalSystemsAPI.getInstance().Pay(paymentDetails);
                 if(Int32.TryParse(result, out int id))
                 {
                     return id;
@@ -23,9 +23,9 @@ namespace Terminal3.ExternalSystems
         public static int CancelPay(IDictionary<String, Object> paymentDetails)
         {
             // Users transaction is canceled
-            if (ExternalSystemsAPI.Handshake())
+            if (ExternalSystemsAPI.getInstance().Handshake())
             {
-                String result = ExternalSystemsAPI.CancelPay(paymentDetails);
+                String result = ExternalSystemsAPI.getInstance().CancelPay(paymentDetails);
                 if (Int32.TryParse(result, out int id))
                 {
                     return id;

@@ -21,11 +21,6 @@ namespace Terminal3
     {        
         static void Main(string[] args)
         {
-            Thread.Sleep(1000);
-            ECommerceSystem a = new ECommerceSystem();
-            //HubConnection SignalRClient = new HubConnection("http://localhost:8080/signalr");
-            //SignalRClient.CreateHubProxy("NotificationHub");
-            //SignalRClient.Start();
             Console.WriteLine("Hello World!");
             Console.ReadKey();
         }

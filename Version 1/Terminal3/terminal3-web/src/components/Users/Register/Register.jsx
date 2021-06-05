@@ -16,9 +16,7 @@ function Copyright() {
         {'.'}
       </Typography>
     );
-  }
-
-// TODO: Add onSubmit functionality
+}
 
 const Register = ({ handleRegister }) => {
     // styles.js
@@ -30,7 +28,6 @@ const Register = ({ handleRegister }) => {
     // for redirecting after register
     let history = useHistory();
 
-    // TODO: Connect to API
     const handleSubmit = (e) => {
         e.preventDefault();
 

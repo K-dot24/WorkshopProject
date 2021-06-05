@@ -89,19 +89,33 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveDiscount(String id)
+        public override Result<IDiscountPolicy> RemoveDiscount(String id)
         {
-            if (Discounts.RemoveAll(discount => discount.Id.Equals(id)) >= 1)
-                return new Result<bool>("", true, true);
+            IDiscountPolicy toBeRemoved = getDiscount(id);
+            if (toBeRemoved != null)
+            {
+                Discounts.Remove(toBeRemoved);
+                return new Result<IDiscountPolicy>("", true, toBeRemoved);
+            }
             foreach (IDiscountPolicy myDiscount in Discounts)
             {
-                Result<bool> result = myDiscount.RemoveDiscount(id);
-                if (result.ExecStatus && result.Data)
+                Result<IDiscountPolicy> result = myDiscount.RemoveDiscount(id);
+                if (result.ExecStatus && result.Data != null)
                     return result;
                 if (!result.ExecStatus)
                     return result;
             }
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountPolicy>("", true, null);
+        }
+
+        private IDiscountPolicy getDiscount(String id)
+        {
+            foreach (IDiscountPolicy myDiscount in Discounts)
+            {
+                if (myDiscount.Id.Equals(id))
+                    return myDiscount;
+            }
+            return null;
         }
 
         public override Result<bool> AddCondition(string id, IDiscountCondition condition)
@@ -117,30 +131,36 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
             foreach (IDiscountPolicy myDiscount in Discounts)
             {
-                Result<bool> result = myDiscount.RemoveCondition(id);
-                if (result.ExecStatus && result.Data)
+                Result<IDiscountCondition> result = myDiscount.RemoveCondition(id);
+                if (result.ExecStatus && result.Data != null)
                     return result;
                 if (!result.ExecStatus)
                     return result;
             }
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountCondition>("", true, null);
         }
 
-        public override Result<IDiscountPolicyData> GetData()
+        public override Result<IDictionary<string, object>> GetData()
         {
-            List<IDiscountPolicyData> discountsList = new List<IDiscountPolicyData>();
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                {"type", "DiscountAnd" },
+                {"Id", Id },
+                {"Discounts", null }
+            };
+            List<IDictionary<string, object>> discountsList = new List<IDictionary<string, object>>();
             foreach (IDiscountPolicy myDiscount in Discounts)
             {
-                Result<IDiscountPolicyData> discountResult = myDiscount.GetData();
+                Result<IDictionary<string, object>> discountResult = myDiscount.GetData();
                 if (!discountResult.ExecStatus)
-                    return new Result<IDiscountPolicyData>(discountResult.Message, false, null);
+                    return discountResult;
                 discountsList.Add(discountResult.Data);
             }
-            return new Result<IDiscountPolicyData>("", true, new DiscountAndData(discountsList, Id));
+            dict["Discounts"] = discountsList;
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public override Result<bool> EditDiscount(Dictionary<string, object> info, string id)

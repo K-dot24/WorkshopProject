@@ -38,7 +38,7 @@ namespace Terminal3.ServiceLayer
 
 
         //Constructor
-        public ECommerceSystem()
+        public ECommerceSystem(String config_path = @"..\Terminal3\Config.json")
         {
 
             /*Initializer.init(StoresAndManagement,
@@ -49,8 +49,32 @@ namespace Terminal3.ServiceLayer
                             DataController, 
                             NotificationService, this.connection);*/
 
-            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(@"..\Terminal3\Config.json"));
+            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(config_path));
+
+            //validate JSON
+            if( (config.externalSystem_url is null) || (config.mongoDB_url is null) || (config.signalRServer_url is null)
+                || (config.password is null) || (config.email is null))
+            {
+                System.Environment.Exit(1);
+            }
+
+            //check config
+            try
+            {
+                string email = config.email;
+                string password = config.password; 
+                string mongo_url = config.mongoDB_url;
+                string signalRServer_url = config.signalRServer_url;
+                string externalSystem_url = config.externalSystem_url;
+            }
+            catch (InvalidDataException)
+            {
+                return;
+            }
+
             Mapper.getInstance(config.mongoDB_url);
+            ExternalSystems.ExternalSystemsAPI.getInstance(config.externalSystem_url);
+            
 
             StoresAndManagement = new StoresAndManagementInterface(config.email, config.password);
             GuestUserInterface = new GuestUserController(StoresAndManagement);
@@ -69,11 +93,6 @@ namespace Terminal3.ServiceLayer
             NotificationService = NotificationService.GetInstance();
             NotificationService.connection = connection;
 
-        }
-
-        public void DisplaySystem()
-        {
-            // TODO - when GUI exists then display all functions according to current user role
         }
 
         //Metohds
@@ -359,12 +378,12 @@ namespace Terminal3.ServiceLayer
             return StoreStaffInterface.EditDiscountCondition(storeId, info, id);
         }
 
-        public Result<IDiscountPolicyData> GetDiscountPolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetDiscountPolicyData(string storeId)
         {
             return StoreStaffInterface.GetDiscountPolicyData(storeId);
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId)
         {
             return StoreStaffInterface.GetPurchasePolicyData(storeId);
         }

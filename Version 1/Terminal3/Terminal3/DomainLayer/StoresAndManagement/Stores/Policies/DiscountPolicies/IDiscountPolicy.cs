@@ -17,15 +17,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         Result<bool> AddCondition(String id, IDiscountCondition condition);
 
-        Result<bool> RemoveDiscount(String id);
+        Result<IDiscountPolicy> RemoveDiscount(String id);
 
-        Result<bool> RemoveCondition(String id);
+        Result<IDiscountCondition> RemoveCondition(String id);
 
         Result<bool> EditDiscount(Dictionary<string, object> info, string id);
 
         Result<bool> EditCondition(Dictionary<string, object> info, string id);
 
-        Result<IDiscountPolicyData> GetData();
+        Result<IDictionary<string, object>> GetData();
 
     }
 }

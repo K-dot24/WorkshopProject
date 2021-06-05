@@ -39,15 +39,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info);
         Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info, String id);
         Result<IDiscountCondition> AddDiscountCondition(Dictionary<string, object> info, String id);
-        Result<Boolean> RemoveDiscountPolicy(String id);
-        Result<Boolean> RemoveDiscountCondition(String id);
+        Result<IDiscountPolicy> RemoveDiscountPolicy(String id);
+        Result<IDiscountCondition> RemoveDiscountCondition(String id);
         Result<Boolean> EditDiscountPolicy(Dictionary<string, object> info, String id);
         Result<Boolean> EditDiscountCondition(Dictionary<string, object> info, String id);
-        Result<IDiscountPolicyData> GetPoliciesData();
-        Result<IPurchasePolicyData> GetPurchasePolicyData();
+        Result<IDictionary<string, object>> GetPoliciesData();
+        Result<IDictionary<string, object>> GetPurchasePolicyData();
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info);
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
-        Result<Boolean> RemovePurchasePolicy(string id);
+        Result<IPurchasePolicy> RemovePurchasePolicy(string id);
         Result<Boolean> EditPurchasePolicy(Dictionary<string, object> info, string id);
         #endregion
 
@@ -121,7 +121,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Founder = new StoreOwner(founder, this, null);
             Owners = new ConcurrentDictionary<String, StoreOwner>();
             Managers = new ConcurrentDictionary<String, StoreManager>();
-            InventoryManager = new InventoryManager(new ConcurrentDictionary<string, Product>());
+            InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
             History = new History();
             isClosed = false;
@@ -578,17 +578,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.AddDiscountCondition(info, id);
         }
 
-        public Result<bool> RemoveDiscountPolicy(string id)
+        public Result<IDiscountPolicy> RemoveDiscountPolicy(string id)
         {
             return PolicyManager.RemoveDiscountPolicy(id);
         }
 
-        public Result<bool> RemoveDiscountCondition(string id)
+        public Result<IDiscountCondition> RemoveDiscountCondition(string id)
         {
             return PolicyManager.RemoveDiscountCondition(id);
         }
 
-        public Result<bool> RemovePurchasePolicy(string id)
+        public Result<IPurchasePolicy> RemovePurchasePolicy(string id)
         {
             return PolicyManager.RemovePurchasePolicy(id);
         }
@@ -603,12 +603,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.EditDiscountCondition(info, id);
         }
 
-        public Result<IDiscountPolicyData> GetPoliciesData()
+        public Result<IDictionary<string, object>> GetPoliciesData()
         {
             return PolicyManager.GetDiscountPolicyData();
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData()
+        public Result<IDictionary<string, object>> GetPurchasePolicyData()
         {
             return PolicyManager.GetPurchasePolicyData();
         }

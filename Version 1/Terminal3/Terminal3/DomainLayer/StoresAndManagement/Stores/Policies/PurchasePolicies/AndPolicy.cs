@@ -63,30 +63,35 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<bool>("", true , false);
         }
 
-        public Result<bool> RemovePolicy(string id)
+        public Result<IPurchasePolicy> RemovePolicy(string id)
         {
-            if (Policies.RemoveAll(policy => policy.Id.Equals(id)) >= 1)
-                return new Result<bool>("", true, true);
-
-            foreach (IPurchasePolicy policy in Policies)
+            IPurchasePolicy policy = Policies.Find(policy => policy.Id.Equals(id));
+            if (policy != null)
             {
-                Result<bool> res = policy.RemovePolicy(id);
+                Policies.Remove(policy);
+                return new Result<IPurchasePolicy>("", true, policy);
+            }
+
+            foreach (IPurchasePolicy curr in Policies)
+            {
+                Result<IPurchasePolicy> res = curr.RemovePolicy(id);
                 if (!res.ExecStatus)
                     return res;
-                if (res.Data)
+                if (res.Data != null)
                     return res;
             }
-            return new Result<bool>("", true, false);
+            return new Result<IPurchasePolicy>("", true, null);
         }
 
-        public Result<IPurchasePolicyData> GetData()
+        public Result<IDictionary<string, object>> GetData()
         {
-            List<IPurchasePolicyData> dataPolicies = new List<IPurchasePolicyData>();
-            foreach(IPurchasePolicy policy in Policies)
+            List<IDictionary<string, object>> dataPolicies = new List<IDictionary<string, object>>();
+            foreach (IPurchasePolicy policy in Policies)
             {
                 dataPolicies.Add(policy.GetData().Data);
             }
-            return new Result<IPurchasePolicyData>("",true, new AndPolicyData(dataPolicies, Id));
+            IDictionary<string, object> dict = new Dictionary<string, object>() { { "Type", "AndPolicy" }, { "Id", Id }, { "Policies", dataPolicies } };
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
