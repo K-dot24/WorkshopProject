@@ -321,18 +321,29 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Store> OpenNewStore(RegisteredUser founder, string storeName, String storeID)
         {
-            Store newStore = new Store(storeName, founder, storeID);
+            if (!Stores.ContainsKey(storeID))
+            {
 
-            // Update in DB
-            mapper.Create(newStore.Founder);
-            mapper.Create(newStore);
+                Store newStore = new Store(storeName, founder, storeID);
 
-            Stores.TryAdd(newStore.Id, newStore);
-            NotificationManager notificationManager = new NotificationManager(newStore);
-            newStore.NotificationManager = notificationManager;
-            newStore.NotificationManager.notifyStoreOpened();
+                // Update in DB
+                mapper.Create(newStore.Founder);
+                mapper.Create(newStore);
+                mapper.Create(newStore.PolicyManager.MainDiscount);
+                mapper.Create(newStore.PolicyManager.MainPolicy);
 
-            return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder.Email}\n", true, newStore);
+                Stores.TryAdd(newStore.Id, newStore);
+                NotificationManager notificationManager = new NotificationManager(newStore);
+                newStore.NotificationManager = notificationManager;
+                newStore.NotificationManager.notifyStoreOpened();
+
+                return new Result<Store>($"New store {storeName}, ID: {newStore.Id} was created successfully by {founder.Email}\n", true, newStore);
+            }
+            else
+            {
+                return new Result<Store>($"StoreID {storeID} already associate with another store\n", false, null);
+            }
+
         }
 
         public Result<Boolean> CloseStore(RegisteredUser founder, string storeId)
