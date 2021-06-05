@@ -326,8 +326,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             // Update in DB
             mapper.Create(newStore.Founder);
             mapper.Create(newStore);
-            mapper.Create(newStore.PolicyManager.MainDiscount);
-            mapper.Create(newStore.PolicyManager.MainPolicy);
 
             Stores.TryAdd(newStore.Id, newStore);
             NotificationManager notificationManager = new NotificationManager(newStore);
@@ -506,9 +504,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     mapper.Create(res.Data);      
-/*                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
-                    mapper.UpdateStore(filter, update);*/
+                    mapper.UpdateStore(filter, update);
                     return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
                 return new Result<bool>(res.Message, res.ExecStatus, false);
@@ -525,9 +523,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     mapper.Create(res.Data);      
-/*                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
-                    mapper.UpdateStore(filter, update);*/
+                    mapper.UpdateStore(filter, update);
                     return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
                 return new Result<bool>(res.Message, res.ExecStatus, false);
@@ -544,9 +542,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     mapper.Create(res.Data);      
-/*                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
-                    mapper.UpdateStore(filter, update);*/
+                    mapper.UpdateStore(filter, update);
                     return new Result<bool>(res.Message, res.ExecStatus, true);
                 }
                 return new Result<bool>(res.Message, res.ExecStatus, false);
@@ -565,9 +563,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     mapper.Delete(res.Data);
-                    /*var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
-                    mapper.UpdateStore(filter, update);*/
+                    mapper.UpdateStore(filter, update);
                 }
                 return new Result<bool>(res.Message, false, false);
             }
@@ -584,9 +582,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     mapper.Delete(res.Data);
-                    /*var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
-                    mapper.UpdateStore(filter, update);*/
+                    mapper.UpdateStore(filter, update);
                 }
                 return new Result<bool>(res.Message, false, false);
             }
@@ -612,9 +610,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     // Update in DB
                     mapper.Delete(res.Data);
-                    /*var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainPolicy", store.PolicyManager.MainPolicy.getDTO());
-                    mapper.UpdateStore(filter, update);*/
+                    mapper.UpdateStore(filter, update);
                 }
                 return new Result<bool>(res.Message, false, false);
             }

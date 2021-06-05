@@ -1194,7 +1194,7 @@ namespace Terminal3.DataAccessLayer
             foreach(var product in s.InventoryManager.Products) { inventory.AddLast(product.Key); }
 
             DAO_Store.Create(new DTO_Store(s.Id, s.Name, s.Founder.GetId(), owners, managers, inventory, Get_DTO_History(s.History),
-                                            s.Rating, s.NumberOfRates , s.isClosed, s.PolicyManager.MainDiscount.Id, s.PolicyManager.MainPolicy.Id));
+                                            s.Rating, s.NumberOfRates , s.isClosed, s.PolicyManager.MainDiscount.getDTO(), s.PolicyManager.MainPolicy.getDTO()));
             Stores.TryAdd(s.Id, s);
         }
 
@@ -1218,8 +1218,8 @@ namespace Terminal3.DataAccessLayer
             s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , dto.isClosed);
 
             Stores.TryAdd(s.Id, s);
-            DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.DiscountRoot));
-            BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.PurchaseRoot));
+            DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.DiscountRoot._id));
+            BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.PurchaseRoot._id));
             s.PolicyManager = new PolicyManager(MainDiscount, MainPolicy);
             StoreOwner founder = getOwnershipTree(s, dto.Founder);
 
