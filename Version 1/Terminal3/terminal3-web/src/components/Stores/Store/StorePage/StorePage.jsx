@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
-import { Products, Navbar, Cart, Action, CheckboxList } from '../../../../components';
+import { Products, Navbar, Cart, Action, CheckboxList, Policy } from '../../../../components';
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
         AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct,
         printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
@@ -455,9 +455,13 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 />
 
                 { /* Get Discount Policy Data */}
-                <Route exact path={match.url + `/getdiscountpolicy`} 
+                {/* <Route exact path={match.url + `/getdiscountpolicy`} 
                     render={(props) => (<Action name='Get Discount Policy Data'  
                                                 handleAction={handleGetDiscountPolicyData} {...props} />)} 
+                /> */}
+
+                <Route exact path={match.url + `/getdiscountpolicy`} 
+                    render={() => (<Policy storeID={store.id} />)} 
                 />
 
                 {/* Add Purchase Policy */}
