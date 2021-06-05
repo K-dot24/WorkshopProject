@@ -532,7 +532,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     // Update in DB
-                    //mapper.DeleteDiscount(res.Data);
+                    mapper.Delete(res.Data);
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
@@ -551,7 +551,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     // Update in DB
-                    //mapper.DeleteDiscount(res.Data);
+                    mapper.Delete(res.Data);
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
                     mapper.UpdateStore(filter, update);
@@ -579,7 +579,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (res.ExecStatus)
                 {
                     // Update in DB
-                    //mapper.DeleteDiscount(res.Data);
+                    mapper.Delete(res.Data);
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
                     var update = Builders<BsonDocument>.Update.Set("MainPolicy", store.PolicyManager.MainPolicy.getDTO());
                     mapper.UpdateStore(filter, update);

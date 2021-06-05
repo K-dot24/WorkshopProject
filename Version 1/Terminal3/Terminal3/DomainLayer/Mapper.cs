@@ -516,6 +516,29 @@ namespace Terminal3.DataAccessLayer
             return null;
         }
 
+        //shaked
+        public void Delete(IPurchasePolicy purchasePolicy)
+        {
+            string[] type = purchasePolicy.GetType().ToString().Split('.');
+            string policy_type = type[type.Length - 1];
+
+            DeleteIPurchasePolicy(policy_type, purchasePolicy.Id);
+        }
+        public void Delete(IDiscountPolicy discount)
+        {
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+
+            DeleteIDiscountPolicy(discount_type, discount.Id);
+        }
+        public void Delete(IDiscountCondition discount)
+        {
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+
+            DeleteIDiscountCondition(discount_type, discount.Id);
+        }
+
         private void DeleteIDiscountTarget(String type, string discount_id)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_id", discount_id);
