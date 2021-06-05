@@ -38,7 +38,7 @@ namespace Terminal3.ServiceLayer
 
 
         //Constructor
-        public ECommerceSystem(String config_path = @"..\Terminal3\Config.json")
+        public ECommerceSystem(String config_path = @"..\..\..\..\Terminal3\Config.json")
         {
 
             /*Initializer.init(StoresAndManagement,
