@@ -13,6 +13,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<RegisteredUserService> AddSystemAdmin(string sysAdminID, String email);
         Result<RegisteredUserService> RemoveSystemAdmin(string sysAdminID, String email);
         Result<bool> ResetSystem(string sysAdminID);
+        Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, string admin_id);
 
     }
     public class SystemAdminController: ISystemAdminInterface
@@ -107,11 +108,25 @@ namespace Terminal3.ServiceLayer.Controllers
         {
             if (isSystemAdmin(sysAdminID))
             {
-                return Service.ResetSystem();
+                //return Service.ResetSystem();
+                StoresAndManagementInterface.resetSystem();
+                return new Result<bool>($"user:{sysAdminID} reset the system\n", true, true);
             }
             else
             {
                 return new Result<bool>($"user:{sysAdminID} is not system admin\n", false, false);
+            }
+        }
+
+        public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, string admin_id)
+        {
+            if (isSystemAdmin(admin_id))
+            {
+                return StoresAndManagementInterface.GetIncomeAmountGroupByDay(start_date, end_date);
+            }
+            else
+            {
+                return new Result<List<Tuple<DateTime, Double>>>($"user:{admin_id} is not system admin\n", false, null);
             }
         }
 

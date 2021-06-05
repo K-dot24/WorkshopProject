@@ -1,22 +1,73 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
+using Terminal3.DataAccessLayer.DTOs;
+
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
-    public class BuyNow : IPurchasePolicy
+    public class BuyNow : IPurchasePolicyType
     {
-        //TODO: Complete properly
 
-        public Double BuyNowPrice { get; }
+        public AndPolicy Policy { get; set; }
+        public string Id { get; }
 
-        public BuyNow(Double buyNowPrice)
+        public BuyNow(string id = "")
         {
-            BuyNowPrice = buyNowPrice;
+            this.Id = id;
+            if (id.Equals(""))
+                this.Id = Service.GenerateId();
+            this.Policy = new AndPolicy();
         }
 
-        public Result<double> CalculatePrice(Product product, int quantity)
+        public BuyNow(AndPolicy policy, string id)
         {
-            return new Result<double>($"Calculated price for {product.Name}.\n", true, BuyNowPrice * quantity);
+            Policy = policy;
+            Id = id;
+        }
+
+        public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
+        {            
+            if(this.Policy.IsConditionMet(bag, user).Data)
+                return new Result<bool>("",true,true);
+            return new Result<bool>("Policy conditions not met", true, false); 
+        }
+
+        public Result<bool> AddPolicy(IPurchasePolicy policy, string id)
+        {
+            return this.Policy.AddPolicy(policy, id);
+        }
+
+        public Result<IPurchasePolicy> RemovePolicy(string id)
+        {
+            if (Policy.Id.Equals(id))
+            {
+                IPurchasePolicy temp = this.Policy;
+                this.Policy = new AndPolicy();
+                return new Result<IPurchasePolicy>("", true, temp);
+            }
+            return Policy.RemovePolicy(id);            
+        }
+
+        public Result<IDictionary<string, object>> GetData()
+        {
+            IDictionary<string, object> dict = new Dictionary<string, object>() { { "Type", "BuyNow" }, { "Id", Id }, { "Policy", Policy.GetData().Data } };
+            return new Result<IDictionary<string, object>>("", true, dict);
+        }
+
+        public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
+        {
+            if(Id.Equals(id))
+                return new Result<bool>("Can't edit the main purchase type", false, false);
+            if (Policy.Id.Equals(id))            
+                return new Result<bool>("Can't edit the main 'And node'", false, false);            
+            return Policy.EditPolicy(info, id);
+        }
+
+        public DTO_BuyNow getDTO()
+        {
+            return new DTO_BuyNow(this.Id, new DTO_AndPolicy(this.Policy.Id, Policy.getPolicis_dto()));
         }
     }
 }

@@ -6,12 +6,20 @@ using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.ServiceLayer.ServiceObjects;
 using System.Collections.Concurrent;
 using System.Linq;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DataAccessLayer;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface IStoresAndManagementInterface
     {
-        Result<StoreService> OpenNewStore(String storeName, String userID);
+        void resetSystem();
+        Result<StoreService> OpenNewStore(String storeName, String userID , String storeID);
+        Result<Boolean> CloseStore(String storeId, String userID);
+        Result<StoreService> ReOpenStore(string storeId, string userID);
+        Result<RegisteredUser> FindUserByEmail(String email);
 
         #region Inventory Management
         Result<ProductService> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
@@ -26,15 +34,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
         Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);        
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID);
+        Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id);
+        Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date);
         #endregion
 
         #region User Actions
-        Result<RegisteredUserService> Register(String email, String password);
+        Result<RegisteredUserService> Register(String email, String password, string Id);
         Result<RegisteredUserService> Login(String email, String password);
-        Result<Boolean> LogOut(String email);
+        Result<RegisteredUserService> Login(String email, String password, String guestUserID);
+        Result<UserService> LogOut(String email);
         Result<Boolean> AddProductToCart(String userID, String productID, int productQuantity, String storeID);
         Result<Boolean> UpdateShoppingCart(string userID, string storeID, string productID, int quantity);
         Result<ShoppingCartService> GetUserShoppingCart(String userID);
@@ -56,6 +68,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #region Display data
         List<StoreService> GetAllStoresToDisplay();
         List<ProductService> GetAllProductByStoreIDToDisplay(string storeID);
+        Boolean[] GetPermission(string userID, string storeID);
+        #endregion
+
+        #region Policies Management
+        Result<Boolean> AddDiscountPolicy(string storeId, Dictionary<string, object> info);
+        Result<Boolean> AddDiscountPolicy(string storeId, Dictionary<string, object> info, String id);
+        Result<Boolean> AddDiscountCondition(string storeId, Dictionary<string, object> info, String id);
+        Result<Boolean> RemoveDiscountPolicy(string storeId, String id);
+        Result<Boolean> RemoveDiscountCondition(string storeId, String id);
+        Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, String id);
+        Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, String id);
+        Result<IDictionary<string, object>> GetPoliciesData(string storeId);
+        Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId);
+        Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info);
+        Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
+        Result<Boolean> RemovePurchasePolicy(string storeId, string id);
+        Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -64,19 +93,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public StoresFacade StoresFacade { get; }
         public UsersAndPermissionsFacade UsersAndPermissionsFacade { get; }
 
-        public StoresAndManagementInterface()
+        public StoresAndManagementInterface(String admin_email, String admin_password)
         {
             StoresFacade = new StoresFacade();
-            UsersAndPermissionsFacade = new UsersAndPermissionsFacade();
+            UsersAndPermissionsFacade = new UsersAndPermissionsFacade(admin_email, admin_password);
         }
 
         // Methods
-        public Result<StoreService> OpenNewStore(String storeName, String userID)
+        public Result<StoreService> OpenNewStore(String storeName, String userID , String storeID)
         {
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser founder))  // Check if userID is a registered user
             {
                 // Open store
-                Result<Store> res = StoresFacade.OpenNewStore(founder, storeName);
+                Result<Store> res = StoresFacade.OpenNewStore(founder, storeName, storeID);
                 if (res.ExecStatus)
                 {
                     return new Result<StoreService>(res.Message, true, res.Data.GetDAL().Data);
@@ -87,6 +116,35 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             //else
             return new Result<StoreService>($"Failed to open store {storeName}: {userID} is not a registered user.\n", false, null);
         }
+
+        public Result<Boolean> CloseStore(string storeId, string userID)
+        {
+            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser founder))  // Check if userID is a registered user
+            {
+                // Close store
+                return StoresFacade.CloseStore(founder, storeId);
+            }
+            //else
+            return new Result<Boolean>($"Failed to close store (Id: {storeId}): {userID} is not a registered user.\n", false, false);
+        }
+
+        public Result<StoreService> ReOpenStore(string storeId, string userID)
+        {
+            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser owner))  // Check if userID is a registered user
+            {
+                // ReOpen store
+                Result<Store> res = StoresFacade.ReOpenStore(owner, storeId);
+                if (res.ExecStatus)
+                {
+                    return new Result<StoreService>(res.Message, true, res.Data.GetDAL().Data);
+                }
+                //else
+                return new Result<StoreService>($"Failed to open store (Id: {storeId})", false, null);
+            }
+            //else
+            return new Result<StoreService>($"Failed to reopen store (Id: {storeId}): {userID} is not a registered user.\n", false, null);
+        }
+
 
         public Result<ProductService> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null)
         {
@@ -166,6 +224,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             }
             //else
             return new Result<Boolean>($"Failed to remove store manager: {removedManagerID} is not a registered user.\n", false, false);
+        }
+
+        public Result<Boolean> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID)
+        {
+            if (UsersAndPermissionsFacade.RegisteredUsers.ContainsKey(removedOwnerID))  // Check if addedOwnerID is a registered user
+            {
+                return StoresFacade.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID);
+            }
+            //else
+            return new Result<Boolean>($"Failed to remove store owner: {removedOwnerID} is not a registered user.\n", false, false);
+
         }
 
         public Result<bool> RemoveProductFromStore(String userID, String storeID, String productID)
@@ -338,9 +407,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<Boolean>($"is {userID} is system admin? {isContains}\n", true, isContains);
         }
 
-        public Result<RegisteredUserService> Register(string email, string password)
+        public Result<RegisteredUserService> Register(string email, string password , string Id)
         {
-            Result<RegisteredUser> res = UsersAndPermissionsFacade.Register(email, password);
+            Result<RegisteredUser> res = UsersAndPermissionsFacade.Register(email, password, Id);
             if (res.ExecStatus)
             {
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
@@ -363,17 +432,34 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, null);
             }
         }
-
-        public Result<Boolean> LogOut(string email)
+        public Result<RegisteredUserService> Login(string email, string password,string guestUserID)
         {
-            return UsersAndPermissionsFacade.LogOut(email);
+            Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password, guestUserID);
+            if (res.ExecStatus)
+            {
+                return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
+            }
+            else
+            {
+                return new Result<RegisteredUserService>(res.Message, res.ExecStatus, null);
+            }
+        }
+
+        public Result<UserService> LogOut(string email)
+        {
+            Result<GuestUser> result = UsersAndPermissionsFacade.LogOut(email);
+            if (result.ExecStatus)
+            {
+                return new Result<UserService>(result.Message, result.ExecStatus, result.Data.GetDAL().Data);
+            }
+            return new Result<UserService>(result.Message, result.ExecStatus,null);
         }
 
         public Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
             // TODO - lock products ?
             Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails);
-            if (res.ExecStatus)
+            if (res.Data != null)
             {
                 ShoppingCart purchasedCart = res.Data;
                 ConcurrentDictionary<String, ShoppingBag> purchasedBags = purchasedCart.ShoppingBags;
@@ -385,7 +471,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 }
                 return new Result<ShoppingCartService>(res.Message, true, res.Data.GetDAL().Data);
             }
-            //else faild
+
+            //else failed
             return new Result<ShoppingCartService>(res.Message, false, null);
         }
        
@@ -425,5 +512,97 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return productsService;
         }
 
+        public Boolean[] GetPermission(string userID, string storeID)
+        {
+            Store store = StoresFacade.Stores[storeID];
+            return store.GetPermission(userID);
+        }
+
+        public Result<RegisteredUser> FindUserByEmail(String email)
+        {
+            return UsersAndPermissionsFacade.FindUserByEmail(email, UsersAndPermissionsFacade.RegisteredUsers);
+        }
+
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info)
+        {
+            return StoresFacade.AddDiscountPolicy(storeId, info);
+        }
+
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresFacade.AddDiscountPolicy(storeId ,info, id);
+        }
+
+        public Result<bool> AddDiscountCondition(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresFacade.AddDiscountCondition(storeId, info, id);
+        }
+
+        public Result<bool> RemoveDiscountPolicy(string storeId, string id)
+        {
+            return StoresFacade.RemoveDiscountPolicy(storeId,id);
+        }
+
+        public Result<bool> RemoveDiscountCondition(string storeId, string id)
+        {
+            return StoresFacade.RemoveDiscountCondition(storeId ,id);
+        }
+
+        public Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresFacade.EditDiscountPolicy(storeId ,info, id);
+        }
+
+        public Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresFacade.EditDiscountCondition(storeId ,info, id);
+        }
+
+        public Result<IDictionary<string, object>> GetPoliciesData(string storeId)
+        {
+            return StoresFacade.GetPoliciesData(storeId);
+        }
+
+        public Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId)
+        {
+            return StoresFacade.GetPurchasePolicyData(storeId);
+        }
+
+        public Result<bool> RemovePurchasePolicy(string storeId, string id)
+        {
+            return StoresFacade.RemovePurchasePolicy(storeId , id);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info)
+        {
+            return StoresFacade.AddPurchasePolicy(storeId ,info);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresFacade.AddPurchasePolicy(storeId ,info, id);
+        }
+
+        public Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresFacade.EditPurchasePolicy(storeId ,info, id);
+        }
+
+        public void resetSystem()
+        {
+            Mapper.getInstance().clearDB();
+            UsersAndPermissionsFacade.resetSystem();
+            StoresFacade.resetSystem();
+        }
+
+        public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id)
+        {
+            return StoresFacade.GetIncomeAmountGroupByDay(start_date, end_date, store_id, owner_id);
+        }
+
+        public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date)
+        {
+            return StoresFacade.GetIncomeAmountGroupByDay(start_date, end_date);
+        }
     }
 }

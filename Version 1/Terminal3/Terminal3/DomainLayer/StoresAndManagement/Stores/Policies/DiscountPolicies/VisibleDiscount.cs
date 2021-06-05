@@ -1,38 +1,171 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Text.Json;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountTargetsData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountTargets;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 {
-    public class VisibleDiscount : IDiscountPolicy
+    public class VisibleDiscount : AbstractDiscountPolicy
     {
-        //TODO: Complete properly
 
-        public Double Precentege { get; }   // 0-100
-        public DateTime ExpirationDate { get; }
+        public DateTime ExpirationDate { get; set; }
+        public IDiscountTarget Target { get; set; }
+        public Double Percentage { get; set; }
 
-        //TODO: Add who eligible parameters for the discount (maybe User/RegisteredUser?)
-
-        public VisibleDiscount(double precentege, DateTime expirationDate)
+        public VisibleDiscount(DateTime expirationDate, IDiscountTarget target, Double percentage, String id="") : base(new Dictionary<string, object>(), id)
         {
-            Precentege = precentege;
             ExpirationDate = expirationDate;
+            Target = target;
+            if (percentage > 100)
+                Percentage = 100;
+            else if (percentage < 0)
+                Percentage = 0;
+            else
+                Percentage = percentage;
         }
 
-        public Result<Double> CalculatePrice(Product product, User user, int quantity, String code)
+        public static Result<IDiscountPolicy> create(Dictionary<string, object> info)
         {
-            //TODO: Add check if user is eligible?
-            if (DateTime.Now.CompareTo(ExpirationDate) < 0)
+            string errorMsg = "Can't create VisibleDiscount: ";
+            if (!info.ContainsKey("ExpirationDate"))
+                return new Result<IDiscountPolicy>(errorMsg + "ExpirationDate not found", false, null);
+            DateTime expirationDate = createDateTime((JsonElement)info["ExpirationDate"]);
+
+            if (!info.ContainsKey("Percentage"))
+                return new Result<IDiscountPolicy>(errorMsg + "Percentage not found", false, null);
+            Double percentage = ((JsonElement)info["Percentage"]).GetDouble();
+
+            if (!info.ContainsKey("Target"))
+                return new Result<IDiscountPolicy>(errorMsg + "Target not found", false, null);
+
+            Result<IDiscountTarget> targetResult = createTarget((JsonElement)info["Target"]);
+            if (!targetResult.ExecStatus)
+                return new Result<IDiscountPolicy>(targetResult.Message, false, null);
+
+            return new Result<IDiscountPolicy>("", true, new VisibleDiscount(expirationDate, targetResult.Data, percentage));
+        }
+
+        private static DateTime createDateTime(JsonElement timeElement)
+        {
+            String timeString = timeElement.GetString();
+            DateTime time = DateTime.ParseExact(timeString, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            return time;
+        }
+
+        private static Result<IDiscountTarget> createTarget(JsonElement targetElement)
+        {
+            Dictionary<string, object> targetDict = JsonSerializer.Deserialize<Dictionary<string, object>>(targetElement.GetRawText());
+
+            return createTarget(targetDict);
+        }
+
+        public override Result<Dictionary<Product, Double>> CalculateDiscount(ConcurrentDictionary<Product, int> products, string code = "")
+        {
+            //if the discount is expired
+            if (DateTime.Now.CompareTo(ExpirationDate) >= 0)
+                return new Result<Dictionary<Product, Double>>("", true, new Dictionary<Product, Double>());
+
+            List<Product> targetProducts = Target.getTargets(products);
+            Dictionary<Product, Double> resultDictionary = new Dictionary<Product, Double>();
+            foreach(Product product in targetProducts)
             {
-                Double newPrice = product.Price * ((100 - Precentege) / 100);
-                return new Result<Double>($"Calculated price for {product.Name}.\n", true, newPrice*quantity);
+                resultDictionary.Add(product, Percentage);
             }
-            //else
-            return new Result<Double>($"Discount for {product.Name} is over.\n", false, product.Price*quantity);     //return -1 ?
+
+            return new Result<Dictionary<Product, double>>("", true, resultDictionary);
         }
 
-        public Result<bool> CheckIfEligible(User user)
+        public override Result<bool> AddDiscount(String id, IDiscountPolicy discount)
         {
-            throw new NotImplementedException();
+            if (Id.Equals(id))
+                return new Result<bool>("Can't add a discount to a visible discount with an id " + id, false, false);
+            return new Result<bool>("", true, false);
+        }
+
+        public override Result<IDiscountPolicy> RemoveDiscount(String id)
+        {
+            return new Result<IDiscountPolicy>("", true, null);
+        }
+
+        public override Result<bool> AddCondition(string id, IDiscountCondition condition)
+        {
+            return new Result<bool>("", true, false);
+        }
+
+        public override Result<IDiscountCondition> RemoveCondition(string id)
+        {
+            return new Result<IDiscountCondition>("", true, null);
+        }
+
+        public override Result<IDictionary<string, object>> GetData()
+        {
+            IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                { "type", "VisibleDiscount" }, 
+                { "Id", Id }, 
+                { "ExpirationDate", ExpirationDate }, 
+                { "percentage", Percentage }, 
+                { "Target", null } 
+            }; 
+
+            if (Target != null)
+            {
+                Result<IDictionary<string, object>> targetDataResult = Target.GetData();
+                if (!targetDataResult.ExecStatus)
+                    return targetDataResult;
+                dict["Target"] = targetDataResult.Data;
+            }
+
+            return new Result<IDictionary<string, object>>("", true, dict);
+        }
+
+        private static Result<IDiscountTarget> createTarget(Dictionary<string, object> info)
+        {
+            if (!info.ContainsKey("type"))
+                return new Result<IDiscountTarget>("Can't create a target without a type", false, null);
+
+            string type = ((JsonElement)info["type"]).ToString();
+            switch (type)
+            {
+                case "DiscountTargetShop":
+                    return DiscountTargetShop.create(info);
+                case "DiscountTargetCategories":
+                    return DiscountTargetCategories.create(info);
+                case "DiscountTargetProducts":
+                    return DiscountTargetProducts.create(info);
+                default:
+                    return new Result<IDiscountTarget>("Can't recognise this target type: " + type, false, null);
+            }
+        }
+
+        public override Result<bool> EditDiscount(Dictionary<string, object> info, string id)
+        {
+            if (Id != id)
+                return new Result<bool>("", true, false);
+
+            if (info.ContainsKey("ExpirationDate"))
+                //ExpirationDate = (DateTime)info["ExpirationDate"];
+                ExpirationDate = createDateTime((JsonElement)info["ExpirationDate"]);
+
+            if (info.ContainsKey("Percentage"))
+                Percentage = ((JsonElement)info["Percentage"]).GetDouble();
+
+            if (info.ContainsKey("Target"))
+            {
+                Result<IDiscountTarget> targetResult = createTarget((JsonElement)info["Target"]);
+                if (!targetResult.ExecStatus)
+                    return new Result<bool>(targetResult.Message, false, false);
+
+            }
+            return new Result<bool>("", true, true);
+        }
+
+        public override Result<bool> EditCondition(Dictionary<string, object> info, string id)
+        {
+            return new Result<bool>("", true, false);
         }
     }
 }

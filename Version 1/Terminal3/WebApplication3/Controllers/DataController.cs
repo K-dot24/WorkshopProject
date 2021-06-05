@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace Terminal3WebAPI.Controllers
     /// <summary>
     /// This controller does not hold any functional requirements, it is only to transfer data to the view 
     /// </summary>
+    /// 
     [Route("api/[controller]")]
     [ApiController]
     public class DataController : ControllerBase
@@ -40,5 +42,16 @@ namespace Terminal3WebAPI.Controllers
             List<ProductService> result = system.GetAllProductByStoreIDToDisplay(storeID);
             return Ok(result);
         }
+
+        [Route("GetPermission/{userID}/{storeID}")]
+        [HttpGet]
+        public IActionResult GetPermission(string userID , string storeID)
+        {
+            Boolean[] result = system.GetPermission(userID, storeID);
+            if (result != null) return Ok(result);
+            else return BadRequest(result);
+        }
+
+
     }
 }

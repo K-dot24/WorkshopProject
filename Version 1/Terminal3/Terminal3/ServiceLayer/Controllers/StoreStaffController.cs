@@ -4,6 +4,9 @@ using System.Text;
 using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 
 namespace Terminal3.ServiceLayer.Controllers
 {
@@ -19,6 +22,24 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID);
         Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID,Boolean isSystemAdmin=false);
         Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID);
+        Result<Boolean> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID);
+        Result<Boolean> CloseStore(string storeId, string userID);
+        Result<StoreService> ReOpenStore(string storeId, string userID);
+        Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info);
+        Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info, String id);
+        Result<bool> AddDiscountCondition(string storeId, Dictionary<string, object> info, String id);
+        Result<bool> RemoveDiscountPolicy(string storeId, String id);
+        Result<bool> RemoveDiscountCondition(string storeId, String id);
+        Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, String id);
+        Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, String id);
+        Result<IDictionary<string, object>> GetDiscountPolicyData(string storeId);
+        Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId);
+        Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info);
+        Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, String id);
+        Result<bool> RemovePurchasePolicy(string storeId, String id);
+        Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
+
+        Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id); 
 
     }
     public class StoreStaffController : IStoreStaffInterface
@@ -43,6 +64,86 @@ namespace Terminal3.ServiceLayer.Controllers
         public Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID) { return StoresAndManagementInterface.GetStoreStaff(ownerID, storeID); }
         public Result<HistoryService> GetStorePurchaseHistory(String ownerID, String storeID, Boolean isSystemAdmin = false) { return StoresAndManagementInterface.GetStorePurchaseHistory(ownerID, storeID); }
         public Result<Boolean> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID) { return StoresAndManagementInterface.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID); }
+        public Result<Boolean> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID) { return StoresAndManagementInterface.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID); }
+        public Result<Boolean> CloseStore(string storeId, string userID)
+        {
+            return StoresAndManagementInterface.CloseStore(storeId, userID);
+        }
+
+        public Result<StoreService> ReOpenStore(string storeId, string userID)
+        {
+            return StoresAndManagementInterface.ReOpenStore(storeId, userID);
+        }
+
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info)
+        {
+            return StoresAndManagementInterface.AddDiscountPolicy(storeId, info);
+        }
+
+        public Result<bool> AddDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresAndManagementInterface.AddDiscountPolicy(storeId, info, id);
+        }
+
+        public Result<bool> AddDiscountCondition(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresAndManagementInterface.AddDiscountCondition(storeId, info, id);
+        }
+
+        public Result<bool> RemoveDiscountPolicy(string storeId, string id)
+        {
+            return StoresAndManagementInterface.RemoveDiscountPolicy(storeId, id);
+        }
+
+        public Result<bool> RemoveDiscountCondition(string storeId, string id)
+        {
+            return StoresAndManagementInterface.RemoveDiscountCondition(storeId, id);
+        }
+
+        public Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresAndManagementInterface.EditDiscountPolicy(storeId, info, id);
+        }
+
+        public Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresAndManagementInterface.EditDiscountCondition(storeId, info, id);
+        }
+
+        public Result<IDictionary<string, object>> GetDiscountPolicyData(string storeId)
+        {
+            return StoresAndManagementInterface.GetPoliciesData(storeId);
+        }
+
+        public Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId)
+        {
+            return StoresAndManagementInterface.GetPurchasePolicyData(storeId);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info)
+        {
+            return StoresAndManagementInterface.AddPurchasePolicy(storeId, info);
+        }
+
+        public Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresAndManagementInterface.AddPurchasePolicy(storeId, info, id);
+        }
+
+        public Result<bool> RemovePurchasePolicy(string storeId, string id)
+        {
+            return StoresAndManagementInterface.RemovePurchasePolicy(storeId, id);
+        }
+
+        public Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id)
+        {
+            return StoresAndManagementInterface.EditPurchasePolicy(storeId, info, id);
+        }
+
+        public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id)
+        {
+            return StoresAndManagementInterface.GetIncomeAmountGroupByDay(start_date, end_date, store_id, owner_id);
+        }
 
         #endregion
     }

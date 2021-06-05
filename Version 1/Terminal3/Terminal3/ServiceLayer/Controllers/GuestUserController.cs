@@ -5,6 +5,7 @@ using System.Text;
 using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
+using System.Runtime.InteropServices;
 
 namespace Terminal3.ServiceLayer.Controllers
 {
@@ -12,12 +13,12 @@ namespace Terminal3.ServiceLayer.Controllers
     {
         Result<UserService> EnterSystem();
         void ExitSystem(String userID);
-        Result<RegisteredUserService> Register(string email, string password);
+        Result<RegisteredUserService> Register(string email, string password, string optionalID = "-1");
         Result<List<StoreService>> SearchStore(IDictionary<String, Object> details);
         Result<List<ProductService>> SearchProduct(IDictionary<String, Object> productDetails);
         Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID);
         Result<ShoppingCartService> GetUserShoppingCart(String userID);
-        Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity);
+        Result<Boolean> UpdateShoppingCart(String userID, String storeID, String productID, int quantity);
         Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<HistoryService> GetUserPurchaseHistory(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
@@ -44,12 +45,12 @@ namespace Terminal3.ServiceLayer.Controllers
         {
             return StoresAndManagementInterface.EnterSystem();
         }
-        public Result<RegisteredUserService> Register(string email, string password){return StoresAndManagementInterface.Register(email,password); }
+        public Result<RegisteredUserService> Register(string email, string password , string optionalID = "-1") {return StoresAndManagementInterface.Register(email,password, optionalID); }
         public Result<List<StoreService>> SearchStore(IDictionary<String, Object> details) { return StoresAndManagementInterface.SearchStore(details); }
         public Result<List<ProductService>> SearchProduct(IDictionary<String, Object> productDetails) { return StoresAndManagementInterface.SearchProduct(productDetails); }
         public Result<Boolean> AddProductToCart(String userID, String ProductID, int ProductQuantity, String StoreID) { return StoresAndManagementInterface.AddProductToCart(userID, ProductID, ProductQuantity, StoreID); }   // Redundent ?
         public Result<ShoppingCartService> GetUserShoppingCart(String userID) { return StoresAndManagementInterface.GetUserShoppingCart(userID); }
-        public Result<Boolean> UpdateShoppingCart(String userID, String shoppingBagID, String productID, int quantity) { return StoresAndManagementInterface.UpdateShoppingCart(userID, shoppingBagID, productID, quantity); }
+        public Result<Boolean> UpdateShoppingCart(String userID, String storeID, String productID, int quantity) { return StoresAndManagementInterface.UpdateShoppingCart(userID, storeID, productID, quantity); }
         public Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
             return StoresAndManagementInterface.Purchase(userID, paymentDetails, deliveryDetails);

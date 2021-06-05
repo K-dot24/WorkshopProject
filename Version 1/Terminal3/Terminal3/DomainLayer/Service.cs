@@ -4,7 +4,10 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Terminal3.DomainLayer
 {
@@ -13,12 +16,6 @@ namespace Terminal3.DomainLayer
         public static String GenerateId()
         {
             return Guid.NewGuid().ToString("N");
-        }
-
-        internal static Result<bool> ResetSystem()
-        {
-            return new Result<Boolean>("The system has been reseted and cleard\n", true, true);
-            
         }
 
     }
@@ -247,7 +244,40 @@ namespace Terminal3.DomainLayer
             {
                 if (properties[i].CanWrite && lowerCaseDict.ContainsKey(properties[i].Name.ToLower()))
                 {
-                    properties[i].SetValue(obj, lowerCaseDict[properties[i].Name.ToLower()], null);
+                    JsonElement jsonElement = (JsonElement)lowerCaseDict[properties[i].Name.ToLower()];
+                    Object value=null;
+                    switch (properties[i].Name.ToLower())
+                    {
+                        case "name":
+                            value = jsonElement.GetString();
+                            break;
+                        case "price":
+                            value = jsonElement.GetDouble();
+                            break;
+                        case "quantity":
+                            value = jsonElement.GetInt32();
+                            break;
+                        case "category":
+                            value = jsonElement.GetString();
+                            break;
+                        case "rating":
+                            value = jsonElement.GetDouble();
+                            break;
+                        case "numberofrates":
+                            value = jsonElement.GetInt32();
+                            break;
+                        case "keywords":
+                            value = jsonElement.EnumerateArray();
+                            LinkedList<String> Keywords = new LinkedList<string>();
+                            foreach (var item in (JsonElement.ArrayEnumerator)value)
+                            {
+                                Keywords.AddLast(item.GetString());
+                            }
+                            value = Keywords;
+                            break;
+                    }
+                    
+                    properties[i].SetValue(obj, value, null);
                 }
             }
         }

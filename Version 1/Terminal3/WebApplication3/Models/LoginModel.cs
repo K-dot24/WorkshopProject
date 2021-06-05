@@ -9,5 +9,6 @@ namespace Terminal3WebAPI.Models
     {
         public String email { get; set; } = "";
         public String password { get; set; } = "";
+        public String guestuserid { get; set; } = "";
     }
 }

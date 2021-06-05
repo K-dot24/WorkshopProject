@@ -7,6 +7,8 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.ServiceLayer.ServiceObjects;
 using System.Threading;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -22,19 +24,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #endregion
 
         #region Staff Management
-        Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID);
-        Result<Boolean> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID);
+        Result<StoreOwner> AddStoreOwner(RegisteredUser futureOwner, String currentlyOwnerID);
+        Result<StoreManager> AddStoreManager(RegisteredUser futureManager, String currentlyOwnerID);
         Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID);
+        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID);        
         Result<Boolean> SetPermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<IStoreStaff, Permission>> GetStoreStaff(String userID);
         #endregion
 
         #region Policies Management
-        Result<Object> SetPurchasePolicyAtStore(IPurchasePolicy policy);
-        Result<Object> GetPurchasePolicyAtStore();
-        Result<Object> SetDiscountPolicyAtStore(IDiscountPolicy policy);
-        Result<Object> GetDiscountPolicyAtStore();
+        double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
+        Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
+        Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info);
+        Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info, String id);
+        Result<IDiscountCondition> AddDiscountCondition(Dictionary<string, object> info, String id);
+        Result<IDiscountPolicy> RemoveDiscountPolicy(String id);
+        Result<IDiscountCondition> RemoveDiscountCondition(String id);
+        Result<Boolean> EditDiscountPolicy(Dictionary<string, object> info, String id);
+        Result<Boolean> EditDiscountCondition(Dictionary<string, object> info, String id);
+        Result<IDictionary<string, object>> GetPoliciesData();
+        Result<IDictionary<string, object>> GetPurchasePolicyData();
+        Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info);
+        Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
+        Result<IPurchasePolicy> RemovePurchasePolicy(string id);
+        Result<Boolean> EditPurchasePolicy(Dictionary<string, object> info, string id);
         #endregion
 
         #region Information        
@@ -46,20 +60,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     {
         public String Id { get; }
         public String Name { get; }
-        public StoreOwner Founder { get; }
-        public ConcurrentDictionary<String, StoreOwner> Owners { get; }
-        public ConcurrentDictionary<String, StoreManager> Managers { get; }
+        public StoreOwner Founder { get; set; }
+        public ConcurrentDictionary<String, StoreOwner> Owners { get; set; }
+        public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; }
         public History History { get; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
         public NotificationManager NotificationManager { get; set; }
+        public Boolean isClosed { get; set; }
 
         //Constructors
-        public Store(String name, RegisteredUser founder)
+        public Store(String name, RegisteredUser founder , String storeID = "-1")
         {
-            Id = Service.GenerateId();
+            if (storeID.Equals("-1"))
+                Id = Service.GenerateId();
+            else
+                Id = storeID;
             Name = name;
             Founder = new StoreOwner(founder, this, null);
             Owners = new ConcurrentDictionary<String, StoreOwner>();
@@ -67,14 +85,55 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
             History = new History();
+            isClosed = false;
 
             //Add founder to list of owners
             Owners.TryAdd(founder.Id, Founder);
 
             //TODO: Complete when policies done properly
             //Add default policies
-            PolicyManager.SetPurchasePolicy(Purchases.BuyNow, true);
-            PolicyManager.SetDiscountPolicy(Discounts.Visible, true);
+        }
+       
+
+        public Store(string id, string name, InventoryManager inventoryManager, History history, double rating, int numberOfRates, NotificationManager notificationManager , Boolean isClosed=false)
+        {
+            Id = id;
+            Name = name;            
+            InventoryManager = inventoryManager;
+            //PolicyManager = policyManager;     TODO
+            History = history;
+            Rating = rating;
+            NumberOfRates = numberOfRates;
+            NotificationManager = notificationManager;
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+            this.isClosed = isClosed;
+
+        }
+
+
+
+        //For Testing ONLY
+        public Store(string id, String name, RegisteredUser founder)
+        {
+            Id = id;
+            Name = name;
+            Founder = new StoreOwner(founder, this, null);
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+            InventoryManager = new InventoryManager();
+            PolicyManager = new PolicyManager();
+            History = new History();
+            isClosed = false;
+
+
+            //Add founder to list of owners
+            Owners.TryAdd(founder.Id, Founder);
+
+            //TODO: Complete when policies done properly
+            //Add default policies
+            //PolicyManager.SetPurchasePolicy(Purchases.BuyNow, true);
+            //PolicyManager.SetDiscountPolicy(Discounts.Visible, true);
         }
 
         //TODO: Implement all functions
@@ -168,7 +227,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
     }
         #endregion
 
-        public Result<Boolean> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
+        public Result<StoreOwner> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
         {
             try
             {
@@ -191,8 +250,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                         }
                         else
                         {
-                            return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
-                                $"is not an owner at ${this.Name}.\n", false, false);
+                            return new Result<StoreOwner>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}) " +
+                                $"is not an owner at ${this.Name}.\n", false, null);
                         }
 
 
@@ -201,10 +260,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                             Managers.TryRemove(futureOwner.Id, out _);
                         }
 
-                        return new Result<Boolean>("User successfuly added as the store owner\n", true, true);
+                        return new Result<StoreOwner>("User successfuly added as the store owner\n", true, newOwner);
                     }
                     //else failed
-                    return new Result<Boolean>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}). The user is already an owner.\n", false, false);
+                    return new Result<StoreOwner>($"Failed to add store owner: Appointing owner (Email: {currentlyOwnerID}). The user is already an owner.\n", false, null);
                 }
                 finally
                 {
@@ -215,11 +274,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             {
                 Console.WriteLine("A SynchronizationLockException occurred. Message:");
                 Console.WriteLine(SyncEx.Message);
-                return new Result<Boolean>(SyncEx.Message, false, false);
+                return new Result<StoreOwner>(SyncEx.Message, false, null);
             }
         }
 
-        public Result<Boolean> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)
+        public Result<StoreManager> AddStoreManager(RegisteredUser futureManager, string currentlyOwnerID)
         {
 
             try
@@ -243,13 +302,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                         }
                         else
                         {
-                            return new Result<Boolean>($"Failed to add store manager because appoitend user is not an owner or manager with relevant permissions at the store\n", false, false);
+                            return new Result<StoreManager>($"Failed to add store manager because appoitend user is not an owner or manager with relevant permissions at the store\n", false, null);
                         }
 
-                        return new Result<Boolean>("User successfuly added as the store manager\n", true, true);
+                        return new Result<StoreManager>("User successfuly added as the store manager\n", true, newManager);
                     }
                     //else failed
-                    return new Result<Boolean>($"Failed to add store manager. The user is already an manager or owner in the store.\n", false, false);
+                    return new Result<StoreManager>($"Failed to add store manager. The user is already an manager or owner in the store.\n", false, null);
                 }
                 finally
                 {
@@ -260,7 +319,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             {
                 Console.WriteLine("A SynchronizationLockException occurred. Message:");
                 Console.WriteLine(SyncEx.Message);
-                return new Result<Boolean>(SyncEx.Message, false, false);
+                return new Result<StoreManager>(SyncEx.Message, false, null);
             }
         }
 
@@ -271,13 +330,57 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (manager.AppointedBy.Equals(owner))
                 {
                     Managers.TryRemove(removedManagerID, out _);
-                    return new Result<bool>($"User (Email: {removedManagerID}) was successfully removed from store management at {this.Name}.\n", true, true);
+                    return new Result<bool>($"User (Id: {removedManagerID}) was successfully removed from store management at {this.Name}.\n", true, true);
                 }
                 //else failed
-                return new Result<bool>($"Failed to remove user (Email: {removedManagerID}) from store management: Unauthorized owner (Email: {currentlyOwnerID}).\n", false, false);
+                return new Result<bool>($"Failed to remove user (Id: {removedManagerID}) from store management: Unauthorized owner (Email: {currentlyOwnerID}).\n", false, false);
             }
             //else failed
-            return new Result<bool>($"Failed to remove user (Email: {removedManagerID}) from store management: Either not a manager or owner not found.\n", false, false);
+            return new Result<bool>($"Failed to remove user (Id: {removedManagerID}) from store management: Either not a manager or owner not found.\n", false, false);
+        }
+
+        public Result<bool> RemoveStoreOwner(String removedOwnerID, string currentlyOwnerID)
+        {
+            if (Owners.TryGetValue(currentlyOwnerID, out StoreOwner ownerBoss) && Owners.TryGetValue(removedOwnerID, out StoreOwner ownerToRemove))
+            {
+                if (ownerToRemove.AppointedBy != null && ownerToRemove.AppointedBy.Equals(ownerBoss))
+                {
+                    Owners.TryRemove(removedOwnerID, out StoreOwner removedOwner);
+                    RemoveAllStaffAppointedByOwner(removedOwner);
+                    return new Result<bool>($"User (Id: {removedOwnerID}) was successfully removed as store owner at {this.Name}.\n", true, true);
+                }
+                //else failed
+                return new Result<bool>($"Failed to remove user (Id: {removedOwnerID}) as store owner: Unauthorized owner (Id: {currentlyOwnerID}).\n", false, false);
+            }
+            //else failed
+            return new Result<bool>($"Failed to remove user (Id: {removedOwnerID}) as store owner: Either currently owner or owner to be romoved not found.\n", false, false);
+        }
+
+        private void RemoveAllStaffAppointedByOwner(StoreOwner owner)
+        {
+            NotificationManager.notifyOwnerSubscriptionRemoved(owner.GetId() , owner);
+            if(Owners.Count != 0)
+            {
+                foreach (var staff_owner in Owners)
+                {
+                    if(staff_owner.Value.AppointedBy != null && staff_owner.Value.AppointedBy.GetId() == owner.GetId())
+                    {
+                        Owners.TryRemove(staff_owner.Value.AppointedBy.GetId(), out StoreOwner removedOwner);
+                        RemoveAllStaffAppointedByOwner(removedOwner);
+                    }
+                }
+            }
+
+            if(Managers.Count != 0)
+            {
+                foreach (var staff_manager in Managers)
+                {
+                    if (staff_manager.Value.AppointedBy.GetId() == owner.GetId())
+                    {
+                        Managers.TryRemove(staff_manager.Value.GetId(), out _);
+                    }
+                }
+            }
         }
 
         public Result<bool> SetPermissions(string managerID, string ownerID, LinkedList<int> permissions)   //TODO: OwnerID can be manager....
@@ -322,31 +425,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<Dictionary<IStoreStaff, Permission>>("The given store staff does not have permission to see the stores staff members\n", false, null);
         }
 
-        public Result<object> SetPurchasePolicyAtStore(IPurchasePolicy policy)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<object> GetPurchasePolicyAtStore()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<object> SetDiscountPolicyAtStore(IDiscountPolicy policy)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<object> GetDiscountPolicyAtStore()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<Object> RemoveProduct(Product product)
-        {
-            throw new NotImplementedException();
-        }
-
         public Result<History> GetStorePurchaseHistory(string userID,bool sysAdmin)
         {
             if(sysAdmin || CheckStoreManagerAndPermissions(userID, Methods.GetStorePurchaseHistory) || CheckIfStoreOwner(userID))
@@ -380,48 +458,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             //else failed
             return new Result<bool>($"Staff ID not found in store.\n", false, false);
         }
-
-        //TODO - DELETE??
-        #region Notification
-        public Result<bool> notifyStoreClosed() //TODO - add the function CloseStore and add there the call to the notification 
-        {
-            String msg = $"Event : Store Closed\nStore Id : {Id}\n";
-            Notification notification = new Notification(msg, true);
-            notify(notification);
-            return new Result<bool>($"All staff members are notified that store {Id} is closed\n", true, true);
-
-        }
-
-        public Result<bool> notifyStoreOpened()
-        {
-            String msg = $"Event : Store Opened\nStore Id : {Id}\n";
-            Notification notification = new Notification(msg, true);
-            notify(notification);
-            return new Result<bool>($"All staff members are notified that store {Id} is opened\n", true, true);
-        }
-
-        public Result<bool> notifyOwnerSubscriptionRemoved(string ownerID)  //TODO - add the function and add there the call to the notification 
-        {
-            String msg = $"Event : Owner Subscription Removed\nStore Id : {Id}\nOwner Id : {ownerID}";
-            Notification notification = new Notification(msg, true);
-            notify(notification);
-            return new Result<bool>($"All staff members are notified that owner ({ownerID}) subscriptoin as store owner ({Id}) has been removed\n", true, true);
-        }
-
-        private void notify(Notification notification)
-        {
-            foreach (var owner in Owners)
-            {
-                owner.Value.Update(notification);
-            }
-
-            foreach (var manager in Managers)
-            {
-                manager.Value.Update(notification);
-            }
-        }
-        #endregion Notification
-
 
         //Getter
         public Result<Product> GetProduct(String productID)
@@ -478,6 +514,143 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<StoreService>("Store DAL object", true, store);
 
         }
-        
+
+        internal Boolean[] GetPermission(string userID)
+        {
+            return getUserPermissionByID(userID);
+        }
+
+        public Boolean[] getUserPermissionByID (string userID)
+        {
+            Boolean[] per = new Boolean[13];
+            foreach(var user in Owners)
+            {
+                if (user.Key == userID)
+                {
+                    StoreOwner owner = user.Value;
+                    for(int i=0; i< per.Length; i++)
+                    {
+                        per[i] = true; 
+                    }
+                    return per; 
+                }
+            }
+
+            foreach (var user in Managers)
+            {
+                if (user.Key == userID)
+                {
+                    StoreManager manager = user.Value;
+                    return (Boolean[])manager.Permission.functionsBitMask;                  
+                }
+            }
+
+            // No Permissions
+            for (int i = 0; i < per.Length; i++)
+            {
+                per[i] = false;
+            }
+            return per;
+        }
+
+        public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
+        {
+            return PolicyManager.GetTotalBagPrice(products, discountCode);
+        }
+
+        public Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)
+        {
+            return PolicyManager.AdheresToPolicy(products, user);
+        }
+
+        public Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info)
+        {
+            return PolicyManager.AddDiscountPolicy(info);
+        }
+
+        public Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.AddDiscountPolicy(info, id);
+        }
+
+        public Result<IDiscountCondition> AddDiscountCondition(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.AddDiscountCondition(info, id);
+        }
+
+        public Result<IDiscountPolicy> RemoveDiscountPolicy(string id)
+        {
+            return PolicyManager.RemoveDiscountPolicy(id);
+        }
+
+        public Result<IDiscountCondition> RemoveDiscountCondition(string id)
+        {
+            return PolicyManager.RemoveDiscountCondition(id);
+        }
+
+        public Result<IPurchasePolicy> RemovePurchasePolicy(string id)
+        {
+            return PolicyManager.RemovePurchasePolicy(id);
+        }
+
+        public Result<bool> EditDiscountPolicy(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.EditDiscountPolicy(info, id);
+        }
+
+        public Result<bool> EditDiscountCondition(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.EditDiscountCondition(info, id);
+        }
+
+        public Result<IDictionary<string, object>> GetPoliciesData()
+        {
+            return PolicyManager.GetDiscountPolicyData();
+        }
+
+        public Result<IDictionary<string, object>> GetPurchasePolicyData()
+        {
+            return PolicyManager.GetPurchasePolicyData();
+        }
+
+        public Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info)
+        {
+            return PolicyManager.AddPurchasePolicy(info);
+        }
+
+        public Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.AddPurchasePolicy(info, id);
+        }
+
+        public Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id)
+        {
+            return PolicyManager.EditPurchasePolicy(info, id);
+        }
+
+        public DTO_Store getDTO()
+        {
+            LinkedList<String> owners_dto = new LinkedList<string>();
+            foreach(var owner in Owners)
+            {
+                owners_dto.AddLast(owner.Key);
+            }
+            LinkedList<String> managers_dto = new LinkedList<string>();
+            foreach (var manager in Managers)
+            {
+                managers_dto.AddLast(manager.Key);
+            }
+            LinkedList<String> inventoryManagerProducts_dto = new LinkedList<string>();
+            ConcurrentDictionary<String, Product> Products = InventoryManager.Products;
+            foreach(var p in Products)
+            {
+                inventoryManagerProducts_dto.AddLast(p.Key);
+            }
+
+            return new DTO_Store(Id, Name, Founder.User.Id, owners_dto, managers_dto, 
+                       inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed,
+                       PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO());
+
+        } 
     }
 }

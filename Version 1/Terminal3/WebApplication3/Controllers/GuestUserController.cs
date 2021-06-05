@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Terminal3.DomainLayer;
+using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ServiceLayer;
 using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3WebAPI.Models;
@@ -33,7 +35,15 @@ namespace Terminal3WebAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         public IActionResult EnterSystem() {
-            return Ok("Welcome to Terminal3 system");
+            Result<UserService> result = system.EnterSystem();
+            if (result.ExecStatus)
+            {
+                return Ok(result.Data.Id);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
         }
 
         /// <summary>
@@ -85,7 +95,7 @@ namespace Terminal3WebAPI.Controllers
         /// </summary>
         /// <param name="storeDetails"></param>
         [Route("SearchStore")]
-        [HttpGet]
+        [HttpPost]
         public IActionResult SearchStore([FromBody] IDictionary<string, object> storeDetails)
         {
             Result<List<StoreService>> result = system.SearchStore(storeDetails);
@@ -111,7 +121,7 @@ namespace Terminal3WebAPI.Controllers
         /// <param name="productDetails"></param>
         /// <returns></returns>
         [Route("SearchProduct")]
-        [HttpGet]
+        [HttpPost]
         public IActionResult SearchProduct([FromBody] IDictionary<string, object> productDetails)
         {
             Result < List < ProductService >> result = system.SearchProduct(productDetails);
@@ -135,7 +145,7 @@ namespace Terminal3WebAPI.Controllers
         public IActionResult AddProductToCart([FromBody] ProductToCart productToCart)
         {
             Result < Boolean > result = system.AddProductToCart(productToCart.userID, productToCart.ProductID, productToCart.ProductQuantity, productToCart.StoreID);
-            if (result.ExecStatus) { return Created($"GetUserShoppingCart/{productToCart.userID}",null); }
+            if (result.ExecStatus) { return Ok(result.Data); }
             else { return BadRequest(result.Message); } 
         }
 
@@ -149,8 +159,24 @@ namespace Terminal3WebAPI.Controllers
         public IActionResult GetUserShoppingCart(String userID)
         {
             Result<ShoppingCartService> result = system.GetUserShoppingCart(userID);
-            if (result.ExecStatus) { return Ok(result); }
-            else { return BadRequest(result); }
+            ShoppingCartService sc = result.Data;
+            LinkedList<ShoppingBagService> shopinng_bags =  sc.ShoppingBags;
+            LinkedList<GetShoppingBag> shopinng_bags_flat = new LinkedList<GetShoppingBag>();
+            foreach (var sb in shopinng_bags)
+            {
+                LinkedList<Tuple<ProductService, int>> Products = sb.Products;
+                LinkedList<ProductService> products_list = new LinkedList<ProductService>();
+                foreach(var tup in Products)
+                {
+                    tup.Item1.Quantity = tup.Item2;
+                    products_list.AddLast(tup.Item1);
+                }
+                shopinng_bags_flat.AddLast(new GetShoppingBag(sb.Id, sb.UserId, sb.StoreId, products_list, sb.TotalBagPrice));
+
+            }
+            GetShoppingCart toReturn = new GetShoppingCart(sc.Id, shopinng_bags_flat, sc.TotalCartPrice);
+            if (result.ExecStatus) { return Ok(toReturn); }
+            else { return BadRequest(toReturn); }
         }
 
         /// <summary>
@@ -158,7 +184,7 @@ namespace Terminal3WebAPI.Controllers
         /// Template of valid JSON:
         /// {
         ///     "userID":"string",
-        ///     "shoppingBagID":"string",
+        ///     "storeID":"string",
         ///     "productID":"string",
         ///     "quantity":int
         /// }
@@ -168,7 +194,7 @@ namespace Terminal3WebAPI.Controllers
         [HttpPut]
         public IActionResult UpdateShoppingCart([FromBody] UpdateShoppingCartModel details)
         {
-            Result<Boolean> result = system.UpdateShoppingCart(details.userID, details.shoppingBagID, details.productID, details.quantity);
+            Result<Boolean> result = system.UpdateShoppingCart(details.userID, details.storeID, details.productID, details.quantity);
             if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result); }
         }
@@ -191,7 +217,7 @@ namespace Terminal3WebAPI.Controllers
         {
             Result<ShoppingCartService> result = system.Purchase(purchaseDetails.userID, purchaseDetails.paymentDetails, purchaseDetails.deliveryDetails);
             if (result.ExecStatus) { return Ok(result); }
-            else { return BadRequest(result); }
+            else { return BadRequest(result.Message); }
         }
 
         /// <summary>
@@ -205,7 +231,7 @@ namespace Terminal3WebAPI.Controllers
         {
             Result<HistoryService> result = system.GetUserPurchaseHistory(userID);
             if (result.ExecStatus) { return Ok(result); }
-            else { return BadRequest(result); }
+            else { return BadRequest(result.Message); }
         }
 
         /// <summary>
@@ -218,7 +244,7 @@ namespace Terminal3WebAPI.Controllers
         {
             Result<double> result = system.GetTotalShoppingCartPrice(userID);
             if (result.ExecStatus) { return Ok(result); }
-            else { return BadRequest(result); }
+            else { return BadRequest(result.Message); }
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Terminal3.DomainLayer;
 using Terminal3.ServiceLayer;
+using Terminal3.ServiceLayer.Controllers;
 using Terminal3.ServiceLayer.ServiceObjects;
 
 namespace Terminal3WebAPI.Controllers
@@ -48,7 +49,7 @@ namespace Terminal3WebAPI.Controllers
         /// <param name="sysAdminID">system admin ID</param>
         /// <param name="storeId">ID of the store to get the purchase history</param>
         /// <returns></returns>
-        [Route("GetStorePurchaseHistory/{sysAdminID}/{storeId}")]
+        [Route("GetStorePurchaseHistory/{sysAdminID}/{storeID}")]
         [HttpGet]
         public IActionResult GetStorePurchaseHistory(string sysAdminID, string storeId)
         {
@@ -80,7 +81,7 @@ namespace Terminal3WebAPI.Controllers
         public IActionResult RemoveSystemAdmin(string sysAdminID, string email)
         {
             Result<RegisteredUserService> result = system.RemoveSystemAdmin(sysAdminID, email);
-            if (result.ExecStatus) { return Ok(result.Message); }
+            if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result.Message); }
         }
 
@@ -94,6 +95,23 @@ namespace Terminal3WebAPI.Controllers
         {
             Result<bool> result = system.ResetSystem(sysAdminID);
             if (result.ExecStatus) { return Ok(result.Message); }
+            else { return BadRequest(result.Message); }
+        }
+        /// Getting income for the store by 2 dates interval
+        /// NOTE!: OwnerID is the systemAdminID
+        /// Template of valid JSON:
+        /// {
+        ///     "StartDate":"string",
+        ///     "EndDate:"string",
+        ///     "OwnerID":"string"
+        /// }
+        /// <param name="data"></param>
+        [Route("GetIncomeAmountGroupByDay")]
+        [HttpPost]
+        public IActionResult GetIncomeAmountGroupByDay([FromBody] GetIncomeAmountGroupByDayModel data)
+        {
+            Result<List<Tuple<DateTime, Double>>> result = system.GetIncomeAmountGroupByDay(data.StartDate, data.EndDate, data.OwnerID);
+            if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result.Message); }
         }
         #endregion

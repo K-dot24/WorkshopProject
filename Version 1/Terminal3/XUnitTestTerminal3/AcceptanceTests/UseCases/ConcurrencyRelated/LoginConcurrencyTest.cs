@@ -9,7 +9,6 @@ namespace XUnitTestTerminal3
 {
     public class LoginConcurrencyTest : XUnitTerminal3TestCase
     {
-        private string kfir_id;
         private BlockingCollection<bool> results;
         public LoginConcurrencyTest() : base()
         {

@@ -5,6 +5,10 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.ExternalSystems;
+using Terminal3.DataAccessLayer;
+using MongoDB.Driver;
+using MongoDB.Bson;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -12,14 +16,38 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         //Properties
         public String Email { get; }
-        public String Password { get; }
+        public String Password { get; set; }        //TODO- change set;
         public Boolean LoggedIn { get; set; }
         public History History { get; set; }
         public LinkedList<Notification> PendingNotification { get; }
-        public NotificationCenter NotificationCenter {get;}     
+        public NotificationCenter NotificationCenter {get;}
 
+        //public Mapper mapper = Mapper.getInstance();
+        
         //Constructor
         public RegisteredUser(String email , String password) : base()
+        {
+            this.Email = email;
+            this.Password = password;
+            this.LoggedIn = false;
+            this.History = new History();
+            this.PendingNotification = new LinkedList<Notification>();
+            this.NotificationCenter = NotificationCenter.GetInstance();
+        }
+
+        // For database load
+        public RegisteredUser(String Id , String email, String password , Boolean loggedin , History history , LinkedList<Notification> notifications ) : base(Id)
+        {
+            this.Email = email;
+            this.Password = password;
+            this.LoggedIn = loggedin;
+            this.History = history;
+            this.PendingNotification = notifications;
+            this.NotificationCenter = NotificationCenter.GetInstance();
+        }
+
+
+        public RegisteredUser(string id, String email, String password) : base(id)
         {
             this.Email = email;
             this.Password = password;
@@ -37,8 +65,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
             if (Password.Equals(password))
             {
-                //Correct paswword
+                // Correct paswword
                 LoggedIn = true;
+
+                /*// Update DB
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
+                var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
+                mapper.UpdateRegisteredUser(filter, update); 
+*/
                 DisplayPendingNotifications();
                 return new Result<RegisteredUser>($"{this.Email} is Logged in\n", true, this);
             }
@@ -91,6 +125,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             return new Result<History>("User history\n", true, History);
         }
+
         public Result<RegisteredUserService> GetDAL()
         {
             ShoppingCartService SCD = this.ShoppingCart.GetDAL().Data;
@@ -109,28 +144,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public new Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
-            Double amount = ShoppingCart.GetTotalShoppingCartPrice();
-
-            bool paymentSuccess = PaymentSystem.Pay(amount, paymentDetails);
-
-            if (!paymentSuccess)
+            if (ShoppingCart.ShoppingBags.IsEmpty)
             {
-                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in payment details\n", false, null);
-
-            }
-            
-            bool deliverySuccess = DeliverySystem.Deliver(deliveryDetails);
-            if (!deliverySuccess)
-            {
-                PaymentSystem.CancelTransaction(paymentDetails);
-                return new Result<ShoppingCart>("Atempt to purchase the shopping cart faild due to error in delivery details\n", false, null);
+                return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
             }
 
-            History.AddPurchasedShoppingCart(ShoppingCart);
-            ShoppingCart copy = new ShoppingCart(ShoppingCart);
-            ShoppingCart = new ShoppingCart();          // create new shopping cart for user
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails);
+            if (result.Data != null)
+            {
+                History.AddPurchasedShoppingCart(ShoppingCart);
+                ShoppingCart = new ShoppingCart();          // create new shopping cart for user
 
-            return new Result<ShoppingCart>("Users purchased shopping cart\n", true, copy);
+               /* // Update DB
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
+                var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.getDTO());
+                mapper.UpdateRegisteredUser(filter, update);*/
+
+            }
+            return result;
         }
     
         public Result<Boolean> Update(Notification notification)
@@ -166,6 +197,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     PendingNotification.Remove(notification);
                 }
             }
+        }
+
+        public DTO_RegisteredUser getDTO()
+        {
+            LinkedList<DTO_Notification> notifications_dto = new LinkedList<DTO_Notification>();
+            foreach(var n in PendingNotification)
+            {
+                notifications_dto.AddLast(n.getDTO()); 
+            }
+            return new DTO_RegisteredUser(Id, ShoppingCart.getDTO(), Email, Password, 
+                                        LoggedIn, History.getDTO(), notifications_dto);
+
         }
     }
 }

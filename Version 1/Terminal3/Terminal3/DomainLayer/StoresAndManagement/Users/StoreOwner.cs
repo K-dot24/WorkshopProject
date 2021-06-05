@@ -2,6 +2,7 @@
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ServiceLayer.ServiceObjects;
 using System;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -9,7 +10,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public RegisteredUser User { get; }
         public Store Store { get; }
-        public IStoreStaff AppointedBy { get; }
+        public IStoreStaff AppointedBy { get; set; }
         public LinkedList<StoreManager> StoreManagers { get; }
         public LinkedList<StoreOwner> StoreOwners { get; }
 
@@ -49,6 +50,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<Boolean> Update(Notification notification)
         {
             return User.Update(notification);
+        }
+        public DTO_StoreOwner getDTO()
+        {
+            LinkedList<string> managers_dto = new LinkedList<string>();
+            foreach(StoreManager sm in StoreManagers)
+            {
+                managers_dto.AddLast(sm.GetId());
+            }
+
+            LinkedList<string> owners_dto = new LinkedList<string>();
+            foreach (StoreOwner so in StoreOwners)
+            {
+                owners_dto.AddLast(so.GetId());
+            }
+            return new DTO_StoreOwner(User.Id, Store.Id, AppointedBy.GetId(), managers_dto, owners_dto);
         }
     }
 }

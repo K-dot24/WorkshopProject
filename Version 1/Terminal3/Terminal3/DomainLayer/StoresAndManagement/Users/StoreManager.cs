@@ -2,6 +2,7 @@
 using Terminal3.ServiceLayer.ServiceObjects;
 using System;
 using System.Collections.Generic;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -17,6 +18,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             User = user;
             Store = store;
             Permission = permission;
+            AppointedBy = appointedBy;
         }
 
         public Result<Boolean> SetPermission(int method, Boolean active)
@@ -44,6 +46,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<Boolean> Update(Notification notification)
         {
             return User.Update(notification);
+        }
+
+        public DTO_StoreManager getDTO()
+        {
+            return new DTO_StoreManager(User.Id, Permission.functionsBitMask, AppointedBy.GetId() ,Store.Id);
         }
     }
 }

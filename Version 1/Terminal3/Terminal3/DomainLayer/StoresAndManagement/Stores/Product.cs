@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Collections.Concurrent;
 using Terminal3.ServiceLayer.ServiceObjects;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -24,6 +25,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Product(String name, Double price, int quantity , String category, [OptionalAttribute]LinkedList<String> Keywords)
         {
             Id = Service.GenerateId();
+            //Id = "1";  //TODO delete
             Name = name;
             Price = price;
             Quantity = quantity;
@@ -32,7 +34,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             else { this.Keywords = Keywords; }
             Review = new ConcurrentDictionary<string, string>();
             this.NotificationManager = null;
-        }       
+        }
+
+        public Product(String id , String name, Double price, int quantity, String category, LinkedList<String> Keywords , ConcurrentDictionary<string, string> review)
+        {
+            Id = id;
+            Name = name;
+            Price = price;
+            Quantity = quantity;
+            Category = category;
+            this.Keywords = Keywords;
+            Review = review;
+            this.NotificationManager = null;
+        }
+
 
         //Method
         public Result<Double> AddRating(Double rate)
@@ -62,7 +77,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             //TODO - check if user can add only one review and then overrride the last review ? or can add multiple reviews?
             Review.TryAdd(userId, review);
-            return new Result<Boolean>("The product review was added successfuly\n", true, true);
+            return NotificationManager.notifyProductReview(this, review);
         }
 
         public Result<ProductService> GetDAL()
@@ -78,6 +93,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             }
             Quantity = Quantity - quantity;
             return NotificationManager.notifyStorePurchase(this, quantity);
+        }
+
+        public DTO_Product getDTO()
+        {
+            return new DTO_Product(Id, Name, Price, Quantity, Category, Rating, NumberOfRates, Keywords, Review);
         }
 
     }

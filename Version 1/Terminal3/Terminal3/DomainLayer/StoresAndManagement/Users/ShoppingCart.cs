@@ -3,6 +3,9 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
+using Terminal3.ExternalSystems;
+using Terminal3.DataAccessLayer.DTOs;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -17,6 +20,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             Id = Service.GenerateId();
             ShoppingBags = new ConcurrentDictionary<string, ShoppingBag>();
             TotalCartPrice = 0;
+        }
+
+        // For loading from database
+        public ShoppingCart( String id , ConcurrentDictionary<String, ShoppingBag> shoppingBags , Double totalCartPrice)
+        {
+            Id = id;
+            ShoppingBags =shoppingBags;
+            TotalCartPrice = totalCartPrice;
         }
 
         public ShoppingCart(ShoppingCart original)
@@ -53,15 +64,73 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         }
 
-        public Double GetTotalShoppingCartPrice()
+        public Result<Double> GetTotalShoppingCartPrice()
         {
-            Double sum=0;
+            Double sum = 0;
+            foreach (ShoppingBag bag in ShoppingBags.Values)
+            {
+                sum += bag.GetTotalPrice();
+            }
+            return new Result<double>($"Total shopping cart price calculated, price = {sum}", true, sum);
+        }
+
+        public Result<bool> AdheresToPolicy()
+        {
             foreach(ShoppingBag bag in ShoppingBags.Values)
             {
-                sum = sum + bag.GetTotalPrice();
+                Result<bool> result = bag.AdheresToPolicy();
+                if (!result.Data)
+                    return result;
             }
-            TotalCartPrice = sum;
-            return sum;
+
+            return new Result<bool>("All bags adhere to their respective store policy", true, true);
+        }
+
+        public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        {
+            if (!AdheresToPolicy().Data)
+                return new Result<ShoppingCart>("A bag in the Shopping cart doesn't adhere to it's respective store's policy", false, null);
+
+            Double amount = GetTotalShoppingCartPrice().Data;
+
+            int paymentId = PaymentSystem.Pay(amount, paymentDetails);
+
+            if (paymentId == -1)
+            {
+                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in payment details\n", false, null);
+
+            }
+
+            int deliverySuccess = DeliverySystem.Supply(deliveryDetails);
+            if (deliverySuccess == -1)
+            {
+                IDictionary<String, Object> refundDetails = new Dictionary<String, Object>();
+                refundDetails.Add("transaction_id", paymentId.ToString());
+                int refundSuccess = PaymentSystem.CancelPay(refundDetails);
+                if(refundSuccess == -1)
+                    return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details and refund failed\n", false, null);
+                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details\n", false, null);
+            }
+            ShoppingCart copy = new ShoppingCart(this);
+
+            // save recipt
+            foreach(ShoppingBag sb in this.ShoppingBags.Values)
+            {
+                DTO_Recipt recipt = new DTO_Recipt(sb.Store.Id, sb.TotalBagPrice, DateTime.Now.Date);
+                Mapper.getInstance().Create(recipt); 
+            }
+
+            return new Result<ShoppingCart>("", true, copy);
+        }
+
+        public DTO_ShoppingCart getDTO()
+        {
+            ConcurrentDictionary<string, DTO_ShoppingBag> bags = new ConcurrentDictionary<string, DTO_ShoppingBag>();
+            foreach(var sb in this.ShoppingBags)
+            {
+                bags.TryAdd(sb.Key, sb.Value.getDTO()); 
+            }
+            return new DTO_ShoppingCart(this.Id, bags , this.TotalCartPrice);
         }
     }
 }
