@@ -461,7 +461,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 /> */}
 
                 <Route exact path={match.url + `/getdiscountpolicy`} 
-                    render={() => (<Policy storeID={store.id} />)} 
+                    render={(props) => (<Policy storeID={store.id} {...props} />)} 
                 />
 
                 {/* Add Purchase Policy */}
@@ -491,9 +491,13 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 />
 
                 { /* Get Purchase Policy Data */}
-                <Route exact path={match.url + `/getpurchasepolicy`} 
+                {/* <Route exact path={match.url + `/getpurchasepolicy`} 
                     render={(props) => (<Action name='Get Purchase Policy Data'  
                                                 handleAction={handleGetPurchasePolicyData} {...props} />)} 
+                /> */}
+
+                <Route exact path={match.url + `/getpurchasepolicy`} 
+                    render={(props) => (<Policy storeID={store.id} {...props} />)} 
                 />
 
 

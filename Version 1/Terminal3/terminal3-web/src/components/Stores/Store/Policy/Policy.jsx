@@ -4,7 +4,7 @@ import { TreeView, TreeItem } from '@material-ui/lab';
 import { ExpandMore, ChevronRight } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { GetDiscountPolicyData, printErrorMessage } from '../../../../api/API';
+import { GetDiscountPolicyData, GetPurchasePolicyData, printErrorMessage } from '../../../../api/API';
 
 const mockData = {
     id: 'root',
@@ -49,16 +49,23 @@ const useStyles = makeStyles((theme) => ({
 }));
 //#endregion
 
-const Policy = ({ storeID }) => {
+const Policy = ({ match, storeID }) => {
     const [data, setData] = useState(null);
     const classes = useStyles();
 
-    // API Calls
+    //#region API Calls
 
     const handleGetDiscountPolicyData = () => {
         GetDiscountPolicyData(storeID).then(response => response.ok ? 
             response.json().then(result => setData(result.data)) : printErrorMessage(response)).catch(err => alert(err));
     }
+
+    const handleGetPurchasePolicyData = () => {
+        GetPurchasePolicyData(storeID).then(response => response.ok ? 
+            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+    }
+
+    //#endregion
 
     const renderTree = (nodes) => (
         <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.name}>
@@ -67,8 +74,10 @@ const Policy = ({ storeID }) => {
     );
 
     useEffect(() => {
-        console.log("Fetching Data");
-        handleGetDiscountPolicyData();
+        if (match.url.includes('getdiscountpolicy'))
+            handleGetDiscountPolicyData();
+        else if (match.url.includes('getpurchasepolicy'))
+            handleGetPurchasePolicyData();
     }, [])
 
     useEffect(() => {
