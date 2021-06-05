@@ -105,15 +105,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<IPurchasePolicy>("", true, null);
         }
 
-        public Result<IPurchasePolicyData> GetData()
-        {
-            IPurchasePolicyData pre = null;
-            IPurchasePolicyData cond = null;
-            if (PreCond != null)
-                pre = PreCond.GetData().Data;
-            if (Cond != null)
-                cond = Cond.GetData().Data;
-            return new Result<IPurchasePolicyData>("", true, new ConditionalPolicyData(pre, cond, Id));
+        public Result<IDictionary<string, object>> GetData()
+        {            
+            IDictionary<string, object> dict = new Dictionary<string, object>() { { "Type", "ConditionalPolicy" }, { "Id", Id }, { "PreCond", PreCond.GetData().Data}, { "Cond", Cond.GetData().Data } };
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public Result<bool> EditPolicy(Dictionary<string, object> info, string id)

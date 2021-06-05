@@ -4,7 +4,7 @@ import { Typography, Button, Divider } from '@material-ui/core';
 import CreditCardInput from 'react-credit-card-input';
 
 import Review from './Review'
-import { Purchase } from '../../api/API';
+import { printErrorMessage, Purchase } from '../../api/API';
 
 const PaymentForm = ({ userID, shippingData, checkoutToken, nextStep, backStep }) => {
     const [cardNumber, setCardNumber] = useState('');
@@ -26,25 +26,37 @@ const PaymentForm = ({ userID, shippingData, checkoutToken, nextStep, backStep }
     const handleSubmit = (event) => {
         event.preventDefault();     // prevent website from refreshing after clicking
 
+        const fullName = shippingData.firstname + ' ' + shippingData.lastname;
+
+        // Split expiry date to month and yearh
+        const splited = expiry.split('/');
+        const month = splited[0].replace(/\b0+/g, '');
+        let year = '20' + splited[1];
+        year = year.replace(' ', '');
+
         const orderData = {
             // products: checkoutToken.products,
             // customer: { firstname: shippingData.firstName, lastname: shippingData.lastName, email: shippingData.email },
             userID: userID,
-            deliveryDetails: { 
+            deliveryDetails: {
+                name: fullName,
                 address: shippingData.address, 
                 city: shippingData.city, 
-                zip: shippingData.zip,
-                shippingCountry: shippingData.shippingCountry 
+                country: shippingData.shippingCountry,
+                zip: shippingData.zip
             },
             paymentDetails: {
-                cardNumber: cardNumber,
-                expiryDate: expiry,
-                cvc: cvc
+                card_number: cardNumber.replace(/ /g,''),
+                month,
+                year,
+                holder: fullName,
+                ccv: cvc,
+                id: userID
             }
         }
 
         Purchase(orderData).then(response => response.ok ?
-            response.json().then(result => result.execStatus ? nextStep() : console.log(result.message)) : console.log("NOT OK")).catch(err => console.log(err));
+            response.json().then(result => result.execStatus ? nextStep() : console.log(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     return (

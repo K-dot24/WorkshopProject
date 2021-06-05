@@ -87,17 +87,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return null;
         }
 
-        public override Result<IDiscountConditionData> GetData()
+        public override Result<IDictionary<string, object>> GetData()
         {
-            List<IDiscountConditionData> conditionsList = new List<IDiscountConditionData>();
-            foreach(IDiscountCondition myCondition in Conditions)
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                {"type", "DiscountConditionAnd" },
+                {"Id", Id },
+                {"Conditions", null }
+            };
+            List<IDictionary<string, object>> conditionsList = new List<IDictionary<string, object>>();
+            foreach (IDiscountCondition myCondition in Conditions)
             {
-                Result<IDiscountConditionData> conditionResult = myCondition.GetData();
+                Result<IDictionary<string, object>> conditionResult = myCondition.GetData();
                 if (!conditionResult.ExecStatus)
-                    return new Result<IDiscountConditionData>(conditionResult.Message, false, null);
+                    return conditionResult;
                 conditionsList.Add(conditionResult.Data);
             }
-            return new Result<IDiscountConditionData>("", true, new DiscountConditionOrData(conditionsList, Id));
+            dict["Conditions"] = conditionsList;
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public override Result<bool> EditCondition(Dictionary<string, object> info, string id)

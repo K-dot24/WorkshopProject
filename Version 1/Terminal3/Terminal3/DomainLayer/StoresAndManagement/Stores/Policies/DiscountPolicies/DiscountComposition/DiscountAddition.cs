@@ -5,7 +5,6 @@ using System.Text;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountComposition;
-using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountComposition;
 
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
@@ -129,17 +128,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<IDiscountCondition>("", true, null);
         }
 
-        public override Result<IDiscountPolicyData> GetData()
+        public override Result<IDictionary<string, object>> GetData()
         {
-            List<IDiscountPolicyData> discountsList = new List<IDiscountPolicyData>();
+            IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                {"type", "DiscountAddition" },
+                {"Id", Id },
+                {"Discounts", null }
+            };
+            List<IDictionary<string, object>> discountsList = new List<IDictionary<string, object>>();
             foreach (IDiscountPolicy myDiscount in Discounts)
             {
-                Result<IDiscountPolicyData> discountResult = myDiscount.GetData();
+                Result<IDictionary<string, object>> discountResult = myDiscount.GetData();
                 if (!discountResult.ExecStatus)
-                    return new Result<IDiscountPolicyData>(discountResult.Message, false, null);
+                    return discountResult;
                 discountsList.Add(discountResult.Data);
             }
-            return new Result<IDiscountPolicyData>("", true, new DiscountAdditionData(discountsList, Id));
+            dict["Discounts"] = discountsList;
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public override Result<bool> EditDiscount(Dictionary<string, object> info, string id)
@@ -173,9 +178,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public DataAccessLayer.DTOs.DTO_DiscountAddition getDTO()
+        public DTO_DiscountAddition getDTO()
         {
-            return null; // TODO - DTO_DiscountAddition
+            ConcurrentDictionary<String, String> Discounts_dto = new ConcurrentDictionary<string, string>();
+            foreach (var dis in Discounts)
+            {
+                Discounts_dto.TryAdd("DiscountAddition", dis.Id);
+            }
+
+            return new DTO_DiscountAddition(this.Id, Discounts_dto);
         }
     }
 }

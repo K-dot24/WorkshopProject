@@ -4,7 +4,7 @@ import { Typography, Button, Card, CardActions, CardContent, CardMedia } from '@
 import useStyles from './styles';
 import { products_image_url } from '../../../api/API';
 
-const CartItem = ({ item, handleUpdateCartQuantity, handleRemoveFromCart }) => {
+const CartItem = ({ item, handleUpdateCartQuantity }) => {
     const classes = useStyles();
 
     return (
@@ -16,11 +16,11 @@ const CartItem = ({ item, handleUpdateCartQuantity, handleRemoveFromCart }) => {
             </CardContent>
             <CardActions className={classes.cardActions}>
                 <div className={classes.buttons}>
-                    <Button type="button" size="small" onClick={() => handleUpdateCartQuantity(item.id, item.quantity - 1)}>-</Button>
+                    <Button type="button" size="small" onClick={() => handleUpdateCartQuantity(item.storeID, item.id, item.quantity - 1)}>-</Button>
                     <Typography>{item.quantity}</Typography>
-                    <Button type="button" size="small" onClick={() => handleUpdateCartQuantity(item.id, item.quantity + 1)}>+</Button>
+                    <Button type="button" size="small" onClick={() => handleUpdateCartQuantity(item.storeID, item.id, item.quantity + 1)}>+</Button>
                 </div>
-                <Button variant="contained" type="button" color="secondary" onClick={() => handleRemoveFromCart(item.id)}>Remove</Button>
+                <Button variant="contained" type="button" color="secondary" onClick={() => handleUpdateCartQuantity(item.storeID, item.id, 0)}>Remove</Button>
             </CardActions>
         </Card>
     )

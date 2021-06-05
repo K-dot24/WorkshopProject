@@ -9,6 +9,7 @@ namespace Terminal3.ExternalSystems.Tests
         public IDictionary<String, Object> deliveryDetails;
         public DeliverySystemTests()
         {
+            ExternalSystemsAPI.getInstance("https://cs-bgu-wsep.herokuapp.com/");
             deliveryDetails = new Dictionary<String, Object>
                     {
                      { "name", "Israel Israelovice" },

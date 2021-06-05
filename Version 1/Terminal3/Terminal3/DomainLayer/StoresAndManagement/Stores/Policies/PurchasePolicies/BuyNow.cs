@@ -50,9 +50,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return Policy.RemovePolicy(id);            
         }
 
-        public Result<IPurchasePolicyData> GetData()
+        public Result<IDictionary<string, object>> GetData()
         {
-            return new Result<IPurchasePolicyData>("", true, new BuyNowData((AndPolicyData)Policy.GetData().Data, Id));
+            IDictionary<string, object> dict = new Dictionary<string, object>() { { "Type", "BuyNow" }, { "Id", Id }, { "Policy", Policy.GetData().Data } };
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public Result<bool> EditPolicy(Dictionary<string, object> info, string id)

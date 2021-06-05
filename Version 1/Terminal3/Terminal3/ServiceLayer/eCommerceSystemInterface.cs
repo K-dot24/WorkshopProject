@@ -50,6 +50,14 @@ namespace Terminal3.ServiceLayer
                             NotificationService, this.connection);*/
 
             Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(config_path));
+
+            //validate JSON
+            if( (config.externalSystem_url is null) || (config.mongoDB_url is null) || (config.signalRServer_url is null)
+                || (config.password is null) || (config.email is null))
+            {
+                System.Environment.Exit(1);
+            }
+
             //check config
             try
             {
@@ -370,12 +378,12 @@ namespace Terminal3.ServiceLayer
             return StoreStaffInterface.EditDiscountCondition(storeId, info, id);
         }
 
-        public Result<IDiscountPolicyData> GetDiscountPolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetDiscountPolicyData(string storeId)
         {
             return StoreStaffInterface.GetDiscountPolicyData(storeId);
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId)
         {
             return StoreStaffInterface.GetPurchasePolicyData(storeId);
         }
