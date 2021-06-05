@@ -19,6 +19,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 using System.Reflection;
 using Newtonsoft.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
+using Terminal3.DomainLayer;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -105,80 +106,89 @@ namespace Terminal3.DataAccessLayer
         //Constructor
         private Mapper(String connection_string)
         {
-            dbClient = new MongoClient(connection_string);
-            //database = dbClient.GetDatabase("Terminal3-development");
-            database = dbClient.GetDatabase("Terminal3-Testing");
+            try
+            {
+                dbClient = new MongoClient(connection_string);
+                //database = dbClient.GetDatabase("Terminal3-development");
+                database = dbClient.GetDatabase("Terminal3-Testing");
 
-            //DAOs
-            DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
-            DAO_Product = new DAO<DTO_Product>(database, "Products");            
-            DAO_StoreManager = new DAO<DTO_StoreManager>(database, "StoreStaffs");
-            DAO_StoreOwner = new DAO<DTO_StoreOwner>(database, "StoreStaffs");
-            DAO_SystemAdmins = new DAO<DTO_SystemAdmins>(database, "SystemAdmins");
-            DAO_Store = new DAO<DTO_Store>(database, "Stores");
-            DAO_Auction = new DAO<DTO_Auction>(database, "PurchasePolicies");
-            DAO_Lottery = new DAO<DTO_Lottery>(database, "PurchasePolicies");
-            DAO_MaxProductPolicy = new DAO<DTO_MaxProductPolicy>(database, "PurchasePolicies");
-            DAO_MinAgePolicy = new DAO<DTO_MinAgePolicy>(database, "PurchasePolicies");
-            DAO_MinProductPolicy = new DAO<DTO_MinProductPolicy>(database, "PurchasePolicies");
-            DAO_Offer = new DAO<DTO_Offer>(database, "PurchasePolicies");
-            DAO_RestrictedHoursPolicy = new DAO<DTO_RestrictedHoursPolicy>(database, "PurchasePolicies");
-            DAO_AndPolicy = new DAO<DTO_AndPolicy>(database, "PurchasePolicies");
-            DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "PurchasePolicies");
-            DAO_BuyNow = new DAO<DTO_BuyNow>(database, "PurchasePolicies");
-            DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "PurchasePolicies");
-            DAO_VisibleDiscount = new DAO<DTO_VisibleDiscount>(database, "DiscountPolicies");
-            DAO_DiscountTargetCategories = new DAO<DTO_DiscountTargetCategories>(database, "DiscountPolicies");
-            DAO_DiscountTargetProducts = new DAO<DTO_DiscountTargetProducts>(database, "DiscountPolicies");
-            DAO_DiscreetDiscount = new DAO<DTO_DiscreetDiscount>(database, "DiscountPolicies");
-            DAO_ConditionalDiscount = new DAO<DTO_ConditionalDiscount>(database, "DiscountPolicies");
-            DAO_MinProductCondition = new DAO<DTO_MinProductCondition>(database, "DiscountPolicies");
-            DAO_MinBagPriceCondition = new DAO<DTO_MinBagPriceCondition>(database, "DiscountPolicies");
-            DAO_MaxProductCondition = new DAO<DTO_MaxProductCondition>(database, "DiscountPolicies");
-            DAO_DiscountConditionOr = new DAO<DTO_DiscountConditionOr>(database, "DiscountPolicies");
-            DAO_DiscountConditionAnd = new DAO<DTO_DiscountConditionAnd>(database, "DiscountPolicies");
-            DAO_DiscountXor = new DAO<DTO_DiscountXor>(database, "DiscountPolicies");
-            DAO_DiscountOr = new DAO<DTO_DiscountOr>(database, "DiscountPolicies");
-            DAO_DiscountMin = new DAO<DTO_DiscountMin>(database, "DiscountPolicies");
-            DAO_DiscountMax = new DAO<DTO_DiscountMax>(database, "DiscountPolicies");
-            DAO_DiscountAnd = new DAO<DTO_DiscountAnd>(database, "DiscountPolicies");
-            DAO_DiscountAddition = new DAO<DTO_DiscountAddition>(database, "DiscountPolicies");
-            DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
+                //DAOs
+                DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
+                DAO_Product = new DAO<DTO_Product>(database, "Products");
+                DAO_StoreManager = new DAO<DTO_StoreManager>(database, "StoreStaffs");
+                DAO_StoreOwner = new DAO<DTO_StoreOwner>(database, "StoreStaffs");
+                DAO_SystemAdmins = new DAO<DTO_SystemAdmins>(database, "SystemAdmins");
+                DAO_Store = new DAO<DTO_Store>(database, "Stores");
+                DAO_Auction = new DAO<DTO_Auction>(database, "PurchasePolicies");
+                DAO_Lottery = new DAO<DTO_Lottery>(database, "PurchasePolicies");
+                DAO_MaxProductPolicy = new DAO<DTO_MaxProductPolicy>(database, "PurchasePolicies");
+                DAO_MinAgePolicy = new DAO<DTO_MinAgePolicy>(database, "PurchasePolicies");
+                DAO_MinProductPolicy = new DAO<DTO_MinProductPolicy>(database, "PurchasePolicies");
+                DAO_Offer = new DAO<DTO_Offer>(database, "PurchasePolicies");
+                DAO_RestrictedHoursPolicy = new DAO<DTO_RestrictedHoursPolicy>(database, "PurchasePolicies");
+                DAO_AndPolicy = new DAO<DTO_AndPolicy>(database, "PurchasePolicies");
+                DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "PurchasePolicies");
+                DAO_BuyNow = new DAO<DTO_BuyNow>(database, "PurchasePolicies");
+                DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "PurchasePolicies");
+                DAO_VisibleDiscount = new DAO<DTO_VisibleDiscount>(database, "DiscountPolicies");
+                DAO_DiscountTargetCategories = new DAO<DTO_DiscountTargetCategories>(database, "DiscountPolicies");
+                DAO_DiscountTargetProducts = new DAO<DTO_DiscountTargetProducts>(database, "DiscountPolicies");
+                DAO_DiscreetDiscount = new DAO<DTO_DiscreetDiscount>(database, "DiscountPolicies");
+                DAO_ConditionalDiscount = new DAO<DTO_ConditionalDiscount>(database, "DiscountPolicies");
+                DAO_MinProductCondition = new DAO<DTO_MinProductCondition>(database, "DiscountPolicies");
+                DAO_MinBagPriceCondition = new DAO<DTO_MinBagPriceCondition>(database, "DiscountPolicies");
+                DAO_MaxProductCondition = new DAO<DTO_MaxProductCondition>(database, "DiscountPolicies");
+                DAO_DiscountConditionOr = new DAO<DTO_DiscountConditionOr>(database, "DiscountPolicies");
+                DAO_DiscountConditionAnd = new DAO<DTO_DiscountConditionAnd>(database, "DiscountPolicies");
+                DAO_DiscountXor = new DAO<DTO_DiscountXor>(database, "DiscountPolicies");
+                DAO_DiscountOr = new DAO<DTO_DiscountOr>(database, "DiscountPolicies");
+                DAO_DiscountMin = new DAO<DTO_DiscountMin>(database, "DiscountPolicies");
+                DAO_DiscountMax = new DAO<DTO_DiscountMax>(database, "DiscountPolicies");
+                DAO_DiscountAnd = new DAO<DTO_DiscountAnd>(database, "DiscountPolicies");
+                DAO_DiscountAddition = new DAO<DTO_DiscountAddition>(database, "DiscountPolicies");
+                DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
 
-            // IdentityMaps  <Id , object>
-            RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
-            GuestUsers = new ConcurrentDictionary<String, GuestUser>();
-            Products = new ConcurrentDictionary<String, Product>();
-            StoreManagers = new ConcurrentDictionary<String, LinkedList<StoreManager>>();
-            StoreOwners = new ConcurrentDictionary<String, LinkedList<StoreOwner>>();
-            Stores = new ConcurrentDictionary<String, Store>();
-            Policy_Auctions = new ConcurrentDictionary<String, Auction>();
-            Policy_Lotterys = new ConcurrentDictionary<String, Lottery>();
-            Policy_MaxProductPolicys = new ConcurrentDictionary<String, MaxProductPolicy>();
-            Policy_MinAgePolicys = new ConcurrentDictionary<String, MinAgePolicy>();
-            Policy_MinProductPolicys = new ConcurrentDictionary<String, MinProductPolicy>();
-            Policy_Offers = new ConcurrentDictionary<String, Offer>();
-            Policy_RestrictedHoursPolicys = new ConcurrentDictionary<String, RestrictedHoursPolicy>();
-            Policy_AndPolicys = new ConcurrentDictionary<String, AndPolicy>();
-            Policy_OrPolicys = new ConcurrentDictionary<String, OrPolicy>();
-            Policy_BuyNows = new ConcurrentDictionary<String, BuyNow>();
-            Policy_ConditionalPolicys = new ConcurrentDictionary<String, ConditionalPolicy>();
-            Discount_VisibleDiscounts = new ConcurrentDictionary<String, VisibleDiscount>();
-            Discount_DiscountTargetCategories = new ConcurrentDictionary<String, DiscountTargetCategories>();
-            Discount_DiscountTargetProducts = new ConcurrentDictionary<String, DiscountTargetProducts>();
-            Discount_DiscreetDiscounts = new ConcurrentDictionary<String, DiscreetDiscount>();
-            Discount_ConditionalDiscounts = new ConcurrentDictionary<String, ConditionalDiscount>();
-            Discount_MinProductConditions = new ConcurrentDictionary<String, MinProductCondition>();
-            Discount_MinBagPriceConditions = new ConcurrentDictionary<String, MinBagPriceCondition>();
-            Discount_MaxProductConditions = new ConcurrentDictionary<String, MaxProductCondition>();
-            Discount_DiscountConditionOrs = new ConcurrentDictionary<String, DiscountConditionOr>();
-            Discount_DiscountConditionAnds = new ConcurrentDictionary<String, DiscountConditionAnd>();
-            Discount_DiscountXors = new ConcurrentDictionary<String, DiscountXor>();
-            Discount_DiscountOrs = new ConcurrentDictionary<String, DiscountOr>();
-            Discount_DiscountMins = new ConcurrentDictionary<String, DiscountMin>();
-            Discount_DiscountMaxs = new ConcurrentDictionary<String, DiscountMax>();
-            Discount_DiscountAnds = new ConcurrentDictionary<String, DiscountAnd>();
-            Discount_DiscountAdditions = new ConcurrentDictionary<String, DiscountAddition>();
+                // IdentityMaps  <Id , object>
+                RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
+                GuestUsers = new ConcurrentDictionary<String, GuestUser>();
+                Products = new ConcurrentDictionary<String, Product>();
+                StoreManagers = new ConcurrentDictionary<String, LinkedList<StoreManager>>();
+                StoreOwners = new ConcurrentDictionary<String, LinkedList<StoreOwner>>();
+                Stores = new ConcurrentDictionary<String, Store>();
+                Policy_Auctions = new ConcurrentDictionary<String, Auction>();
+                Policy_Lotterys = new ConcurrentDictionary<String, Lottery>();
+                Policy_MaxProductPolicys = new ConcurrentDictionary<String, MaxProductPolicy>();
+                Policy_MinAgePolicys = new ConcurrentDictionary<String, MinAgePolicy>();
+                Policy_MinProductPolicys = new ConcurrentDictionary<String, MinProductPolicy>();
+                Policy_Offers = new ConcurrentDictionary<String, Offer>();
+                Policy_RestrictedHoursPolicys = new ConcurrentDictionary<String, RestrictedHoursPolicy>();
+                Policy_AndPolicys = new ConcurrentDictionary<String, AndPolicy>();
+                Policy_OrPolicys = new ConcurrentDictionary<String, OrPolicy>();
+                Policy_BuyNows = new ConcurrentDictionary<String, BuyNow>();
+                Policy_ConditionalPolicys = new ConcurrentDictionary<String, ConditionalPolicy>();
+                Discount_VisibleDiscounts = new ConcurrentDictionary<String, VisibleDiscount>();
+                Discount_DiscountTargetCategories = new ConcurrentDictionary<String, DiscountTargetCategories>();
+                Discount_DiscountTargetProducts = new ConcurrentDictionary<String, DiscountTargetProducts>();
+                Discount_DiscreetDiscounts = new ConcurrentDictionary<String, DiscreetDiscount>();
+                Discount_ConditionalDiscounts = new ConcurrentDictionary<String, ConditionalDiscount>();
+                Discount_MinProductConditions = new ConcurrentDictionary<String, MinProductCondition>();
+                Discount_MinBagPriceConditions = new ConcurrentDictionary<String, MinBagPriceCondition>();
+                Discount_MaxProductConditions = new ConcurrentDictionary<String, MaxProductCondition>();
+                Discount_DiscountConditionOrs = new ConcurrentDictionary<String, DiscountConditionOr>();
+                Discount_DiscountConditionAnds = new ConcurrentDictionary<String, DiscountConditionAnd>();
+                Discount_DiscountXors = new ConcurrentDictionary<String, DiscountXor>();
+                Discount_DiscountOrs = new ConcurrentDictionary<String, DiscountOr>();
+                Discount_DiscountMins = new ConcurrentDictionary<String, DiscountMin>();
+                Discount_DiscountMaxs = new ConcurrentDictionary<String, DiscountMax>();
+                Discount_DiscountAnds = new ConcurrentDictionary<String, DiscountAnd>();
+                Discount_DiscountAdditions = new ConcurrentDictionary<String, DiscountAddition>();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                Environment.Exit(1);
+            }
+
 
     }
 
