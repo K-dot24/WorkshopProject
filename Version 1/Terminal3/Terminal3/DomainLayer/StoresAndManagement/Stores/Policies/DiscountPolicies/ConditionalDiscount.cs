@@ -40,7 +40,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public override Result<bool> AddDiscount(String id, IDiscountPolicy discount)
         {
             if (Id == id)
+            {
                 Discount = discount;
+                return new Result<bool>("", true, true);
+            }
             else if(Discount != null)
                 return Discount.AddDiscount(id, discount);
             return new Result<bool>("", true, false);
@@ -62,7 +65,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public override Result<bool> AddCondition(string id, IDiscountCondition condition)
         {
             if (Id == id)
+            {
                 Condition = condition;
+                return new Result<bool>("", true, true);
+            }
             else if (Condition != null)
                 return Condition.AddCondition(id, condition);
             return new Result<bool>("", true, false);

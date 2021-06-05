@@ -1,9 +1,9 @@
 import { React, useState, useEffect } from 'react';
-import { Container, CssBaseline } from '@material-ui/core';
+import { Container, CssBaseline, Typography, Avatar } from '@material-ui/core';
 import { TreeView, TreeItem } from '@material-ui/lab';
-import { ExpandMore, ChevronRight } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/core/styles';
+import { ExpandMore, ChevronRight, Receipt } from '@material-ui/icons';
 
+import useStyles from './styles';
 import { GetDiscountPolicyData, GetPurchasePolicyData, printErrorMessage } from '../../../../api/API';
 
 const mockData = {
@@ -27,28 +27,6 @@ const mockData = {
     ],
 };
 
-//#region Styles
-const useStyles = makeStyles((theme) => ({
-    root: {
-      height: 110,
-      flexGrow: 1,
-      maxWidth: 400,
-    },
-    toolbar: theme.mixins.toolbar,
-    layout: {
-        marginTop: '5%',
-        width: 'auto',
-        marginLeft: theme.spacing(2),
-        marginRight: theme.spacing(2),
-        [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
-            width: 600,
-            marginLeft: 'auto',
-            marginRight: 'auto',
-        },
-    },
-}));
-//#endregion
-
 const Policy = ({ match, storeID }) => {
     const [data, setData] = useState(null);
     const classes = useStyles();
@@ -68,7 +46,19 @@ const Policy = ({ match, storeID }) => {
     //#endregion
 
     const renderTree = (nodes) => (
-        <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.name}>
+        <TreeItem key={nodes.id} nodeId={nodes.id} 
+                // label={nodes.name}
+                label={
+                    <div className={classes.labelRoot}>
+                      <Typography variant="body2" className={classes.labelText}>
+                        {nodes.name}
+                      </Typography>
+                      <Typography variant="caption" color="inherit">
+                        {nodes.id}
+                      </Typography>
+                    </div>
+                  }
+        >
             {Array.isArray(nodes.children) ? nodes.children.map((node) => renderTree(node)) : null}
         </TreeItem>
     );
@@ -80,27 +70,31 @@ const Policy = ({ match, storeID }) => {
             handleGetPurchasePolicyData();
     }, [])
 
-    useEffect(() => {
-        console.log(data);
-    }, [data])
+    // useEffect(() => {
+    //     console.log(data);
+    // }, [data])
 
     return (
-    <>
-        <div className={classes.toolbar} />
-        <main className={classes.layout}>
-            <Container component="main" maxWidth="xs">
-                <CssBaseline />
+        <Container component="main" maxWidth="xs">
+            <CssBaseline />
+            <div className={classes.paper}>
+                <Avatar className={classes.avatar}>
+                    <Receipt />
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                    {match.url.includes('getdiscountpolicy') ? "Discount Policy Tree" : "Purchase Policy Tree"}
+                </Typography>
+                <br/>
                 <TreeView
                     className={classes.root}
                     defaultCollapseIcon={<ExpandMore />}
-                    defaultExpanded={['root']}
+                    // defaultExpanded={['root']}
                     defaultExpandIcon={<ChevronRight />}
                 >
-                    {renderTree(mockData)}
+                    {data !== null && renderTree(data)}
                 </TreeView>
-            </Container>
-        </main> 
-    </>
+            </div>
+        </Container>
     );
 }
 

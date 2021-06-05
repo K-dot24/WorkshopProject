@@ -236,12 +236,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
-    // TODO: Display information to user (+ check business returns actual data)
-    const handleGetDiscountPolicyData = () => {
-        GetDiscountPolicyData(store.id).then(response => response.ok ? 
-            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
-    }
-
     //#endregion
 
     //#region Purchase Policy Functions
@@ -286,12 +280,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     const handleRemovePurchasePolicy = (data) => {
         RemovePurchasePolicy(store.id, data.nodeid).then(response => response.ok ? 
             response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
-    }
-
-    // TODO: Display information to user (+ check business returns actual data)
-    const handleGetPurchasePolicyData = () => {
-        GetPurchasePolicyData(store.id).then(response => response.ok ? 
-            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     //#endregion
@@ -455,11 +443,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 />
 
                 { /* Get Discount Policy Data */}
-                {/* <Route exact path={match.url + `/getdiscountpolicy`} 
-                    render={(props) => (<Action name='Get Discount Policy Data'  
-                                                handleAction={handleGetDiscountPolicyData} {...props} />)} 
-                /> */}
-
                 <Route exact path={match.url + `/getdiscountpolicy`} 
                     render={(props) => (<Policy storeID={store.id} {...props} />)} 
                 />
@@ -491,15 +474,9 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 />
 
                 { /* Get Purchase Policy Data */}
-                {/* <Route exact path={match.url + `/getpurchasepolicy`} 
-                    render={(props) => (<Action name='Get Purchase Policy Data'  
-                                                handleAction={handleGetPurchasePolicyData} {...props} />)} 
-                /> */}
-
                 <Route exact path={match.url + `/getpurchasepolicy`} 
                     render={(props) => (<Policy storeID={store.id} {...props} />)} 
                 />
-
 
             </Switch>
         </div>
