@@ -13,8 +13,8 @@ namespace XUnitTestTerminal3
         private string igor_id;
         private string store_id;
         private string product_id;
-        private IDictionary<String, Object> paymentDetails;
-        private IDictionary<String, Object> deliveryDetails;
+        //private IDictionary<String, Object> paymentDetails;
+        //private IDictionary<String, Object> deliveryDetails;
         private BlockingCollection<bool> results;
         public PurchaseConcurrencyTest() : base()
         {
@@ -24,7 +24,7 @@ namespace XUnitTestTerminal3
             this.igor_id = sut.Login("igor@gmail.com", "igor").Data;
             this.store_id = sut.OpenNewStore("test_store", kfir_id).Data;
             this.product_id = sut.AddProductToStore(kfir_id, store_id, "test_product", 10, 1, "test").Data;
-            paymentDetails = new Dictionary<String, Object>
+            /*paymentDetails = new Dictionary<String, Object>
                     {
                      { "card_number", "2222333344445555" },
                      { "month", "4" },
@@ -40,12 +40,29 @@ namespace XUnitTestTerminal3
                      { "city", "Beer Sheva" },
                      { "country", "Israel" },
                      { "zip", "8458527" }
-                    };
+                    };*/
             results = new BlockingCollection<bool>();
         }
 
         internal void ThreadWork(string user_id)
         {
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>
+                    {
+                     { "card_number", "2222333344445555" },
+                     { "month", "4" },
+                     { "year", "2021" },
+                     { "holder", "Israel Israelovice" },
+                     { "ccv", "262" },
+                     { "id", "20444444" }
+                    };
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>
+                    {
+                     { "name", "Israel Israelovice" },
+                     { "address", "Rager Blvd 12" },
+                     { "city", "Beer Sheva" },
+                     { "country", "Israel" },
+                     { "zip", "8458527" }
+                    };
             sut.AddProductToCart(user_id, product_id, 1, store_id);
             bool result = sut.Purchase(user_id, paymentDetails, deliveryDetails).Data == null;
             results.TryAdd(result);
