@@ -11,7 +11,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         List<Product> getTargets(ConcurrentDictionary<Product, int> products);
 
-        Result<IDictionary<string, object>> GetData();
+        Result<String> GetData();
 
         String getId();
 

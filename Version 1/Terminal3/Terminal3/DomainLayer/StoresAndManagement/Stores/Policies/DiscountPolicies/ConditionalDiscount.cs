@@ -83,19 +83,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public override Result<IDictionary<string, object>> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() {
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() {
                 { "type", "VisibleDiscount" },
                 { "Id", Id },               
                 { "Condition", null },
                 { "Discount", null }
+            };*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Conditional"},
+                { "children", new Dictionary<String, object>[0] }
             };
-
+            List<IDictionary<String, object>> children = new List<IDictionary<string, object>>();
             if (Condition != null)
             {
                 Result<IDictionary<string, object>> conditionDataResult = Condition.GetData();
                 if (!conditionDataResult.ExecStatus)
                     return conditionDataResult;
-                dict["Condition"] = conditionDataResult.Data;
+                children.Add(conditionDataResult.Data);
             }
 
             if (Discount!= null)
@@ -103,8 +108,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 Result<IDictionary<string, object>> discountDataResult = Discount.GetData();
                 if (!discountDataResult.ExecStatus)
                     return discountDataResult;
-                dict["Discount"] = discountDataResult.Data;
+                children.Add(discountDataResult.Data);
             }
+            dict["children"] = children.ToArray();
 
             return new Result<IDictionary<string, object>>("", true, dict);
         }

@@ -103,20 +103,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public override Result<IDictionary<string, object>> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() { 
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
                 { "type", "VisibleDiscount" }, 
                 { "Id", Id }, 
                 { "ExpirationDate", ExpirationDate }, 
                 { "percentage", Percentage }, 
                 { "Target", null } 
-            }; 
+            };*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Visible expires on " + ExpirationDate.ToString() + ", " +Percentage + "% on "},
+                { "children", new Dictionary<String, object>[0] }
+            };
 
             if (Target != null)
             {
-                Result<IDictionary<string, object>> targetDataResult = Target.GetData();
+                Result<String> targetDataResult = Target.GetData();
                 if (!targetDataResult.ExecStatus)
-                    return targetDataResult;
-                dict["Target"] = targetDataResult.Data;
+                    return new Result<IDictionary<string, object>>(targetDataResult.Message, false, null);
+                dict["name"] = dict["name"] + targetDataResult.Data;
             }
 
             return new Result<IDictionary<string, object>>("", true, dict);

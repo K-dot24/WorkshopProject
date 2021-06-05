@@ -145,33 +145,40 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public override Result<IDictionary<string, object>> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() { 
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
                 {"type","DiscountXor" },
                 {"Discount1",null },
                 {"Discount2",null },
                 {"ChoosingCondition",null}
 
+            };*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Xor"},
+                { "children", new Dictionary<String, object>[0] }
             };
+            List<IDictionary<string, object>> children = new List<IDictionary<string, object>>();
+            if (ChoosingCondition != null)
+            {
+                Result<IDictionary<string, object>> ChoosingConditionResult = ChoosingCondition.GetData();
+                if (!ChoosingConditionResult.ExecStatus)
+                    return ChoosingConditionResult;
+                children.Add(ChoosingConditionResult.Data);
+            }
             if (Discount1 != null) {
                 Result<IDictionary<string, object>> discount1Result = Discount1.GetData();
                 if (!discount1Result.ExecStatus)
                     return discount1Result;
-                dict["Discount1"] = discount1Result.Data;
+                children.Add(discount1Result.Data);
             }
             if (Discount2 != null)
             {
                 Result<IDictionary<string, object>> discount2Result = Discount2.GetData();
                 if (!discount2Result.ExecStatus)
                     return discount2Result;
-                dict["Discount2"] = discount2Result.Data;
+                children.Add(discount2Result.Data);
             }
-            if (ChoosingCondition != null)
-            {
-                Result<IDictionary<string, object>> ChoosingConditionResult = ChoosingCondition.GetData();
-                if (!ChoosingConditionResult.ExecStatus)
-                    return ChoosingConditionResult;
-                dict["ChoosingCondition"] = ChoosingConditionResult.Data;
-            }
+            dict["children"] = children.ToArray();
             return new Result<IDictionary<string, object>>("", true, dict);
         }
 
