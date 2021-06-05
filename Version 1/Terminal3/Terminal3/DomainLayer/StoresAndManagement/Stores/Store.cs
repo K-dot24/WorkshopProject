@@ -64,7 +64,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, StoreOwner> Owners { get; set; }
         public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
-        public PolicyManager PolicyManager { get; }
+        public PolicyManager PolicyManager { get; set; }
         public History History { get; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }

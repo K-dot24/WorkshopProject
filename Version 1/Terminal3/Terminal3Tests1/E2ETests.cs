@@ -14,7 +14,7 @@ namespace Terminal3_E2ETests
         public E2ETests()
         { }
 
-        [Fact]
+        [Fact()]
         public void BadMongoUrlConfig()
         {
             String config_path = @"..\Terminal3\BadMongoUrlConfig.json";
@@ -23,7 +23,7 @@ namespace Terminal3_E2ETests
             Assert.True(system.Register("shaked@gmail.com", "123").ExecStatus);
         }
 
-        [Fact]
+        [Fact()]
         public void BadExternalSystemUrlConfig()
         {
             String config_path = @"..\Terminal3\BadExternalSystemConfig.json";
@@ -46,7 +46,7 @@ namespace Terminal3_E2ETests
             Assert.True(res.ExecStatus);
         }
 
-        [Fact]
+        [Fact()]
         public void InvalidConfig()
         {
             String config_path = @"..\Terminal3\InvalidConfig.json";

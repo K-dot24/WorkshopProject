@@ -18,7 +18,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountComposition;
 using System.Reflection;
 using Newtonsoft.Json;
-
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -1195,7 +1195,9 @@ namespace Terminal3.DataAccessLayer
             s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , dto.isClosed);
 
             Stores.TryAdd(s.Id, s);
-            s.PolicyManager = new DomainLayer.StoresAndManagement.Stores.Policies.PolicyManager();
+            DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.DiscountRoot._id));
+            BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.PurchaseRoot._id));
+            s.PolicyManager = new PolicyManager(MainDiscount, MainPolicy);
             StoreOwner founder = getOwnershipTree(s, dto.Founder);
 
             s.Founder = founder;
