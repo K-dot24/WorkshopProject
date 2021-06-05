@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
@@ -12,23 +13,25 @@ namespace Terminal3_E2ETests
 {
     public class E2ETests
     {
+        String BadMongoURLPath = @"..\netcoreapp3.1\BadMongoUrlConfig.json";
+        String BadExternalSystemUrlPath = @"..\netcoreapp3\BadExternalSystemConfig.json";
+        String InvalidConfigPath = @"..\netcoreapp3\InvalidConfig.json";
+
         public E2ETests()
         { }
 
         [Fact()]
+        [Trait("Category","InitConfigTests")]
         public void BadMongoUrlConfig()
         {
-            String config_path = @"..\Terminal3\BadMongoUrlConfig.json";
-            ECommerceSystem system = new ECommerceSystem(config_path);
-
-            Assert.True(system.Register("shaked@gmail.com", "123").ExecStatus);
+            ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(BadMongoURLPath)); 
         }
 
         [Fact()]
+        [Trait("Category", "InitConfigTests")]
         public void BadExternalSystemUrlConfig()
         {
-            String config_path = @"..\Terminal3\BadExternalSystemConfig.json";
-            ECommerceSystem system = new ECommerceSystem(config_path);
+            ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(BadExternalSystemUrlPath));
 
             system.Register("shaked@gmail.com", "123");
             Result<RegisteredUserService> user = system.Login("shaked@gmail.com", "123");
@@ -44,14 +47,15 @@ namespace Terminal3_E2ETests
             IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>();
 
             Result<ShoppingCartService> res = system.Purchase(user.Data.Id, paymentDetails, deliveryDetails);
-            Assert.True(res.ExecStatus);
+            Assert.False(res.ExecStatus);
         }
 
         [Fact()]
+        [Trait("Category", "InitConfigTests")]
         public void InvalidConfig()
         {
-            String config_path = @"..\Terminal3\InvalidConfig.json";
-            new ECommerceSystem(config_path);
+ 
+            new ECommerceSystem(configData: File.ReadAllText(InvalidConfigPath));
         }
 
 

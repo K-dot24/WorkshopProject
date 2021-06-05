@@ -84,11 +84,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 Result<Product> res_s = store.AddNewProduct(userID, productName, price, initialQuantity, category, keywords);
 
                 // Update Store in DB
-                mapper.Create(res_s.Data);
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-                var update = Builders<BsonDocument>.Update.Set("InventoryManager", store.getDTO().InventoryManager);
-                mapper.UpdateStore(filter, update);
-
+                if (res_s.ExecStatus)
+                {
+                    mapper.Create(res_s.Data);
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var update = Builders<BsonDocument>.Update.Set("InventoryManager", store.getDTO().InventoryManager);
+                    mapper.UpdateStore(filter, update);
+                }
                 return res_s;   
             }
             //else failed
@@ -122,19 +124,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             if (Stores.TryGetValue(storeID, out Store store))     // Check if storeID exists
             {
                 Result<Product> res_p =  store.EditProduct(userID, productID, details);
-
-                // Update Product in DB
-                DTO_Product p_dto = res_p.Data.getDTO(); 
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", p_dto._id);
-                var update = Builders<BsonDocument>.Update.Set("Name", p_dto.Name)
-                                                          .Set("Price", p_dto.Price)
-                                                          .Set("Quantity", p_dto.Quantity)
-                                                          .Set("Category", p_dto.Category)
-                                                          .Set("Rating", p_dto.Rating)
-                                                          .Set("NumberOfRates", p_dto.NumberOfRates)
-                                                          .Set("Keywords" , p_dto.Keywords)
-                                                          .Set("Review", p_dto.Review);
-                mapper.UpdateProduct(filter, update);
+                if (res_p.ExecStatus)
+                {
+                    // Update Product in DB
+                    DTO_Product p_dto = res_p.Data.getDTO();
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", p_dto._id);
+                    var update = Builders<BsonDocument>.Update.Set("Name", p_dto.Name)
+                                                              .Set("Price", p_dto.Price)
+                                                              .Set("Quantity", p_dto.Quantity)
+                                                              .Set("Category", p_dto.Category)
+                                                              .Set("Rating", p_dto.Rating)
+                                                              .Set("NumberOfRates", p_dto.NumberOfRates)
+                                                              .Set("Keywords", p_dto.Keywords)
+                                                              .Set("Review", p_dto.Review);
+                    mapper.UpdateProduct(filter, update);
+                }
 
                 return res_p;
             }

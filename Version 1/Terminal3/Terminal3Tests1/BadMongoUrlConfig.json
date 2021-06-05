@@ -1,0 +1,7 @@
+{
+  "email": "Admin@terminal3.com",
+  "password": "Admin123",
+  "signalRServer_url": "https://localhost:4001/signalr/notification",
+  "mongoDB_url": "",
+  "externalSystem_url": "https://cs-bgu-wsep.herokuapp.com/"
+}
