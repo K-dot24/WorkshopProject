@@ -325,7 +325,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     useEffect(() => {
         fetchProducts();
         console.log("store id: " + store.id);
-        console.log(products);
     }, []);
 
     return (

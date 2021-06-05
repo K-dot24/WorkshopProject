@@ -19,9 +19,9 @@ const Product = ({ product, onAddToBag }) => {
                     <Typography variant="h5">
                         {product.price}₪
                     </Typography>
-                    {/* <Typography variant="subtitle2">
+                    <Typography variant="subtitle2">    {/* TODO: Maybe somehow show only to staff */}
                         {product.id}
-                    </Typography> */}
+                    </Typography>
                 </div>
                 <Typography variant="body2" color="textSecondary">{product.category}</Typography>
             </CardContent>
