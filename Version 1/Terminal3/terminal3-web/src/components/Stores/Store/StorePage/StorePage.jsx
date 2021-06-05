@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
-import { Products, Navbar, Cart, Action, CheckboxList } from '../../../../components';
+import { Products, Navbar, Cart, Action, CheckboxList, Policy } from '../../../../components';
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
         AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct,
         printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
@@ -236,12 +236,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
-    // TODO: Display information to user (+ check business returns actual data)
-    const handleGetDiscountPolicyData = () => {
-        GetDiscountPolicyData(store.id).then(response => response.ok ? 
-            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
-    }
-
     //#endregion
 
     //#region Purchase Policy Functions
@@ -288,12 +282,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
-    // TODO: Display information to user (+ check business returns actual data)
-    const handleGetPurchasePolicyData = () => {
-        GetPurchasePolicyData(store.id).then(response => response.ok ? 
-            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
-    }
-
     //#endregion
 
     //#endregion
@@ -325,7 +313,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     useEffect(() => {
         fetchProducts();
         console.log("store id: " + store.id);
-        console.log(products);
     }, []);
 
     return (
@@ -457,8 +444,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
                 { /* Get Discount Policy Data */}
                 <Route exact path={match.url + `/getdiscountpolicy`} 
-                    render={(props) => (<Action name='Get Discount Policy Data'  
-                                                handleAction={handleGetDiscountPolicyData} {...props} />)} 
+                    render={(props) => (<Policy storeID={store.id} {...props} />)} 
                 />
 
                 {/* Add Purchase Policy */}
@@ -489,10 +475,8 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
                 { /* Get Purchase Policy Data */}
                 <Route exact path={match.url + `/getpurchasepolicy`} 
-                    render={(props) => (<Action name='Get Purchase Policy Data'  
-                                                handleAction={handleGetPurchasePolicyData} {...props} />)} 
+                    render={(props) => (<Policy storeID={store.id} {...props} />)} 
                 />
-
 
             </Switch>
         </div>
