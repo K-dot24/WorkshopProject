@@ -40,7 +40,7 @@ const Policy = ({ match, storeID }) => {
 
     const handleGetPurchasePolicyData = () => {
         GetPurchasePolicyData(storeID).then(response => response.ok ? 
-            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => alert(err));
+            response.json().then(result => setData(result.data)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     //#endregion
@@ -68,7 +68,7 @@ const Policy = ({ match, storeID }) => {
             handleGetDiscountPolicyData();
         else if (match.url.includes('getpurchasepolicy'))
             handleGetPurchasePolicyData();
-    }, [])
+    }, [match])
 
     // useEffect(() => {
     //     console.log(data);

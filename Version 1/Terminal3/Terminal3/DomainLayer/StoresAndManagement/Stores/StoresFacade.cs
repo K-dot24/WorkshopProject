@@ -839,7 +839,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         private void UpdatePolicyRoot(BuyNow purchaseRoot)
         {
-            mapper.DeleteDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
+            mapper.DeleteBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
             mapper.Create(purchaseRoot);
         }
     }
