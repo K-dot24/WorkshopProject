@@ -16,6 +16,7 @@ using System.IO;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace Terminal3.ServiceLayer
 {   
@@ -39,18 +40,19 @@ namespace Terminal3.ServiceLayer
 
 
         //Constructor
-        public ECommerceSystem(String config_path = @"..\..\..\..\Terminal3\Config.json")
+        public ECommerceSystem(String config_path = @"..\Terminal3\Config.json",string configData="")
         {
 
-            /*Initializer.init(StoresAndManagement,
-                            GuestUserInterface,
-                            RegisteredUserInterface,
-                            StoreStaffInterface,
-                            SystemAdminInterface, 
-                            DataController, 
-                            NotificationService, this.connection);*/
+            Config config;
+            if (!(configData.Equals(String.Empty))) {
+                config = JsonConvert.DeserializeObject<Config>(configData);
 
-            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(config_path));
+            }
+            else
+            {
+                config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(config_path));
+
+            }
 
             //validate JSON
             if( (config.externalSystem_url is null) || (config.mongoDB_url is null) || (config.signalRServer_url is null)
