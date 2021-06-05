@@ -758,6 +758,5 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             { return new Result<List<Tuple<DateTime, Double>>>("End date cannot be before start date", false, null); }
         }
 
-       
     }
 }
