@@ -42,7 +42,6 @@ namespace Terminal3.ServiceLayer
         //Constructor
         public ECommerceSystem(String config_path = @"..\Terminal3\Config.json",string configData="")
         {
-
             Config config;
             if (!(configData.Equals(String.Empty))) {
                 config = JsonConvert.DeserializeObject<Config>(configData);
