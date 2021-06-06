@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import { AppBar, Toolbar, IconButton, Badge, MenuItem, Menu, Typography, Button, InputBase, 
         List, ListItem, ListItemText, Collapse } from '@material-ui/core';
 import { ShoppingCart, LocalMall, Menu as MenuIcon, Notifications as NotificationsIcon, Search as SearchIcon,
@@ -78,9 +78,9 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
         )
     };
 
-    const StoreActions = () => {
+    const StoreActions = forwardRef((props, ref) => {
         return (
-        <>
+        <div ref={ref} {...props}>
             {allActions.map((action, index) => permissions[index] && 
                         (
                             action === 'Discount Policy' ? 
@@ -97,9 +97,9 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                         )  
             )}
             <MenuItem key="getIncome" onClick={() => handleMenuClick(`/stores/${storeId}/getincomesbyday`)}>Get Incomes by Day</MenuItem>
-        </>
+        </div>
         );
-    };
+    });
 
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
