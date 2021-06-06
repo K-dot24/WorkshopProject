@@ -577,14 +577,13 @@ export function RemoveSystemAdmin( sysAdminID, email ) {
 
 /// Reset the system, including all the stored data
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
-export function ResetSystem( data ) {
-    return fetch(`https://localhost:5000/api/SystemAdmin/ResetSystem/${data.sysAdminID}`, {
-        method: 'POST',                                       
+export function ResetSystem( sysAdminID ) {
+    return fetch(`https://localhost:5000/api/SystemAdmin/ResetSystem/${sysAdminID}`, {
+        method: 'PUT',                                       
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 

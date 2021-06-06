@@ -198,10 +198,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));     
 
             }) : null).catch(err => console.log(err));
-
-        // SetPermissions({storeID: store.id, managerID: managerID.managerid, ownerID: user.id, permissions})
-        //     .then(response => response.ok ?
-        //         response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     const handleRemovePermissions = (permissions, managerID) => {

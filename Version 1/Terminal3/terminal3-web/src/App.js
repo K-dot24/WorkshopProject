@@ -8,7 +8,7 @@ import { HubConnectionBuilder } from '@microsoft/signalr';
 import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products, Review } from './components';
 import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
         GetUserShoppingCart, UpdateShoppingCart, EnterSystem, SearchProduct, GetTotalShoppingCartPrice,
-        GetUserPurchaseHistory, AddSystemAdmin, RemoveSystemAdmin, printErrorMessage } from './api/API';
+        GetUserPurchaseHistory, AddSystemAdmin, RemoveSystemAdmin, printErrorMessage, ResetSystem } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -175,6 +175,12 @@ const App = () => {
     const handleRemoveSystemAdmin = async (data) => {
         RemoveSystemAdmin(user.id, data.email).then(response => response.ok ? 
             response.json().then(result => setSystemAdmins(prev => prev.filter(id => id !== result.data.id)) & alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
+    }
+
+    // TODO: Check
+    const handleResetSystem = async () => {
+        ResetSystem(user.id).then(response => response.ok ? 
+            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
     //#endregion
@@ -347,7 +353,7 @@ const App = () => {
                         {systemAdmins.includes(user.id) && (
                             <Route exact path={`/${user.id}/addsystemadmin`} 
                                     render={(props) => (<Action name='Add System Admin' fields={[{name: 'Email', required: true}]} 
-                                    handleAction={handleAddSystemAdmin} {...props} />)} 
+                                                                handleAction={handleAddSystemAdmin} {...props} />)} 
                             />
                         )}
 
@@ -355,7 +361,15 @@ const App = () => {
                         {systemAdmins.includes(user.id) && (
                             <Route exact path={`/${user.id}/removesystemadmin`} 
                                     render={(props) => (<Action name='Remove System Admin' fields={[{name: 'Email', required: true}]} 
-                                    handleAction={handleRemoveSystemAdmin} {...props} />)} 
+                                                                handleAction={handleRemoveSystemAdmin} {...props} />)} 
+                            />
+                        )}
+
+                        {/* Reset System Page */}
+                        {systemAdmins.includes(user.id) && (
+                            <Route exact path={`/${user.id}/resetsystem`} 
+                                    render={(props) => (<Action name='Reset System' 
+                                                                handleAction={handleResetSystem} {...props} />)} 
                             />
                         )}
                         
