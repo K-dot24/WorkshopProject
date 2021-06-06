@@ -206,7 +206,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 response.json().then(message => console.log(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
-    // TODO: Display information (waiting for business to return something)
     const handleGetStorePurchaseHistory = async () => {
         GetStorePurchaseHistory(user.id, store.id).then(response => response.ok ?
             response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'purchaseHistory'})) : printErrorMessage(response)).catch(err => console.log(err));
@@ -390,16 +389,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
 
     // Information component
-    // TODO: Add purchaseHistory type when data returns ok from API
-    /* 
-        something like:
-            info.data.shoppingBags.map((bag) => bag.products.map((product) => (
-                                <ListItem style={{padding: '10px 0'}} key={product.item1.name}>
-                                    <ListItemText primary={product.item1.name} secondary={`Quantity: ${product.item2}`} />
-                                    <Typography variant="body2">{product.item1.price * product.item2}₪</Typography>
-                                </ListItem>
-                            ))
-    */
     const InfoDisplay = () =>
     <>
         <div className={classes.toolbar} />
