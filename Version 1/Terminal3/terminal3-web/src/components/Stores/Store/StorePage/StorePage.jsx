@@ -388,7 +388,18 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         console.log(info);
     }, [info]);
 
+
     // Information component
+    // TODO: Add purchaseHistory type when data returns ok from API
+    /* 
+        something like:
+            info.data.shoppingBags.map((bag) => bag.products.map((product) => (
+                                <ListItem style={{padding: '10px 0'}} key={product.item1.name}>
+                                    <ListItemText primary={product.item1.name} secondary={`Quantity: ${product.item2}`} />
+                                    <Typography variant="body2">{product.item1.price * product.item2}₪</Typography>
+                                </ListItem>
+                            ))
+    */
     const InfoDisplay = () =>
     <>
         <div className={classes.toolbar} />
