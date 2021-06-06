@@ -404,7 +404,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                     {info.type === 'purchaseHistory' ? (
                         info.data.shoppingBags.map((bag) => bag.products.map((product) => (
                             <ListItem style={{padding: '10px 0'}} key={product.item1.name}>
-                                <ListItemText primary={product.item1.name} secondary={`Quantity: ${product.item2}`} />
+                                <ListItemText primary={product.item1.name} secondary={`User: ${bag.userId} | Quantity: ${product.item2}`} />
                                 <Typography variant="body2">{product.item1.price * product.item2}₪</Typography>
                             </ListItem>
                         )))
