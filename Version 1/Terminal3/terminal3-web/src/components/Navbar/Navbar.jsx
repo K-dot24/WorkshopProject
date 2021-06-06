@@ -79,8 +79,9 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
     };
 
     const StoreActions = () => {
-        return [
-            allActions.map((action, index) => permissions[index] && 
+        return (
+        <>
+            {allActions.map((action, index) => permissions[index] && 
                         (
                             action === 'Discount Policy' ? 
                             <PolicyDropDown key={index} action={action} subOptions={discountPolicySubOptions}
@@ -94,8 +95,10 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                         :
                             <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    
                         )  
-            )
-        ];
+            )}
+            <MenuItem key="getIncome" onClick={() => handleMenuClick(`/stores/${storeId}/getincomesbyday`)}>Get Incomes by Day</MenuItem>
+        </>
+        );
     };
 
     const handleMenuOpen = (event) => {

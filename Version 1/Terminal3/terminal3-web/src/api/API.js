@@ -496,6 +496,21 @@ export function RemoveStoreManager( storeID, currentlyOwnerID, removedManagerID 
     })
 }
 
+/// Get store's incomes by day
+/// <param name="StartDate">Start Date</param>
+/// <param name="EndDate">End Date</param>
+/// <param name="storeID">StoreID</param>
+/// <param name="OwnerID">OwnerID</param>
+export function GetIncomeAmountGroupByDay( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetIncomeAmountGroupByDay`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
 //#endregion
 

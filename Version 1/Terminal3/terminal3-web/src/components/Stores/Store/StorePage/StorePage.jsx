@@ -5,8 +5,8 @@ import { Products, Navbar, Cart, Action, CheckboxList, Policy } from '../../../.
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
         AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct,
         printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
-        AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition, GetDiscountPolicyData,
-        AddPurchasePolicy, AddPurchasePolicyById, RemovePurchasePolicy, GetPurchasePolicyData } from '../../../../api/API';
+        AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition, AddPurchasePolicy, 
+        AddPurchasePolicyById, RemovePurchasePolicy, GetIncomeAmountGroupByDay } from '../../../../api/API';
 
 
 
@@ -156,6 +156,14 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         RemovePermissions({storeID: store.id, managerID: managerID.managerid, ownerID: user.id, permissions})
             .then(response => response.ok ?
                 response.json().then(message => console.log(message)) : printErrorMessage(response)).catch(err => console.log(err));
+    }
+
+    const handleGetIncomeAmountGroupByDay = (data) => {
+        const toSend = {startDate: data.startdate, endDate: data.enddate, storeID: store.id, ownerID: user.id};
+
+        GetIncomeAmountGroupByDay(toSend)
+            .then(response => response.ok ?
+                response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     //#region Discount Policy Functions
@@ -476,6 +484,14 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 { /* Get Purchase Policy Data */}
                 <Route exact path={match.url + `/getpurchasepolicy`} 
                     render={(props) => (<Policy storeID={store.id} {...props} />)} 
+                />
+
+                { /* Get Store's Incomes by Day */}
+                <Route exact path={match.url + `/getincomesbyday`} 
+                    render={(props) => (<Action name='Get Incomes by Day'
+                                                fields={[{name: 'Start Date', required: true, type: 'date'},
+                                                        {name: 'End Date', required: true, type: 'date'}]}   
+                                                handleAction={handleGetIncomeAmountGroupByDay} {...props} />)} 
                 />
 
             </Switch>
