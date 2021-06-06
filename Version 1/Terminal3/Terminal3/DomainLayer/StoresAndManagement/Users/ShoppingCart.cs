@@ -88,6 +88,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
+            if(!checkInventory(this.ShoppingBags))
+                return new Result<ShoppingCart>("A bag in the Shopping cart contains more of a product than the store can supply", false, null);
             if (!AdheresToPolicy().Data)
                 return new Result<ShoppingCart>("A bag in the Shopping cart doesn't adhere to it's respective store's policy", false, null);
 
@@ -131,6 +133,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 bags.TryAdd(sb.Key, sb.Value.getDTO()); 
             }
             return new DTO_ShoppingCart(this.Id, bags , this.TotalCartPrice);
+        }
+
+        private bool checkInventory(ConcurrentDictionary<string, ShoppingBag> shoppingBags)
+        {
+            foreach(ShoppingBag bag in shoppingBags.Values)
+            {
+                foreach(KeyValuePair<Product, int> p in bag.Products)
+                {
+                    if (p.Key.Quantity < p.Value)
+                        return false;
+                }
+            }
+            return true;
         }
     }
 }

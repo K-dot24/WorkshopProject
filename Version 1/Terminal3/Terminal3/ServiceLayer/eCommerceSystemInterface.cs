@@ -15,6 +15,7 @@ using Terminal3.DataAccessLayer;
 using System.IO;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using System.Threading;
 using System.Runtime.InteropServices;
 
 namespace Terminal3.ServiceLayer
@@ -80,7 +81,6 @@ namespace Terminal3.ServiceLayer
             while (connection.State != HubConnectionState.Connected) { }
             NotificationService = NotificationService.GetInstance();
             NotificationService.connection = connection;
-
         }
 
         //Metohds

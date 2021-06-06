@@ -13,7 +13,7 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 {
     public class RealAdapter : ISystemInterface
     {
-        public ECommerceSystem system = new ECommerceSystem();
+        public ECommerceSystem system = new ECommerceSystem(@"..\..\..\..\Terminal3\Config.json");
 
         //TODO
         public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
