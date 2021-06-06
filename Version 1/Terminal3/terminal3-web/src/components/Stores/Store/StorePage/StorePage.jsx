@@ -209,7 +209,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     // TODO: Display information (waiting for business to return something)
     const handleGetStorePurchaseHistory = async () => {
         GetStorePurchaseHistory(user.id, store.id).then(response => response.ok ?
-            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => console.log(err));
+            response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'purchaseHistory'})) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     const handleGetIncomeAmountGroupByDay = (data) => {
@@ -412,7 +412,16 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             </div>
             <Paper className={classes.paper}>
                 <List disablePadding>
-                    {info.data.map((item, index) => ( info.type === 'incomes' ?
+                    {info.type === 'purchaseHistory' ? (
+                        info.data.shoppingBags.map((bag) => bag.products.map((product) => (
+                            <ListItem style={{padding: '10px 0'}} key={product.item1.name}>
+                                <ListItemText primary={product.item1.name} secondary={`Quantity: ${product.item2}`} />
+                                <Typography variant="body2">{product.item1.price * product.item2}₪</Typography>
+                            </ListItem>
+                        )))
+                    )
+                    :
+                    info.data.map((item, index) => ( info.type === 'incomes' ?
                         <ListItem style={{padding: '10px 0'}} key={index}>
                             <ListItemText primary={item.item1.substring(0, 10)} />
                             <Typography variant="body2">{item.item2}₪</Typography>
@@ -426,6 +435,21 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                             ))}`}</Typography>
                         </ListItem>
                     ))}
+
+                    {/* {info.data.map((item, index) => ( info.type === 'incomes' ?
+                        <ListItem style={{padding: '10px 0'}} key={index}>
+                            <ListItemText primary={item.item1.substring(0, 10)} />
+                            <Typography variant="body2">{item.item2}₪</Typography>
+                        </ListItem>
+                    :
+                        info.type === 'staff' &&
+                        <ListItem style={{padding: '10px 0'}} key={index}>
+                            <ListItemText primary={item.item1.id} secondary={item.item2.isOwner ? "Owner" : "Manager"} />
+                            <Typography variant="body2">{`Permissions: ${item.item2.functionsBitMask.map((permission, index) => (
+                                permission ? index : null
+                            ))}`}</Typography>
+                        </ListItem>
+                    ))} */}
                 </List>
             </Paper>
         </main>
