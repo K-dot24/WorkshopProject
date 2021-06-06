@@ -10,7 +10,7 @@ import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromSt
         AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct,
         printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
         AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition, AddPurchasePolicy, 
-        AddPurchasePolicyById, RemovePurchasePolicy, GetIncomeAmountGroupByDay } from '../../../../api/API';
+        AddPurchasePolicyById, RemovePurchasePolicy, GetIncomeAmountGroupByDay, GetStorePurchaseHistory } from '../../../../api/API';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -206,6 +206,12 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 response.json().then(message => console.log(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
+    // TODO: Display information (waiting for business to return something)
+    const handleGetStorePurchaseHistory = async () => {
+        GetStorePurchaseHistory(user.id, store.id).then(response => response.ok ?
+            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => console.log(err));
+    }
+
     const handleGetIncomeAmountGroupByDay = (data) => {
         const toSend = {startDate: data.startdate, endDate: data.enddate, storeID: store.id, ownerID: user.id};
 
@@ -397,7 +403,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 <List disablePadding>
                     {info.data.map((item, index) => ( info.type === 'incomes' ?
                         <ListItem style={{padding: '10px 0'}} key={index}>
-                            <ListItemText primary={item.item1} />
+                            <ListItemText primary={item.item1.substring(0, 10)} />
                             <Typography variant="body2">{item.item2}₪</Typography>
                         </ListItem>
                     :
@@ -588,6 +594,15 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 { /* Get Purchase Policy Data */}
                 <Route exact path={match.url + `/getpurchasepolicy`} 
                     render={(props) => (<Policy storeID={store.id} {...props} />)} 
+                />
+
+                {/* Get Purchase History */}
+                <Route exact path={match.url + `/getstorepurchasehistory`}                       
+                    render={function(props) {
+                        if (!issued)
+                            return (<Action name='Get Purhcase History'     
+                                            handleAction={handleGetStorePurchaseHistory} {...props} />)
+                    }}
                 />
 
                 { /* Get Store's Incomes by Day */}

@@ -470,14 +470,13 @@ export function GetStoreStaff(ownerID, storeID) {
 /// Returns in-store purchase history
 /// <param name="ownerID">ownerID</param>
 /// <param name="storeID">ID of the store to get the purchase history</param>
-export function GetStorePurchaseHistory( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeId}`, {
+export function GetStorePurchaseHistory( ownerID, storeID ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetStorePurchaseHistory/${ownerID}/${storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
