@@ -239,13 +239,13 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                     }
 
                     {/* Notifications Icon */}
-                    <div className={classes.sectionDesktop}>
+                    {/* <div className={classes.sectionDesktop}>
                         <IconButton aria-label="show 2 new notifications" color="inherit">
                             <Badge badgeContent={2} color="secondary">
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
-                    </div>
+                    </div> */}
 
                     {/* Menu Icon */}
                     {(user.loggedIn) &&
