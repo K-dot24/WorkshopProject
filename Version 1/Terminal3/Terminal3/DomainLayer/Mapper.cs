@@ -109,8 +109,8 @@ namespace Terminal3.DataAccessLayer
             try
             {
                 dbClient = new MongoClient(connection_string);
-                database = dbClient.GetDatabase("Terminal3-development");
-                //database = dbClient.GetDatabase("Terminal3-Testing");
+                //database = dbClient.GetDatabase("Terminal3-development");
+                database = dbClient.GetDatabase("Terminal3-Testing");
 
                 //DAOs
                 DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
