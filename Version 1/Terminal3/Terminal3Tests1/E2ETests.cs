@@ -171,8 +171,8 @@ namespace Terminal3_E2ETests
             Result<List<Tuple<DateTime, Double>>> recipts_owner = system.GetIncomeAmountGroupByDay("2021-06-07", "2021-06-07", store.Data.Id, user.Data.Id);
             Result<List<Tuple<DateTime, Double>>> recipts_admin = system.GetIncomeAmountGroupByDay("2021-06-07", "2021-06-07", "-777");
 
-            Assert.True(recipts_owner.Data.Count == 0);
-            Assert.True(recipts_admin.Data.Count == 0);
+            Assert.True(recipts_owner.Data[0].Item2 == 0);
+            Assert.True(recipts_admin.Data[0].Item2 == 0);
 
             system.ResetSystem("-777");
         }
