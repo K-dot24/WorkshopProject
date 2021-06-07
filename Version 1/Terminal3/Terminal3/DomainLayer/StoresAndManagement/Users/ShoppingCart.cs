@@ -6,6 +6,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ExternalSystems;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DataAccessLayer;
+using System.Globalization;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -118,7 +119,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             // save recipt
             foreach(ShoppingBag sb in this.ShoppingBags.Values)
             {
-                DTO_Recipt recipt = new DTO_Recipt(sb.Store.Id, sb.TotalBagPrice, DateTime.Now.Date);
+                DTO_Recipt recipt = new DTO_Recipt(sb.Store.Id, sb.TotalBagPrice, DateTime.Now.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
                 Mapper.getInstance().Create(recipt); 
             }
 
