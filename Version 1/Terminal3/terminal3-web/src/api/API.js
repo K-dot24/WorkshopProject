@@ -1,4 +1,5 @@
 export const products_image_url = 'https://i.ibb.co/HxrQmhn/price-tag.jpg';
+const API_URL = 'https://localhost:5001/api';
 
 export function printErrorMessage(response) {
     return response.json().then(message => alert(message));
@@ -7,7 +8,7 @@ export function printErrorMessage(response) {
 //#region DataController
 
 export function GetAllStoresToDisplay() {
-    return fetch(`https://localhost:5000/api/Data/GetAllStoresToDisplay`, {
+    return fetch(`${API_URL}/Data/GetAllStoresToDisplay`, {
         method: 'GET',
         // agent: httpsAgent,
         headers: {
@@ -18,7 +19,7 @@ export function GetAllStoresToDisplay() {
 }
 
 export function GetAllProductByStoreIDToDisplay(storeId) {
-    return fetch(`https://localhost:5000/api/Data/GetAllProductByStoreIDToDisplay/${storeId}`, {
+    return fetch(`${API_URL}/Data/GetAllProductByStoreIDToDisplay/${storeId}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -28,7 +29,7 @@ export function GetAllProductByStoreIDToDisplay(storeId) {
 }
 
 export function GetPermission(userId , storeId) {
-    return fetch(`https://localhost:5000/api/Data/GetPermission/${userId}/${storeId}`, {
+    return fetch(`${API_URL}/Data/GetPermission/${userId}/${storeId}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -44,7 +45,7 @@ export function GetPermission(userId , storeId) {
 
 /// Get welcome page of the system
 export function EnterSystem() {
-    return fetch(`https://localhost:5000/api/GuestUser`, {
+    return fetch(`${API_URL}/GuestUser`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -61,7 +62,7 @@ export function EnterSystem() {
 ///     "Password":"string"
 /// }
 export function Register( data ) {
-    return fetch(`https://localhost:5000/api/GuestUser/Register`, {
+    return fetch(`${API_URL}/GuestUser/Register`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -80,7 +81,7 @@ export function Register( data ) {
 /// }
 /// NOTE: fields are optionals
 export function SearchStore( search_by ) {
-    return fetch(`https://localhost:5000/api/GuestUser/SearchStore`, {
+    return fetch(`${API_URL}/GuestUser/SearchStore`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -103,7 +104,7 @@ export function SearchStore( search_by ) {
 /// }
 /// NOTE: fields are optionals
 export function SearchProduct( search_by ) {
-    return fetch(`https://localhost:5000/api/GuestUser/SearchProduct`, {
+    return fetch(`${API_URL}/GuestUser/SearchProduct`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -122,7 +123,7 @@ export function SearchProduct( search_by ) {
 ///     "StoreID":"string"
 /// }
 export function AddProductToCart( data ) {    
-    return fetch(`https://localhost:5000/api/GuestUser/AddProductToCart`, {
+    return fetch(`${API_URL}/GuestUser/AddProductToCart`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -145,7 +146,7 @@ export function AddProductToCart( data ) {
 /// }
 ///
 export function GetUserShoppingCart( userID ) {    
-    return fetch(`https://localhost:5000/api/GuestUser/GetUserShoppingCart/${userID}`, {
+    return fetch(`${API_URL}/GuestUser/GetUserShoppingCart/${userID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -163,7 +164,7 @@ export function GetUserShoppingCart( userID ) {
 ///     "quantity":int
 /// }
 export function UpdateShoppingCart( data ) {    
-    return fetch(`https://localhost:5000/api/GuestUser/UpdateShoppingCart`, {
+    return fetch(`${API_URL}/GuestUser/UpdateShoppingCart`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
@@ -183,7 +184,7 @@ export function UpdateShoppingCart( data ) {
 ///                         }
 /// }
 export function Purchase( data ) {    
-    return fetch(`https://localhost:5000/api/GuestUser/Purchase`, {
+    return fetch(`${API_URL}/GuestUser/Purchase`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
@@ -195,7 +196,7 @@ export function Purchase( data ) {
 
 /// Retrive the user purchase history
 export function GetUserPurchaseHistory( userID ) {    
-    return fetch(`https://localhost:5000/api/GuestUser/GetUserPurchaseHistory/${userID}`, {
+    return fetch(`${API_URL}/GuestUser/GetUserPurchaseHistory/${userID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -207,7 +208,7 @@ export function GetUserPurchaseHistory( userID ) {
 
 /// Return the total amount of the user's shopping cart
 export function GetTotalShoppingCartPrice( userID ) {    
-    return fetch(`https://localhost:5000/api/GuestUser/GetTotalShoppingCartPrice/${userID}`, {
+    return fetch(`${API_URL}/GuestUser/GetTotalShoppingCartPrice/${userID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -222,7 +223,7 @@ export function GetTotalShoppingCartPrice( userID ) {
 
 /// Returns all the reviews on a specific product
 export function GetProductReview( data ) {    
-    return fetch(`https://localhost:5000/api/GuestUser/GetProductReview/${data.storeID}/${data.productID}`, {
+    return fetch(`${API_URL}/GuestUser/GetProductReview/${data.storeID}/${data.productID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -248,7 +249,7 @@ export function GetProductReview( data ) {
 //     "Password":"string"
 // } 
 export function Login( data ) {
-    return fetch(`https://localhost:5000/api/RegisteredUser/Login`, {
+    return fetch(`${API_URL}/RegisteredUser/Login`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -260,7 +261,7 @@ export function Login( data ) {
 
 /// logout from the system
 export function Logout( email ) {
-    return fetch(`https://localhost:5000/api/RegisteredUser/Logout/${email}`, {
+    return fetch(`${API_URL}/RegisteredUser/Logout/${email}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -278,7 +279,7 @@ export function Logout( email ) {
 ///     "userID":"string"
 /// }
 export function OpenNewStore( data) {
-    return fetch(`https://localhost:5000/api/RegisteredUser/OpenNewStore`, {
+    return fetch(`${API_URL}/RegisteredUser/OpenNewStore`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -298,7 +299,7 @@ export function OpenNewStore( data) {
 ///     "review":"string"
 /// }
 export function AddProductReview( data ) {
-    return fetch(`https://localhost:5000/api/RegisteredUser/AddProductReview`, {
+    return fetch(`${API_URL}/RegisteredUser/AddProductReview`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -326,7 +327,7 @@ export function AddProductReview( data ) {
 ///     "keywords":["string","string"],
 /// }
 export function AddProductToStore( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/AddProductToStore`, {
+    return fetch(`${API_URL}/StoreStaff/AddProductToStore`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -341,7 +342,7 @@ export function AddProductToStore( data ) {
 /// <param name="storeID">storeId where the product is located in</param>
 /// <param name="productID">product identifier</param>
 export function RemoveProductFromStore( userID, storeID, productID ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/RemoveProductFromStore/${userID}/${storeID}/${productID}`, {
+    return fetch(`${API_URL}/StoreStaff/RemoveProductFromStore/${userID}/${storeID}/${productID}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',
@@ -367,7 +368,7 @@ export function RemoveProductFromStore( userID, storeID, productID ) {
 /// }
 /// NOTE: all fields in "detalis" values are optionals
 export function EditProductDetails( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/EditProductDetails`, {
+    return fetch(`${API_URL}/StoreStaff/EditProductDetails`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
@@ -385,7 +386,7 @@ export function EditProductDetails( data ) {
 ///     "storeID":"string"
 /// }
 export function AddStoreOwner( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/AddStoreOwner`, {
+    return fetch(`${API_URL}/StoreStaff/AddStoreOwner`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -404,7 +405,7 @@ export function AddStoreOwner( data ) {
 ///     "storeID":"string"
 /// }
 export function AddStoreManager( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/AddStoreManager`, {
+    return fetch(`${API_URL}/StoreStaff/AddStoreManager`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -424,7 +425,7 @@ export function AddStoreManager( data ) {
 ///     "permissions":[int,int,int...]
 /// }
 export function SetPermissions( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/SetPermissions`, {
+    return fetch(`${API_URL}/StoreStaff/SetPermissions`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
@@ -444,7 +445,7 @@ export function SetPermissions( data ) {
 ///     "permissions":[int,int,int...]
 /// }
 export function RemovePermissions( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/RemovePermissions`, {
+    return fetch(`${API_URL}/StoreStaff/RemovePermissions`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
@@ -458,7 +459,7 @@ export function RemovePermissions( data ) {
 /// <param name="ownerID">ID of the owner who request to preform the operation</param>
 /// <param name="storeID">storeID</param>
 export function GetStoreStaff(ownerID, storeID) {
-    return fetch(`https://localhost:5000/api/StoreStaff/GetStoreStaff/${ownerID}/${storeID}`, {
+    return fetch(`${API_URL}/StoreStaff/GetStoreStaff/${ownerID}/${storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -471,7 +472,7 @@ export function GetStoreStaff(ownerID, storeID) {
 /// <param name="ownerID">ownerID</param>
 /// <param name="storeID">ID of the store to get the purchase history</param>
 export function GetStorePurchaseHistory( ownerID, storeID ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/GetStorePurchaseHistory/${ownerID}/${storeID}`, {
+    return fetch(`${API_URL}/StoreStaff/GetStorePurchaseHistory/${ownerID}/${storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -486,7 +487,7 @@ export function GetStorePurchaseHistory( ownerID, storeID ) {
 /// <param name="currentlyOwnerID">OwnerID</param>
 /// <param name="removedManagerID">ID of the manager to be removed</param>
 export function RemoveStoreManager( storeID, currentlyOwnerID, removedManagerID ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/RemoveStoreManager/${storeID}/${currentlyOwnerID}/${removedManagerID}`, {
+    return fetch(`${API_URL}/StoreStaff/RemoveStoreManager/${storeID}/${currentlyOwnerID}/${removedManagerID}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',
@@ -501,7 +502,7 @@ export function RemoveStoreManager( storeID, currentlyOwnerID, removedManagerID 
 /// <param name="storeID">StoreID</param>
 /// <param name="OwnerID">OwnerID</param>
 export function GetIncomeAmountGroupByDay( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/GetIncomeAmountGroupByDay`, {
+    return fetch(`${API_URL}/StoreStaff/GetIncomeAmountGroupByDay`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -520,7 +521,7 @@ export function GetIncomeAmountGroupByDay( data ) {
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="userID">ID of the user to get the purchase history</param>
 export function AdminGetUserPurchaseHistory( data ) {
-    return fetch(`https://localhost:5000/api/SystemAdmin/GetUserPurchaseHistory/${data.sysAdminID}/${data.userID}`, {
+    return fetch(`${API_URL}/SystemAdmin/GetUserPurchaseHistory/${data.sysAdminID}/${data.userID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -535,7 +536,7 @@ export function AdminGetUserPurchaseHistory( data ) {
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="storeId">ID of the store to get the purchase history</param>
 export function AdminGetStorePurchaseHistory( data ) {
-    return fetch(`https://localhost:5000/api/SystemAdmin/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeID}`, {
+    return fetch(`${API_URL}/SystemAdmin/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -550,7 +551,7 @@ export function AdminGetStorePurchaseHistory( data ) {
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
 /// <param name="email">email of the request new system admin</param>
 export function AddSystemAdmin( sysAdminID, email ) {
-    return fetch(`https://localhost:5000/api/SystemAdmin/AddSystemAdmin/${sysAdminID}/${email}`, {
+    return fetch(`${API_URL}/SystemAdmin/AddSystemAdmin/${sysAdminID}/${email}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -564,7 +565,7 @@ export function AddSystemAdmin( sysAdminID, email ) {
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
 /// <param name="email">email of admin to be removed</param>
 export function RemoveSystemAdmin( sysAdminID, email ) {
-    return fetch(`https://localhost:5000/api/SystemAdmin/RemoveSystemAdmin/${sysAdminID}/${email}`, {
+    return fetch(`${API_URL}/SystemAdmin/RemoveSystemAdmin/${sysAdminID}/${email}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',
@@ -577,7 +578,7 @@ export function RemoveSystemAdmin( sysAdminID, email ) {
 /// Reset the system, including all the stored data
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
 export function ResetSystem( sysAdminID ) {
-    return fetch(`https://localhost:5000/api/SystemAdmin/ResetSystem/${sysAdminID}`, {
+    return fetch(`${API_URL}/SystemAdmin/ResetSystem/${sysAdminID}`, {
         method: 'PUT',                                       
         headers: {
             'Accept': 'application/json',
@@ -593,7 +594,7 @@ export function ResetSystem( sysAdminID ) {
 //#region Discount Policy
 
 export function AddDiscountPolicy( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/AddDiscountPolicy`, {
+    return fetch(`${API_URL}/StoreStaff/AddDiscountPolicy`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -604,7 +605,7 @@ export function AddDiscountPolicy( data ) {
 }
 
 export function AddDiscountPolicyById( id, data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/AddDiscountPolicy/${id}`, {
+    return fetch(`${API_URL}/StoreStaff/AddDiscountPolicy/${id}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -615,7 +616,7 @@ export function AddDiscountPolicyById( id, data ) {
 }
 
 export function AddDiscountCondition( id, data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/AddDiscountCondition/${id}`, {
+    return fetch(`${API_URL}/StoreStaff/AddDiscountCondition/${id}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -626,7 +627,7 @@ export function AddDiscountCondition( id, data ) {
 }
 
 export function RemoveDiscountPolicy( storeID, id ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/RemoveDiscountPolicy/${storeID}/${id}`, {
+    return fetch(`${API_URL}/StoreStaff/RemoveDiscountPolicy/${storeID}/${id}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',
@@ -636,7 +637,7 @@ export function RemoveDiscountPolicy( storeID, id ) {
 }
 
 export function RemoveDiscountCondition( storeID, id ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/RemoveDiscountCondition/${storeID}/${id}`, {
+    return fetch(`${API_URL}/StoreStaff/RemoveDiscountCondition/${storeID}/${id}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',
@@ -646,7 +647,7 @@ export function RemoveDiscountCondition( storeID, id ) {
 }
 
 export function GetDiscountPolicyData( storeID ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/GetDiscountPolicyData/${storeID}`, {
+    return fetch(`${API_URL}/StoreStaff/GetDiscountPolicyData/${storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -660,7 +661,7 @@ export function GetDiscountPolicyData( storeID ) {
 //#region Purchase Policy
 
 export function AddPurchasePolicy( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/AddPurchasePolicy`, {
+    return fetch(`${API_URL}/StoreStaff/AddPurchasePolicy`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -671,7 +672,7 @@ export function AddPurchasePolicy( data ) {
 }
 
 export function AddPurchasePolicyById( id, data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/AddPurchasePolicy/${id}`, {
+    return fetch(`${API_URL}/StoreStaff/AddPurchasePolicy/${id}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -682,7 +683,7 @@ export function AddPurchasePolicyById( id, data ) {
 }
 
 export function RemovePurchasePolicy( storeID, id ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/RemovePurchasePolicy/${storeID}/${id}`, {
+    return fetch(`${API_URL}/StoreStaff/RemovePurchasePolicy/${storeID}/${id}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',
@@ -692,7 +693,7 @@ export function RemovePurchasePolicy( storeID, id ) {
 }
 
 export function GetPurchasePolicyData( storeID ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/GetPurchasePolicyData/${storeID}`, {
+    return fetch(`${API_URL}/StoreStaff/GetPurchasePolicyData/${storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',

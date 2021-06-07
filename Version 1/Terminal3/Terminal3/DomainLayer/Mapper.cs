@@ -1228,6 +1228,7 @@ namespace Terminal3.DataAccessLayer
 
             s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , dto.isClosed);
             s.NotificationManager.Store = s;
+
             Stores.TryAdd(s.Id, s);
             DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.MainDiscount._id));
             BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.MainPolicy._id));
