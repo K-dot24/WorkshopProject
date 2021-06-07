@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -21,6 +21,7 @@ namespace signalRgateway
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseUrls("https://localhost:4001;http://localhost:4000");
                 });
     }
 }

@@ -110,7 +110,8 @@ namespace Terminal3.DataAccessLayer
             {
                 dbClient = new MongoClient(connection_string);
                 //database = dbClient.GetDatabase("Terminal3-development");
-                database = dbClient.GetDatabase("Terminal3-Testing");
+                //database = dbClient.GetDatabase("Terminal3-Testing");
+                database = dbClient.GetDatabase("Terminal3-tomer");
 
                 //DAOs
                 DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
@@ -1228,8 +1229,8 @@ namespace Terminal3.DataAccessLayer
             s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , dto.isClosed);
 
             Stores.TryAdd(s.Id, s);
-            DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.DiscountRoot._id));
-            BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.PurchaseRoot._id));
+            DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.MainDiscount._id));
+            BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.MainPolicy._id));
             s.PolicyManager = new PolicyManager(MainDiscount, MainPolicy);
             StoreOwner founder = getOwnershipTree(s, dto.Founder);
 
