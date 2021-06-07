@@ -15,10 +15,9 @@ namespace Terminal3.DataAccessLayer.DTOs
         [BsonElement]
         public Double amount { get; set; }
         [BsonElement]
-        [BsonDateTimeOptions(DateOnly = true )]
-        public DateTime date { get; set; }
+        public String date { get; set; }
 
-        public DTO_Recipt(string store_id, double amount, DateTime date)
+        public DTO_Recipt(string store_id, double amount, String date)
         {
             _id = Service.GenerateId();
             this.store_id = store_id;

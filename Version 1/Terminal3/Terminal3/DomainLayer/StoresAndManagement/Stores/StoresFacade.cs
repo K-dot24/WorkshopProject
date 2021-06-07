@@ -774,13 +774,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     DateTime curr = start;
                     while (curr <= end)
                     {
-                        List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("dd/MM/yyyy", DateTimeFormatInfo.InvariantInfo), store_id);
+                        List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo), store_id);
                         Double amountPerDay = 0; 
                         foreach(DTO_Recipt dto in recipts)
                         {
                             amountPerDay += dto.amount;
                         }
-                        recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
+                        if (amountPerDay > 0)
+                        {
+                            recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
+                        }
                         curr = curr.AddDays(1);
                     }
 
@@ -796,8 +799,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         // Get reciptes for admin in system
         public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date)
         {
-            DateTime start = DateTime.ParseExact(start_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            DateTime end = DateTime.ParseExact(end_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            DateTime start = DateTime.ParseExact(start_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            DateTime end = DateTime.ParseExact(end_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
             List<Tuple<DateTime, Double>> recipts_list = new List<Tuple<DateTime, double>>();
 
@@ -806,13 +809,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 DateTime curr = start;
                 while (curr <= end)
                 {
-                    List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("dd/MM/yyyy", DateTimeFormatInfo.InvariantInfo));
+                    List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
                     Double amountPerDay = 0;
                     foreach (DTO_Recipt dto in recipts)
                     {
                         amountPerDay += dto.amount;
                     }
-                    recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
+                    if (amountPerDay > 0)
+                    {
+                        recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
+                    }
+
                     curr = curr.AddDays(1);
                 }
 
