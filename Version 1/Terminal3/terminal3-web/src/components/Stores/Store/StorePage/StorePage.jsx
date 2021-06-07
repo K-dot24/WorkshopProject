@@ -1,18 +1,71 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
 
+import { Typography, Avatar, ListItemText, ListItem, List, Paper } from '@material-ui/core'
+import { Receipt } from '@material-ui/icons';
+import { makeStyles } from '@material-ui/core/styles';
 import { Products, Navbar, Cart, Action, CheckboxList, Policy } from '../../../../components';
+
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
         AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct,
         printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
-        AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition, GetDiscountPolicyData,
-        AddPurchasePolicy, AddPurchasePolicyById, RemovePurchasePolicy, GetPurchasePolicyData } from '../../../../api/API';
+        AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition, AddPurchasePolicy, 
+        AddPurchasePolicyById, RemovePurchasePolicy, GetIncomeAmountGroupByDay, GetStorePurchaseHistory } from '../../../../api/API';
 
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        height: 110,
+        flexGrow: 1,
+        maxWidth: 400,
+    },
+    toolbar: theme.mixins.toolbar,
+    layout: {
+        marginTop: '5%',
+        width: 'auto',
+        marginLeft: theme.spacing(2),
+        marginRight: theme.spacing(2),
+        [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
+            width: 600,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+        },
+    },
+    paper: {
+        marginTop: theme.spacing(3),
+        marginBottom: theme.spacing(3),
+        padding: theme.spacing(2),
+        [theme.breakpoints.down('xs')]: {
+            width: '100%',
+            marginTop: 60,
+        },
+        [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
+            marginTop: theme.spacing(6),
+            marginBottom: theme.spacing(6),
+            padding: theme.spacing(3),
+        },
+    },
+    title: {
+        marginTop: theme.spacing(8),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    avatar: {
+        margin: theme.spacing(1),
+        backgroundColor: theme.palette.secondary.main,
+    },
+}));
 
 
 const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     const [products, setProducts] = useState([]);
     const [bag, setBag] = useState({products: [], totalPrice: 0});
+
+    // States for information display (GetStoreStaff, GetIncomeAmount...)
+    const [issued, setIssued] = useState(false);
+    const [info, setInfo] = useState(null);
+    const classes = useStyles();
 
     const fetchProducts = async () => {
         GetAllProductByStoreIDToDisplay(store.id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
@@ -124,10 +177,9 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
-    // TODO: Show information to user
     const handleGetStoreStaff = async () => {
         GetStoreStaff(user.id, store.id).then(response => response.ok ?
-            response.json().then(json => console.log(json)) : printErrorMessage(response)).catch(err => console.log(err));
+            response.json().then(data => setIssued(true) & setInfo({data, type: 'staff'})) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     const handleSetPermissions = (permissions, managerID) => {
@@ -146,16 +198,25 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));     
 
             }) : null).catch(err => console.log(err));
-
-        // SetPermissions({storeID: store.id, managerID: managerID.managerid, ownerID: user.id, permissions})
-        //     .then(response => response.ok ?
-        //         response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     const handleRemovePermissions = (permissions, managerID) => {
         RemovePermissions({storeID: store.id, managerID: managerID.managerid, ownerID: user.id, permissions})
             .then(response => response.ok ?
                 response.json().then(message => console.log(message)) : printErrorMessage(response)).catch(err => console.log(err));
+    }
+
+    const handleGetStorePurchaseHistory = async () => {
+        GetStorePurchaseHistory(user.id, store.id).then(response => response.ok ?
+            response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'purchaseHistory'})) : printErrorMessage(response)).catch(err => console.log(err));
+    }
+
+    const handleGetIncomeAmountGroupByDay = (data) => {
+        const toSend = {startDate: data.startdate, endDate: data.enddate, storeID: store.id, ownerID: user.id};
+
+        GetIncomeAmountGroupByDay(toSend)
+            .then(response => response.ok ?
+                response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'incomes'})) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     //#region Discount Policy Functions
@@ -310,20 +371,90 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     //#endregion
 
+    // Fetch products on first render of page
     useEffect(() => {
         fetchProducts();
         console.log("store id: " + store.id);
     }, []);
+
+    // Restart information when moving page
+    useEffect(() => {
+        setIssued(false);
+        setInfo(null);
+    }, [match]);
+
+    useEffect(() => {
+        console.log(info);
+    }, [info]);
+
+
+    // Information component
+    const InfoDisplay = () =>
+    <>
+        <div className={classes.toolbar} />
+        <main className={classes.layout}>
+            <div className={classes.title}>
+                <Avatar className={classes.avatar}>
+                    <Receipt />
+                </Avatar>
+                <Typography variant="h6" gutterBottom>Results</Typography>
+            </div>
+            <Paper className={classes.paper}>
+                <List disablePadding>
+                    {info.type === 'purchaseHistory' ? (
+                        info.data.shoppingBags.map((bag) => bag.products.map((product) => (
+                            <ListItem style={{padding: '10px 0'}} key={product.item1.name}>
+                                <ListItemText primary={product.item1.name} secondary={`User: ${bag.userId} | Quantity: ${product.item2}`} />
+                                <Typography variant="body2">{product.item1.price * product.item2}₪</Typography>
+                            </ListItem>
+                        )))
+                    )
+                    :
+                    info.data.map((item, index) => ( info.type === 'incomes' ?
+                        <ListItem style={{padding: '10px 0'}} key={index}>
+                            <ListItemText primary={item.item1.substring(0, 10)} />
+                            <Typography variant="body2">{item.item2}₪</Typography>
+                        </ListItem>
+                    :
+                        info.type === 'staff' &&
+                        <ListItem style={{padding: '10px 0'}} key={index}>
+                            <ListItemText primary={item.item1.id} secondary={item.item2.isOwner ? "Owner" : "Manager"} />
+                            <Typography variant="body2">{`Permissions: ${item.item2.functionsBitMask.map((permission, index) => (
+                                permission ? index : null
+                            ))}`}</Typography>
+                        </ListItem>
+                    ))}
+
+                    {/* {info.data.map((item, index) => ( info.type === 'incomes' ?
+                        <ListItem style={{padding: '10px 0'}} key={index}>
+                            <ListItemText primary={item.item1.substring(0, 10)} />
+                            <Typography variant="body2">{item.item2}₪</Typography>
+                        </ListItem>
+                    :
+                        info.type === 'staff' &&
+                        <ListItem style={{padding: '10px 0'}} key={index}>
+                            <ListItemText primary={item.item1.id} secondary={item.item2.isOwner ? "Owner" : "Manager"} />
+                            <Typography variant="body2">{`Permissions: ${item.item2.functionsBitMask.map((permission, index) => (
+                                permission ? index : null
+                            ))}`}</Typography>
+                        </ListItem>
+                    ))} */}
+                </List>
+            </Paper>
+        </main>
+    </>
 
     return (
         <div>
             <Navbar storeId={store.id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} 
                     /*handleSearch={handleProductSearch}*/ />
             <Switch>
+                {/* Main Store Page */}
                 <Route exact path={match.url}>
                     <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} />
                 </Route>
 
+                {/* Bag Page */}
                 <Route exact path={match.url + "/bag"}>
                     <Cart
                         id={store.id}
@@ -334,6 +465,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                     />
                 </Route>
 
+                {/* Add New Product */}
                 <Route exact path={match.url + `/addnewproduct`} 
                     render={(props) => (<Action name='Add New Product' 
                                                 fields={[{name: 'Product Name', required: true}, 
@@ -344,12 +476,14 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                                                 handleAction={handleAddProductToStore} {...props} />)} 
                 />
 
+                {/* Remove Product */}
                 <Route exact path={match.url + `/removeproduct`} 
                     render={(props) => (<Action name='Remove Product' 
                                                 fields={[{name: 'Product ID', required: true}]} 
                                                 handleAction={handleRemoveProductFromStore} {...props} />)} 
                 />
 
+                {/* Edit Product */}
                 <Route exact path={match.url + `/editproductdetails`} 
                     render={(props) => (<Action name='Edit Product Details' 
                                                 fields={[{name: 'Product ID', required: true}, 
@@ -361,29 +495,37 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                                                 handleAction={handleEditProductDetails} {...props} />)} 
                 />
 
+                {/* Add Store Owner */}
                 <Route exact path={match.url + `/addstoreowner`} 
                     render={(props) => (<Action name='Add Store Owner' 
                                                 fields={[{name: 'New Owner ID', required: true}]} 
                                                 handleAction={handleAddStoreOwner} {...props} />)} 
                 />
 
+                {/* Add Store Manager */}
                 <Route exact path={match.url + `/addstoreManager`} 
                     render={(props) => (<Action name='Add Store Manager' 
                                                 fields={[{name: 'New Manager ID', required: true}]} 
                                                 handleAction={handleAddStoreManager} {...props} />)} 
                 />
 
+                {/* Remove Store Manager */}
                 <Route exact path={match.url + `/removestoremanager`} 
                     render={(props) => (<Action name='Remove Store Manager' 
                                                 fields={[{name: 'Removed Manager ID', required: true}]} 
                                                 handleAction={handleRemoveStoreManager} {...props} />)} 
                 />
 
-                <Route exact path={match.url + `/getstorestaff`} 
-                    render={(props) => (<Action name='Get Store Stuff'     
-                                                handleAction={handleGetStoreStaff} {...props} />)} 
+                {/* Get Store Staff */}
+                <Route exact path={match.url + `/getstorestaff`}                       
+                    render={function(props) {
+                        if (!issued)
+                            return (<Action name='Get Store Stuff'     
+                                            handleAction={handleGetStoreStaff} {...props} />)
+                    }}
                 />
 
+                {/* Set Permissions */}
                 <Route exact path={match.url + `/setpermissions`} 
                     render={(props) => (<Action name='Set Permissions'
                                                 fields={[{name: 'Manager ID', required: true}]}   
@@ -478,7 +620,31 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                     render={(props) => (<Policy storeID={store.id} {...props} />)} 
                 />
 
+                {/* Get Purchase History */}
+                <Route exact path={match.url + `/getstorepurchasehistory`}                       
+                    render={function(props) {
+                        if (!issued)
+                            return (<Action name='Get Purhcase History'     
+                                            handleAction={handleGetStorePurchaseHistory} {...props} />)
+                    }}
+                />
+
+                { /* Get Store's Incomes by Day */}
+                <Route exact path={match.url + `/getincomesbyday`} 
+                    render={function(props) {
+                        if (!issued)
+                            return (<Action name='Get Incomes by Day'
+                            fields={[{name: 'Start Date', required: true, type: 'date'},
+                                    {name: 'End Date', required: true, type: 'date'}]}   
+                            handleAction={handleGetIncomeAmountGroupByDay} {...props} />)
+                    }}
+                />
+
             </Switch>
+
+            {/* Information display */}
+            {(issued && info !== null) && <InfoDisplay />}
+        
         </div>
     )
 }

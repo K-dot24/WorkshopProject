@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import { AppBar, Toolbar, IconButton, Badge, MenuItem, Menu, Typography, Button, InputBase, 
         List, ListItem, ListItemText, Collapse } from '@material-ui/core';
 import { ShoppingCart, LocalMall, Menu as MenuIcon, Notifications as NotificationsIcon, Search as SearchIcon,
@@ -78,9 +78,10 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
         )
     };
 
-    const StoreActions = () => {
-        return [
-            allActions.map((action, index) => permissions[index] && 
+    const StoreActions = forwardRef((props, ref) => {
+        return (
+        <div ref={ref} {...props}>
+            {allActions.map((action, index) => permissions[index] && 
                         (
                             action === 'Discount Policy' ? 
                             <PolicyDropDown key={index} action={action} subOptions={discountPolicySubOptions}
@@ -94,9 +95,11 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                         :
                             <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    
                         )  
-            )
-        ];
-    };
+            )}
+            <MenuItem key="getIncome" onClick={() => handleMenuClick(`/stores/${storeId}/getincomesbyday`)}>Get Incomes by Day</MenuItem>
+        </div>
+        );
+    });
 
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -236,13 +239,13 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                     }
 
                     {/* Notifications Icon */}
-                    <div className={classes.sectionDesktop}>
+                    {/* <div className={classes.sectionDesktop}>
                         <IconButton aria-label="show 2 new notifications" color="inherit">
                             <Badge badgeContent={2} color="secondary">
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
-                    </div>
+                    </div> */}
 
                     {/* Menu Icon */}
                     {(user.loggedIn) &&
