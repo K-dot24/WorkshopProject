@@ -10,6 +10,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
+using System.Threading;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
@@ -92,6 +93,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         // Properties
         public StoresFacade StoresFacade { get; }
         public UsersAndPermissionsFacade UsersAndPermissionsFacade { get; }
+        private readonly object my_lock = new object();
 
         public StoresAndManagementInterface(String admin_email, String admin_password)
         {
@@ -458,22 +460,39 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
             // TODO - lock products ?
-            Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails);
-            if (res.Data != null)
+            try
             {
-                ShoppingCart purchasedCart = res.Data;
-                ConcurrentDictionary<String, ShoppingBag> purchasedBags = purchasedCart.ShoppingBags;
-                foreach(var bag in purchasedBags)
+                Monitor.Enter(my_lock);
+                try
                 {
-                    Store store = StoresFacade.GetStore(bag.Key).Data;
-                    store.UpdateInventory(bag.Value);
-                    store.History.AddPurchasedShoppingBag(bag.Value);
-                }
-                return new Result<ShoppingCartService>(res.Message, true, res.Data.GetDAL().Data);
-            }
+                    Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails);
+                    if (res.Data != null)
+                    {
+                        ShoppingCart purchasedCart = res.Data;
+                        ConcurrentDictionary<String, ShoppingBag> purchasedBags = purchasedCart.ShoppingBags;
+                        foreach (var bag in purchasedBags)
+                        {
+                            Store store = StoresFacade.GetStore(bag.Key).Data;
+                            store.UpdateInventory(bag.Value);
+                            store.History.AddPurchasedShoppingBag(bag.Value);
+                        }
+                        return new Result<ShoppingCartService>(res.Message, true, res.Data.GetDAL().Data);
+                    }
 
-            //else failed
-            return new Result<ShoppingCartService>(res.Message, false, null);
+                    //else failed
+                    return new Result<ShoppingCartService>(res.Message, false, null);
+                }
+                finally
+                {
+                    Monitor.Exit(my_lock);
+                }
+            }
+            catch (SynchronizationLockException SyncEx)
+            {
+                Console.WriteLine("A SynchronizationLockException occurred. Message:");
+                Console.WriteLine(SyncEx.Message);
+                return new Result<ShoppingCartService>(SyncEx.Message, false, null);
+            }
         }
        
         public Result<double> GetTotalShoppingCartPrice(String userID)

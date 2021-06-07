@@ -52,7 +52,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
         public Result<IDictionary<string, object>> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() { { "Type", "BuyNow" }, { "Id", Id }, { "Policy", Policy.GetData().Data } };
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                { "Type", "BuyNow" }, 
+                { "Id", Id }, 
+                { "Policy", Policy.GetData().Data } 
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "BuyNow"},
+                { "children", new Dictionary<String, object>[0] }
+            };
+            List<IDictionary<string, object>> children = new List<IDictionary<string, object>>();
+            Result<IDictionary<string, object>> PolicyResult = Policy.GetData();
+            if (!PolicyResult.ExecStatus)
+                return PolicyResult;
+            children.Add(PolicyResult.Data);
+            dict["children"] = children.ToArray();
             return new Result<IDictionary<string, object>>("", true, dict);
         }
 

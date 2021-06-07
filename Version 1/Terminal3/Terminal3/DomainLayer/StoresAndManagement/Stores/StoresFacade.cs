@@ -762,8 +762,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         // Get reciptes for owner in store 
         public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id)
         {
-            DateTime start = DateTime.ParseExact(start_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            DateTime end = DateTime.ParseExact(end_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            DateTime start = DateTime.ParseExact(start_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            DateTime end = DateTime.ParseExact(end_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
             List<Tuple<DateTime, Double>> recipts_list = new List<Tuple<DateTime, double>>(); 
 
@@ -839,7 +839,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
         private void UpdatePolicyRoot(BuyNow purchaseRoot)
         {
-            mapper.DeleteDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
+            mapper.DeleteBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
             mapper.Create(purchaseRoot);
         }
     }

@@ -63,7 +63,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
         public Result<IDictionary<string, object>> GetData()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() { { "Type", "RestrictedHoursPolicy"}, { "Id", Id }, { "StartRestrict", StartRestrict }, { "EndRestrict", EndRestrict }, { "ProductId", ProductId } };
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "Type", "RestrictedHoursPolicy"}, 
+                { "Id", Id }, 
+                { "StartRestrict", StartRestrict }, 
+                { "EndRestrict", EndRestrict }, 
+                { "ProductId", ProductId } 
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Restricted Hours - from " + DateTimeToHour(StartRestrict) + " to " + DateTimeToHour(EndRestrict) + " for product " + ProductId},
+                { "children", new Dictionary<String, object>[0] }
+            };            
             return new Result<IDictionary<string, object>>("", true, dict);
         }
 
@@ -94,6 +106,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         public DTO_RestrictedHoursPolicy getDTO()
         {
             return new DTO_RestrictedHoursPolicy(this.Id, this.StartRestrict.ToString(), this.EndRestrict.ToString(), this.ProductId);
+        }
+
+        private String DateTimeToHour(DateTime date)
+        {
+            return date.Hour + ":" + date.Minute + ":" + date.Second;
         }
     }
 }

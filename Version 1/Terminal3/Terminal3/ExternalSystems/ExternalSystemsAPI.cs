@@ -40,7 +40,7 @@ namespace Terminal3.ExternalSystems
         public String Pay(IDictionary<String, Object> paymentDetails)
         {
             paymentDetails.Add("action_type", "pay");
-            return HttpClientPost(paymentDetails);         
+            return HttpClientPost(paymentDetails);
         }
 
         public String CancelPay(IDictionary<String, Object> paymentDetails)
