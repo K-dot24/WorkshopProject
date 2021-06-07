@@ -109,9 +109,9 @@ namespace Terminal3.DataAccessLayer
             try
             {
                 dbClient = new MongoClient(connection_string);
-                //database = dbClient.GetDatabase("Terminal3-development");
+                database = dbClient.GetDatabase("Terminal3-development");
                 //database = dbClient.GetDatabase("Terminal3-Testing");
-                database = dbClient.GetDatabase("Terminal3-tomer");
+                //database = dbClient.GetDatabase("Terminal3-tomer");
 
                 //DAOs
                 DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
@@ -1227,6 +1227,7 @@ namespace Terminal3.DataAccessLayer
             }
 
             s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , dto.isClosed);
+            s.NotificationManager.Store = s;
 
             Stores.TryAdd(s.Id, s);
             DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.MainDiscount._id));
