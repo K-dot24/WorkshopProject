@@ -470,14 +470,13 @@ export function GetStoreStaff(ownerID, storeID) {
 /// Returns in-store purchase history
 /// <param name="ownerID">ownerID</param>
 /// <param name="storeID">ID of the store to get the purchase history</param>
-export function GetStorePurchaseHistory( data ) {
-    return fetch(`https://localhost:5000/api/StoreStaff/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeId}`, {
+export function GetStorePurchaseHistory( ownerID, storeID ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetStorePurchaseHistory/${ownerID}/${storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
@@ -496,6 +495,21 @@ export function RemoveStoreManager( storeID, currentlyOwnerID, removedManagerID 
     })
 }
 
+/// Get store's incomes by day
+/// <param name="StartDate">Start Date</param>
+/// <param name="EndDate">End Date</param>
+/// <param name="storeID">StoreID</param>
+/// <param name="OwnerID">OwnerID</param>
+export function GetIncomeAmountGroupByDay( data ) {
+    return fetch(`https://localhost:5000/api/StoreStaff/GetIncomeAmountGroupByDay`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
 
 //#endregion
 
@@ -562,14 +576,13 @@ export function RemoveSystemAdmin( sysAdminID, email ) {
 
 /// Reset the system, including all the stored data
 /// <param name="sysAdminID">userId of the system admin who preform the addition</param>
-export function ResetSystem( data ) {
-    return fetch(`https://localhost:5000/api/SystemAdmin/ResetSystem/${data.sysAdminID}`, {
-        method: 'POST',                                       
+export function ResetSystem( sysAdminID ) {
+    return fetch(`https://localhost:5000/api/SystemAdmin/ResetSystem/${sysAdminID}`, {
+        method: 'PUT',                                       
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 

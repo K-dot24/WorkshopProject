@@ -6,7 +6,7 @@ import CreditCardInput from 'react-credit-card-input';
 import Review from './Review'
 import { printErrorMessage, Purchase } from '../../api/API';
 
-const PaymentForm = ({ userID, shippingData, checkoutToken, nextStep, backStep }) => {
+const PaymentForm = ({ userID, shippingData, checkoutToken, nextStep, backStep, handlePurchase }) => {
     const [cardNumber, setCardNumber] = useState('');
     const [expiry, setExpiry] = useState('');
     const [cvc, setCvc] = useState('');
@@ -55,8 +55,10 @@ const PaymentForm = ({ userID, shippingData, checkoutToken, nextStep, backStep }
             }
         }
 
-        Purchase(orderData).then(response => response.ok ?
-            response.json().then(result => result.execStatus ? nextStep() : console.log(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+        handlePurchase(orderData);
+
+        // Purchase(orderData).then(response => response.ok ?
+        //     response.json().then(result => result.execStatus ? nextStep() : console.log(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     return (
