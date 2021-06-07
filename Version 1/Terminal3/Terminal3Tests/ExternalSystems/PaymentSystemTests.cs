@@ -8,9 +8,14 @@ namespace Terminal3.ExternalSystems.Tests
     {
 
         public IDictionary<String, Object> paymentDetails;
+        public bool isMock { get; }
         public PaymentSystemTests()
         {
-            ExternalSystemsAPI.getInstance("https://cs-bgu-wsep.herokuapp.com/");
+            isMock = true;
+            if (isMock)
+                ExternalSystemsAPI.getInstance("");
+            else
+                ExternalSystemsAPI.getInstance("https://cs-bgu-wsep.herokuapp.com/");
             paymentDetails = new Dictionary<String, Object>
                     {
                      { "card_number", "2222333344445555" },
