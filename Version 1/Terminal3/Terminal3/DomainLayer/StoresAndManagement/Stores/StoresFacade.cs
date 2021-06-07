@@ -335,6 +335,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 mapper.Create(newStore);
                 mapper.Create(newStore.PolicyManager.MainDiscount);
                 mapper.Create(newStore.PolicyManager.MainPolicy);
+                mapper.Create(newStore.PolicyManager.MainPolicy.Policy);
 
                 Stores.TryAdd(newStore.Id, newStore);
                 NotificationManager notificationManager = new NotificationManager(newStore);
@@ -841,6 +842,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             mapper.DeleteBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
             mapper.Create(purchaseRoot);
+            mapper.Create(purchaseRoot.Policy);
         }
     }
 }
