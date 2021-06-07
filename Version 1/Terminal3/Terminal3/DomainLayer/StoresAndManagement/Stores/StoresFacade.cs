@@ -780,10 +780,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                         {
                             amountPerDay += dto.amount;
                         }
-                        if (amountPerDay > 0)
-                        {
-                            recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
-                        }
+                        
+                        recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));                        
                         curr = curr.AddDays(1);
                     }
 
@@ -815,10 +813,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     {
                         amountPerDay += dto.amount;
                     }
-                    if (amountPerDay > 0)
-                    {
-                        recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
-                    }
+
+                    recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));                 
 
                     curr = curr.AddDays(1);
                 }
