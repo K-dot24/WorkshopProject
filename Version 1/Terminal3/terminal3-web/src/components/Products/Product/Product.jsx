@@ -19,10 +19,10 @@ const Product = ({ product, onAddToBag }) => {
                     <Typography variant="h5">
                         {product.price}₪
                     </Typography>
-                    <Typography variant="subtitle2">    {/* TODO: Maybe somehow show only to staff */}
-                        {product.id}
-                    </Typography>
                 </div>
+                <Typography variant="subtitle2">    {/* TODO: Maybe somehow show only to staff */}
+                    {product.id}
+                </Typography>
                 <Typography variant="body2" color="textSecondary">{product.category}</Typography>
             </CardContent>
             <CardActions disableSpacing className={classes.cardActions}>
