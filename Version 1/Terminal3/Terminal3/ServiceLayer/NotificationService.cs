@@ -15,7 +15,9 @@ namespace Terminal3.ServiceLayer
         StoreClosed,
         StoreOpened,
         OwnerSubscriptionRemoved,
-        ProductReview
+        ProductReview,
+        OfferRecievedStore,
+        OfferRecievedUser
     };
 
     public sealed class NotificationService
@@ -34,6 +36,8 @@ namespace Terminal3.ServiceLayer
             notificationToBeSend.Add(Event.StoreOpened, new List<Notification>());
             notificationToBeSend.Add(Event.OwnerSubscriptionRemoved, new List<Notification>());
             notificationToBeSend.Add(Event.ProductReview, new List<Notification>());
+            notificationToBeSend.Add(Event.OfferRecievedStore, new List<Notification>());
+            notificationToBeSend.Add(Event.OfferRecievedUser, new List<Notification>());
 
         }
 

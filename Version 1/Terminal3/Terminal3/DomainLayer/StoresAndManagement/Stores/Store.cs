@@ -65,6 +65,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; set; }
+        public LinkedList<Offer> Offers { get; set; }
         public History History { get; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
@@ -625,6 +626,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<bool> EditPurchasePolicy(Dictionary<string, object> info, string id)
         {
             return PolicyManager.EditPurchasePolicy(info, id);
+        }
+
+        public Result<bool> AddOffer(Dictionary<string, object> info)
+        {
+            Result<Offer> res = Offer.Create(info);
+            if (res.ExecStatus)
+            {
+                Offers.AddLast(res.Data);
+                asdas
+                return new Result<bool>(res.Message, res.ExecStatus, true);
+            }
+            return new Result<bool>(res.Message, res.ExecStatus, false);
+
         }
 
         public DTO_Store getDTO()

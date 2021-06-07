@@ -66,6 +66,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>($"All staff members are notified that a product review was added to store {Store.Id} successfuly\n", true, true);
         }
 
+        public Result<bool> notifyOfferRecievedStore(String UserID, String ProductID, int Amount, double Price)
+        {
+            String msg = $"Event : An offer has been received\nUser Id : {UserID}\nProduct Id : {ProductID}\nAmount : {Amount}\nPrice : {Price}\n";
+            notify(Event.OfferRecievedStore, msg, true);
+            return new Result<bool>($"All staff members are notified that an offer was recieved from the user : {UserID}\n", true, true);
+        }
+
+        public Result<bool> notifyOfferRecievedUser(String UserID, String ProductID, int Amount, double CounterOffer, bool Accepted)
+        {
+            String msg = $"Event : An offer has been received\nUser Id : {UserID}\nProduct Id : {ProductID}\nAmount : {Amount}\nPrice : {Price}\n";
+            notifyOwners(Event.OfferRecievedUser, msg, true);
+            return new Result<bool>($"All staff members are notified that an offer was recieved from the user : {UserID}\n", true, true);
+        }
+
 
 
         // Private Functions

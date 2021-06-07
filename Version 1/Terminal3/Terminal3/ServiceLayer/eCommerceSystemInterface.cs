@@ -140,6 +140,10 @@ namespace Terminal3.ServiceLayer
         public Result<List<Tuple<String, String>>> GetProductReview(String storeID, String productID) {
             return GuestUserInterface.GetProductReview(storeID, productID);
         }
+        public Result<bool> SendOfferToStore(string storeID, Dictionary<string, object> info)
+        {
+            return GuestUserInterface.SendOfferToStore(storeID, info);
+        }
         #endregion
 
         #region Register User Actions

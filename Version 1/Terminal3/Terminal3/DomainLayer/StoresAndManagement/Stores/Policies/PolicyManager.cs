@@ -40,7 +40,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public DiscountAddition MainDiscount { get; }
         public BuyNow MainPolicy { get; set; }
-
         public PolicyManager()
         {
             MainDiscount = new DiscountAddition();
@@ -370,6 +369,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             }
             return result;
         }
+
+        
     }
 
 /*    // Update Store in DB
