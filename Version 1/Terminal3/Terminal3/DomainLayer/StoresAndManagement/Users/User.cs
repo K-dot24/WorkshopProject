@@ -6,6 +6,7 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ExternalSystems;
 using Terminal3.DataAccessLayer.DTOs;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -13,11 +14,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public String Id { get;}
         public ShoppingCart ShoppingCart { get; set; }
-
+        public LinkedList<Offer> Offers { get; set; }
         protected User()
         {
             Id = Service.GenerateId();
             ShoppingCart = new ShoppingCart();
+            Offers = new LinkedList<Offer>();
         }
         protected User(string id)
         {
@@ -25,11 +27,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 Id = Service.GenerateId();
             else Id = id;
             ShoppingCart = new ShoppingCart();
+            Offers = new LinkedList<Offer>();
         }
         protected User(String id , ShoppingCart shoppingCart)
         {
             Id = id;
             ShoppingCart = shoppingCart;
+            Offers = new LinkedList<Offer>();
         }
 
 
@@ -137,6 +141,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 }
             }
             return true;
+        }
+
+        public Result<bool> SendOfferToStore(string storeID, Dictionary<string, object> info)
+        {
+            Result<Offer> res_o = Offer.Create(info);
+            if (!res_o.ExecStatus)
+                return new Result<bool>(res_o.Message, res_o.ExecStatus, false);
+            Offers.AddLast(res_o.Data);
+            return new Result<bool>("", true, true);
         }
 
         public Result<UserService> GetDAL()

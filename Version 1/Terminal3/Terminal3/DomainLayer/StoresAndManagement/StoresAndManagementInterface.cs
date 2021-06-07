@@ -58,6 +58,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<UserService> EnterSystem();
         Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<double> GetTotalShoppingCartPrice(String userID);
+        Result<bool> SendOfferToStore(string storeID, Dictionary<string, object> info);
         #endregion
 
         #region System Managment
@@ -622,6 +623,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date)
         {
             return StoresFacade.GetIncomeAmountGroupByDay(start_date, end_date);
+        }
+
+        public Result<bool> SendOfferToStore(string storeID, Dictionary<string, object> info)
+        {
+            return UsersAndPermissionsFacade.SendOfferToStore(storeID, info);
         }
     }
 }
