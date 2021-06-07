@@ -1,61 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
-
-import { Typography, Avatar, ListItemText, ListItem, List, Paper } from '@material-ui/core'
-import { Receipt } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/core/styles';
-import { Products, Navbar, Cart, Action, CheckboxList, Policy } from '../../../../components';
+import { Products, Navbar, Cart, Action, Policy, InfoDisplay } from '../../../../components';
 
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
         AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct,
         printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
         AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition, AddPurchasePolicy, 
         AddPurchasePolicyById, RemovePurchasePolicy, GetIncomeAmountGroupByDay, GetStorePurchaseHistory } from '../../../../api/API';
-
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        height: 110,
-        flexGrow: 1,
-        maxWidth: 400,
-    },
-    toolbar: theme.mixins.toolbar,
-    layout: {
-        marginTop: '5%',
-        width: 'auto',
-        marginLeft: theme.spacing(2),
-        marginRight: theme.spacing(2),
-        [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
-            width: 600,
-            marginLeft: 'auto',
-            marginRight: 'auto',
-        },
-    },
-    paper: {
-        marginTop: theme.spacing(3),
-        marginBottom: theme.spacing(3),
-        padding: theme.spacing(2),
-        [theme.breakpoints.down('xs')]: {
-            width: '100%',
-            marginTop: 60,
-        },
-        [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-            marginTop: theme.spacing(6),
-            marginBottom: theme.spacing(6),
-            padding: theme.spacing(3),
-        },
-    },
-    title: {
-        marginTop: theme.spacing(8),
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-    },
-    avatar: {
-        margin: theme.spacing(1),
-        backgroundColor: theme.palette.secondary.main,
-    },
-}));
 
 
 const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
@@ -65,7 +16,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     // States for information display (GetStoreStaff, GetIncomeAmount...)
     const [issued, setIssued] = useState(false);
     const [info, setInfo] = useState(null);
-    const classes = useStyles();
 
     const fetchProducts = async () => {
         GetAllProductByStoreIDToDisplay(store.id).then(response => response.json().then(json => setProducts(json))).catch(err => console.log(err));
@@ -387,63 +337,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         console.log(info);
     }, [info]);
 
-
-    // Information component
-    const InfoDisplay = () =>
-    <>
-        <div className={classes.toolbar} />
-        <main className={classes.layout}>
-            <div className={classes.title}>
-                <Avatar className={classes.avatar}>
-                    <Receipt />
-                </Avatar>
-                <Typography variant="h6" gutterBottom>Results</Typography>
-            </div>
-            <Paper className={classes.paper}>
-                <List disablePadding>
-                    {info.type === 'purchaseHistory' ? (
-                        info.data.shoppingBags.map((bag) => bag.products.map((product) => (
-                            <ListItem style={{padding: '10px 0'}} key={product.item1.name}>
-                                <ListItemText primary={product.item1.name} secondary={`User: ${bag.userId} | Quantity: ${product.item2}`} />
-                                <Typography variant="body2">{product.item1.price * product.item2}₪</Typography>
-                            </ListItem>
-                        )))
-                    )
-                    :
-                    info.data.map((item, index) => ( info.type === 'incomes' ?
-                        <ListItem style={{padding: '10px 0'}} key={index}>
-                            <ListItemText primary={item.item1.substring(0, 10)} />
-                            <Typography variant="body2">{item.item2}₪</Typography>
-                        </ListItem>
-                    :
-                        info.type === 'staff' &&
-                        <ListItem style={{padding: '10px 0'}} key={index}>
-                            <ListItemText primary={item.item1.id} secondary={item.item2.isOwner ? "Owner" : "Manager"} />
-                            <Typography variant="body2">{`Permissions: ${item.item2.functionsBitMask.map((permission, index) => (
-                                permission ? index : null
-                            ))}`}</Typography>
-                        </ListItem>
-                    ))}
-
-                    {/* {info.data.map((item, index) => ( info.type === 'incomes' ?
-                        <ListItem style={{padding: '10px 0'}} key={index}>
-                            <ListItemText primary={item.item1.substring(0, 10)} />
-                            <Typography variant="body2">{item.item2}₪</Typography>
-                        </ListItem>
-                    :
-                        info.type === 'staff' &&
-                        <ListItem style={{padding: '10px 0'}} key={index}>
-                            <ListItemText primary={item.item1.id} secondary={item.item2.isOwner ? "Owner" : "Manager"} />
-                            <Typography variant="body2">{`Permissions: ${item.item2.functionsBitMask.map((permission, index) => (
-                                permission ? index : null
-                            ))}`}</Typography>
-                        </ListItem>
-                    ))} */}
-                </List>
-            </Paper>
-        </main>
-    </>
-
     return (
         <div>
             <Navbar storeId={store.id} totalItems={bag.products.length} user={user} handleLogOut={handleLogOut} 
@@ -643,7 +536,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             </Switch>
 
             {/* Information display */}
-            {(issued && info !== null) && <InfoDisplay />}
+            {(issued && info !== null) && <InfoDisplay info={info} />}
         
         </div>
     )
