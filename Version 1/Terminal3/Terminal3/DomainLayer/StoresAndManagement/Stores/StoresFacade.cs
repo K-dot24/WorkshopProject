@@ -835,12 +835,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         private void UpdatePolicyRoot(DiscountAddition discountRoot)
         {
-            mapper.DeleteDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", discountRoot.Id));
+            mapper.DAO_DiscountAddition.Delete(Builders<BsonDocument>.Filter.Eq("_id", discountRoot.Id));
             mapper.Create(discountRoot);
         }
         private void UpdatePolicyRoot(BuyNow purchaseRoot)
         {
-            mapper.DeleteBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
+            mapper.DAO_BuyNow.Delete(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
             mapper.Create(purchaseRoot);
             mapper.Create(purchaseRoot.Policy);
         }
