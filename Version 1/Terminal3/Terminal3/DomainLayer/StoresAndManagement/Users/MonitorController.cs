@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using Terminal3.DataAccessLayer;
 using Terminal3.DataAccessLayer.DTOs;
+using Terminal3.ServiceLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -20,22 +21,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         private MonitorController()
         {
+            DTO_Monitor dto = Mapper.getInstance().LoadMonitor();
             today = DateTime.Now.Date;
-            GuestUsers = 0;
-            RegisteredUsers = 0;
-            ManagersNotOwners = 0;
-            Owners = 0;
-            Admins = 0;
-        }
-
-        private MonitorController(int guestUsers, int registeredUsers, int managersNotOwners, int owners, int admins)
-        {
-            today = DateTime.Now.Date;
-            GuestUsers = guestUsers;
-            RegisteredUsers = registeredUsers;
-            ManagersNotOwners = managersNotOwners;
-            Owners = owners;
-            Admins = admins;
+            GuestUsers = dto.GuestUsers;
+            RegisteredUsers = dto.RegisteredUsers;
+            ManagersNotOwners = dto.ManagersNotOwners;
+            Owners = dto.Owners;
+            Admins = dto.Admins;
         }
 
         public static MonitorController getInstance()
@@ -89,6 +81,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             //save in DB
             String date = today.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo);
+            NotificationService.GetInstance().sendMonitorStatus(new DTO_Monitor(date,GuestUsers,RegisteredUsers,ManagersNotOwners,Owners,Admins));
             Mapper.getInstance().Update(new DTO_Monitor(date, GuestUsers, RegisteredUsers, ManagersNotOwners, Owners, Admins));
         }
     }
