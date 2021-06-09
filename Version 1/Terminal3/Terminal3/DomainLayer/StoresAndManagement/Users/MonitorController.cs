@@ -8,19 +8,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         private static MonitorController Instance = null;
 
-        public List<Tuple<DateTime, String>> GuestUsers { get; set;}
-        public List<Tuple<DateTime, String>> RegisteredUsers { get; set; }
-        public List<Tuple<DateTime, String>> ManagersNotOwners { get; set; }
-        public List<Tuple<DateTime, String>> Owners { get; set;}
-        public List<Tuple<DateTime, String>> Admins { get; set; }
+        DateTime today;
+        public int GuestUsers { get; set; }
+        public int RegisteredUsers { get; set; }
+        public int ManagersNotOwners { get; set; }
+        public int Owners { get; set; }
+        public int Admins { get; set; }
 
         private MonitorController()
         {
-            GuestUsers = new List<Tuple<DateTime, string>>();
-            RegisteredUsers = new List<Tuple<DateTime, string>>();
-            ManagersNotOwners = new List<Tuple<DateTime, string>>();
-            Owners = new List<Tuple<DateTime, string>>();
-            Admins = new List<Tuple<DateTime, string>>();
+            today = DateTime.Now.Date;
+            GuestUsers = 0;
+            RegisteredUsers = 0;
+            ManagersNotOwners = 0;
+            Owners = 0;
+            Admins = 0;
         }
 
         public static MonitorController getInstance()
@@ -32,5 +34,48 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return Instance;
         }
 
+        public void update(String fieldName)
+        {
+            if (DateTime.Now.Date != today)
+            {
+                //save in DB
+
+                GuestUsers = 0;
+                RegisteredUsers = 0;
+                ManagersNotOwners = 0;
+                Owners = 0;
+                Admins = 0;
+
+            }
+
+            switch (fieldName)
+            {
+                case "GuestUsers":
+                    GuestUsers--;
+                    break;
+
+                case "RegisteredUsers":
+                    RegisteredUsers++;
+                    GuestUsers--;
+                    break;
+
+                case "ManagersNotOwners":
+                    ManagersNotOwners++;
+                    GuestUsers--;
+                    break;
+
+
+                case "Owners":
+                    Owners++;
+                    GuestUsers--;
+                    break;
+
+
+                case "Admins":
+                    Admins++;
+                    GuestUsers--;
+                    break;
+            }
+        }
     }
 }
