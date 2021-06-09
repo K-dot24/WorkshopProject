@@ -304,7 +304,7 @@ namespace Terminal3.DataAccessLayer
                     products.TryAdd(LoadProduct(filter), p.Value);
                 }
                 //sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user, LoadStore(), products, bag.Value.TotalBagPrice)); - TODO
-                sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user, products, bag.Value.TotalBagPrice));
+                sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user,LoadStore(Builders<BsonDocument>.Filter.Eq("_id", bag.Value.StoreId)) ,products, bag.Value.TotalBagPrice));
             }
             ShoppingCart sc = new ShoppingCart(dto._id, sb, dto.TotalCartPrice);
             return sc;
@@ -1226,10 +1226,11 @@ namespace Terminal3.DataAccessLayer
             }
 
             s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , dto.isClosed);
+            s.NotificationManager.Store = s;
 
             Stores.TryAdd(s.Id, s);
-            DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.DiscountRoot._id));
-            BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.PurchaseRoot._id));
+            DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.MainDiscount._id));
+            BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.MainPolicy._id));
             s.PolicyManager = new PolicyManager(MainDiscount, MainPolicy);
             StoreOwner founder = getOwnershipTree(s, dto.Founder);
 

@@ -25,6 +25,7 @@ namespace Terminal3WebAPI
                                     {
                                         { "Register",new Func<string,string,string,Result<RegisteredUserService>>(system.Register)},
                                         { "Login",new Func< string, string,Result<RegisteredUserService>>(system.Login)},
+                                        { "LogOut",new Func< string,Result<UserService>>(system.LogOut)},
                                         { "OpenNewStore",new Func< string, string,string,Result<StoreService>>(system.OpenNewStore)},
                                         { "AddProductToStore",new Func< String , String , String , double , int , String , LinkedList<String> ,Result<ProductService>>(system.AddProductToStore)},
                                         { "AddStoreManager",new Func< String , String , String ,Result<Boolean>>(system.AddStoreManager)}

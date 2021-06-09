@@ -28,9 +28,9 @@ namespace Terminal3.DataAccessLayer.DTOs
         [BsonElement]
         public Boolean isClosed { get; set; }
         [BsonElement]
-        public DTO_DiscountAddition DiscountRoot { get; set; } // List of IDiscountPolicy ids 
+        public DTO_DiscountAddition MainDiscount { get; set; } // List of IDiscountPolicy ids 
         [BsonElement]
-        public DTO_BuyNow PurchaseRoot { get; set; }
+        public DTO_BuyNow MainPolicy { get; set; }
 
 
 
@@ -47,8 +47,8 @@ namespace Terminal3.DataAccessLayer.DTOs
             Rating = rating;
             NumberOfRates = numberOfRates;
             isClosed = isclosed;
-            DiscountRoot = discount;
-            PurchaseRoot = by_now;
+            MainDiscount = discount;
+            MainPolicy = by_now;
         }
     }
 }

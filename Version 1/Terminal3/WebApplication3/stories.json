@@ -23,6 +23,10 @@
     {
       "function": "AddStoreManager",
       "args": [ "user3ID", "user2ID", "StoreID1" ]
+    },
+    {
+      "function": "LogOut",
+      "args": [ "user2@email.com" ]
     }
   ]
 }
