@@ -57,10 +57,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             LoadSystemAdmins();
             if (SystemAdmins.IsEmpty)
             {
-                var sha1 = new SHA1CryptoServiceProvider();
-                var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(admin_password));                
-
-                defaultUser = new RegisteredUser("-777", admin_email, Encoding.ASCII.GetString(hash_pass));
+                defaultUser = new RegisteredUser("-777", admin_email, admin_password);
                 insertInitializeData(defaultUser);
             }
         }
@@ -82,13 +79,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 {
                     if (isUniqueEmail(email))
                     {
-                        RegisteredUser newUser;
-                        var sha1 = new SHA1CryptoServiceProvider();
-                        var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));                        
+                        RegisteredUser newUser;                  
                         if (Id == "-1")
-                            newUser = new RegisteredUser(email, Encoding.ASCII.GetString(hash_pass));
+                            newUser = new RegisteredUser(email, password);
                         else
-                            newUser = new RegisteredUser(Id , email, Encoding.ASCII.GetString(hash_pass));
+                            newUser = new RegisteredUser(Id , email, password);
 
                         this.RegisteredUsers.TryAdd(newUser.Id, newUser);
 
