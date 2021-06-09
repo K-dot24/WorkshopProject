@@ -548,14 +548,13 @@ export function AdminGetUserPurchaseHistory( sysAdminID, userID ) {
 /// Returns in-store purchase history
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="storeId">ID of the store to get the purchase history</param>
-export function AdminGetStorePurchaseHistory( data ) {
-    return fetch(`${API_URL}/SystemAdmin/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeID}`, {
+export function AdminGetStorePurchaseHistory( sysAdminID, storeID ) {
+    return fetch(`${API_URL}/SystemAdmin/GetStorePurchaseHistory/${sysAdminID}/${storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
