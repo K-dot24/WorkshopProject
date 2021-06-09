@@ -91,6 +91,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             if(!checkInventory(this.ShoppingBags))
                 return new Result<ShoppingCart>("A bag in the Shopping cart contains more of a product than the store can supply", false, null);
+                        
             if (!AdheresToPolicy().Data)
                 return new Result<ShoppingCart>("A bag in the Shopping cart doesn't adhere to it's respective store's policy", false, null);
 

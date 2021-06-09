@@ -56,7 +56,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<ProductService> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
         Result<UserService> EnterSystem();
-        Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        //Result<ShoppingCartService> PurchaseAsync(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        System.Threading.Tasks.Task<Result<ShoppingCartService>> PurchaseAsync(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<double> GetTotalShoppingCartPrice(String userID);
         #endregion
 
@@ -457,42 +458,54 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<UserService>(result.Message, result.ExecStatus,null);
         }
 
-        public Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        public async System.Threading.Tasks.Task<Result<ShoppingCartService>> PurchaseAsync(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
-            // TODO - lock products ?
-            try
+
+            using (var session = await Mapper.getInstance().GetMongoClient().StartSessionAsync())
             {
-                Monitor.Enter(my_lock);
+                // Begin transaction
+                session.StartTransaction();
+
                 try
                 {
-                    Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails);
-                    if (res.Data != null)
+                    Monitor.Enter(my_lock);
+                    try
                     {
-                        ShoppingCart purchasedCart = res.Data;
-                        ConcurrentDictionary<String, ShoppingBag> purchasedBags = purchasedCart.ShoppingBags;
-                        foreach (var bag in purchasedBags)
+                        Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails);
+                        if (res.Data != null)
                         {
-                            Store store = StoresFacade.GetStore(bag.Key).Data;
-                            store.UpdateInventory(bag.Value);
-                            store.History.AddPurchasedShoppingBag(bag.Value);
+                            ShoppingCart purchasedCart = res.Data;
+                            ConcurrentDictionary<String, ShoppingBag> purchasedBags = purchasedCart.ShoppingBags;
+                            foreach (var bag in purchasedBags)
+                            {
+                                Store store = StoresFacade.GetStore(bag.Key).Data;
+                                store.UpdateInventory(bag.Value);
+                                store.History.AddPurchasedShoppingBag(bag.Value);
+                            }
+                            return new Result<ShoppingCartService>(res.Message, true, res.Data.GetDAL().Data);
                         }
-                        return new Result<ShoppingCartService>(res.Message, true, res.Data.GetDAL().Data);
-                    }
 
-                    //else failed
-                    return new Result<ShoppingCartService>(res.Message, false, null);
+                        //else failed
+                        return new Result<ShoppingCartService>(res.Message, false, null);
+                    }
+                    finally
+                    {
+                        Monitor.Exit(my_lock);
+                    }
                 }
-                finally
+                catch (SynchronizationLockException SyncEx)
                 {
-                    Monitor.Exit(my_lock);
+                    Console.WriteLine("A SynchronizationLockException occurred. Message:");
+                    Console.WriteLine(SyncEx.Message);
+                    return new Result<ShoppingCartService>(SyncEx.Message, false, null);
                 }
-            }
-            catch (SynchronizationLockException SyncEx)
-            {
-                Console.WriteLine("A SynchronizationLockException occurred. Message:");
-                Console.WriteLine(SyncEx.Message);
-                return new Result<ShoppingCartService>(SyncEx.Message, false, null);
-            }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error writing to MongoDB: " + e.Message);
+                    await session.AbortTransactionAsync();
+                    return new Result<ShoppingCartService>(e.Message, false, null);
+                }
+            }           
         }
        
         public Result<double> GetTotalShoppingCartPrice(String userID)

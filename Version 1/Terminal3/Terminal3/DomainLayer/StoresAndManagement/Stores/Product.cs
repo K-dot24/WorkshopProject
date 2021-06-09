@@ -91,7 +91,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             {
                 return new Result<bool>("Error: No Notification Manager set for this product\n", false, false);
             }
-            Quantity = Quantity - quantity;
+            this.Quantity = this.Quantity - quantity;
             return NotificationManager.notifyStorePurchase(this, quantity);
         }
 

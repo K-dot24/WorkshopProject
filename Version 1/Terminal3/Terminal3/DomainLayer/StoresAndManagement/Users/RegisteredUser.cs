@@ -16,20 +16,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         //Properties
         public String Email { get; }
-        public String Password { get; set; }        //TODO- change set;
+        public String Password { get; set; }        
         public Boolean LoggedIn { get; set; }
         public History History { get; set; }
-        public LinkedList<Notification> PendingNotification { get; }
-        public NotificationCenter NotificationCenter {get;}
+        public LinkedList<Notification> PendingNotification { get; set; }
+        public NotificationCenter NotificationCenter {get; set; }
 
         //public Mapper mapper = Mapper.getInstance();
-        
+
         //Constructor
         public RegisteredUser(String email , String password) : base()
         {
             this.Email = email;
             this.Password = password;
             this.LoggedIn = false;
+            this.History = new History();
+            this.PendingNotification = new LinkedList<Notification>();
+            this.NotificationCenter = NotificationCenter.GetInstance();
+        }
+
+        public RegisteredUser(String Id, String email, String password , Boolean loggedin) : base(Id)
+        {
+            this.Email = email;
+            this.Password = password;
+            this.LoggedIn = loggedin;
             this.History = new History();
             this.PendingNotification = new LinkedList<Notification>();
             this.NotificationCenter = NotificationCenter.GetInstance();
@@ -153,7 +163,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (result.Data != null)
             {
                 History.AddPurchasedShoppingCart(ShoppingCart);
-                ShoppingCart = new ShoppingCart();          // create new shopping cart for user
+                this.ShoppingCart = new ShoppingCart();          // create new shopping cart for user
 
                /* // Update DB
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
@@ -172,6 +182,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<Boolean>("User is LoggedIn , therefor displaying the notification\n", true, true);
             }
             PendingNotification.AddLast(notification);
+
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_notification = Builders<BsonDocument>.Update.Set("PendingNotification", getPendingNotificationsDTO());
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_notification);
             return new Result<Boolean>("User not logged in , therefore the notification is added to pending list\n", false, false);
         }    
 
@@ -199,19 +213,26 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     PendingNotification.Remove(notification);
                 }
             }
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_notification = Builders<BsonDocument>.Update.Set("PendingNotification", getPendingNotificationsDTO());
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_notification);
             
         }
 
         public DTO_RegisteredUser getDTO()
+        {            
+            return new DTO_RegisteredUser(Id, ShoppingCart.getDTO(), Email, Password, 
+                                        LoggedIn, History.getDTO(), getPendingNotificationsDTO());
+        }
+
+        public LinkedList<DTO_Notification> getPendingNotificationsDTO()
         {
             LinkedList<DTO_Notification> notifications_dto = new LinkedList<DTO_Notification>();
-            foreach(var n in PendingNotification)
+            foreach (var n in PendingNotification)
             {
-                notifications_dto.AddLast(n.getDTO()); 
+                notifications_dto.AddLast(n.getDTO());
             }
-            return new DTO_RegisteredUser(Id, ShoppingCart.getDTO(), Email, Password, 
-                                        LoggedIn, History.getDTO(), notifications_dto);
-
+            return notifications_dto;
         }
     }
 }

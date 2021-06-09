@@ -243,7 +243,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
                     mapper.UpdateRegisteredUser(filter, update);
-
+                    mapper.Load_RegisteredUserNotifications(res_ru.Data);
+                    mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
                     return res_ru;
                 }
 
@@ -272,6 +273,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
                     mapper.UpdateRegisteredUser(filter, update);
+                    mapper.Load_RegisteredUserNotifications(res_ru.Data);
+                    mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
                 }
                 return res_ru;
 
@@ -339,6 +342,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             if (RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
             {
+                mapper.Load_RegisteredUserHistory(user);
                 return user.GetUserPurchaseHistory();
             }
             return new Result<History>("Not a registered user\n", false, null);
@@ -348,6 +352,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             if (RegisteredUsers.TryGetValue(userID, out RegisteredUser user))   // Check if user is registered
             {
+                mapper.Load_StorePolicyManager(store);
                 Result<ShoppingCart> res_sc = user.AddProductToCart(product, productQuantity, store);
 
                 // Update DB
@@ -482,16 +487,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 {
                     // Update DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
-                    var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.Data.getDTO());
-                    mapper.UpdateRegisteredUser(filter, update);
+                    ShoppingCart sc = registerd_user.ShoppingCart;
+                    var update_shoppingcart = Builders<BsonDocument>.Update.Set("ShoppingCart", sc.getDTO());
+                    mapper.UpdateRegisteredUser(filter, update_shoppingcart);
                 }
 
                 return ShoppingCart; 
             }
-            else
-            {
-                return new Result<ShoppingCart>("User does not exist\n", false, null);
-            }
+            else { return new Result<ShoppingCart>("User does not exist\n", false, null); }
         }
 
 
