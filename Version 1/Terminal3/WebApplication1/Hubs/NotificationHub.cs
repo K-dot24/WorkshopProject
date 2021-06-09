@@ -34,9 +34,9 @@ namespace signalRgateway.Hubs
             }
         }
 
-        public async Task SendBroadcast(Notification message)
+        public async Task SendBroadcast(string message)
         {
-            await Clients.All.ReceiveMessage(message.Message);
+            await Clients.All.ReceiveMessage(message);
         }
 
         public async Task Identify(Identifier message)

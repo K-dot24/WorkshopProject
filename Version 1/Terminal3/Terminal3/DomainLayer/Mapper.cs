@@ -24,12 +24,18 @@ using System.Security.Cryptography;
 
 namespace Terminal3.DataAccessLayer
 {
+    public enum ConnectionStatus
+    {
+        OK=0,
+        Error=1
+    }
     public sealed class Mapper
     {
         //Fields
         private static Mapper Instance = null;
         public MongoClient dbClient;
         public IMongoDatabase database;
+        public static ConnectionStatus connectionStatus= ConnectionStatus.OK;
 
         // DAOs
         public DAO<DTO_RegisteredUser> DAO_RegisteredUser;
@@ -2415,6 +2421,13 @@ namespace Terminal3.DataAccessLayer
         #endregion Policies
 
         #region Utils
+        public static void NotifyConnectionError()
+        {
+            if (Mapper.connectionStatus.Equals(ConnectionStatus.Error))
+            {
+                NotificationService.GetInstance().Broadcast("Oops... Its seems like we got some trouble with the DB. Please try again in a few minutes");
+            }
+        }
         public void clearDB()
         {
             if (!(Instance is null))
