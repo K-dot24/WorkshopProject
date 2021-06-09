@@ -628,8 +628,54 @@ namespace Terminal3.DomainLayer.StoresAndManagement
     
         public void updateMonitor(String userID)
         {
-
+            MonitorController monitor = MonitorController.getInstance();
+            if (UsersAndPermissionsFacade.SystemAdmins.ContainsKey(userID))
+            {
+                monitor.update("Admins");
+                return;
+            }
+            Boolean owner = isOwner(userID);
+            if (isManager(userID) && !owner)
+            {
+                monitor.update("ManagersNotOwners");
+                return;
+            }
+            if (owner)
+            {
+                monitor.update("Owners");
+                return;
+            }
+            monitor.update("RegisteredUsers");
         }
-    
+
+        public Boolean isManager(String userID)
+        {
+            foreach (var record in StoresFacade.Stores)
+            {
+                Store s = record.Value;
+                foreach(var owner in s.Owners)
+                {
+                    if (owner.Value.GetId() == userID)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public Boolean isOwner(String userID)
+        {
+            foreach (var record in StoresFacade.Stores)
+            {
+                Store s = record.Value;
+                if(s.Founder.GetId() == userID)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
 }
