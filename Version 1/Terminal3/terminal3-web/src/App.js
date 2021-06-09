@@ -268,14 +268,6 @@ const App = () => {
             setProducts([]);
     }, [productSearchQuery]);
 
-    // useEffect(() => {
-    //     console.log(cart.products);
-    // }, [cart]);
-
-    useEffect(() => {
-        console.log(systemAdmins);
-    }, [systemAdmins]);
-
     useEffect(() => {
         setIssued(false);
         setInfo(null);

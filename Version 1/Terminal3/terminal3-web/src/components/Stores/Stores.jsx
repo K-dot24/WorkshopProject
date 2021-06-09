@@ -12,16 +12,8 @@ const Stores = ({ setPathname, match, user, searchQuery, handleAddToCart, handle
     const classes = useStyles();
     const location = useLocation();
 
-
-
     const fetchStores = async () => {
         GetAllStoresToDisplay().then(response => response.json().then(json => setStores(json))).catch(err => console.log(err));
-
-        // Mock data
-        // setStores([
-        //     { id: 1, name: 'Topshop', rating: 4, image: 'https://salience.co.uk/wp-content/uploads/topshop-1.jpg'},
-        //     { id: 2, name: 'ZARA MEN', rating: 4.5, image: 'https://blackfriday-best.co.il/wp-content/uploads/2020/11/ZARA-logo.jpg'}
-        // ]);
     }
 
     const searchStoresByQuery = async () => {
