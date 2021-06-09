@@ -12,7 +12,7 @@ namespace Terminal3.ServiceLayer.ServiceObjects
         public String Id { get; }
         public String UserId { get; }
         public String StoreId { get; }
-        public LinkedList<Tuple< ProductService , int>> Products { get; set; }  //<productDAL , quantity>  -- TODO - check why quantity here if there is a quantity field in productservice
+        public LinkedList<Tuple< ProductService , int>> Products { get; set; }  //<productDAL , quantity of product that was purchased>  
         public Double TotalBagPrice { get; }
 
 
