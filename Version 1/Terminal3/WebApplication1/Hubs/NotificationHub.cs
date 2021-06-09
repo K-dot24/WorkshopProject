@@ -2,6 +2,7 @@
 using signalRgateway.Client;
 using signalRgateway.Model;
 using signalRgateway.Models;
+using SignalRgateway.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,6 +59,11 @@ namespace signalRgateway.Hubs
             Console.WriteLine($"Logout: UserID:{message.newUserID}, ConnectionID:{Context.ConnectionId}");
 
 
+        }
+    
+        public async Task sendMonitor(Record status)
+        {
+            await Clients.All.ReceiveMonitor(status);
         }
     }
 }
