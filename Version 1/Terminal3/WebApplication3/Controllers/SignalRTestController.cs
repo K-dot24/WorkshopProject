@@ -42,12 +42,11 @@ namespace Terminal3WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<string> Post([FromBody] Notification msg)
+        public async Task<string> Broadcast([FromBody] string msg)
         {
             var retMessage = string.Empty;
             try
             {
-                //hubProxy.Invoke("SendBroadcast",msg);
                 await connection.InvokeAsync("SendBroadcast",msg);
             }
             catch (Exception e)
@@ -56,6 +55,7 @@ namespace Terminal3WebAPI.Controllers
             }
             return retMessage;
         }
+
     }
 }
 
