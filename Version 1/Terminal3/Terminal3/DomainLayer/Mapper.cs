@@ -2470,10 +2470,16 @@ namespace Terminal3.DataAccessLayer
         #endregion
 
         #region Monitor
-        public void Update(DTO_Monitor)
+        public void Update(DTO_Monitor monitor)
         {
-
-
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", monitor._id);
+            var update = Builders<BsonDocument>.Update.Set("Date", monitor.Date)
+                                                    .Set("GuestUsers", monitor.GuestUsers)
+                                                    .Set("RegisteredUsers", monitor.RegisteredUsers)
+                                                    .Set("ManagersNotOwners", monitor.ManagersNotOwners)
+                                                    .Set("Owners", monitor.Owners)
+                                                    .Set("Admins", monitor.Admins);
+            DAO_Monitor.Update(filter, update, true);
         }
         #endregion
     }
