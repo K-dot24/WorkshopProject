@@ -20,6 +20,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer;
+using System.Security.Cryptography;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -109,9 +110,9 @@ namespace Terminal3.DataAccessLayer
             try
             {
                 dbClient = new MongoClient(connection_string);
-                database = dbClient.GetDatabase("Terminal3-development");
+                //database = dbClient.GetDatabase("Terminal3-development");
                 //database = dbClient.GetDatabase("Terminal3-Testing");
-                //database = dbClient.GetDatabase("Terminal3-tomer");
+                database = dbClient.GetDatabase("Terminal3-tomer");
 
                 //DAOs
                 DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
@@ -821,7 +822,7 @@ namespace Terminal3.DataAccessLayer
         #region RegisteredUser
         public void Create(RegisteredUser ru)
         {            
-            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, ru.Password, ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification)));
+            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, ru.Password , ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification)));
             RegisteredUsers.TryAdd(ru.Id , ru);
         }        
 
