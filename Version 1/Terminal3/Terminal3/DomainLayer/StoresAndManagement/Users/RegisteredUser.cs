@@ -9,6 +9,8 @@ using Terminal3.DataAccessLayer;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using Terminal3.DataAccessLayer.DTOs;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -63,7 +65,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 //User already logged in
                 return new Result<RegisteredUser>($"{this.Email} already logged in", false, null);
             }
-            if (Password.Equals(password))
+            var sha1 = new SHA1CryptoServiceProvider();
+            var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));
+
+            if (Password.Equals(Encoding.ASCII.GetString(hash_pass)))
             {
                 // Correct paswword
                 LoggedIn = true;

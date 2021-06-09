@@ -10,6 +10,7 @@ using Terminal3.DataAccessLayer;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using Terminal3.DataAccessLayer.DTOs;
+using System.Security.Cryptography;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -56,7 +57,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             LoadSystemAdmins();
             if (SystemAdmins.IsEmpty)
             {
-                defaultUser = new RegisteredUser("-777", admin_email, admin_password);
+                var sha1 = new SHA1CryptoServiceProvider();
+                var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(admin_password));                
+
+                defaultUser = new RegisteredUser("-777", admin_email, Encoding.ASCII.GetString(hash_pass));
                 insertInitializeData(defaultUser);
             }
         }
@@ -78,11 +82,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 {
                     if (isUniqueEmail(email))
                     {
-                        RegisteredUser newUser; 
+                        RegisteredUser newUser;
+                        var sha1 = new SHA1CryptoServiceProvider();
+                        var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));                        
                         if (Id == "-1")
-                            newUser = new RegisteredUser(email, password);
+                            newUser = new RegisteredUser(email, Encoding.ASCII.GetString(hash_pass));
                         else
-                            newUser = new RegisteredUser(Id , email, password);
+                            newUser = new RegisteredUser(Id , email, Encoding.ASCII.GetString(hash_pass));
 
                         this.RegisteredUsers.TryAdd(newUser.Id, newUser);
 
