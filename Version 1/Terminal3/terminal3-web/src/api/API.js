@@ -534,14 +534,13 @@ export function GetIncomeAmountGroupByDay( data ) {
 /// Returns user's purchase history
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="userID">ID of the user to get the purchase history</param>
-export function AdminGetUserPurchaseHistory( data ) {
-    return fetch(`${API_URL}/SystemAdmin/GetUserPurchaseHistory/${data.sysAdminID}/${data.userID}`, {
+export function AdminGetUserPurchaseHistory( sysAdminID, userID ) {
+    return fetch(`${API_URL}/SystemAdmin/GetUserPurchaseHistory/${sysAdminID}/${userID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
