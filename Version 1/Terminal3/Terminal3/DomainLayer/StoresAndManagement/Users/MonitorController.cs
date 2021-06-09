@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
+using Terminal3.DataAccessLayer;
+using Terminal3.DataAccessLayer.DTOs;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -39,6 +42,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (DateTime.Now.Date > today)
             {
                 //save in DB
+                String date = today.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo);
+                //Mapper.getInstance(new DTO_Monitor(date, GuestUsers, RegisteredUsers, ManagersNotOwners, Owners, Admins));
 
                 GuestUsers = 0;
                 RegisteredUsers = 0;
