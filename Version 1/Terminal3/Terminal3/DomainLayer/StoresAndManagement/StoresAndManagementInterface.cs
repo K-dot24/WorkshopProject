@@ -427,6 +427,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password);
             if (res.ExecStatus)
             {
+
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
             }
             else
@@ -434,6 +435,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, null);
             }
         }
+
         public Result<RegisteredUserService> Login(string email, string password,string guestUserID)
         {
             Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password, guestUserID);
@@ -623,5 +625,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             return StoresFacade.GetIncomeAmountGroupByDay(start_date, end_date);
         }
+    
+        public void updateMonitor(String userID)
+        {
+
+        }
+    
     }
 }

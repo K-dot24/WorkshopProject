@@ -37,7 +37,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             try
             {
-                Monitor.Enter(product);
+                MonitorController.Enter(product);
                 try
                 {
                     ShoppingBag sb;
@@ -67,7 +67,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 }
                 finally
                 {
-                    Monitor.Exit(product);
+                    MonitorController.Exit(product);
                 }
             }
             catch (SynchronizationLockException SyncEx)

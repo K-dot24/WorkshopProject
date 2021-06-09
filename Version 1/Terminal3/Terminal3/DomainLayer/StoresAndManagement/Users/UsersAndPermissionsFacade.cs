@@ -300,6 +300,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 if (res.ExecStatus)
                 {
                     GuestUsers.TryAdd(res.Data.Id, res.Data);
+                    MonitorController.getInstance().GuestUsers.Add(new Tuple<DateTime, String>(DateTime.Now.Date, res.Data.Id));
 
                     // Update DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", searchResult.Data.Id);
