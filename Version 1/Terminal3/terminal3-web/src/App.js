@@ -85,38 +85,6 @@ const App = () => {
             response.json().then(result => result.execStatus ? fetchCart() : console.log(result.message)) : console.log("NOT OKAY")).catch(err => alert(err));
     }
 
-    // const handleUpdateCartQuantity = async (productId, quantity) => {
-        
-    //     if (quantity === 0) {
-    //         handleRemoveFromCart(productId);
-    //     } else {
-    //         setCart(function(prevState) {
-    //             const product = prevState.products.filter(product => product.id === productId)[0];
-    //             const toAdd = quantity - product.quantity;
-                
-    //             return {
-    //                 products: prevState.products.map(
-    //                 p => p.id === productId ? { ...p, quantity: quantity }: p
-    //                 ),
-    //                 totalPrice: prevState.totalPrice + product.price * toAdd       
-    //             }
-    //         }); 
-    //     }
-    // }
-
-    // const handleRemoveFromCart = async (productId) => {
-    //     setCart(function(prevState) {
-    //         const product = prevState.products.filter(product => product.id === productId)[0];
-            
-    //         return {
-    //         products: prevState.products.filter(
-    //             product => product.id !== productId
-    //         ),
-    //         totalPrice: prevState.totalPrice - product.price * product.quantity       
-    //         }
-    //     }); 
-    // }
-
     const handleEmptyCart = () => {
         console.log("EMPTY CART");
         const allProducts = cart.products;
