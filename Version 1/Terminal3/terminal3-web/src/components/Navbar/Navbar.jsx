@@ -33,7 +33,8 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
     const purchasePolicySubOptions = [
         'Add Purchase Policy', 'Remove Purchase Policy'
     ];
-    
+
+    let isStoreOwner = arr => arr.every(Boolean);
 
     //#region API Calls
 
@@ -96,7 +97,12 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                             <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    
                         )  
             )}
-            <MenuItem key="getIncome" onClick={() => handleMenuClick(`/stores/${storeId}/getincomesbyday`)}>Get Incomes by Day</MenuItem>
+            {isStoreOwner(permissions) && (
+            <>
+                <MenuItem key="getIncome" onClick={() => handleMenuClick(`/stores/${storeId}/getincomesbyday`)}>Get Incomes by Day</MenuItem>
+                <MenuItem key="removeStoreOwner" onClick={() => handleMenuClick(`/stores/${storeId}/removestoreowner`)}>Remove Store Owner</MenuItem>
+            </>
+            )}
         </div>
         );
     });

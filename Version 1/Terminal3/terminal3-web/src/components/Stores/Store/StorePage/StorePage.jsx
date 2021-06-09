@@ -122,14 +122,14 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
-    const handleRemoveStoreManager = async (data) => {
-        RemoveStoreManager(store.id, user.id, data.removedmanagerid).then(response => response.ok ?
-            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
-    }
-
     const handleRemoveStoreOwner = async (data) => {
         RemoveStoreOwner(store.id, user.id, data.removedownerid).then(response => response.ok ?
             response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+    }
+
+    const handleRemoveStoreManager = async (data) => {
+        RemoveStoreManager(store.id, user.id, data.removedmanagerid).then(response => response.ok ?
+            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     const handleGetStoreStaff = async () => {
