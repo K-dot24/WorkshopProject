@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // 
 import { Products, Navbar, Cart, Action, Policy, InfoDisplay } from '../../../../components';
 
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
-        AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct,
+        AddStoreOwner, AddStoreManager, RemoveStoreManager, RemoveStoreOwner, GetStoreStaff, SetPermissions,
         printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
         AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition, AddPurchasePolicy, 
         AddPurchasePolicyById, RemovePurchasePolicy, GetIncomeAmountGroupByDay, GetStorePurchaseHistory } from '../../../../api/API';
@@ -125,6 +125,11 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     const handleRemoveStoreManager = async (data) => {
         RemoveStoreManager(store.id, user.id, data.removedmanagerid).then(response => response.ok ?
             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
+    }
+
+    const handleRemoveStoreOwner = async (data) => {
+        RemoveStoreOwner(store.id, user.id, data.removedownerid).then(response => response.ok ?
+            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     const handleGetStoreStaff = async () => {
@@ -407,6 +412,13 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                     render={(props) => (<Action name='Remove Store Manager' 
                                                 fields={[{name: 'Removed Manager ID', required: true}]} 
                                                 handleAction={handleRemoveStoreManager} {...props} />)} 
+                />
+
+                {/* Remove Store Owner */}
+                <Route exact path={match.url + `/removestoreowner`} 
+                    render={(props) => (<Action name='Remove Store Owner' 
+                                                fields={[{name: 'Removed Owner ID', required: true}]} 
+                                                handleAction={handleRemoveStoreOwner} {...props} />)} 
                 />
 
                 {/* Get Store Staff */}
