@@ -28,6 +28,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             Admins = 0;
         }
 
+        private MonitorController(int guestUsers, int registeredUsers, int managersNotOwners, int owners, int admins)
+        {
+            today = DateTime.Now.Date;
+            GuestUsers = guestUsers;
+            RegisteredUsers = registeredUsers;
+            ManagersNotOwners = managersNotOwners;
+            Owners = owners;
+            Admins = admins;
+        }
+
         public static MonitorController getInstance()
         {
             if (Instance == null)
@@ -41,10 +51,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             if (DateTime.Now.Date > today)
             {
-                //save in DB
-                String date = today.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo);
-                //Mapper.getInstance(new DTO_Monitor(date, GuestUsers, RegisteredUsers, ManagersNotOwners, Owners, Admins));
-
                 GuestUsers = 0;
                 RegisteredUsers = 0;
                 ManagersNotOwners = 0;
@@ -80,6 +86,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     GuestUsers--;
                     break;
             }
+
+            //save in DB
+            String date = today.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo);
+            Mapper.getInstance().Update(new DTO_Monitor(date, GuestUsers, RegisteredUsers, ManagersNotOwners, Owners, Admins));
         }
     }
 }
