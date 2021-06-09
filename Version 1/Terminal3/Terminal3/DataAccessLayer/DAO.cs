@@ -100,9 +100,21 @@ namespace Terminal3.DataAccessLayer.DAOs
 
         public void Update(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update, Boolean upsert = false)
         {
-            if (upsert)
-                collection.UpdateOne(filter, update, new UpdateOptions(){ IsUpsert = upsert});
-            else collection.UpdateOne(filter, update);
+            try
+            {
+                if (upsert)
+                    collection.UpdateOne(filter, update, new UpdateOptions() { IsUpsert = upsert });
+                else collection.UpdateOne(filter, update);
+            }
+            catch (MongoWriteException e)
+            {
+                Console.WriteLine(e.ToString());
+                Logger.LogError(e.ToString());
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+            }
         }
     }
 }
