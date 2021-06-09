@@ -482,12 +482,26 @@ export function GetStorePurchaseHistory( ownerID, storeID ) {
 }
 
 
-/// Removing excisting store manager by an owner
+/// Removing existing store manager by an owner
 /// <param name="storeID">StoreID</param>
 /// <param name="currentlyOwnerID">OwnerID</param>
 /// <param name="removedManagerID">ID of the manager to be removed</param>
 export function RemoveStoreManager( storeID, currentlyOwnerID, removedManagerID ) {
     return fetch(`${API_URL}/StoreStaff/RemoveStoreManager/${storeID}/${currentlyOwnerID}/${removedManagerID}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
+/// Removing existing store owner by the appointing owner
+/// <param name="storeID">StoreID</param>
+/// <param name="currentlyOwnerID">OwnerID</param>
+/// <param name="removedOwnerID">ID of the owner to be removed</param>
+export function RemoveStoreOwner( storeID, currentlyOwnerID, removedOwnerID ) {
+    return fetch(`${API_URL}/StoreStaff/RemoveStoreOwner/${storeID}/${currentlyOwnerID}/${removedOwnerID}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',
