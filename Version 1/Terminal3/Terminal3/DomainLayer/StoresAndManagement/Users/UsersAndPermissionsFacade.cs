@@ -10,6 +10,7 @@ using Terminal3.DataAccessLayer;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using Terminal3.DataAccessLayer.DTOs;
+using System.Security.Cryptography;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -78,7 +79,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 {
                     if (isUniqueEmail(email))
                     {
-                        RegisteredUser newUser; 
+                        RegisteredUser newUser;                  
                         if (Id == "-1")
                             newUser = new RegisteredUser(email, password);
                         else
