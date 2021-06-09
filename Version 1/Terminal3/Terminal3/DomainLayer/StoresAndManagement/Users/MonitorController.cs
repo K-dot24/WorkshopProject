@@ -36,7 +36,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public void update(String fieldName)
         {
-            if (DateTime.Now.Date != today)
+            if (DateTime.Now.Date > today)
             {
                 //save in DB
 
@@ -45,7 +45,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 ManagersNotOwners = 0;
                 Owners = 0;
                 Admins = 0;
-
             }
 
             switch (fieldName)
