@@ -20,6 +20,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer;
+using System.Security.Cryptography;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -820,8 +821,10 @@ namespace Terminal3.DataAccessLayer
 
         #region RegisteredUser
         public void Create(RegisteredUser ru)
-        {            
-            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, ru.Password, ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification)));
+        {
+            var sha1 = new SHA1CryptoServiceProvider();
+            var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(ru.Password));
+            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, Encoding.ASCII.GetString(hash_pass), ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification)));
             RegisteredUsers.TryAdd(ru.Id , ru);
         }        
 
