@@ -52,13 +52,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             MainPolicy = mainPolicy;
         }
 
-
-        public PolicyManager(DiscountAddition mainDiscount, BuyNow mainPolicy)
-        {
-            MainDiscount = mainDiscount;
-            MainPolicy = mainPolicy;
-        }
-
         public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
         {
             Result<Dictionary<Product, Double>> discountsResult = MainDiscount.CalculateDiscount(products, discountCode);
