@@ -545,6 +545,15 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                     }}
                 />
 
+                {/* Admin Get Purchase History */}
+                <Route exact path={match.url + `/${user.id}/admingetstorepurchasehistory/${store.id}`}                       
+                    render={function(props) {
+                        if (!issued)
+                            return (<Action name='Get Purhcase History'     
+                                            handleAction={handleGetStorePurchaseHistory} {...props} />)
+                    }}
+                />
+
             </Switch>
 
             {/* Information display */}

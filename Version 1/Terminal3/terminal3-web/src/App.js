@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 // SignalR
 import { HubConnectionBuilder } from '@microsoft/signalr';
 
-import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products, Review } from './components';
+import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products, Review, InfoDisplay } from './components';
 import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
         GetUserShoppingCart, UpdateShoppingCart, EnterSystem, SearchProduct, GetTotalShoppingCartPrice,
-        GetUserPurchaseHistory, AddSystemAdmin, RemoveSystemAdmin, printErrorMessage, ResetSystem } from './api/API';
+        GetUserPurchaseHistory, AddSystemAdmin, RemoveSystemAdmin, printErrorMessage, ResetSystem,
+        AdminGetUserPurchaseHistory, AdminGetStorePurchaseHistory } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -23,6 +24,7 @@ const theme = createMuiTheme({
   });
 
 const App = () => {
+
     // states
     const [user, setUser] = useState({id: -1, email: '', loggedIn: false});
     const [cart, setCart] = useState({id: 0, products: [], totalPrice: 0});
@@ -35,6 +37,11 @@ const App = () => {
     
     // User's Purchase History
     const [userPurchaseHistory, setUserPurchaseHistory] = useState(null);
+
+    // States for information display (Store/User Purchase History)
+    const [issued, setIssued] = useState(false);
+    const [info, setInfo] = useState(null);
+    const [pathname, setPathname] = useState('/');
 
     // SignalR
     const [connection, setConnection] = useState(null);
@@ -177,6 +184,17 @@ const App = () => {
             response.json().then(result => setSystemAdmins(prev => prev.filter(id => id !== result.data.id)) & alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
+    //setIssued(true) & setInfo({data, type: 'purchaseHistory'})
+    const handleAdminGetUserPurchaseHistory = async (data) => {
+        AdminGetUserPurchaseHistory(user.id, data.userid).then(response => response.ok ? 
+            response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'purchaseHistory'})) : printErrorMessage(response)).catch(err => alert(err));
+    }
+
+    const handleAdminGetStorePurchaseHistory = async (data) => {
+        AdminGetStorePurchaseHistory(user.id, data.storeid).then(response => response.ok ? 
+            response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'purchaseHistory'})) : printErrorMessage(response)).catch(err => alert(err));
+    }
+
     // TODO: Check
     const handleResetSystem = async () => {
         ResetSystem(user.id).then(response => response.ok ? 
@@ -257,6 +275,11 @@ const App = () => {
     useEffect(() => {
         console.log(systemAdmins);
     }, [systemAdmins]);
+
+    useEffect(() => {
+        setIssued(false);
+        setInfo(null);
+    }, [pathname]);
 
     useEffect(() => {
         handleEnterSystem();
@@ -365,6 +388,32 @@ const App = () => {
                             />
                         )}
 
+                        {/* Admin Get User Purchase History */}
+                        {systemAdmins.includes(user.id) && (
+                            <Route exact path={`/${user.id}/admingetuserpurchasehistory`} 
+                                    // render={(props) => (<Action name='Get User Purhcase History' fields={[{name: 'User ID', required: true}]} 
+                                    //                             handleAction={handleAdminGetUserPurchaseHistory} {...props} />)} 
+                                    render={function(props) {
+                                        if (!issued)
+                                            return (<Action name='Get User Purhcase History' fields={[{name: 'User ID', required: true}]} 
+                                                            handleAction={handleAdminGetUserPurchaseHistory} {...props} />)
+                                    }}
+                            />
+                        )}
+
+                        {/* Admin Get Store Purchase History */}
+                        {systemAdmins.includes(user.id) && (
+                            <Route exact path={`/${user.id}/admingetstorepurchasehistory`} 
+                                    // render={(props) => (<Action name='Get Store Purhcase History' fields={[{name: 'Store ID', required: true}]} 
+                                    //                             handleAction={handleAdminGetStorePurchaseHistory} {...props} />)} 
+                                    render={function(props) {
+                                        if (!issued)
+                                            return (<Action name='Get Store Purhcase History' fields={[{name: 'Store ID', required: true}]} 
+                                                            handleAction={handleAdminGetStorePurchaseHistory} {...props} />)
+                                    }}
+                            />
+                        )}
+
                         {/* Reset System Page */}
                         {systemAdmins.includes(user.id) && (
                             <Route exact path={`/${user.id}/resetsystem`} 
@@ -377,10 +426,14 @@ const App = () => {
                         { products.length > 0 ? (
                             <Products storeName={'SEARCH_RES'} products={products} onAddToBag={handleAddToCart} />
                         ) : (
-                            <Route path="/" render={(props) => (<Stores user={user} searchQuery={storeSearchQuery} handleAddToCart={handleAddToCart} handleLogOut={handleLogOut} {...props} />)} />
+                            <Route path="/" render={(props) => (<Stores setPathname={setPathname} user={user} searchQuery={storeSearchQuery} 
+                                                                        handleAddToCart={handleAddToCart} handleLogOut={handleLogOut}
+                                                                        isSystemAdmin={systemAdmins.includes(user.id)} {...props} />)} />
                         )}
                         
                     </Switch>
+                    {/* Information display */}
+                    {(issued && info !== null) && <InfoDisplay info={info} />}
                 </div>
             </Router>
         </MuiThemeProvider>
