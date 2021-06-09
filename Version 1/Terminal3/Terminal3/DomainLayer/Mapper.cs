@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer;
 using System.Security.Cryptography;
+using System.Globalization;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -2480,6 +2481,20 @@ namespace Terminal3.DataAccessLayer
                                                     .Set("Owners", monitor.Owners)
                                                     .Set("Admins", monitor.Admins);
             DAO_Monitor.Update(filter, update, true);
+        }
+        public DTO_Monitor LoadMonitor()
+        {
+
+            String date = DateTime.Now.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo);
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", date);
+
+            DTO_Monitor dto = DAO_Monitor.Load(filter);
+            if(dto is null)
+            {
+                dto = new DTO_Monitor(date, 0, 0, 0, 0, 0);
+            }
+            return dto;
+
         }
         #endregion
     }
