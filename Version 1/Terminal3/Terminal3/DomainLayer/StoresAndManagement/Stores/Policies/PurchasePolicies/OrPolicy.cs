@@ -61,30 +61,54 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
 
         }
 
-        public Result<bool> RemovePolicy(string id)
+        public Result<IPurchasePolicy> RemovePolicy(string id)
         {
-            if (Policies.RemoveAll(policy => policy.Id.Equals(id)) >= 1)
-                return new Result<bool>("", true, true);
-
-            foreach (IPurchasePolicy policy in Policies)
+            IPurchasePolicy policy = Policies.Find(policy => policy.Id.Equals(id));
+            if (policy != null)
             {
-                Result<bool> res = policy.RemovePolicy(id);
+                Policies.Remove(policy);
+                return new Result<IPurchasePolicy>("", true, policy);
+            }
+
+            foreach (IPurchasePolicy curr in Policies)
+            {
+                Result<IPurchasePolicy> res = curr.RemovePolicy(id);
                 if (!res.ExecStatus)
                     return res;
-                if (res.Data)
+                if (res.Data != null)
                     return res;
             }
-            return new Result<bool>("", true, false);
+            return new Result<IPurchasePolicy>("", true, null);
         }
 
-        public Result<IPurchasePolicyData> GetData()
+        public Result<IDictionary<string, object>> GetData()
         {
-            List<IPurchasePolicyData> dataPolicies = new List<IPurchasePolicyData>();
+            /*List<IDictionary<string, object>> dataPolicies = new List<IDictionary<string, object>>();
             foreach (IPurchasePolicy policy in Policies)
             {
                 dataPolicies.Add(policy.GetData().Data);
             }
-            return new Result<IPurchasePolicyData>("", true, new OrPolicyData(dataPolicies, Id));
+            IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                { "Type", "OrPolicy" }, 
+                { "Id", Id}, 
+                {"Policies", dataPolicies} 
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Or"},
+                { "children", new Dictionary<String, object>[0] }
+            };
+            List<IDictionary<string, object>> children = new List<IDictionary<string, object>>();
+            foreach (IPurchasePolicy myPolicy in Policies)
+            {
+                Result<IDictionary<string, object>> purchasePolicyResult = myPolicy.GetData();
+                if (!purchasePolicyResult.ExecStatus)
+                    return purchasePolicyResult;
+                children.Add(purchasePolicyResult.Data);
+            }
+            dict["children"] = children.ToArray();
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public Result<bool> EditPolicy(Dictionary<string, object> info, string id)

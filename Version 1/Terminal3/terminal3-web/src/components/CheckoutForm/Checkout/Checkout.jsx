@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Paper, Stepper, Step, StepLabel, Typography, CircularProgress, Divider, Button } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 
+import { printErrorMessage, Purchase } from '../../../api/API';
 import useStyles from './styles';
 import AddressForm from '../AddressForm';
 import PaymentForm from '../PaymentForm';
@@ -16,7 +17,13 @@ const Checkout = ({ userID, cart, handleEmptyCart }) => {
     
     const classes = useStyles();
 
-    // TODO: fetch generate token? (02:08:00~)
+    const handlePurchase = (orderData) => {
+        nextStep();
+
+        Purchase(orderData).then(response => response.ok ?
+            response.json().then(result => result.execStatus ? setIsFinished(true) : console.log(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+    }
+
     useEffect(() => {
         const generateToken = async () => {
             try {
@@ -38,15 +45,15 @@ const Checkout = ({ userID, cart, handleEmptyCart }) => {
         nextStep();
     }
 
-    const timeout = () => {
-        setTimeout(() => {
-            setIsFinished(true);
-        }, 2000);
-    }
+    // const timeout = () => {
+    //     setTimeout(() => {
+    //         setIsFinished(true);
+    //     }, 2000);
+    // }
 
     const Confirmation = () => !isFinished ? (
         <>
-            {timeout()}
+            {/* {timeout()} */}
             <div className={classes.spinner}>
                 <CircularProgress />
             </div>
@@ -65,7 +72,8 @@ const Checkout = ({ userID, cart, handleEmptyCart }) => {
 
     const Form = () => activeStep === 0 ?
         <AddressForm next={next} /> :
-        <PaymentForm userID={userID} shippingData={shippingData} checkoutToken={checkoutToken} nextStep={nextStep} backStep={backStep} />
+        <PaymentForm userID={userID} shippingData={shippingData} checkoutToken={checkoutToken} 
+                    nextStep={nextStep} backStep={backStep} handlePurchase={handlePurchase} />
 
     return (
         <>

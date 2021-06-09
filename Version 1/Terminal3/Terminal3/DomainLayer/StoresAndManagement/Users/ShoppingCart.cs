@@ -6,6 +6,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ExternalSystems;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DataAccessLayer;
+using System.Globalization;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -88,8 +89,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
+            if(!checkInventory(this.ShoppingBags))
+                return new Result<ShoppingCart>("A bag in the Shopping cart contains more of a product than the store can supply", false, null);
             if (!AdheresToPolicy().Data)
-                return new Result<ShoppingCart>("A bag in the Shopping cart doesn't adhere to it's respective store's policy", true, null);
+                return new Result<ShoppingCart>("A bag in the Shopping cart doesn't adhere to it's respective store's policy", false, null);
 
             Double amount = GetTotalShoppingCartPrice().Data;
 
@@ -97,7 +100,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             if (paymentId == -1)
             {
-                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in payment details\n", true, null);
+                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in payment details\n", false, null);
 
             }
 
@@ -108,15 +111,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 refundDetails.Add("transaction_id", paymentId.ToString());
                 int refundSuccess = PaymentSystem.CancelPay(refundDetails);
                 if(refundSuccess == -1)
-                    return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details and refund failed\n", true, null);
-                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details\n", true, null);
+                    return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details and refund failed\n", false, null);
+                return new Result<ShoppingCart>("Attempt to purchase the shopping cart failed due to error in delivery details\n", false, null);
             }
             ShoppingCart copy = new ShoppingCart(this);
 
             // save recipt
             foreach(ShoppingBag sb in this.ShoppingBags.Values)
             {
-                DTO_Recipt recipt = new DTO_Recipt(sb.Store.Id, sb.TotalBagPrice, DateTime.Now.Date);
+                DTO_Recipt recipt = new DTO_Recipt(sb.Store.Id, sb.TotalBagPrice, DateTime.Now.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
                 Mapper.getInstance().Create(recipt); 
             }
 
@@ -131,6 +134,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 bags.TryAdd(sb.Key, sb.Value.getDTO()); 
             }
             return new DTO_ShoppingCart(this.Id, bags , this.TotalCartPrice);
+        }
+
+        private bool checkInventory(ConcurrentDictionary<string, ShoppingBag> shoppingBags)
+        {
+            foreach(ShoppingBag bag in shoppingBags.Values)
+            {
+                foreach(KeyValuePair<Product, int> p in bag.Products)
+                {
+                    if (p.Key.Quantity < p.Value)
+                        return false;
+                }
+            }
+            return true;
         }
     }
 }

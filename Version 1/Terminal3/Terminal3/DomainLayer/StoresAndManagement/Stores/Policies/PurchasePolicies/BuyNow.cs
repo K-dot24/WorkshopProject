@@ -39,19 +39,37 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return this.Policy.AddPolicy(policy, id);
         }
 
-        public Result<bool> RemovePolicy(string id)
+        public Result<IPurchasePolicy> RemovePolicy(string id)
         {
             if (Policy.Id.Equals(id))
             {
+                IPurchasePolicy temp = this.Policy;
                 this.Policy = new AndPolicy();
-                return new Result<bool>("", true, true);
+                return new Result<IPurchasePolicy>("", true, temp);
             }
             return Policy.RemovePolicy(id);            
         }
 
-        public Result<IPurchasePolicyData> GetData()
+        public Result<IDictionary<string, object>> GetData()
         {
-            return new Result<IPurchasePolicyData>("", true, new BuyNowData((AndPolicyData)Policy.GetData().Data, Id));
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                { "Type", "BuyNow" }, 
+                { "Id", Id }, 
+                { "Policy", Policy.GetData().Data } 
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "BuyNow"},
+                { "children", new Dictionary<String, object>[0] }
+            };
+            List<IDictionary<string, object>> children = new List<IDictionary<string, object>>();
+            Result<IDictionary<string, object>> PolicyResult = Policy.GetData();
+            if (!PolicyResult.ExecStatus)
+                return PolicyResult;
+            children.Add(PolicyResult.Data);
+            dict["children"] = children.ToArray();
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public Result<bool> EditPolicy(Dictionary<string, object> info, string id)

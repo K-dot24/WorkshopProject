@@ -190,13 +190,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         private void RemoveOpenedNotifications()
         {
-            foreach (Notification notification in PendingNotification)
+            List<Notification> pendings = new List<Notification>(PendingNotification);
+            for(int i=0;i< pendings.Count;i++)
             {
+                Notification notification = pendings[i];
                 if (notification.isOpened)
                 {
                     PendingNotification.Remove(notification);
                 }
             }
+            
         }
 
         public DTO_RegisteredUser getDTO()

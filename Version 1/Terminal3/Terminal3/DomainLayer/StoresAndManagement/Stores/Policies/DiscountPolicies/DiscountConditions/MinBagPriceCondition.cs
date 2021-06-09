@@ -44,14 +44,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountCondition>("", true, null);
         }
 
-        public override Result<IDiscountConditionData> GetData()
+        public override Result<IDictionary<string, object>> GetData()
         {
-            return new Result<IDiscountConditionData>("", true, new MinBagPriceConditionData(MinPrice, Id));
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() {
+                {"type", "DiscountConditionAnd" },
+                {"Id", Id },
+                {"MinPrice", MinPrice} 
+            };*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Bag price >= " + MinPrice},
+                { "children", new Dictionary<String, object>[0] }
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public override Result<bool> EditCondition(Dictionary<string, object> info, string id)

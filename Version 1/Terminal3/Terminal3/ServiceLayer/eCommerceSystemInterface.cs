@@ -15,6 +15,8 @@ using Terminal3.DataAccessLayer;
 using System.IO;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
+using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace Terminal3.ServiceLayer
 {   
@@ -38,19 +40,30 @@ namespace Terminal3.ServiceLayer
 
 
         //Constructor
-        public ECommerceSystem()
+        public ECommerceSystem(String config_path = @"..\Terminal3\Config.json",string configData="")
         {
+            Config config;
+            if (!(configData.Equals(String.Empty))) {
+                config = JsonConvert.DeserializeObject<Config>(configData);
 
-            /*Initializer.init(StoresAndManagement,
-                            GuestUserInterface,
-                            RegisteredUserInterface,
-                            StoreStaffInterface,
-                            SystemAdminInterface, 
-                            DataController, 
-                            NotificationService, this.connection);*/
+            }
+            else
+            {
+                config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(config_path));
 
-            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(@"..\Terminal3\Config.json"));
+            }
+
+            //validate JSON
+            if( (config.externalSystem_url is null) || (config.mongoDB_url is null) || (config.signalRServer_url is null)
+                || (config.password is null) || (config.email is null))
+            {
+                Logger.LogError("Invalid JSON format - One or more missing attribute has been found in the config JSON");
+                Environment.Exit(1);
+            }
+
             Mapper.getInstance(config.mongoDB_url);
+            ExternalSystems.ExternalSystemsAPI.getInstance(config.externalSystem_url);
+            
 
             StoresAndManagement = new StoresAndManagementInterface(config.email, config.password);
             GuestUserInterface = new GuestUserController(StoresAndManagement);
@@ -68,12 +81,6 @@ namespace Terminal3.ServiceLayer
             while (connection.State != HubConnectionState.Connected) { }
             NotificationService = NotificationService.GetInstance();
             NotificationService.connection = connection;
-
-        }
-
-        public void DisplaySystem()
-        {
-            // TODO - when GUI exists then display all functions according to current user role
         }
 
         //Metohds
@@ -359,12 +366,12 @@ namespace Terminal3.ServiceLayer
             return StoreStaffInterface.EditDiscountCondition(storeId, info, id);
         }
 
-        public Result<IDiscountPolicyData> GetDiscountPolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetDiscountPolicyData(string storeId)
         {
             return StoreStaffInterface.GetDiscountPolicyData(storeId);
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId)
         {
             return StoreStaffInterface.GetPurchasePolicyData(storeId);
         }

@@ -44,14 +44,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<bool>("", true, false);
         }
 
-        public Result<bool> RemovePolicy(string id)
+        public Result<IPurchasePolicy> RemovePolicy(string id)
         {
-            return new Result<bool>("", true,false);
+            return new Result<IPurchasePolicy>("", true,null);
         }
 
-        public Result<IPurchasePolicyData> GetData()
+        public Result<IDictionary<string, object>> GetData()
         {
-            return new Result<IPurchasePolicyData>("", true, new MinAgePolicyData(Age, Id));
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                { "Type", "MinAgePolicy" }, 
+                { "Id", Id }, 
+                { "Age", Age } 
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Age >= " + Age },
+                { "children", new Dictionary<String, object>[0] }
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public Result<bool> EditPolicy(Dictionary<string, object> info, string id)

@@ -32,8 +32,8 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<bool> RemoveDiscountCondition(string storeId, String id);
         Result<bool> EditDiscountPolicy(string storeId, Dictionary<string, object> info, String id);
         Result<bool> EditDiscountCondition(string storeId, Dictionary<string, object> info, String id);
-        Result<IDiscountPolicyData> GetDiscountPolicyData(string storeId);
-        Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId);
+        Result<IDictionary<string, object>> GetDiscountPolicyData(string storeId);
+        Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId);
         Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info);
         Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, String id);
         Result<bool> RemovePurchasePolicy(string storeId, String id);
@@ -110,12 +110,12 @@ namespace Terminal3.ServiceLayer.Controllers
             return StoresAndManagementInterface.EditDiscountCondition(storeId, info, id);
         }
 
-        public Result<IDiscountPolicyData> GetDiscountPolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetDiscountPolicyData(string storeId)
         {
             return StoresAndManagementInterface.GetPoliciesData(storeId);
         }
 
-        public Result<IPurchasePolicyData> GetPurchasePolicyData(string storeId)
+        public Result<IDictionary<string, object>> GetPurchasePolicyData(string storeId)
         {
             return StoresAndManagementInterface.GetPurchasePolicyData(storeId);
         }

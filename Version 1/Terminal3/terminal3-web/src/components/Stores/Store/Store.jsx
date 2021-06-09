@@ -26,7 +26,7 @@ const Store = ({ store }) => {
                 <Typography variant="body2" color="textSecondary">{store.category}</Typography>
             </CardContent>
             <CardActions disableSpacing className={classes.cardActions}>
-                <IconButton component={Link} to={{pathname: `/stores/${store.id}`, state: { store: store }}} aria-label="Open store page">
+                <IconButton /*component={Link} to={{pathname: `/stores/${store.id}`, state: { store: store }}}*/ aria-label="Open store page">
                     <Storefront />
                 </IconButton>
             </CardActions>

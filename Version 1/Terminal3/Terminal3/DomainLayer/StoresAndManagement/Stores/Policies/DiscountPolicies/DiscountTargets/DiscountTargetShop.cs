@@ -22,9 +22,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return result;
         }
 
-        public Result<IDiscountTargetData> GetData()
+        public Result<String> GetData()
         {
-            return new Result<IDiscountTargetData>("", true, new DiscountTargetShopData());
+            return new Result<string>("", true, "the whole store");
         }
 
         public string getId()

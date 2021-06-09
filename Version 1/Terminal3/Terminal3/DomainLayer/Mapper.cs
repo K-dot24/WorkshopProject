@@ -19,6 +19,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies
 using System.Reflection;
 using Newtonsoft.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
+using Terminal3.DomainLayer;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -30,7 +31,6 @@ namespace Terminal3.DataAccessLayer
         public IMongoDatabase database;
 
         // DAOs
-        // public DAO<DTO_GuestUser> DAO_GuestUser;
         public DAO<DTO_RegisteredUser> DAO_RegisteredUser;
         public DAO<DTO_Product> DAO_Product;
         public DAO<DTO_StoreManager> DAO_StoreManager;
@@ -106,80 +106,90 @@ namespace Terminal3.DataAccessLayer
         //Constructor
         private Mapper(String connection_string)
         {
-            dbClient = new MongoClient(connection_string);
-            database = dbClient.GetDatabase("Terminal3-development");
+            try
+            {
+                dbClient = new MongoClient(connection_string);
+                database = dbClient.GetDatabase("Terminal3-development");
+                //database = dbClient.GetDatabase("Terminal3-Testing");
+                //database = dbClient.GetDatabase("Terminal3-tomer");
 
-            //DAOs
-            //DAO_GuestUser = new DAO<DTO_GuestUser>(database, "Users");
-            DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
-            DAO_Product = new DAO<DTO_Product>(database, "Products");            
-            DAO_StoreManager = new DAO<DTO_StoreManager>(database, "Users");
-            DAO_StoreOwner = new DAO<DTO_StoreOwner>(database, "Users");
-            DAO_SystemAdmins = new DAO<DTO_SystemAdmins>(database, "SystemAdmins");
-            DAO_Store = new DAO<DTO_Store>(database, "Stores");
-            DAO_Auction = new DAO<DTO_Auction>(database, "Policies");
-            DAO_Lottery = new DAO<DTO_Lottery>(database, "Policies");
-            DAO_MaxProductPolicy = new DAO<DTO_MaxProductPolicy>(database, "Policies");
-            DAO_MinAgePolicy = new DAO<DTO_MinAgePolicy>(database, "Policies");
-            DAO_MinProductPolicy = new DAO<DTO_MinProductPolicy>(database, "Policies");
-            DAO_Offer = new DAO<DTO_Offer>(database, "Policies");
-            DAO_RestrictedHoursPolicy = new DAO<DTO_RestrictedHoursPolicy>(database, "Policies");
-            DAO_AndPolicy = new DAO<DTO_AndPolicy>(database, "Policies");
-            DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "Policies");
-            DAO_BuyNow = new DAO<DTO_BuyNow>(database, "Policies");
-            DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "Policies");
-            DAO_VisibleDiscount = new DAO<DTO_VisibleDiscount>(database, "Discounts");
-            DAO_DiscountTargetCategories = new DAO<DTO_DiscountTargetCategories>(database, "Discounts");
-            DAO_DiscountTargetProducts = new DAO<DTO_DiscountTargetProducts>(database, "Discounts");
-            DAO_DiscreetDiscount = new DAO<DTO_DiscreetDiscount>(database, "Discounts");
-            DAO_ConditionalDiscount = new DAO<DTO_ConditionalDiscount>(database, "Discounts");
-            DAO_MinProductCondition = new DAO<DTO_MinProductCondition>(database, "Discounts");
-            DAO_MinBagPriceCondition = new DAO<DTO_MinBagPriceCondition>(database, "Discounts");
-            DAO_MaxProductCondition = new DAO<DTO_MaxProductCondition>(database, "Discounts");
-            DAO_DiscountConditionOr = new DAO<DTO_DiscountConditionOr>(database, "Discounts");
-            DAO_DiscountConditionAnd = new DAO<DTO_DiscountConditionAnd>(database, "Discounts");
-            DAO_DiscountXor = new DAO<DTO_DiscountXor>(database, "Discounts");
-            DAO_DiscountOr = new DAO<DTO_DiscountOr>(database, "Discounts");
-            DAO_DiscountMin = new DAO<DTO_DiscountMin>(database, "Discounts");
-            DAO_DiscountMax = new DAO<DTO_DiscountMax>(database, "Discounts");
-            DAO_DiscountAnd = new DAO<DTO_DiscountAnd>(database, "Discounts");
-            DAO_DiscountAddition = new DAO<DTO_DiscountAddition>(database, "Discounts");
-            DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
+                //DAOs
+                DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
+                DAO_Product = new DAO<DTO_Product>(database, "Products");
+                DAO_StoreManager = new DAO<DTO_StoreManager>(database, "StoreStaffs");
+                DAO_StoreOwner = new DAO<DTO_StoreOwner>(database, "StoreStaffs");
+                DAO_SystemAdmins = new DAO<DTO_SystemAdmins>(database, "SystemAdmins");
+                DAO_Store = new DAO<DTO_Store>(database, "Stores");
+                DAO_Auction = new DAO<DTO_Auction>(database, "PurchasePolicies");
+                DAO_Lottery = new DAO<DTO_Lottery>(database, "PurchasePolicies");
+                DAO_MaxProductPolicy = new DAO<DTO_MaxProductPolicy>(database, "PurchasePolicies");
+                DAO_MinAgePolicy = new DAO<DTO_MinAgePolicy>(database, "PurchasePolicies");
+                DAO_MinProductPolicy = new DAO<DTO_MinProductPolicy>(database, "PurchasePolicies");
+                DAO_Offer = new DAO<DTO_Offer>(database, "PurchasePolicies");
+                DAO_RestrictedHoursPolicy = new DAO<DTO_RestrictedHoursPolicy>(database, "PurchasePolicies");
+                DAO_AndPolicy = new DAO<DTO_AndPolicy>(database, "PurchasePolicies");
+                DAO_OrPolicy = new DAO<DTO_OrPolicy>(database, "PurchasePolicies");
+                DAO_BuyNow = new DAO<DTO_BuyNow>(database, "PurchasePolicies");
+                DAO_ConditionalPolicy = new DAO<DTO_ConditionalPolicy>(database, "PurchasePolicies");
+                DAO_VisibleDiscount = new DAO<DTO_VisibleDiscount>(database, "DiscountPolicies");
+                DAO_DiscountTargetCategories = new DAO<DTO_DiscountTargetCategories>(database, "DiscountPolicies");
+                DAO_DiscountTargetProducts = new DAO<DTO_DiscountTargetProducts>(database, "DiscountPolicies");
+                DAO_DiscreetDiscount = new DAO<DTO_DiscreetDiscount>(database, "DiscountPolicies");
+                DAO_ConditionalDiscount = new DAO<DTO_ConditionalDiscount>(database, "DiscountPolicies");
+                DAO_MinProductCondition = new DAO<DTO_MinProductCondition>(database, "DiscountPolicies");
+                DAO_MinBagPriceCondition = new DAO<DTO_MinBagPriceCondition>(database, "DiscountPolicies");
+                DAO_MaxProductCondition = new DAO<DTO_MaxProductCondition>(database, "DiscountPolicies");
+                DAO_DiscountConditionOr = new DAO<DTO_DiscountConditionOr>(database, "DiscountPolicies");
+                DAO_DiscountConditionAnd = new DAO<DTO_DiscountConditionAnd>(database, "DiscountPolicies");
+                DAO_DiscountXor = new DAO<DTO_DiscountXor>(database, "DiscountPolicies");
+                DAO_DiscountOr = new DAO<DTO_DiscountOr>(database, "DiscountPolicies");
+                DAO_DiscountMin = new DAO<DTO_DiscountMin>(database, "DiscountPolicies");
+                DAO_DiscountMax = new DAO<DTO_DiscountMax>(database, "DiscountPolicies");
+                DAO_DiscountAnd = new DAO<DTO_DiscountAnd>(database, "DiscountPolicies");
+                DAO_DiscountAddition = new DAO<DTO_DiscountAddition>(database, "DiscountPolicies");
+                DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
 
-            // IdentityMaps  <Id , object>
-            RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
-            GuestUsers = new ConcurrentDictionary<String, GuestUser>();
-            Products = new ConcurrentDictionary<String, Product>();
-            StoreManagers = new ConcurrentDictionary<String, LinkedList<StoreManager>>();
-            StoreOwners = new ConcurrentDictionary<String, LinkedList<StoreOwner>>();
-            Stores = new ConcurrentDictionary<String, Store>();
-            Policy_Auctions = new ConcurrentDictionary<String, Auction>();
-            Policy_Lotterys = new ConcurrentDictionary<String, Lottery>();
-            Policy_MaxProductPolicys = new ConcurrentDictionary<String, MaxProductPolicy>();
-            Policy_MinAgePolicys = new ConcurrentDictionary<String, MinAgePolicy>();
-            Policy_MinProductPolicys = new ConcurrentDictionary<String, MinProductPolicy>();
-            Policy_Offers = new ConcurrentDictionary<String, Offer>();
-            Policy_RestrictedHoursPolicys = new ConcurrentDictionary<String, RestrictedHoursPolicy>();
-            Policy_AndPolicys = new ConcurrentDictionary<String, AndPolicy>();
-            Policy_OrPolicys = new ConcurrentDictionary<String, OrPolicy>();
-            Policy_BuyNows = new ConcurrentDictionary<String, BuyNow>();
-            Policy_ConditionalPolicys = new ConcurrentDictionary<String, ConditionalPolicy>();
-            Discount_VisibleDiscounts = new ConcurrentDictionary<String, VisibleDiscount>();
-            Discount_DiscountTargetCategories = new ConcurrentDictionary<String, DiscountTargetCategories>();
-            Discount_DiscountTargetProducts = new ConcurrentDictionary<String, DiscountTargetProducts>();
-            Discount_DiscreetDiscounts = new ConcurrentDictionary<String, DiscreetDiscount>();
-            Discount_ConditionalDiscounts = new ConcurrentDictionary<String, ConditionalDiscount>();
-            Discount_MinProductConditions = new ConcurrentDictionary<String, MinProductCondition>();
-            Discount_MinBagPriceConditions = new ConcurrentDictionary<String, MinBagPriceCondition>();
-            Discount_MaxProductConditions = new ConcurrentDictionary<String, MaxProductCondition>();
-            Discount_DiscountConditionOrs = new ConcurrentDictionary<String, DiscountConditionOr>();
-            Discount_DiscountConditionAnds = new ConcurrentDictionary<String, DiscountConditionAnd>();
-            Discount_DiscountXors = new ConcurrentDictionary<String, DiscountXor>();
-            Discount_DiscountOrs = new ConcurrentDictionary<String, DiscountOr>();
-            Discount_DiscountMins = new ConcurrentDictionary<String, DiscountMin>();
-            Discount_DiscountMaxs = new ConcurrentDictionary<String, DiscountMax>();
-            Discount_DiscountAnds = new ConcurrentDictionary<String, DiscountAnd>();
-            Discount_DiscountAdditions = new ConcurrentDictionary<String, DiscountAddition>();
+                // IdentityMaps  <Id , object>
+                RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
+                GuestUsers = new ConcurrentDictionary<String, GuestUser>();
+                Products = new ConcurrentDictionary<String, Product>();
+                StoreManagers = new ConcurrentDictionary<String, LinkedList<StoreManager>>();
+                StoreOwners = new ConcurrentDictionary<String, LinkedList<StoreOwner>>();
+                Stores = new ConcurrentDictionary<String, Store>();
+                Policy_Auctions = new ConcurrentDictionary<String, Auction>();
+                Policy_Lotterys = new ConcurrentDictionary<String, Lottery>();
+                Policy_MaxProductPolicys = new ConcurrentDictionary<String, MaxProductPolicy>();
+                Policy_MinAgePolicys = new ConcurrentDictionary<String, MinAgePolicy>();
+                Policy_MinProductPolicys = new ConcurrentDictionary<String, MinProductPolicy>();
+                Policy_Offers = new ConcurrentDictionary<String, Offer>();
+                Policy_RestrictedHoursPolicys = new ConcurrentDictionary<String, RestrictedHoursPolicy>();
+                Policy_AndPolicys = new ConcurrentDictionary<String, AndPolicy>();
+                Policy_OrPolicys = new ConcurrentDictionary<String, OrPolicy>();
+                Policy_BuyNows = new ConcurrentDictionary<String, BuyNow>();
+                Policy_ConditionalPolicys = new ConcurrentDictionary<String, ConditionalPolicy>();
+                Discount_VisibleDiscounts = new ConcurrentDictionary<String, VisibleDiscount>();
+                Discount_DiscountTargetCategories = new ConcurrentDictionary<String, DiscountTargetCategories>();
+                Discount_DiscountTargetProducts = new ConcurrentDictionary<String, DiscountTargetProducts>();
+                Discount_DiscreetDiscounts = new ConcurrentDictionary<String, DiscreetDiscount>();
+                Discount_ConditionalDiscounts = new ConcurrentDictionary<String, ConditionalDiscount>();
+                Discount_MinProductConditions = new ConcurrentDictionary<String, MinProductCondition>();
+                Discount_MinBagPriceConditions = new ConcurrentDictionary<String, MinBagPriceCondition>();
+                Discount_MaxProductConditions = new ConcurrentDictionary<String, MaxProductCondition>();
+                Discount_DiscountConditionOrs = new ConcurrentDictionary<String, DiscountConditionOr>();
+                Discount_DiscountConditionAnds = new ConcurrentDictionary<String, DiscountConditionAnd>();
+                Discount_DiscountXors = new ConcurrentDictionary<String, DiscountXor>();
+                Discount_DiscountOrs = new ConcurrentDictionary<String, DiscountOr>();
+                Discount_DiscountMins = new ConcurrentDictionary<String, DiscountMin>();
+                Discount_DiscountMaxs = new ConcurrentDictionary<String, DiscountMax>();
+                Discount_DiscountAnds = new ConcurrentDictionary<String, DiscountAnd>();
+                Discount_DiscountAdditions = new ConcurrentDictionary<String, DiscountAddition>();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                Environment.Exit(1);
+            }
+
 
     }
 
@@ -295,7 +305,7 @@ namespace Terminal3.DataAccessLayer
                     products.TryAdd(LoadProduct(filter), p.Value);
                 }
                 //sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user, LoadStore(), products, bag.Value.TotalBagPrice)); - TODO
-                sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user, products, bag.Value.TotalBagPrice));
+                sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user,LoadStore(Builders<BsonDocument>.Filter.Eq("_id", bag.Value.StoreId)) ,products, bag.Value.TotalBagPrice));
             }
             ShoppingCart sc = new ShoppingCart(dto._id, sb, dto.TotalCartPrice);
             return sc;
@@ -334,6 +344,8 @@ namespace Terminal3.DataAccessLayer
             ConcurrentDictionary<String, String> Policies = new ConcurrentDictionary<String, String>(); //<id , type>
             foreach (IPurchasePolicy policy in list)
             {
+                if (policy == null)
+                    continue;
                 string[] type = policy.GetType().ToString().Split('.');
                 string policy_type = type[type.Length - 1];
                 AddPolicyToDB(policy_type, policy);
@@ -356,6 +368,8 @@ namespace Terminal3.DataAccessLayer
         {
             ConcurrentDictionary<String, String> Discounts = new ConcurrentDictionary<String, String>();    //<id , type>
 
+            if (discount == null)
+                return Discounts;
             string[] type = discount.GetType().ToString().Split('.');
             string discount_type = type[type.Length - 1];
             AddDiscountToDB(discount_type, discount);
@@ -367,6 +381,8 @@ namespace Terminal3.DataAccessLayer
         {
             ConcurrentDictionary<String, String> Discounts = new ConcurrentDictionary<String, String>();    //<id , type>
 
+            if (discount == null)
+                return Discounts;
             string[] type = discount.GetType().ToString().Split('.');
             string discount_type = type[type.Length - 1];
             AddDiscountToDB(discount_type, discount);
@@ -508,6 +524,29 @@ namespace Terminal3.DataAccessLayer
             }
 
             return null;
+        }
+
+        //shaked
+        public void Delete(IPurchasePolicy purchasePolicy)
+        {
+            string[] type = purchasePolicy.GetType().ToString().Split('.');
+            string policy_type = type[type.Length - 1];
+
+            DeleteIPurchasePolicy(policy_type, purchasePolicy.Id);
+        }
+        public void Delete(IDiscountPolicy discount)
+        {
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+
+            DeleteIDiscountPolicy(discount_type, discount.Id);
+        }
+        public void Delete(IDiscountCondition discount)
+        {
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+
+            DeleteIDiscountCondition(discount_type, discount.Id);
         }
 
         private void DeleteIDiscountTarget(String type, string discount_id)
@@ -1040,6 +1079,45 @@ namespace Terminal3.DataAccessLayer
         }
         #endregion  System Admin
 
+        public List<RegisteredUser> LoadAllRegisterUsers()
+        {
+            //load all registerUsers dto
+            var filter = Builders<BsonDocument>.Filter.Empty;
+            List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
+            List<DTO_RegisteredUser> registerUsersDTO = new List<DTO_RegisteredUser>();
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                DTO_RegisteredUser dto = JsonConvert.DeserializeObject<DTO_RegisteredUser>(json);
+                registerUsersDTO.Add(dto);
+            }
+            List<RegisteredUser> registeredUsers = new List<RegisteredUser>();
+            foreach (DTO_RegisteredUser dto in registerUsersDTO)
+            {
+                RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
+                registeredUsers.Add(registerUser);
+            }
+            return registeredUsers;
+        }
+        public LinkedList<String> LoadAllSystemAdmins()
+        {
+            var filter = Builders<BsonDocument>.Filter.Empty;
+            List<BsonDocument> docs = DAO_SystemAdmins.collection.Find(filter).ToList();
+            List<DTO_SystemAdmins> systemAdminDTO = new List<DTO_SystemAdmins>();
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                DTO_SystemAdmins dto = JsonConvert.DeserializeObject<DTO_SystemAdmins>(json);
+                systemAdminDTO.Add(dto);
+            }
+            if (systemAdminDTO.Count > 0)
+            {
+                return systemAdminDTO[0].SystemAdmins;
+            }
+            else { return null; }
+        }
         #endregion User
 
         #region Shop till you drop
@@ -1095,7 +1173,6 @@ namespace Terminal3.DataAccessLayer
             }
 
             p = new Product(dto._id, dto.Name, dto.Price, dto.Quantity, dto.Category, dto.Keywords, dto.Review);
-            // TODO - get product notification Manager and inject it
             Products.TryAdd(p.Id, p);
             return p;
         }
@@ -1149,14 +1226,13 @@ namespace Terminal3.DataAccessLayer
                 products.TryAdd(product, p);
             }
 
-            var d_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.DiscountRoot._id);
-            var p_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.PurchaseRoot._id);
-
-            PolicyManager PolicyManager = new PolicyManager(LoadDiscountAddition(d_filter) , LoadBuyNowPolicy(p_filter));
-            s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , PolicyManager);
+            s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , dto.isClosed);
+            s.NotificationManager.Store = s;
 
             Stores.TryAdd(s.Id, s);
-
+            DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.MainDiscount._id));
+            BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.MainPolicy._id));
+            s.PolicyManager = new PolicyManager(MainDiscount, MainPolicy);
             StoreOwner founder = getOwnershipTree(s, dto.Founder);
 
             s.Founder = founder;
@@ -1176,6 +1252,29 @@ namespace Terminal3.DataAccessLayer
             {
                 Stores.TryRemove(deletedStore._id, out Store s);
             }
+        }
+
+        public List<Store> LoadAllStores()
+        {
+            //load all stores dto
+            var filter = Builders<BsonDocument>.Filter.Empty;
+            List<BsonDocument> docs = DAO_Store.collection.Find(filter).ToList();
+            List<DTO_Store> storesDTOs = new List<DTO_Store>();
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                DTO_Store dto = JsonConvert.DeserializeObject<DTO_Store>(json);
+                storesDTOs.Add(dto);
+            }
+            List<Store> stores = new List<Store>();
+            foreach(DTO_Store dto in storesDTOs)
+            {
+                var f = Builders<BsonDocument>.Filter.Eq("_id", dto._id);
+                Store s = LoadStore(f);
+                stores.Add(s);
+            }
+            return stores;
         }
 
         #endregion Store
@@ -1656,10 +1755,10 @@ namespace Terminal3.DataAccessLayer
         {
             VisibleDiscount v;
             DTO_VisibleDiscount dto = DAO_VisibleDiscount.Load(filter);
-            //if (Discount_VisibleDiscounts.TryGetValue(dto._id, out v))
-            //{
-            //    return v;
-            //}
+            if (Discount_VisibleDiscounts.TryGetValue(dto._id, out v))
+            {
+                return v;
+            }
 
             IDiscountTarget Target = null;
             foreach (var discount in dto.Target)
@@ -1698,10 +1797,10 @@ namespace Terminal3.DataAccessLayer
         {
             DiscountTargetCategories d;
             DTO_DiscountTargetCategories dto = DAO_DiscountTargetCategories.Load(filter);
-            //if (Discount_DiscountTargetCategories.TryGetValue(dto._id, out d))
-            //{
-            //    return d;
-            //}
+            if (Discount_DiscountTargetCategories.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
 
             d = new DiscountTargetCategories(dto.Categories , dto._id);
             Discount_DiscountTargetCategories.TryAdd(dto._id, d);
@@ -1762,10 +1861,10 @@ namespace Terminal3.DataAccessLayer
         {
             DiscreetDiscount d;
             DTO_DiscreetDiscount dto = DAO_DiscreetDiscount.Load(filter);
-            //if (Discount_DiscreetDiscounts.TryGetValue(dto._id, out d))
-            //{
-            //    return d;
-            //}
+            if (Discount_DiscreetDiscounts.TryGetValue(dto._id, out d))
+            {
+                return d;
+            }
 
             IDiscountPolicy Discount = null;
             foreach (var discount in dto.Discount)
@@ -1805,10 +1904,10 @@ namespace Terminal3.DataAccessLayer
         {
             ConditionalDiscount c;
             DTO_ConditionalDiscount dto = DAO_ConditionalDiscount.Load(filter);
-            //if (Discount_ConditionalDiscounts.TryGetValue(dto._id, out c))
-            //{
-            //    return c;
-            //}
+            if (Discount_ConditionalDiscounts.TryGetValue(dto._id, out c))
+            {
+                return c;
+            }
 
             IDiscountCondition Condition = null;
             foreach (var discount in dto.Condition)
@@ -2327,6 +2426,7 @@ namespace Terminal3.DataAccessLayer
                 database.GetCollection<BsonDocument>("SystemAdmins").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("Users").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("Recipts").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("StoreStaffs").DeleteMany(emptyFilter);
 
                 RegisteredUsers.Clear();
                 GuestUsers.Clear();
@@ -2345,146 +2445,27 @@ namespace Terminal3.DataAccessLayer
                 Policy_OrPolicys.Clear();
                 Policy_BuyNows.Clear();
                 Policy_ConditionalPolicys.Clear();
+                Discount_VisibleDiscounts.Clear();
+                Discount_DiscountTargetCategories.Clear();
+                Discount_DiscountTargetProducts.Clear();
+                Discount_DiscreetDiscounts.Clear();
+                Discount_ConditionalDiscounts.Clear();
+                Discount_MinProductConditions.Clear();
+                Discount_MinBagPriceConditions.Clear();
+                Discount_MaxProductConditions.Clear();
+                Discount_DiscountConditionOrs.Clear();
+                Discount_DiscountConditionAnds.Clear();
+                Discount_DiscountXors.Clear();
+                Discount_DiscountOrs.Clear();
+                Discount_DiscountMins.Clear();
+                Discount_DiscountMaxs.Clear();
+                Discount_DiscountAnds.Clear();
+                Discount_DiscountAdditions.Clear();
     }
 
     }
         #endregion
 
-
-
-        #region Methods TO Delete
-        //TODO - delete
-        //private StoreManager LoadStoreManager(FilterDefinition<BsonDocument> filter)
-        //{
-        //    StoreManager sm;
-        //    LinkedList<StoreManager> list;
-        //    DTO_StoreManager dto = DAO_StoreManager.Load(filter);       // TODO - need to make sure when loading store manager the filter includes user id and store id
-
-        //    bool listExists = StoreManagers.TryGetValue(dto.UserId, out list);
-        //    if (listExists)
-        //    {
-        //        foreach(StoreManager manager in list)
-        //        {
-        //            if(manager.Store.Id == dto.StoreId)
-        //            {
-        //                return manager;
-        //            }
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        list = new LinkedList<StoreManager>();
-        //    }
-
-        //    var user_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.UserId);
-        //    var store_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.StoreId);
-        //    var owner_filter = Builders<BsonDocument>.Filter.Eq("UserId", dto.AppointedBy)& Builders<BsonDocument>.Filter.Eq("StoreId", dto.StoreId);
-
-        //    sm = new StoreManager(LoadRegisteredUser(user_filter), LoadStore(store_filter), new Permission(dto.Permission), LoadStoreOwner(owner_filter));
-
-        //    list.AddLast(sm);
-        //    if (!listExists)
-        //    {
-        //        StoreManagers.TryAdd(sm.GetId(), list);
-        //    }
-        //    // else added to list pointer
-
-        //    return sm;
-        //}
-
-
-        //// TODO - delete
-        //private StoreOwner LoadStoreOwner(FilterDefinition<BsonDocument> filter)
-        //{
-        //    StoreOwner so;
-        //    LinkedList<StoreOwner> list;
-        //    DTO_StoreOwner dto = DAO_StoreOwner.Load(filter);       // TODO - need to make sure when loading store manager the filter includes user id and store id
-
-        //    bool listExists = StoreOwners.TryGetValue(dto.UserId, out list);
-        //    if (listExists)
-        //    {
-        //        foreach (StoreOwner owner in list) { if (owner.Store.Id == dto.StoreId) { return owner; } }
-
-        //    }
-        //    else { list = new LinkedList<StoreOwner>(); }
-
-        //    var user_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.UserId);
-        //    var store_filter = Builders<BsonDocument>.Filter.Eq("_id", dto.StoreId);
-        //    var owner_filter = Builders<BsonDocument>.Filter.Eq("UserId", dto.AppointedBy) & Builders<BsonDocument>.Filter.Eq("StoreId", dto.StoreId);            
-
-        //    LinkedList<StoreOwner> owners = new LinkedList<StoreOwner>();
-        //    LinkedList<StoreManager> managers = new LinkedList<StoreManager>();
-
-        //    foreach (String owner in dto.StoreOwners)
-        //    {
-        //        var filter1 = Builders<BsonDocument>.Filter.Eq("UserId", owner) & Builders<BsonDocument>.Filter.Eq("StoreId", dto.StoreId);
-        //        owners.AddLast(LoadStoreOwner(filter1));
-        //    }
-        //    foreach (String manager in dto.StoreManagers)
-        //    {
-        //        var filter2 = Builders<BsonDocument>.Filter.Eq("UserId", manager) & Builders<BsonDocument>.Filter.Eq("StoreId", dto.StoreId);
-        //        managers.AddLast(LoadStoreManager(filter2)); 
-        //    }
-
-        //    so = new StoreOwner(LoadRegisteredUser(user_filter), LoadStore(store_filter), LoadStoreOwner(owner_filter), managers, owners);
-
-        //    list.AddLast(so);
-        //    if (!listExists)  { StoreOwners.TryAdd(so.GetId(), list); }
-        //    // else added to list pointer
-
-        //    //TODO - inject owners and managers
-
-        //    return so;
-        //}        
-
-
-        //private Store LoadStore(FilterDefinition<BsonDocument> filter)
-        //{
-        //    Store s;
-        //    DTO_Store dto = DAO_Store.Load(filter);
-        //    if (Stores.TryGetValue(dto._id, out s)) { return s; }
-
-        //    var founder_filter = Builders<BsonDocument>.Filter.Eq("UserId", dto.Founder)&Builders<BsonDocument>.Filter.Eq("StoreId", dto._id);
-
-        //    ConcurrentDictionary<String, StoreOwner> owners = new ConcurrentDictionary<String, StoreOwner>();
-        //    ConcurrentDictionary<String, StoreManager> managers = new ConcurrentDictionary<String, StoreManager>();
-        //    ConcurrentDictionary<String, Product> products = new ConcurrentDictionary<String, Product>();
-
-        //    foreach (String owner in dto.Owners)
-        //    {
-        //        var filter1 = Builders<BsonDocument>.Filter.Eq("UserId", owner) & Builders<BsonDocument>.Filter.Eq("StoreId", dto._id);
-        //        owners.TryAdd(owner , LoadStoreOwner(filter1));
-        //    }
-        //    foreach (String manager in dto.Managers)
-        //    {
-        //        var filter2 = Builders<BsonDocument>.Filter.Eq("UserId", manager) & Builders<BsonDocument>.Filter.Eq("StoreId", dto._id);
-        //        managers.TryAdd(manager , LoadStoreManager(filter2));
-        //    }
-
-        //    NotificationManager notificationManager = new NotificationManager();
-
-        //    foreach(String product in dto.InventoryManager)
-        //    {
-        //        var filter3 = Builders<BsonDocument>.Filter.Eq("_id", product);
-        //        Product p = LoadProduct(filter3);
-        //        p.NotificationManager = notificationManager;
-        //        products.TryAdd(product, p );
-        //    }
-
-        //    InventoryManager inventory = new InventoryManager(products);
-
-        //    s = new Store(dto._id, dto.Name, LoadStoreOwner(founder_filter), owners, managers, inventory, ToObject(dto.History), dto.Rating, dto.NumberOfRates , notificationManager);                            
-
-        //    Stores.TryAdd(s.Id, s);
-
-        //    // TODO - inject owners and managers
-
-        //    return s;
-        //}
-
-
-        #endregion Methods TO Delete
     }
 }
 

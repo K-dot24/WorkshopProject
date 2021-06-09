@@ -1,0 +1,8 @@
+{
+  "email": "Admin@terminal3.com",
+  "password": "Admin123",
+  "signalRServer_url": "https://localhost:4001/signalr/notification",
+  "mongoDB_url": "mongodb+srv://admin:terminal3@cluster0.cbdpv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+  "externalSystem_url": ""
+}
+

@@ -10,7 +10,7 @@ namespace Terminal3.DataAccessLayer.DTOs
         [BsonId]
         public string _id { get; set; }
         [BsonElement]
-        public Double MinPrice { get; }
+        public Double MinPrice { get; set; }
 
         public DTO_MinBagPriceCondition(string id, double minPrice)
         {

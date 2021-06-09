@@ -72,23 +72,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return Discount2.AddDiscount(id, discount);
         }
 
-        public override Result<bool> RemoveDiscount(string id)
+        public override Result<IDiscountPolicy> RemoveDiscount(string id)
         {
-            if (Discount1.Id.Equals(id))
+            IDiscountPolicy oldPolicy = null;
+            if (Discount1 != null && Discount1.Id.Equals(id))
             {
-                //return new Result<bool>("Can't remove a discount that is a child of xor. Id of the discount is " + id, false, false);
+                oldPolicy = Discount1;
                 Discount1 = null;
-                return new Result<bool>("", true, true);
+                return new Result<IDiscountPolicy>("", true, oldPolicy);
             }
-            if (Discount2.Id.Equals(id))
+            if (Discount2 != null && Discount2.Id.Equals(id))
             {
-                //return new Result<bool>("Can't remove a discount that is a child of xor. Id of the discount is " + id, false, false);
+                oldPolicy = Discount2;
                 Discount2 = null;
-                return new Result<bool>("", true, true);
+                return new Result<IDiscountPolicy>("", true, oldPolicy);
             }
 
-            Result<bool> result = Discount1.RemoveDiscount(id);
-            if (result.ExecStatus && result.Data)
+            Result<IDiscountPolicy> result = Discount1.RemoveDiscount(id);
+            if (result.ExecStatus && result.Data != null)
                 return result;
             if (!result.ExecStatus)
                 return result;
@@ -118,41 +119,67 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return Discount2.AddCondition(id, condition);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
-            if (Id == id)
+            if (ChoosingCondition != null && ChoosingCondition.Id == id)
             {
+                IDiscountCondition oldCondition = ChoosingCondition;
                 ChoosingCondition = null;
-                return new Result<bool>("", true, true);
+                return new Result<IDiscountCondition>("", true, oldCondition);
             }
             if (ChoosingCondition != null)
             {
-                Result<bool> choosingResult = ChoosingCondition.RemoveCondition(id);
-                if (choosingResult.ExecStatus && choosingResult.Data)
+                Result<IDiscountCondition> choosingResult = ChoosingCondition.RemoveCondition(id);
+                if (choosingResult.ExecStatus && choosingResult.Data != null)
                     return choosingResult;
                 if (!choosingResult.ExecStatus)
                     return choosingResult;
             }
-            Result<bool> result = Discount1.RemoveCondition(id);
-            if (result.ExecStatus && result.Data)
+            Result<IDiscountCondition> result = Discount1.RemoveCondition(id);
+            if (result.ExecStatus && result.Data != null)
                 return result;
             if (!result.ExecStatus)
                 return result;
             return Discount2.RemoveCondition(id);
         }
 
-        public override Result<IDiscountPolicyData> GetData()
+        public override Result<IDictionary<string, object>> GetData()
         {
-            Result<IDiscountPolicyData> discount1Result = Discount1.GetData();
-            if (!discount1Result.ExecStatus)
-                return new Result<IDiscountPolicyData>(discount1Result.Message, false, null);
-            Result<IDiscountPolicyData> discount2Result = Discount2.GetData();
-            if (!discount2Result.ExecStatus)
-                return new Result<IDiscountPolicyData>(discount2Result.Message, false, null);
-            Result<IDiscountConditionData> choosingConditionResult = ChoosingCondition.GetData();
-            if (!choosingConditionResult.ExecStatus)
-                return new Result<IDiscountPolicyData>(choosingConditionResult.Message, false, null);
-            return new Result<IDiscountPolicyData>("", true, new DiscountXorData(discount1Result.Data, discount2Result.Data, choosingConditionResult.Data, Id));
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                {"type","DiscountXor" },
+                {"Discount1",null },
+                {"Discount2",null },
+                {"ChoosingCondition",null}
+
+            };*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Xor"},
+                { "children", new Dictionary<String, object>[0] }
+            };
+            List<IDictionary<string, object>> children = new List<IDictionary<string, object>>();
+            if (ChoosingCondition != null)
+            {
+                Result<IDictionary<string, object>> ChoosingConditionResult = ChoosingCondition.GetData();
+                if (!ChoosingConditionResult.ExecStatus)
+                    return ChoosingConditionResult;
+                children.Add(ChoosingConditionResult.Data);
+            }
+            if (Discount1 != null) {
+                Result<IDictionary<string, object>> discount1Result = Discount1.GetData();
+                if (!discount1Result.ExecStatus)
+                    return discount1Result;
+                children.Add(discount1Result.Data);
+            }
+            if (Discount2 != null)
+            {
+                Result<IDictionary<string, object>> discount2Result = Discount2.GetData();
+                if (!discount2Result.ExecStatus)
+                    return discount2Result;
+                children.Add(discount2Result.Data);
+            }
+            dict["children"] = children.ToArray();
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public override Result<bool> EditDiscount(Dictionary<string, object> info, string id)

@@ -40,60 +40,85 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public override Result<bool> AddDiscount(String id, IDiscountPolicy discount)
         {
             if (Id == id)
+            {
                 Discount = discount;
+                return new Result<bool>("", true, true);
+            }
             else if(Discount != null)
                 return Discount.AddDiscount(id, discount);
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveDiscount(String id)
+        public override Result<IDiscountPolicy> RemoveDiscount(String id)
         {
             if (Discount.Id.Equals(id))
+            {
+                IDiscountPolicy oldDiscount = Discount;
                 Discount = null;
+                return new Result<IDiscountPolicy>("", true, oldDiscount);
+            }
             else if (Discount != null)
                 return Discount.RemoveDiscount(id);
-            return new Result<bool>("", true, false);
+            return new Result<IDiscountPolicy>("", true, null);
         }
 
         public override Result<bool> AddCondition(string id, IDiscountCondition condition)
         {
             if (Id == id)
+            {
                 Condition = condition;
+                return new Result<bool>("", true, true);
+            }
             else if (Condition != null)
                 return Condition.AddCondition(id, condition);
             return new Result<bool>("", true, false);
         }
 
-        public override Result<bool> RemoveCondition(string id)
+        public override Result<IDiscountCondition> RemoveCondition(string id)
         {
             if (Condition == null)
-                return new Result<bool>("", true, false);
+                return new Result<IDiscountCondition>("", true, null);
             if (Condition.Id.Equals(id))
-                //return new Result<bool>("Cant remove the main condition of the conditional discount yet", false, false);
+            {
+                IDiscountCondition oldCondition = Condition;
                 Condition = null;
+                return new Result<IDiscountCondition>("", true, oldCondition);
+            }
             return Condition.RemoveCondition(id);
         }
 
-        public override Result<IDiscountPolicyData> GetData()
+        public override Result<IDictionary<string, object>> GetData()
         {
-            IDiscountPolicyData discountData = null;
-            if (Discount != null)
-            {
-                Result<IDiscountPolicyData> discountDataResult = Discount.GetData();
-                if (!discountDataResult.ExecStatus)
-                    return discountDataResult;
-                discountData = discountDataResult.Data;
-            }
-            IDiscountConditionData conditionData = null;
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "type", "VisibleDiscount" },
+                { "Id", Id },               
+                { "Condition", null },
+                { "Discount", null }
+            };*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Conditional"},
+                { "children", new Dictionary<String, object>[0] }
+            };
+            List<IDictionary<String, object>> children = new List<IDictionary<string, object>>();
             if (Condition != null)
             {
-                Result<IDiscountConditionData> conditionDataResult = Condition.GetData();
+                Result<IDictionary<string, object>> conditionDataResult = Condition.GetData();
                 if (!conditionDataResult.ExecStatus)
-                    return new Result<IDiscountPolicyData>(conditionDataResult.Message, false, null);
-                conditionData = conditionDataResult.Data;
+                    return conditionDataResult;
+                children.Add(conditionDataResult.Data);
             }
 
-            return new Result<IDiscountPolicyData>("", true, new ConditionalDiscountData(discountData, conditionData, Id));
+            if (Discount!= null)
+            {
+                Result<IDictionary<string, object>> discountDataResult = Discount.GetData();
+                if (!discountDataResult.ExecStatus)
+                    return discountDataResult;
+                children.Add(discountDataResult.Data);
+            }
+            dict["children"] = children.ToArray();
+
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public override Result<bool> EditDiscount(Dictionary<string, object> info, string id)

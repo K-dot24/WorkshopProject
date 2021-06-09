@@ -7,8 +7,14 @@ namespace Terminal3.ExternalSystems.Tests
     public class DeliverySystemTests
     {
         public IDictionary<String, Object> deliveryDetails;
+        public bool isMock { get; }
         public DeliverySystemTests()
         {
+            isMock = true;
+            if(isMock)
+                ExternalSystemsAPI.getInstance("");
+            else
+                ExternalSystemsAPI.getInstance("https://cs-bgu-wsep.herokuapp.com/");
             deliveryDetails = new Dictionary<String, Object>
                     {
                      { "name", "Israel Israelovice" },

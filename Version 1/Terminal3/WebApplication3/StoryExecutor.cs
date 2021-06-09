@@ -25,6 +25,7 @@ namespace Terminal3WebAPI
                                     {
                                         { "Register",new Func<string,string,string,Result<RegisteredUserService>>(system.Register)},
                                         { "Login",new Func< string, string,Result<RegisteredUserService>>(system.Login)},
+                                        { "LogOut",new Func< string,Result<UserService>>(system.LogOut)},
                                         { "OpenNewStore",new Func< string, string,string,Result<StoreService>>(system.OpenNewStore)},
                                         { "AddProductToStore",new Func< String , String , String , double , int , String , LinkedList<String> ,Result<ProductService>>(system.AddProductToStore)},
                                         { "AddStoreManager",new Func< String , String , String ,Result<Boolean>>(system.AddStoreManager)}
@@ -35,6 +36,10 @@ namespace Terminal3WebAPI
             {
                 string json = File.ReadAllText(path);
                 StoryConfig storyConfig = JsonConvert.DeserializeObject<StoryConfig>(json);
+                if (storyConfig.story is null) {
+                    Logger.LogError("Invalid JSON format - One or more missing attribute has been found in the config JSON");
+                    Environment.Exit(0);
+                }
                 foreach (Story story in storyConfig.story)
                 {
 

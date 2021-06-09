@@ -13,8 +13,6 @@ const AddressForm = ({ next }) => {
 
     const methods = useForm();
 
-    // TODO: Fetch from api?
-    //     : checkoutToken?
     const fetchShippingCountries = async () => {
         const countries = ['Israel', 'Cyprus'];
         setShippingCountries(countries);

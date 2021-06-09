@@ -51,9 +51,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             return result;
         }
 
-        public Result<IDiscountTargetData> GetData()
+        public Result<String> GetData()
         {
-            return new Result<IDiscountTargetData>("", true, new DiscountTargetCategoriesData(new List<string>(Categories)));
+            String answer = "";
+            foreach (String category in Categories)
+                answer += category + ", ";
+            if (Categories.Count > 0)
+                answer = answer.Substring(0, answer.Length - 2);
+            return new Result<String>("", true, answer);
         }
 
         public string getId()

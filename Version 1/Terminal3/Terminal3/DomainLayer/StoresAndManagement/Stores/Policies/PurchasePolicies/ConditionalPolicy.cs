@@ -76,34 +76,66 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             return new Result<bool>("", true, false);
         }
 
-        public Result<bool> RemovePolicy(string id)
+        public Result<IPurchasePolicy> RemovePolicy(string id)
         {
-            if((PreCond != null && PreCond.Id.Equals(id)) || (Cond != null && Cond.Id.Equals(id)))
-                return new Result<bool>("", false, false);
+            if (PreCond != null && PreCond.Id.Equals(id))
+            {
+                IPurchasePolicy temp = PreCond;
+                PreCond = null;
+                return new Result<IPurchasePolicy>("", true, temp);
+            }
+            else if (Cond != null && Cond.Id.Equals(id))
+            {
+                IPurchasePolicy temp = Cond;
+                Cond = null;
+                return new Result<IPurchasePolicy>("", true, temp);
+            }
 
-            Result<bool> res = PreCond.RemovePolicy(id);
+            Result<IPurchasePolicy> res = PreCond.RemovePolicy(id);
             if (!res.ExecStatus)
                 return res;
-            if (res.Data)
+            if (res.Data != null)
                 return res;
 
             res = Cond.RemovePolicy(id);
             if (!res.ExecStatus)
                 return res;
-            if (res.Data)
+            if (res.Data != null)
                 return res;
-            return new Result<bool>("", true, false);
+            return new Result<IPurchasePolicy>("", true, null);
         }
 
-        public Result<IPurchasePolicyData> GetData()
+        public Result<IDictionary<string, object>> GetData()
         {
-            IPurchasePolicyData pre = null;
-            IPurchasePolicyData cond = null;
+            /*IDictionary<string, object> dict = new Dictionary<string, object>() { 
+                { "Type", "ConditionalPolicy" }, 
+                { "Id", Id }, 
+                { "PreCond", PreCond.GetData().Data}, 
+                { "Cond", Cond.GetData().Data } 
+            };
+            return new Result<IDictionary<string, object>>("", true, dict);*/
+            IDictionary<string, object> dict = new Dictionary<string, object>() {
+                { "id", Id },
+                { "name", "Conditional"},
+                { "children", new Dictionary<String, object>[0] }
+            };
+            List<IDictionary<string, object>> children = new List<IDictionary<string, object>>();            
             if (PreCond != null)
-                pre = PreCond.GetData().Data;
+            {
+                Result<IDictionary<string, object>> PreCondResult = PreCond.GetData();
+                if (!PreCondResult.ExecStatus)
+                    return PreCondResult;
+                children.Add(PreCondResult.Data);
+            }
             if (Cond != null)
-                cond = Cond.GetData().Data;
-            return new Result<IPurchasePolicyData>("", true, new ConditionalPolicyData(pre, cond, Id));
+            {
+                Result<IDictionary<string, object>> CondResult = Cond.GetData();
+                if (!CondResult.ExecStatus)
+                    return CondResult;
+                children.Add(CondResult.Data);
+            }
+            dict["children"] = children.ToArray();
+            return new Result<IDictionary<string, object>>("", true, dict);
         }
 
         public Result<bool> EditPolicy(Dictionary<string, object> info, string id)
