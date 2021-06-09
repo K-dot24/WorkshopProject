@@ -6,9 +6,11 @@ using Terminal3.DomainLayer;
 
 namespace Terminal3.DataAccessLayer.DTOs
 {
-    class DTO_Monitor
+    public class DTO_Monitor
     {
         [BsonId]
+        public String _id { get; set; }
+        [BsonElement]
         public String Date { get; set; }
         [BsonElement]
         public int GuestUsers { get; set; }
@@ -21,8 +23,9 @@ namespace Terminal3.DataAccessLayer.DTOs
         [BsonElement]
         public int Admins { get; set; }
 
-        public DTO_Monitor(string date, int guestUsers, int registeredUsers, int managersNotOwners, int owners, int admins)
+        public DTO_Monitor(String date, int guestUsers, int registeredUsers, int managersNotOwners, int owners, int admins)
         {
+            _id = Service.GenerateId();
             Date = date;
             GuestUsers = guestUsers;
             RegisteredUsers = registeredUsers;
