@@ -6,7 +6,7 @@ using Terminal3.DomainLayer;
 
 namespace Terminal3.DataAccessLayer.DTOs
 {
-    class DTO_Monitor
+    public class DTO_Monitor
     {
         [BsonId]
         public String Date { get; set; }

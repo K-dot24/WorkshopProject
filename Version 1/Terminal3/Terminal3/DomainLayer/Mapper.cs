@@ -66,6 +66,7 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_DiscountAnd> DAO_DiscountAnd;
         public DAO<DTO_DiscountAddition> DAO_DiscountAddition;
         public DAO<DTO_Recipt> DAO_Recipt;
+        public DAO<DTO_Monitor> DAO_Monitor;
 
         // IdentityMaps  <Id , object>
         public ConcurrentDictionary<String, RegisteredUser> RegisteredUsers;
@@ -149,6 +150,7 @@ namespace Terminal3.DataAccessLayer
                 DAO_DiscountAnd = new DAO<DTO_DiscountAnd>(database, "DiscountPolicies");
                 DAO_DiscountAddition = new DAO<DTO_DiscountAddition>(database, "DiscountPolicies");
                 DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
+                DAO_Monitor = new DAO<DTO_Monitor>(database, "Monitor");
 
                 // IdentityMaps  <Id , object>
                 RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
@@ -2467,6 +2469,13 @@ namespace Terminal3.DataAccessLayer
     }
         #endregion
 
+        #region Monitor
+        public void Update(DTO_Monitor)
+        {
+
+
+        }
+        #endregion
     }
 }
 
