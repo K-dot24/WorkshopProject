@@ -94,12 +94,6 @@ namespace Terminal3.ServiceLayer
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void sendMonitorStatus(DTO_Monitor monitor)
         {
-            string date,
-                int guestUsers,
-                int registeredUsers,
-                int managersNotOwners, 
-                int owners,
-                int admins
             connection.InvokeAsync("sendMonitor", new Record(monitor.Date,monitor.GuestUsers,monitor.RegisteredUsers,monitor.ManagersNotOwners,monitor.Owners,monitor.Admins));
         }
 
