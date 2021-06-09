@@ -20,22 +20,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         private MonitorController()
         {
+            DTO_Monitor dto = Mapper.getInstance().LoadMonitor();
             today = DateTime.Now.Date;
-            GuestUsers = 0;
-            RegisteredUsers = 0;
-            ManagersNotOwners = 0;
-            Owners = 0;
-            Admins = 0;
-        }
-
-        private MonitorController(int guestUsers, int registeredUsers, int managersNotOwners, int owners, int admins)
-        {
-            today = DateTime.Now.Date;
-            GuestUsers = guestUsers;
-            RegisteredUsers = registeredUsers;
-            ManagersNotOwners = managersNotOwners;
-            Owners = owners;
-            Admins = admins;
+            GuestUsers = dto.GuestUsers;
+            RegisteredUsers = dto.RegisteredUsers;
+            ManagersNotOwners = dto.ManagersNotOwners;
+            Owners = dto.Owners;
+            Admins = dto.Admins;
         }
 
         public static MonitorController getInstance()
