@@ -10,7 +10,7 @@ namespace Terminal3.ServiceLayer.ServiceObjects
         public String Id { get; }
         public String Name { get; }
         public Double Price { get; }
-        public int Quantity { get; set; }       //TODO - check is it is product quantity and not store quantity - i checked , it is store quantity - maybe change ?
+        public int Quantity { get; set; }       // quantity of product that was in store after purchasing the shopping cart
         public String Category { get; }
 
         //Constructor
