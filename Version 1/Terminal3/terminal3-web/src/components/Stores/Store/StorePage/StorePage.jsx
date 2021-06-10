@@ -569,7 +569,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
                 { /* Get Discount Policy Data */}
                 <Route exact path={match.url + `/checkoffers`} 
-                    render={(props) => (<OfferPage storeID={store.id} userID={user.id} {...props} />)} 
+                    render={(props) => (<OfferPage type='store' storeID={store.id} userID={user.id} {...props} />)} 
                 />
 
             </Switch>

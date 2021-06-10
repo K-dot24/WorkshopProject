@@ -731,8 +731,8 @@ export function SendOfferResponseToUser( data ) {
 // TODO: Implement with real API
 export function GetUserOffersData( userID ) {
     const data = { offers: [
-        { offerID: 'offer1', storeID: 'StoreID1', productID: '7a2b9d541fcb464f8924d18d0b91d3fd', amount: 3, price: 10 },
-        { offerID: 'offer2', storeID: 'StoreID2', productID: 'MadeUpPID', amount: 1, price: 20 },
+        { offerID: 'offer1', storeID: 'StoreID1', storeName: 'Store1', productID: '7a2b9d541fcb464f8924d18d0b91d3fd', amount: 3, price: 10 },
+        { offerID: 'offer2', storeID: 'StoreID2', storeName: 'Store2', productID: 'MadeUpPID', amount: 1, price: 20 },
     ] }
 
     return data;

@@ -3,7 +3,7 @@ import { List, ListItem, ListItemText, Typography, Paper, Button, Divider } from
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Offer } from '../../../components';
-import { GetStoreOffersData } from '../../../api/API';
+import { GetStoreOffersData, GetUserOffersData } from '../../../api/API';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const OffersPage = ({ storeID, userID }) => {
+const OffersPage = ({ type, storeID, userID }) => {
     const classes = useStyles();
 
     // Offers list data from API
@@ -51,22 +51,33 @@ const OffersPage = ({ storeID, userID }) => {
 
     // TODO: Update with real API call
     const fetchOffers = () => {
-        const res = GetStoreOffersData(userID, storeID);
+        let res;
+        if (type === 'store')
+            res = GetStoreOffersData(userID, storeID);
+        else if (type === 'user')
+            res = GetUserOffersData(userID);
         setData(res);
     };
 
     // TODO: Connect to API
     const handleAccept = (offerID) => {
-        const toSend = { StoreId: storeID, UserId: userID, OfferId: offerID, Accepted: true }
-        console.log(toSend);
+        if (type === 'store'){
+            const toSend = { StoreId: storeID, UserId: userID, OfferId: offerID, Accepted: true }
+            console.log(toSend);
+        }
+        else if (type === 'user')
+            console.log("ACCEPTED BY USER");
     };
 
     // TODO: Connect to API
     const handleDecline = (offerID) => {
-        const toSend = { StoreId: storeID, UserId: userID, OfferId: offerID, Accepted: false, CounterOffer: -1 }
-        console.log(toSend);
+        if (type === 'store'){
+            const toSend = { StoreId: storeID, UserId: userID, OfferId: offerID, Accepted: false, CounterOffer: -1 }
+            console.log(toSend);
+        }
+        else if (type === 'user')
+            console.log("DECLINED BY USER");
     };
-
 
     const onCounter = (offerID) => {
         setSelectedOfferID(offerID)
@@ -94,7 +105,7 @@ const OffersPage = ({ storeID, userID }) => {
             <main className={classes.layout}>
                 <Paper className={classes.paper}>
                     <List component="nav" aria-label="offers list">
-                        {data !== null && (
+                        {(type === 'store' && data !== null) && (
                             data.offers.map((offer) => (
                             <>
                                 <ListItem style={{padding: '10px 0'}} key={offer.offerID}>
@@ -103,6 +114,20 @@ const OffersPage = ({ storeID, userID }) => {
                                 </ListItem>
                                 <Button color="primary" onClick={() => handleAccept(offer.offerID)}>Accept</Button>
                                 <Button color="primary" onClick={() => onCounter(offer.offerID)}>Counter</Button>
+                                <Button color="secondary" onClick={() => handleDecline(offer.offerID)}>Decline</Button>
+                                <Divider />
+                            </>
+                            ))
+                        )}
+
+                        {(type === 'user' && data !== null) && (
+                            data.offers.map((offer) => (
+                            <>
+                                <ListItem style={{padding: '10px 0'}} key={offer.offerID}>
+                                    <ListItemText primary={offer.productName} secondary={`Store: ${offer.storeName}`} />
+                                    <Typography variant="body2">{`Amount: ${offer.amount}, Price: ${offer.price}₪`}</Typography>
+                                </ListItem>
+                                <Button color="primary" onClick={() => handleAccept(offer.offerID)}>Accept</Button>
                                 <Button color="secondary" onClick={() => handleDecline(offer.offerID)}>Decline</Button>
                                 <Divider />
                             </>

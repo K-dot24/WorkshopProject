@@ -140,8 +140,10 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
         open={isMenuOpen}
         onClose={() => setAnchorEl(null)}
         >
+        {/* Main Page Menu */}
         {storeId === -1 ? (
             <div>
+                { /* System Admin Actions Menu */}
                 {isSystemAdmin &&
                 <>
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/addsystemadmin`)}>Add System Admin</MenuItem>
@@ -151,13 +153,15 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/resetsystem`)}>Reset System</MenuItem>
                 </>
                 }
+                { /* Registered User Actions Menu */}
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/review`)}>Write Review</MenuItem>
                 <MenuItem onClick={() => handleHistory(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
-                <MenuItem onClick={() => handleHistory(`/${user.id}/checkoffers`)}>Check Offers</MenuItem>
+                <MenuItem onClick={() => handleHistory(`/${user.id}/checkuseroffers`)}>Check Offers</MenuItem>
 
             </div>
         ) : (
+            // Store Menu
             <StoreActions />
         )
         

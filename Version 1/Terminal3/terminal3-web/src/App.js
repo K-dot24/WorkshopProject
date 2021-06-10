@@ -5,7 +5,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 // SignalR
 import { HubConnectionBuilder } from '@microsoft/signalr';
 
-import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products, Review, InfoDisplay } from './components';
+import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products, Review, InfoDisplay, OfferPage } from './components';
 import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
         GetUserShoppingCart, UpdateShoppingCart, EnterSystem, SearchProduct, GetTotalShoppingCartPrice,
         GetUserPurchaseHistory, AddSystemAdmin, RemoveSystemAdmin, printErrorMessage, ResetSystem,
@@ -331,6 +331,11 @@ const App = () => {
                         {/* Purchase History Page */}
                         <Route exact path={`/${user.id}/purchasehistory`}
                                 render = {() => (<Review checkoutToken={userPurchaseHistory} />)} />
+
+                        {/* Check User's Offers */}
+                        <Route exact path={`/${user.id}/checkuseroffers`} 
+                                render={(props) => (<OfferPage type='user' userID={user.id} {...props} />)} 
+                        />
                         
                         {/* Add System Admin Page */}
                         {systemAdmins.includes(user.id) && (
