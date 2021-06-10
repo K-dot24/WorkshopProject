@@ -715,3 +715,17 @@ export function GetPurchasePolicyData( storeID ) {
 }
 
 //#endregion
+
+//#region Offer
+
+// TODO: Implement with real API
+export function SendOfferToStore( data ) {
+    console.log(data)
+}
+
+// TODO: Implement with real API
+export function SendOfferResponseToUser( data ) {
+    console.log(data)
+}
+
+//#endregion

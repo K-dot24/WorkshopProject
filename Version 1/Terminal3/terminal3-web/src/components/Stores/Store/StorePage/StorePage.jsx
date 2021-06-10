@@ -6,7 +6,8 @@ import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromSt
         AddStoreOwner, AddStoreManager, RemoveStoreManager, RemoveStoreOwner, GetStoreStaff, SetPermissions,
         printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
         AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition, AddPurchasePolicy, 
-        AddPurchasePolicyById, RemovePurchasePolicy, GetIncomeAmountGroupByDay, GetStorePurchaseHistory } from '../../../../api/API';
+        AddPurchasePolicyById, RemovePurchasePolicy, GetIncomeAmountGroupByDay, GetStorePurchaseHistory,
+        SendOfferToStore } from '../../../../api/API';
 
 
 const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
@@ -302,6 +303,16 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     //#endregion
 
+    //#region Offer
+
+    // TODO: Update with real API call
+    const handleSendOfferToStore = (data) => {
+        const fullData = { StoreId: store.id, UserId: user.id, ...data }
+        SendOfferToStore(fullData);
+    }
+
+    //#endregion
+
     //#region Search (commented out)
 
     // const [searchQuery, setsearchQuery] = useState('');
@@ -349,7 +360,9 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             <Switch>
                 {/* Main Store Page */}
                 <Route exact path={match.url}>
-                    <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} />
+                    <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} 
+                            handleSendOfferToStore={handleSendOfferToStore} 
+                    />
                 </Route>
 
                 {/* Bag Page */}

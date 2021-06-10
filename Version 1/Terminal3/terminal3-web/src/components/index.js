@@ -12,3 +12,4 @@ export { default as CheckboxList } from './Users/Action/CheckboxList';
 export { default as Review } from './CheckoutForm/Review';
 export { default as Policy } from './Stores/Store/Policy/Policy';
 export { default as InfoDisplay } from './Stores/Store/StorePage/InfoDisplay/InfoDisplay';
+export { default as Offer } from './Products/Offer/Offer';
