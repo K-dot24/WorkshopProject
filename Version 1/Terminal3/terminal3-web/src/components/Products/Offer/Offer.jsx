@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Dialog, TextField, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 
-const Offer = ({ open, setOpen, onSendOffer }) => {
+const Offer = ({ type, open, setOpen, onSendOffer }) => {
     const [data, setData] = useState(null);
 
     const handleClickOpen = () => {
@@ -23,21 +23,24 @@ const Offer = ({ open, setOpen, onSendOffer }) => {
                 <DialogTitle id="form-dialog-title">Submit Offer</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        To submit an offer, please enter the following details:
+                        {type === 'new' ? 'To submit an offer, please enter the following details:' 
+                                        : 'To submit a counter offer, please enter the following details:'}
                     </DialogContentText>
+                    {type === 'new' && (
+                        <TextField
+                            required={true}
+                            autoFocus
+                            margin="dense"
+                            id="amount"
+                            label="Amount"
+                            type="number"
+                            fullWidth
+                            onChange={(e) => setData({ ...data, amount: parseInt(e.target.value) })}
+                        />
+                    )}
                     <TextField
                         required={true}
-                        autoFocus
-                        margin="dense"
-                        id="amount"
-                        label="Amount"
-                        type="number"
-                        fullWidth
-                        onChange={(e) => setData({ ...data, amount: parseInt(e.target.value) })}
-                    />
-                    <TextField
-                        required={true}
-                        // autoFocus
+                        autoFocus={type === 'counter'}
                         margin="dense"
                         id="price"
                         label="Offered Price"

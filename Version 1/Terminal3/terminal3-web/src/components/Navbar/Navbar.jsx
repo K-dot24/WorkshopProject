@@ -101,6 +101,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
             <>
                 <MenuItem key="getIncome" onClick={() => handleMenuClick(`/stores/${storeId}/getincomesbyday`)}>Get Incomes by Day</MenuItem>
                 <MenuItem key="removeStoreOwner" onClick={() => handleMenuClick(`/stores/${storeId}/removestoreowner`)}>Remove Store Owner</MenuItem>
+                <MenuItem key="checkOffers" onClick={() => handleMenuClick(`/stores/${storeId}/checkOffers`)}>Check Offers</MenuItem>
             </>
             )}
         </div>

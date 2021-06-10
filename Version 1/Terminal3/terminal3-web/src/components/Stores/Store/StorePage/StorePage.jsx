@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
-import { Products, Navbar, Cart, Action, Policy, InfoDisplay } from '../../../../components';
+import { Products, Navbar, Cart, Action, Policy, InfoDisplay, OfferPage } from '../../../../components';
 
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
         AddStoreOwner, AddStoreManager, RemoveStoreManager, RemoveStoreOwner, GetStoreStaff, SetPermissions,
@@ -565,6 +565,11 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                             return (<Action name='Get Purhcase History'     
                                             handleAction={handleGetStorePurchaseHistory} {...props} />)
                     }}
+                />
+
+                { /* Get Discount Policy Data */}
+                <Route exact path={match.url + `/checkOffers`} 
+                    render={(props) => (<OfferPage storeID={store.id} userID={user.id} {...props} />)} 
                 />
 
             </Switch>

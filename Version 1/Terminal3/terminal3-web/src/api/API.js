@@ -728,4 +728,24 @@ export function SendOfferResponseToUser( data ) {
     console.log(data)
 }
 
+// TODO: Implement with real API
+export function GetUserOffersData( userID ) {
+    const data = { offers: [
+        { offerID: 'offer1', storeID: 'StoreID1', productID: '7a2b9d541fcb464f8924d18d0b91d3fd', amount: 3, price: 10 },
+        { offerID: 'offer2', storeID: 'StoreID2', productID: 'MadeUpPID', amount: 1, price: 20 },
+    ] }
+
+    return data;
+}
+
+// TODO: Implement with real API
+export function GetStoreOffersData( ownerID, storeID ) {
+    const data = { offers: [
+        { offerID: 'offer1', userID: 'User2ID', productID: '7a2b9d541fcb464f8924d18d0b91d3fd', productName: 'Bamba', amount: 3, price: 15 },
+        { offerID: 'offer2', userID: 'User2ID', productID: 'MadeUpPID', productName: 'Bisli', amount: 1, price: 20 },
+    ] }
+
+    return data;
+}
+
 //#endregion

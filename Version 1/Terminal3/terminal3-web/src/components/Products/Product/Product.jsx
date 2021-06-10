@@ -47,7 +47,9 @@ const Product = ({ product, onAddToBag, handleSendOfferToStore }) => {
                 }
             </CardActions>
         </Card>
-        {showOfferDialog && <Offer setOpen={setShowOfferDialog} open={showOfferDialog} onSendOffer={onSendOffer} />}
+        {showOfferDialog && 
+            <Offer type='new' setOpen={setShowOfferDialog} open={showOfferDialog} onSendOffer={onSendOffer} />
+        }
     </>
     )
 }
