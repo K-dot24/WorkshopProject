@@ -59,6 +59,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info);
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> RemovePurchasePolicy(string storeId, string id);
+
+        Result<bool> SendOfferToStore(Offer offer);
         #endregion
     }
 
@@ -846,6 +848,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             mapper.DAO_BuyNow.Delete(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
             mapper.Create(purchaseRoot);
             mapper.Create(purchaseRoot.Policy);
+        }
+
+        public Result<bool> SendOfferToStore(Offer offer)
+        {
+            if (Stores.TryGetValue(offer.StoreID, out Store store))
+            {
+                Result<bool> res = store.SendOfferToStore(offer);
+                if (res.ExecStatus)
+                {
+                    // Update in DB
+                    mapper.Create(offer);
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+                    var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
+                    mapper.UpdateStore(filter, update);
+                    UpdatePolicyRoot(store.PolicyManager.MainDiscount);
+
+                    return new Result<bool>(res.Message, res.ExecStatus, true);
+                }
+                return res;
+            }
+            return new Result<bool>("Failed to add an offer: Failed to locate the store\n", false, false);
         }
     }
 }

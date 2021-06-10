@@ -143,12 +143,29 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return true;
         }
 
-        public Result<bool> SendOfferToStore(string storeID, Dictionary<string, object> info)
+        public Result<Offer> SendOfferToStore(string storeID, string productID, int amount, double price)
         {
-            Result<Offer> res_o = Offer.Create(info);
+            Result<Offer> res_o = Offer.Create();
             if (!res_o.ExecStatus)
-                return new Result<bool>(res_o.Message, res_o.ExecStatus, false);
+                return res_o;
             Offers.AddLast(res_o.Data);
+            return res_o;
+        }
+
+        private Offer findOffer(string id)
+        {
+            foreach (Offer offer in Offers)
+                if (offer.Id == id)
+                    return offer;
+            return null;
+        }
+
+        public Result<bool> RemoveOffer(string id)
+        {
+            Offer offer = findOffer(id);
+            if (offer == null)
+                return new Result<bool>("Failed to remove offer from user: Failed to locate the offer", false, false);
+            Offers.Remove(offer);
             return new Result<bool>("", true, true);
         }
 

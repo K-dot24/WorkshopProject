@@ -49,6 +49,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
         Result<IPurchasePolicy> RemovePurchasePolicy(string id);
         Result<Boolean> EditPurchasePolicy(Dictionary<string, object> info, string id);
+
+        Result<bool> SendOfferToStore(Offer offer);
         #endregion
 
         #region Information        
@@ -628,17 +630,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.EditPurchasePolicy(info, id);
         }
 
-        public Result<bool> AddOffer(Dictionary<string, object> info)
+        public Result<bool> SendOfferToStore(Offer offer)
         {
-            Result<Offer> res = Offer.Create(info);
-            if (res.ExecStatus)
-            {
-                Offers.AddLast(res.Data);
-                asdas
-                return new Result<bool>(res.Message, res.ExecStatus, true);
-            }
-            return new Result<bool>(res.Message, res.ExecStatus, false);
+            Offers.AddLast(offer);
 
+            return new Result<bool>("", true, true);
         }
 
         public DTO_Store getDTO()
@@ -664,6 +660,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed,
                 PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO());
 
-        } 
+        }
     }
 }

@@ -58,7 +58,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<UserService> EnterSystem();
         Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<double> GetTotalShoppingCartPrice(String userID);
-        Result<bool> SendOfferToStore(string storeID, string userID, Dictionary<string, object> info);
+        Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price);
         #endregion
 
         #region System Managment
@@ -625,13 +625,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return StoresFacade.GetIncomeAmountGroupByDay(start_date, end_date);
         }
 
-        public Result<bool> SendOfferToStore(string storeID, string userID, Dictionary<string, object> info)
+        public Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price)
         {
             //make store add offer to its offer list and send an alert to all owners and needed managers.
-            Result<bool> res = UsersAndPermissionsFacade.SendOfferToStore(storeID, userID, info);
-            if (!res.ExecStatus)
-                return res;
+
+            Result<Offer> userResult = UsersAndPermissionsFacade.SendOfferToStore(storeID, userID, productID, amount, price);
+            if (!userResult.ExecStatus)
+                return new Result<bool>(userResult.Message, false, false);
+
             //get store and activate function to alert all related staff
+            Result<bool> storeResult = StoresFacade.SendOfferToStore(userResult.Data);
+            if (!storeResult.ExecStatus)
+            {
+                UsersAndPermissionsFacade.RemoveOffer(userID, userResult.Data.Id);
+                return storeResult;
+            }
+            return new Result<bool>("Offer was added successfully", true, true);
         }
     }
 }

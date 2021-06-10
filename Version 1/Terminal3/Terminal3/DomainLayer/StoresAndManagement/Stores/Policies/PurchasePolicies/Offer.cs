@@ -16,6 +16,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         public bool Accepted { get; }
         public string UserID { get; }
         public string ProductID { get; }
+        public string StoreID { get; }
         public int Amount { get; }
         public double Price { get; }
         public string Id { get; set; }

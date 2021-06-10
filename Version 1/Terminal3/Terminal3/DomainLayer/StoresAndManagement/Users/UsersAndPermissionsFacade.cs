@@ -12,6 +12,7 @@ using MongoDB.Bson;
 using Terminal3.DataAccessLayer.DTOs;
 using System.Text.Json;
 using System.Security.Cryptography;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -31,8 +32,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<Boolean> ExitSystem(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
         Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
-        Result<bool> SendOfferToStore(string storeID, string userID, Dictionary<string, object> info);
-
+        Result<Offer> SendOfferToStore(string storeID, string userID, string productID, int amount, double price);
+        Result<bool> RemoveOffer(string userID, string id);
 
     }
 
@@ -561,19 +562,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         }
         
-        //maybe change this to return the Offer
-        public Result<bool> SendOfferToStore(string storeID, string userID, Dictionary<string, object> info) {           
+        public Result<Offer> SendOfferToStore(string storeID, string userID, string productID, int amount, double price) 
+        {
             if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
-            {
-                Result<bool> res_o = guest_user.SendOfferToStore(storeID, info);
-                return res_o;
-            }
+                return guest_user.SendOfferToStore(storeID, productID, amount, price);
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
-            {
-                Result<bool> res_o = registerd_user.SendOfferToStore(storeID, info);
-                return res_o;
-            }
-            return new Result<bool>("", false, false);
+                return registerd_user.SendOfferToStore(storeID, productID, amount, price);
+            return new Result<Offer>("Failed to create offer: Failed to locate the user", false, null);
+        }
+
+        public Result<bool> RemoveOffer(string userID, string id)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+                return guest_user.RemoveOffer(id);
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+                return registerd_user.RemoveOffer(id);
+            return new Result<bool>("Failed to remove offer: Failed to locate the user", false, false);
         }
     }
 }
