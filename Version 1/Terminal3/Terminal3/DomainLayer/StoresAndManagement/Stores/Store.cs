@@ -101,7 +101,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Id = id;
             Name = name;            
             InventoryManager = inventoryManager;
-            //PolicyManager = policyManager;     TODO
+            //PolicyManager = policyManager;     
             History = history;
             Rating = rating;
             NumberOfRates = numberOfRates;

@@ -335,6 +335,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 mapper.Create(newStore);
                 mapper.Create(newStore.PolicyManager.MainDiscount);
                 mapper.Create(newStore.PolicyManager.MainPolicy);
+                mapper.Create(newStore.PolicyManager.MainPolicy.Policy);
 
                 Stores.TryAdd(newStore.Id, newStore);
                 NotificationManager notificationManager = new NotificationManager(newStore);
@@ -762,8 +763,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         // Get reciptes for owner in store 
         public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id)
         {
-            DateTime start = DateTime.ParseExact(start_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            DateTime end = DateTime.ParseExact(end_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            DateTime start = DateTime.ParseExact(start_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            DateTime end = DateTime.ParseExact(end_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
             List<Tuple<DateTime, Double>> recipts_list = new List<Tuple<DateTime, double>>(); 
 
@@ -774,13 +775,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     DateTime curr = start;
                     while (curr <= end)
                     {
-                        List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("dd/MM/yyyy", DateTimeFormatInfo.InvariantInfo), store_id);
+                        List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo), store_id);
                         Double amountPerDay = 0; 
                         foreach(DTO_Recipt dto in recipts)
                         {
                             amountPerDay += dto.amount;
                         }
-                        recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
+                        
+                        recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));                        
                         curr = curr.AddDays(1);
                     }
 
@@ -796,8 +798,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         // Get reciptes for admin in system
         public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date)
         {
-            DateTime start = DateTime.ParseExact(start_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            DateTime end = DateTime.ParseExact(end_date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            DateTime start = DateTime.ParseExact(start_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            DateTime end = DateTime.ParseExact(end_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
             List<Tuple<DateTime, Double>> recipts_list = new List<Tuple<DateTime, double>>();
 
@@ -806,13 +808,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 DateTime curr = start;
                 while (curr <= end)
                 {
-                    List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("dd/MM/yyyy", DateTimeFormatInfo.InvariantInfo));
+                    List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
                     Double amountPerDay = 0;
                     foreach (DTO_Recipt dto in recipts)
                     {
                         amountPerDay += dto.amount;
                     }
-                    recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
+
+                    recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));                 
+
                     curr = curr.AddDays(1);
                 }
 
@@ -834,13 +838,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         private void UpdatePolicyRoot(DiscountAddition discountRoot)
         {
-            mapper.DeleteDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", discountRoot.Id));
+            mapper.DAO_DiscountAddition.Delete(Builders<BsonDocument>.Filter.Eq("_id", discountRoot.Id));
             mapper.Create(discountRoot);
         }
         private void UpdatePolicyRoot(BuyNow purchaseRoot)
         {
-            mapper.DeleteBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
+            mapper.DAO_BuyNow.Delete(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
             mapper.Create(purchaseRoot);
+            mapper.Create(purchaseRoot.Policy);
         }
     }
 }

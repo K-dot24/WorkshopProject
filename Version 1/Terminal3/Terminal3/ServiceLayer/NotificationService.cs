@@ -87,5 +87,11 @@ namespace Terminal3.ServiceLayer
             return pendingMessages;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void Broadcast(string message)
+        {
+            connection.InvokeAsync("SendBroadcast", message);
+        }
+
     }
 }

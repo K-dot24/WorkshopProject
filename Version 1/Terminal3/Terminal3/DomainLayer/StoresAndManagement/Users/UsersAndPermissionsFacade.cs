@@ -11,6 +11,7 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using Terminal3.DataAccessLayer.DTOs;
 using System.Text.Json;
+using System.Security.Cryptography;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -30,7 +31,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<Boolean> ExitSystem(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
         Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
-        Result<bool> SendOffer(string storeID, Dictionary<string, object> info)
+        Result<bool> SendOfferToStore(string storeID, string userID, Dictionary<string, object> info);
 
 
     }
@@ -80,7 +81,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 {
                     if (isUniqueEmail(email))
                     {
-                        RegisteredUser newUser; 
+                        RegisteredUser newUser;                  
                         if (Id == "-1")
                             newUser = new RegisteredUser(email, password);
                         else
@@ -559,21 +560,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
 
         }
-
-        public Result<bool> SendOfferToStore(string storeID, Dictionary<string, object> info)
-        {
-            if (!info.ContainsKey("UserID"))
-                return new Result<bool>("SendOffer failed : UserID not found in info", false, false);
-            string UserID = ((JsonElement)info["UserID"]).GetString();
-            if (GuestUsers.TryGetValue(UserID, out GuestUser guest_user))
+        
+        //maybe change this to return the Offer
+        public Result<bool> SendOfferToStore(string storeID, string userID, Dictionary<string, object> info) {           
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
             {
                 Result<bool> res_o = guest_user.SendOfferToStore(storeID, info);
                 return res_o;
             }
-            else if (RegisteredUsers.TryGetValue(UserID, out RegisteredUser registerd_user))
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
-                Result<ShoppingCart> res_o = registerd_user.SendOfferToStore(storeID, info);
+                Result<bool> res_o = registerd_user.SendOfferToStore(storeID, info);
+                return res_o;
             }
+            return new Result<bool>("", false, false);
         }
     }
 }

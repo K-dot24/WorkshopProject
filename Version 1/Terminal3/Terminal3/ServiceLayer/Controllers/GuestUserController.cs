@@ -65,7 +65,7 @@ namespace Terminal3.ServiceLayer.Controllers
 
         public Result<bool> SendOfferToStore(string storeID, Dictionary<string, object> info)
         {
-            return StoresAndManagementInterface.SendOffer(storeID, info);
+            return StoresAndManagementInterface.SendOfferToStore(storeID, info);
         }
         #endregion
 
