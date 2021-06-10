@@ -93,7 +93,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             if (info.ContainsKey("CounterOffer"))                
                 CounterOffer = ((JsonElement)info["CounterOffer"]).GetDouble();
 
-
             if (info.ContainsKey("Accepted"))
                 Accepted = ((JsonElement)info["Accepted"]).GetBoolean();
 

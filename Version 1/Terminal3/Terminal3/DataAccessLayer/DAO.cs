@@ -24,15 +24,18 @@ namespace Terminal3.DataAccessLayer.DAOs
             {
                 var doc = dto.ToBsonDocument();
                 collection.InsertOne(doc);
+                Mapper.connectionStatus = ConnectionStatus.OK;
             }
             catch(MongoWriteException e)
             {
                 Console.WriteLine(e.ToString());
                 Logger.LogError(e.ToString());
+                updateConnectiviyError();
             }
             catch(Exception e)
             {
                 Logger.LogError(e.ToString());
+                updateConnectiviyError();
             }
         }
 
@@ -43,17 +46,20 @@ namespace Terminal3.DataAccessLayer.DAOs
                 //collection.DeleteOne(filter);
                 BsonDocument deletedDocument = collection.FindOneAndDelete(filter);
                 T dto = JsonConvert.DeserializeObject<T>(deletedDocument.ToJson());
+                Mapper.connectionStatus = ConnectionStatus.OK;
                 return dto;
             }
             catch (MongoWriteException e)
             {
                 Console.WriteLine(e.ToString());
                 Logger.LogError(e.ToString());
+                updateConnectiviyError();
                 return default(T);
             }
             catch (Exception e)
             {
                 Logger.LogError(e.ToString());
+                updateConnectiviyError();
                 return default(T);
             }
         }
@@ -66,18 +72,21 @@ namespace Terminal3.DataAccessLayer.DAOs
                 var json = Document.ToJson();
                 if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
                 T dto = JsonConvert.DeserializeObject<T>(json);
+                Mapper.connectionStatus = ConnectionStatus.OK;
                 return dto;
             }
             catch (MongoWriteException e)
             {
                 Console.WriteLine(e.ToString());
                 Logger.LogError(e.ToString());
+                updateConnectiviyError();
                 return default(T);
 
             }
             catch (Exception e)
             {
                 Logger.LogError(e.ToString());
+                updateConnectiviyError();
                 return default(T);
 
             }
@@ -100,9 +109,35 @@ namespace Terminal3.DataAccessLayer.DAOs
 
         public void Update(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update, Boolean upsert = false)
         {
-            if (upsert)
-                collection.UpdateOne(filter, update, new UpdateOptions(){ IsUpsert = upsert});
-            else collection.UpdateOne(filter, update);
+            try
+            {
+                if (upsert)
+                    collection.UpdateOne(filter, update, new UpdateOptions() { IsUpsert = upsert });
+                else collection.UpdateOne(filter, update);
+                Mapper.connectionStatus = ConnectionStatus.OK;
+
+            }
+            catch (MongoWriteException e)
+            {
+                Console.WriteLine(e.ToString());
+                Logger.LogError(e.ToString());
+                updateConnectiviyError();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                updateConnectiviyError();
+            }
+        }
+
+        public void updateConnectiviyError()
+        {
+            if (!Mapper.connectionStatus.Equals(ConnectionStatus.Error))
+            {
+                Mapper.connectionStatus = ConnectionStatus.Error;
+                Mapper.NotifyConnectionError();
+
+            }
         }
     }
 }
