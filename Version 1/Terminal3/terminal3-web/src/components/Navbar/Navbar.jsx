@@ -101,7 +101,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
             <>
                 <MenuItem key="getIncome" onClick={() => handleMenuClick(`/stores/${storeId}/getincomesbyday`)}>Get Incomes by Day</MenuItem>
                 <MenuItem key="removeStoreOwner" onClick={() => handleMenuClick(`/stores/${storeId}/removestoreowner`)}>Remove Store Owner</MenuItem>
-                <MenuItem key="checkOffers" onClick={() => handleMenuClick(`/stores/${storeId}/checkOffers`)}>Check Offers</MenuItem>
+                <MenuItem key="checkoffers" onClick={() => handleMenuClick(`/stores/${storeId}/checkoffers`)}>Check Offers</MenuItem>
             </>
             )}
         </div>
@@ -154,6 +154,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/review`)}>Write Review</MenuItem>
                 <MenuItem onClick={() => handleHistory(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
+                <MenuItem onClick={() => handleHistory(`/${user.id}/checkoffers`)}>Check Offers</MenuItem>
 
             </div>
         ) : (
