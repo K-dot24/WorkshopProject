@@ -1165,7 +1165,7 @@ namespace Terminal3.DataAccessLayer
         public DTO_Monitor LoadMonitorRecord(string date)
         {
 
-            var filter = Builders<BsonDocument>.Filter.Eq("date", date);
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", date);
 
             List<BsonDocument> docs = DAO_Monitor.collection.Find(filter).ToList();
 

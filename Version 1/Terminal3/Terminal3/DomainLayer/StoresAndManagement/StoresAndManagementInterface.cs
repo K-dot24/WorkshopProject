@@ -432,7 +432,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password);
             if (res.ExecStatus)
             {
-
+                updateMonitor(res.Data.Id);
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
             }
             else
@@ -446,6 +446,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password, guestUserID);
             if (res.ExecStatus)
             {
+                updateMonitor(res.Data.Id);
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
             }
             else
