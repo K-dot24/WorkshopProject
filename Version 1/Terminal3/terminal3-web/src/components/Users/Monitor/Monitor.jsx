@@ -3,7 +3,7 @@ import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Lin
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { useHistory } from 'react-router-dom';
 import {Action} from '../../../components';
-import {LineChart} from '../../../components'
+import {LineChart,BarChart} from '../../../components'
 import  {createDataGroup} from '../../Charts/LineChart'
 import {GetSystemMonitorRecords,printErrorMessage} from '../../../api/API'
 import useStyles from './styles';
@@ -56,10 +56,6 @@ const Monitor = ({ userID }) => {
     // states
     const [data, setData] = useState([]);
 
-    //const sample = createDataGroup('this is first name',['1','2','3','4','5','6','7'],[1,2,3,4,5,6,7]);
-    //const sample1 = createDataGroup('this is second name',['1','2','3','4','5','6','7'],[1,2,3,3,3,6,7]);
-    //console.log(sample);
-
     const handleGetSystemMonitorRecords = (data) => {
         console.log(data)
         const toSend = {startDate: data.startdate, endDate: data.enddate, AdminID: userID};
@@ -75,6 +71,11 @@ const Monitor = ({ userID }) => {
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}> <LockOutlinedIcon /> </Avatar>
                 <Typography component="h1" variant="h5"> Monitor System </Typography>
+                <BarChart   registerUsersNumber={13}
+                            GuestuserNumber={9} 
+                            OwnerNumber={2}
+                            ManagerNumber={22}
+                            sysAdminNumber={50} />
                     <Button
                         type="submit"
                         fullWidth
@@ -88,9 +89,7 @@ const Monitor = ({ userID }) => {
                             fields={[{name: 'Start Date', required: true, type: 'date'},
                                     {name: 'End Date', required: true, type: 'date'}]}   
                             handleAction={handleGetSystemMonitorRecords}/>
-                    <Grid container spacing={2}>
                         < LineChart DataGroups={data} />
-                    </Grid>
             </div>
         <Box mt={5}>
             <Copyright />
