@@ -88,7 +88,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> RemovePurchasePolicy(string storeId, string id);
         Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
-        Result<bool> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer);
+        Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer);
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID);
+        public Result<List<Dictionary<string, object>>> getUserOffers(string userID);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -645,15 +647,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<bool>("Offer was added successfully", true, true);
         }
 
-        public Result<bool> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer)
+        public Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer)
         {
-            Result<bool> storeResult = StoresFacade.SendOfferResponseToUser(storeID, userID, offerID, accepted, counterOffer);
+            Result<OfferResponse> storeResult = StoresFacade.SendOfferResponseToUser(storeID, ownerID, offerID, accepted, counterOffer);
             if (!storeResult.ExecStatus)
-            {
-                UsersAndPermissionsFacade.RemoveOffer(userID, userResult.Data.Id);
-                return storeResult;
-            }
+                return new Result<bool>(storeResult.Message, false, false);
+
+            OfferResponse respone = storeResult.Data;
+            if (respone == OfferResponse.Accepted)
+                UsersAndPermissionsFacade.AcceptOffer(userID, offerID);
+            else if (respone == OfferResponse.Declined)
+                UsersAndPermissionsFacade.DeclineOffer(userID, offerID);
+            else if (respone == OfferResponse.CounterOffered)
+                UsersAndPermissionsFacade.CounterOffer(userID, offerID);
+
             return new Result<bool>("Offer was added successfully", true, true);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
+        {
+            return StoresFacade.getStoreOffers(storeID);
+        }
+
+        public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
+        {
+            return UsersAndPermissionsFacade.getUserOffers(userId);
         }
     }
 }

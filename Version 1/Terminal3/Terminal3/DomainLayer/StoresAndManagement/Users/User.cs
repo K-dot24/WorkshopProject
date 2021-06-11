@@ -151,7 +151,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<Offer>("", true, offer);
         }
 
-        private Offer findOffer(string id)
+        protected Offer findOffer(string id)
         {
             foreach (Offer offer in Offers)
                 if (offer.Id == id)
@@ -167,6 +167,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             Offers.Remove(offer);
             //TODO mapper?
             return new Result<bool>("", true, true);
+        }
+
+        public abstract Result<bool> AcceptOffer(string offerID);
+
+        public abstract Result<bool> DeclineOffer(string offerID);
+
+        public abstract Result<bool> CounterOffer(string offerID);
+
+        public Result<List<Dictionary<string, object>>> getUserOffers()
+        {
+            List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
+            foreach (Offer offer in Offers)
+                list.Add(offer.GetData());
+            return new Result<List<Dictionary<string, object>>>("", true, list);
         }
 
         public Result<UserService> GetDAL()

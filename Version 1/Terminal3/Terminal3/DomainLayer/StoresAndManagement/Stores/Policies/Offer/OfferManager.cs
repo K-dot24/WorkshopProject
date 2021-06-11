@@ -31,13 +31,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
             return null;
         }
 
-        public Result<Tuple<OfferResponse, Offer>> SendOfferResponseToUser(string userID, string offerID, bool accepted, double counterOffer, List<string> allOwners)
+        public Result<OfferResponse> SendOfferResponseToUser(string ownerID, string offerID, bool accepted, double counterOffer, List<string> allOwners)
         {
             Offer offer = getOffer(offerID);
             if (offer == null)
-                return new Result<Tuple<OfferResponse, Offer>>("Failed to response to an offer: Failed to locate the offer", false, null);
+                return new Result<OfferResponse>("Failed to response to an offer: Failed to locate the offer", false, OfferResponse.None);
             if (accepted)
-                return AcceptedResponse(userID, offer, allOwners);
+                return AcceptedResponse(ownerID, offer, allOwners);
 
             PendingOffers.Remove(offer);
             //TODO mapper?
@@ -46,23 +46,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
             return CounterOfferResponse(offer, counterOffer);
         }
 
-        private Result<Tuple<OfferResponse, Offer>> CounterOfferResponse(Offer offer, double counterOffer)
+        private Result<OfferResponse> CounterOfferResponse(Offer offer, double counterOffer)
         {
             offer.CounterOffer = counterOffer;
-            return new Result<Tuple<OfferResponse, Offer>>("", true, new Tuple<OfferResponse, Offer>(OfferResponse.CounterOffered, offer));
+            return new Result<OfferResponse>("", true, OfferResponse.CounterOffered);
         }
 
-        private Result<Tuple<OfferResponse, Offer>> DeclinedResponse(Offer offer)
+        private Result<OfferResponse> DeclinedResponse(Offer offer)
         {
-            return new Result<Tuple<OfferResponse, Offer>>("", true, new Tuple<OfferResponse, Offer>(OfferResponse.Declined, offer));
+            return new Result<OfferResponse>("", true, OfferResponse.Declined);
         }
 
-        private Result<Tuple<OfferResponse, Offer>> AcceptedResponse(string userID, Offer offer, List<string> allOwners)
+        private Result<OfferResponse> AcceptedResponse(string ownerID, Offer offer, List<string> allOwners)
         {
-            Result<Tuple<OfferResponse, Offer>> response = offer.AcceptedResponse(userID, allOwners);
+            Result<OfferResponse> response = offer.AcceptedResponse(ownerID, allOwners);
             if (!response.ExecStatus)
                 return response;
-            if(response.Data.Item1 == OfferResponse.Accepted)
+            if(response.Data == OfferResponse.Accepted)
             {
                 PendingOffers.Remove(offer);
                 //TODo mapper?
@@ -73,6 +73,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
         internal void AddOffer(Offer offer)
         {
             PendingOffers.Add(offer);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers()
+        {
+            List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
+            foreach (Offer offer in PendingOffers)
+                list.Add(offer.GetData());
+            return new Result<List<Dictionary<string, object>>>("", true, list);
         }
     }
 }

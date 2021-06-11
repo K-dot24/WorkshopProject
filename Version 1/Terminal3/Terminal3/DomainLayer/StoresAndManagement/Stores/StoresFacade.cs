@@ -861,13 +861,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>("Failed to add an offer: Failed to locate the store\n", false, false);
         }
 
-        public Result<bool> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer)
+        public Result<OfferResponse> SendOfferResponseToUser(string storeID, string ownerID, string offerID, bool accepted, double counterOffer)
         {
             if (Stores.TryGetValue(storeID, out Store store))
             {
-                return store.SendOfferResponseToUser(userID, offerID, accepted, counterOffer);
+                return store.SendOfferResponseToUser(ownerID, offerID, accepted, counterOffer);
             }
-            return new Result<bool>("Failed to response to an offer: Failed to locate the store\n", false, false);
+            return new Result<OfferResponse>("Failed to response to an offer: Failed to locate the store\n", false, OfferResponse.None);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
+        {
+            if (Stores.TryGetValue(storeID, out Store store))
+            {
+                return store.getStoreOffers();
+            }
+            return new Result<List<Dictionary<string, object>>>("Failed to get store offers: Failed to locate the store\n", false, null);
         }
     }
 }

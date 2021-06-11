@@ -266,9 +266,19 @@ namespace Terminal3.ServiceLayer
             return StoreStaffInterface.GetIncomeAmountGroupByDay(start_date, end_date, store_id, owner_id);
         }
 
-        public Result<bool> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer)
+        public Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer)
         {
-            return StoreStaffInterface.SendOfferResponseToUser(storeID, userID, offerID, accepted, counterOffer);
+            return StoreStaffInterface.SendOfferResponseToUser(storeID, ownerID, userID, offerID, accepted, counterOffer);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
+        {
+            return StoreStaffInterface.getStoreOffers(storeID);
+        }
+
+        public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
+        {
+            return StoreStaffInterface.getUserOffers(userId);
         }
         #endregion
 

@@ -682,26 +682,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return ids;
         }
 
-        public Result<OfferResponse> SendOfferResponseToUser(string userID, string offerID, bool accepted, double counterOffer)
+        public Result<OfferResponse> SendOfferResponseToUser(string ownerID, string offerID, bool accepted, double counterOffer)
         {
             List<string> ids = ownerIDs();
-            if (!ids.Contains(userID))
+            if (!ids.Contains(ownerID))
                 return new Result<OfferResponse>("Failed to reponse to an offer: The responding user is not an owner", false, OfferResponse.None);
-            Result<Tuple<OfferResponse, Offer>> result = OfferManager.SendOfferResponseToUser(userID, offerID, accepted, counterOffer, ids);
-            if (result.ExecStatus)
-            {
-                Offer offer = result.Data.Item2;
-                if (result.Data.Item1 == OfferResponse.Accepted)
-                    NotificationManager.notifyOfferRecievedUser(offer.UserID, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, -1, true);
-                else if (result.Data.Item1 == OfferResponse.Declined)
-                    NotificationManager.notifyOfferRecievedUser(offer.UserID, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, -1, false);
-                else if (result.Data.Item1 == OfferResponse.CounterOffered)
-                    NotificationManager.notifyOfferRecievedUser(offer.UserID, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
+            return OfferManager.SendOfferResponseToUser(ownerID, offerID, accepted, counterOffer, ids);
+        }
 
-                return new Result<OfferResponse>(result.Message, true, result.Data.Item1);
-            }
-            else
-                return new Result<OfferResponse>(result.Message, false, OfferResponse.None);
+        public Result<List<Dictionary<string, object>>> getStoreOffers()
+        {
+            return OfferManager.getStoreOffers();
         }
     }
 }

@@ -34,11 +34,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
             this.acceptedOwners = new List<string>();
         }
 
-        public Result<IDictionary<string, object>> GetData()
-        {
-            throw new NotImplementedException();
-        }
-
         public DTO_Offer getDTO()
         {
             return new DTO_Offer(this.Id, this.LastOffer.Item1, this.LastOffer.Item2, this.CounterOffer, this.Accepted);
@@ -54,15 +49,30 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
             return true;
         }
 
-        public Result<Tuple<OfferResponse, Offer>> AcceptedResponse(string userID, List<string> allOwners)
+        public Result<OfferResponse> AcceptedResponse(string ownerID, List<string> allOwners)
         {
-            if (acceptedOwners.Contains(userID))
-                return new Result<Tuple<OfferResponse, Offer>>("Failed to response to an offer: Owner Can't accept an offer more than once", false, null);
-            acceptedOwners.Add(userID);
+            if (acceptedOwners.Contains(ownerID))
+                return new Result<OfferResponse>("Failed to response to an offer: Owner Can't accept an offer more than once", false, OfferResponse.None);
+            acceptedOwners.Add(ownerID);
             if (didAllOwnersAccept(allOwners))
-                return new Result<Tuple<OfferResponse, Offer>>("", true, new Tuple<OfferResponse, Offer>(OfferResponse.Accepted, this));
+                return new Result<OfferResponse>("", true, OfferResponse.Accepted);
             else
-                return new Result<Tuple<OfferResponse, Offer>>("", true, new Tuple<OfferResponse, Offer>(OfferResponse.None, null));
+                return new Result<OfferResponse>("", true, OfferResponse.None);
+        }
+
+        public Dictionary<string, object> GetData()
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>() {
+                { "Id", Id },
+                { "Product", ProductID },
+                { "User", UserID },
+                { "Store", StoreID },
+                { "Amount", Amount },
+                { "Price", Price },
+            };
+            if (CounterOffer != -1)
+                data["Price"] = CounterOffer;
+            return data;
         }
     }
 }

@@ -11,6 +11,7 @@ using MongoDB.Bson;
 using Terminal3.DataAccessLayer.DTOs;
 using System.Security.Cryptography;
 using System.Text;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -218,6 +219,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new DTO_RegisteredUser(Id, ShoppingCart.getDTO(), Email, Password, 
                                         LoggedIn, History.getDTO(), notifications_dto);
 
+        }
+
+        public override Result<bool> AcceptOffer(string offerID)
+        {
+            //TODO add to the bag
+            Offer offer = findOffer(offerID);
+            RemoveOffer(offerID);
+            return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, true);
+        }
+
+        public override Result<bool> DeclineOffer(string offerID)
+        {
+            Offer offer = findOffer(offerID);
+            RemoveOffer(offerID);
+            return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
+        }
+
+        public override Result<bool> CounterOffer(string offerID)
+        {
+            Offer offer = findOffer(offerID);
+            return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
         }
     }
 }
