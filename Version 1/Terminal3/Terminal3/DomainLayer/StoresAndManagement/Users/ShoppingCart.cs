@@ -87,10 +87,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<bool>("All bags adhere to their respective store policy", true, true);
         }
 
-        public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails , MongoDB.Driver.IClientSessionHandle session = null)
         {
             if(!checkInventory(this.ShoppingBags))
                 return new Result<ShoppingCart>("A bag in the Shopping cart contains more of a product than the store can supply", false, null);
+                        
             if (!AdheresToPolicy().Data)
                 return new Result<ShoppingCart>("A bag in the Shopping cart doesn't adhere to it's respective store's policy", false, null);
 
@@ -120,7 +121,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             foreach(ShoppingBag sb in this.ShoppingBags.Values)
             {
                 DTO_Recipt recipt = new DTO_Recipt(sb.Store.Id, sb.TotalBagPrice, DateTime.Now.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
-                Mapper.getInstance().Create(recipt); 
+                Mapper.getInstance().Create(recipt , session); 
             }
 
             return new Result<ShoppingCart>("", true, copy);
