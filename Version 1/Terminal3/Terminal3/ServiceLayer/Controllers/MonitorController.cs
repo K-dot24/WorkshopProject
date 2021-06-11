@@ -53,29 +53,33 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             switch (fieldName)
             {
                 case "GuestUsers":
-                    GuestUsers--;
+                    GuestUsers++;
                     break;
 
                 case "RegisteredUsers":
                     RegisteredUsers++;
-                    GuestUsers--;
+                    if (GuestUsers > 0)
+                        GuestUsers--;
                     break;
 
                 case "ManagersNotOwners":
                     ManagersNotOwners++;
-                    GuestUsers--;
+                    if (GuestUsers > 0)
+                        GuestUsers--;
                     break;
 
 
                 case "Owners":
                     Owners++;
-                    GuestUsers--;
+                    if (GuestUsers > 0)
+                        GuestUsers--;
                     break;
 
 
                 case "Admins":
                     Admins++;
-                    GuestUsers--;
+                    if (GuestUsers > 0)
+                        GuestUsers--;
                     break;
             }
 
