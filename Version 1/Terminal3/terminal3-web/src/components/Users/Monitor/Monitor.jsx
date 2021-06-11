@@ -22,15 +22,42 @@ function Copyright() {
 }
 
 
+function prepareData(data){
+    let dates=[];
+    let admins=[];
+    let guestUsers=[];
+    let managersNotOwners=[];
+    let owners=[];
+    let registeredUsers=[];
+
+    data.map((record)=>{
+        dates.push(record.date);
+        admins.push(record.admins);
+        guestUsers.push(record.guestUsers);
+        managersNotOwners.push(record.managersNotOwners);
+        owners.push(record.owners);
+        registeredUsers.push(record.registeredUsers);
+
+    })
+    let adminsData = createDataGroup('System Admins',dates,admins);
+    let guestsData = createDataGroup('Guest Users',dates,guestUsers);
+    let managersData = createDataGroup('Managers',dates,managersNotOwners);
+    let ownersData = createDataGroup('Owners',dates,owners);
+    let registerData = createDataGroup('Register Users',dates,registeredUsers);
+    return [registerData,guestsData,ownersData,managersData,adminsData] ;
+
+
+}
+
 const Monitor = ({ userID }) => {
     // styles.js
     const classes = useStyles();
   
     // states
-    const [data, setData] = useState({});
+    const [data, setData] = useState([]);
 
-    const sample = createDataGroup('this is first name',['1','2','3','4','5','6','7'],[1,2,3,4,5,6,7]);
-    const sample1 = createDataGroup('this is second name',['1','2','3','4','5','6','7'],[1,2,3,3,3,6,7]);
+    //const sample = createDataGroup('this is first name',['1','2','3','4','5','6','7'],[1,2,3,4,5,6,7]);
+    //const sample1 = createDataGroup('this is second name',['1','2','3','4','5','6','7'],[1,2,3,3,3,6,7]);
     //console.log(sample);
 
     const handleGetSystemMonitorRecords = (data) => {
@@ -39,7 +66,7 @@ const Monitor = ({ userID }) => {
 
         GetSystemMonitorRecords(toSend)
             .then(response => response.ok ?
-                response.json().then(result => console.log(result) ) : printErrorMessage(response)).catch(err => console.log(err));
+                response.json().then(result => setData(prepareData(result.data)) ) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     return (
@@ -62,7 +89,7 @@ const Monitor = ({ userID }) => {
                                     {name: 'End Date', required: true, type: 'date'}]}   
                             handleAction={handleGetSystemMonitorRecords}/>
                     <Grid container spacing={2}>
-                        < LineChart DataGroups={[sample,sample1]} />
+                        < LineChart DataGroups={data} />
                     </Grid>
             </div>
         <Box mt={5}>
