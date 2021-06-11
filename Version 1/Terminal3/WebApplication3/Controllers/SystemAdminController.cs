@@ -120,7 +120,7 @@ namespace Terminal3WebAPI.Controllers
         [HttpPost]
         public IActionResult GetSystemMonitorRecords([FromBody] GetSystemMonitorRecordsModel data)
         {
-            Result<List<MonitorService>> result = system.GetSystemMonitorRecords(data.start_date, data.end_date, data.admin_id);
+            Result<List<MonitorService>> result = system.GetSystemMonitorRecords(data.StartDate, data.EndDate, data.AdminID);
             if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result.Message); }
         }

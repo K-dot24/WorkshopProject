@@ -587,6 +587,21 @@ export function ResetSystem( sysAdminID ) {
     })
 }
 
+/// Get System monitor records by dates
+/// <param name="StartDate">Start Date</param>
+/// <param name="EndDate">End Date</param>
+/// <param name="AdminID">StoreID</param>
+export function GetSystemMonitorRecords( data ) {
+    return fetch(`${API_URL}/SystemAdmin/GetSystemMonitorRecords`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
 //#endregion
 
 

@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import {Action} from '../../../components';
 import {LineChart} from '../../../components'
 import  {createDataGroup} from '../../Charts/LineChart'
-
+import {GetSystemMonitorRecords,printErrorMessage} from '../../../api/API'
 import useStyles from './styles';
 
 function Copyright() {
@@ -33,24 +33,13 @@ const Monitor = ({ userID }) => {
     const sample1 = createDataGroup('this is second name',['1','2','3','4','5','6','7'],[1,2,3,3,3,6,7]);
     //console.log(sample);
 
-    // for redirecting after register
-    let history = useHistory();
+    const handleGetSystemMonitorRecords = (data) => {
+        console.log(data)
+        const toSend = {startDate: data.startdate, endDate: data.enddate, AdminID: userID};
 
-    const handleMonitor = (data) => {
-        // const toSend = {startDate: data.startdate, endDate: data.enddate, storeID: store.id, ownerID: user.id};
-
-        // GetIncomeAmountGroupByDay(toSend)
-        //     .then(response => response.ok ?
-        //         response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'incomes'})) : printErrorMessage(response)).catch(err => console.log(err));
-    }
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        //handleRegister(data);
-
-        // redirect to login page
-        history.push('/login');
+        GetSystemMonitorRecords(toSend)
+            .then(response => response.ok ?
+                response.json().then(result => console.log(result) ) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     return (
@@ -59,66 +48,6 @@ const Monitor = ({ userID }) => {
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}> <LockOutlinedIcon /> </Avatar>
                 <Typography component="h1" variant="h5"> Monitor System </Typography>
-                <form className={classes.form} onSubmit={handleSubmit}>
-                    <Grid container spacing={2}>
-                        {/* <Grid item xs={12} sm={6}>
-                        <TextField
-                            autoComplete="fname"
-                            name="firstName"
-                            variant="outlined"
-                            // required
-                            fullWidth
-                            id="firstName"
-                            label="First Name"
-                            autoFocus
-                            onChange={(e) => setData({ ...data, firstname: e.target.value })}
-                        />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                        <TextField
-                            variant="outlined"
-                            // required
-                            fullWidth
-                            id="lastName"
-                            label="Last Name"
-                            name="lastName"
-                            autoComplete="lname"
-                            onChange={(e) => setData({ ...data, lastname: e.target.value })}
-                        />
-                        </Grid>
-                        <Grid item xs={12}>
-                        <TextField
-                            variant="outlined"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
-                            onChange={(e) => setData({ ...data, email: e.target.value })}
-                        />
-                        </Grid>
-                        <Grid item xs={12}>
-                        <TextField
-                            variant="outlined"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                            onChange={(e) => setData({ ...data, password: e.target.value })}
-                        />
-                        </Grid>
-                        <Grid item xs={12}>
-                        <FormControlLabel
-                            control={<Checkbox value="allowExtraEmails" color="primary" />}
-                            label="I want to receive inspiration, marketing promotions and updates via email."
-                        />
-                        </Grid> */}
-                        < LineChart DataGroups={[sample,sample1]} />
-                    </Grid>
                     <Button
                         type="submit"
                         fullWidth
@@ -131,8 +60,10 @@ const Monitor = ({ userID }) => {
                     <Action name='System Status by Day'
                             fields={[{name: 'Start Date', required: true, type: 'date'},
                                     {name: 'End Date', required: true, type: 'date'}]}   
-                            handleAction={handleMonitor}/>
-                </form>
+                            handleAction={handleGetSystemMonitorRecords}/>
+                    <Grid container spacing={2}>
+                        < LineChart DataGroups={[sample,sample1]} />
+                    </Grid>
             </div>
         <Box mt={5}>
             <Copyright />
