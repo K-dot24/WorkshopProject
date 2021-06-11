@@ -5,7 +5,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 // SignalR
 import { HubConnectionBuilder } from '@microsoft/signalr';
 
-import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products, Review } from './components';
+import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products, Review, Monitor } from './components';
 import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
         GetUserShoppingCart, UpdateShoppingCart, EnterSystem, SearchProduct, GetTotalShoppingCartPrice,
         GetUserPurchaseHistory, AddSystemAdmin, RemoveSystemAdmin, printErrorMessage, ResetSystem } from './api/API';
@@ -183,6 +183,10 @@ const App = () => {
             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
+    const handleMonitorSystem = async () => {
+        ResetSystem(user.id).then(response => response.ok ? 
+            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => alert(err));
+    }
     //#endregion
 
     const handleStoreSearch = async (query) => {
@@ -370,6 +374,13 @@ const App = () => {
                             <Route exact path={`/${user.id}/resetsystem`} 
                                     render={(props) => (<Action name='Reset System' 
                                                                 handleAction={handleResetSystem} {...props} />)} 
+                            />
+                        )}
+
+                        {/* Monitor System Page */}
+                        {systemAdmins.includes(user.id) && (
+                            <Route exact path={`/${user.id}/monitorsystem`} 
+                            render={(props) => (<Monitor userID={user.id} {...props} />)} 
                             />
                         )}
                         

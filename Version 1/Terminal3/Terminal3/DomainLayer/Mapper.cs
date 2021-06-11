@@ -1159,6 +1159,7 @@ namespace Terminal3.DataAccessLayer
                 RegisteredUser registerUser = LazyLoad_RegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
                 registeredUsers.Add(registerUser);
             }
+
             return registeredUsers;
         }
         public LinkedList<String> LoadAllSystemAdmins()
@@ -2597,9 +2598,8 @@ namespace Terminal3.DataAccessLayer
         #region Monitor
         public void Update(DTO_Monitor monitor)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", monitor._id);
-            var update = Builders<BsonDocument>.Update.Set("Date", monitor.Date)
-                                                    .Set("GuestUsers", monitor.GuestUsers)
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", monitor.Date);
+            var update = Builders<BsonDocument>.Update.Set("GuestUsers", monitor.GuestUsers)
                                                     .Set("RegisteredUsers", monitor.RegisteredUsers)
                                                     .Set("ManagersNotOwners", monitor.ManagersNotOwners)
                                                     .Set("Owners", monitor.Owners)

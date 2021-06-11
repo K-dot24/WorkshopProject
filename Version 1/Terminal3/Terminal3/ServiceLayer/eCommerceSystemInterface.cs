@@ -24,6 +24,7 @@ namespace Terminal3.ServiceLayer
     {
         List<Notification> GetNotificationByEvent(Event eventEnum);
         List<Notification> GetPendingMessagesByUserID(string userId);
+
     }
     //try git action
     public class ECommerceSystem : IECommerceSystem
@@ -63,6 +64,7 @@ namespace Terminal3.ServiceLayer
 
             Mapper.getInstance(config.mongoDB_url);
             ExternalSystems.ExternalSystemsAPI.getInstance(config.externalSystem_url);
+            MonitorController.getInstance();
             
 
             StoresAndManagement = new StoresAndManagementInterface(config.email, config.password);
@@ -333,6 +335,12 @@ namespace Terminal3.ServiceLayer
         public List<Notification> GetPendingMessagesByUserID(string userId) {
             return NotificationService.GetPendingMessagesByUserID(userId);
         }
+        public Result<Boolean> StartMonitorRequest(string adminId)
+        {
+            return SystemAdminInterface.StartMonitorRequest(adminId);
+
+        }
+
         #endregion
 
         #region Policies Management
