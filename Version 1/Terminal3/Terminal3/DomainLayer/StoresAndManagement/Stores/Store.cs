@@ -9,6 +9,9 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using System.Threading;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DataAccessLayer.DTOs;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -20,7 +23,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Product> RemoveProduct(String userID, String productID);
         Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details);
-        Result<Boolean> UpdateInventory(ShoppingBag bag);
+        Result<Boolean> UpdateInventory(ShoppingBag bag, MongoDB.Driver.IClientSessionHandle session = null);
         #endregion
 
         #region Staff Management
@@ -65,7 +68,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; set; }
-        public History History { get; }
+        public History History { get; set; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
         public NotificationManager NotificationManager { get; set; }
@@ -110,7 +113,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             this.isClosed = isClosed;
 
         }
-
+        public Store(string id, string name, InventoryManager inventoryManager, double rating, int numberOfRates, NotificationManager notificationManager, Boolean isClosed = false)
+        {
+            Id = id;
+            Name = name;
+            InventoryManager = inventoryManager;
+            Rating = rating;
+            NumberOfRates = numberOfRates;
+            NotificationManager = notificationManager;
+            History = new History();
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+            this.isClosed = isClosed;
+        }
 
 
         //For Testing ONLY
@@ -214,17 +229,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 return new Result<Product>($"{userID} does not have permissions to edit products' information in {this.Name}\n", false, null);
             }
         }
-        public Result<bool> UpdateInventory(ShoppingBag bag)
+        public Result<bool> UpdateInventory(ShoppingBag bag, MongoDB.Driver.IClientSessionHandle session = null)
         {
             ConcurrentDictionary<Product, int> product_quantity = bag.Products;     // <Product, Quantity user bought>
             foreach(var product in product_quantity)
             {
-                product.Key.UpdatePurchasedProductQuantity(product.Value);
+                product.Key.NotifyPurchasedProduct(product.Value , session);
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", product.Key.Id);
+                var update_product = Builders<BsonDocument>.Update.Set("Quantity", product.Key.Quantity);
+                Mapper.getInstance().UpdateProduct(filter , update_product , session);
             }
 
             return new Result<bool>("Store inventory updated successuly\n", true, true);
 
-    }
+        }
         #endregion
 
         public Result<StoreOwner> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)

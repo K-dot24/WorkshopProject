@@ -28,10 +28,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         //TODO -         [MethodImpl(MethodImplOptions.Synchronized)]
 
         // Methods
-        public Result<bool> notifyStorePurchase(Product product , int quantity)
+        public Result<bool> notifyStorePurchase(Product product , int quantity, MongoDB.Driver.IClientSessionHandle session = null)
         {
             String msg = $"Event : Product Purchased\nStore Id : {Store.Id}\nProduct Name : {product.Name}\nProduct Quantity : {quantity}\n";
-            notify(Event.StorePurchase,msg , true);
+            notify(Event.StorePurchase,msg , true , session);
             return new Result<bool>("All staff members are notified with product purchase\n", true, true);
         }
 
@@ -69,7 +69,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
 
         // Private Functions
-        private void notify(Event eventName,String msg , Boolean isStaff)
+        private void notify(Event eventName,String msg , Boolean isStaff, MongoDB.Driver.IClientSessionHandle session = null)
         {
             //Send a new (and different) notification for each staff member due to the addresse Id field in the notificaion itself
             ConcurrentDictionary<String, StoreOwner> Owners = Store.Owners;
@@ -78,13 +78,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             foreach (var owner in Owners)
             {
                 Notification notification = new Notification(eventName, owner.Value.GetId() , msg, true);
-                owner.Value.Update(notification);
+                owner.Value.Update(notification , session);
             }
 
             foreach (var manager in Managers)
             {
                 Notification notification = new Notification(eventName, manager.Value.GetId() ,msg, true);
-                manager.Value.Update(notification);
+                manager.Value.Update(notification , session);
             }
         }
 
