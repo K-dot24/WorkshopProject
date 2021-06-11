@@ -62,7 +62,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> RemovePurchasePolicy(string storeId, string id);
 
         Result<bool> SendOfferToStore(Offer offer);
-        Result<bool> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer);
+        Result<OfferResponse> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer);
         #endregion
     }
 
