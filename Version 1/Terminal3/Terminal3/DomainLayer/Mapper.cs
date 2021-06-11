@@ -1204,10 +1204,10 @@ namespace Terminal3.DataAccessLayer
             else { return null; }
         }
 
-        public void ClearChace_logout(String userID)
+      /*  public void ClearChace_logout(String userID)
         {
             RegisteredUsers.TryRemove(userID, out RegisteredUser ru);
-        }
+        }*/
 
         public Boolean Query_isUniqEmail(String email)
         {
