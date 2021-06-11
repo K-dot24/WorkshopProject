@@ -24,6 +24,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<StoreService> ReOpenStore(string storeId, string userID);
         Result<RegisteredUser> FindUserByEmail(String email);
 
+        Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date);
+
+
         #region Inventory Management
         Result<ProductService> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
