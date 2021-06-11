@@ -1177,8 +1177,7 @@ namespace Terminal3.DataAccessLayer
             {
                 foreach (String id in admins)
                 {
-                    // LAZY LOAD
-                    RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", id));
+                    RegisteredUser registerUser = LazyLoad_RegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", id));
                     allusers.Add(registerUser);
                 }
             }
@@ -1204,6 +1203,23 @@ namespace Terminal3.DataAccessLayer
             }
             else { return null; }
         }
+
+        public void ClearChace_logout(String userID)
+        {
+            RegisteredUsers.TryRemove(userID, out RegisteredUser ru);
+        }
+
+        public Boolean Query_isUniqEmail(String email)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("Email", email);
+            List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
+
+            if (docs.Count == 0)
+                return true;
+            else
+                return false;
+        }
+
         #endregion User
 
         #region Shop till you drop

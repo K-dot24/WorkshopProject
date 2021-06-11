@@ -77,7 +77,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 Monitor.Enter(my_lock);
                 try
                 {
-                    if (isUniqueEmail(email))
+                    if (mapper.Query_isUniqEmail(email))
                     {
                         RegisteredUser newUser;                  
                         if (Id == "-1")
@@ -307,6 +307,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", searchResult.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", false);
                     mapper.UpdateRegisteredUser(filter, update);
+                    mapper.ClearChace_logout(searchResult.Data.Id);
 
                     return new Result<GuestUser>($"{email} logged out\n", true, res.Data);
                 }
