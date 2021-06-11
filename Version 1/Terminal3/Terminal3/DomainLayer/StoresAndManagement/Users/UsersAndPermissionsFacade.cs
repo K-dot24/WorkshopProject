@@ -496,7 +496,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
         }
 
-        public Result<List<DTO_Monitor>> GetMonitoring(String start_date, String end_date)
+        public Result<List<DTO_Monitor>> GetSystemMonitorRecords(String start_date, String end_date)
         {
             DateTime start = DateTime.ParseExact(start_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
             DateTime end = DateTime.ParseExact(end_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
