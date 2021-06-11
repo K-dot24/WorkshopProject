@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer;
 using System.Security.Cryptography;
+using System.Globalization;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -72,6 +73,7 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_DiscountAnd> DAO_DiscountAnd;
         public DAO<DTO_DiscountAddition> DAO_DiscountAddition;
         public DAO<DTO_Recipt> DAO_Recipt;
+        public DAO<DTO_Monitor> DAO_Monitor;
 
         // IdentityMaps  <Id , object>
         public ConcurrentDictionary<String, RegisteredUser> RegisteredUsers;
@@ -155,6 +157,7 @@ namespace Terminal3.DataAccessLayer
                 DAO_DiscountAnd = new DAO<DTO_DiscountAnd>(database, "DiscountPolicies");
                 DAO_DiscountAddition = new DAO<DTO_DiscountAddition>(database, "DiscountPolicies");
                 DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
+                DAO_Monitor = new DAO<DTO_Monitor>(database, "Monitor");
 
                 // IdentityMaps  <Id , object>
                 RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
@@ -1157,6 +1160,24 @@ namespace Terminal3.DataAccessLayer
             }
 
             return recipts;
+        }
+
+        public DTO_Monitor LoadMonitorRecord(string date)
+        {
+
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", date);
+
+            List<BsonDocument> docs = DAO_Monitor.collection.Find(filter).ToList();
+
+            DTO_Monitor dto = null;
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                dto = JsonConvert.DeserializeObject<DTO_Monitor>(json);
+            }
+
+            return dto;
         }
 
         #endregion Shop till you drop
@@ -2480,6 +2501,33 @@ namespace Terminal3.DataAccessLayer
     }
         #endregion
 
+        #region Monitor
+        public void Update(DTO_Monitor monitor)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", monitor._id);
+            var update = Builders<BsonDocument>.Update.Set("Date", monitor.Date)
+                                                    .Set("GuestUsers", monitor.GuestUsers)
+                                                    .Set("RegisteredUsers", monitor.RegisteredUsers)
+                                                    .Set("ManagersNotOwners", monitor.ManagersNotOwners)
+                                                    .Set("Owners", monitor.Owners)
+                                                    .Set("Admins", monitor.Admins);
+            DAO_Monitor.Update(filter, update, true);
+        }
+        public DTO_Monitor LoadMonitor()
+        {
+
+            String date = DateTime.Now.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo);
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", date);
+
+            DTO_Monitor dto = DAO_Monitor.Load(filter);
+            if(dto is null)
+            {
+                dto = new DTO_Monitor(date, 0, 0, 0, 0, 0);
+            }
+            return dto;
+
+        }
+        #endregion
     }
 }
 

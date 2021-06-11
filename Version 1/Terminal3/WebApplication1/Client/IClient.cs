@@ -1,4 +1,5 @@
 ﻿using signalRgateway.Model;
+using SignalRgateway.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ namespace signalRgateway.Client
 {
     public interface IClient {
         Task ReceiveMessage(String message);
+        Task ReceiveMonitor(Record record);
 
     }
 }

@@ -11,6 +11,7 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using Terminal3.DataAccessLayer.DTOs;
 using System.Security.Cryptography;
+using System.Globalization;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -30,8 +31,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<Boolean> ExitSystem(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
         Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
-
-
+        Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date);
     }
 
     public class UsersAndPermissionsFacade : IUsersAndPermissionsFacade
@@ -300,7 +300,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 if (res.ExecStatus)
                 {
                     GuestUsers.TryAdd(res.Data.Id, res.Data);
-
                     // Update DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", searchResult.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", false);
@@ -438,6 +437,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             GuestUser guest = new GuestUser();
             GuestUsers.TryAdd(guest.Id, guest);
+            MonitorController.getInstance().update("GuestUsers");
 
             //TODO - When adding Service Layer
             //checkIfUserWantsToRegister();            
@@ -495,6 +495,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
         }
 
+        public Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date)
+        {
+            DateTime start = DateTime.ParseExact(start_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            DateTime end = DateTime.ParseExact(end_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+            List<MonitorService> monitorRecords_list = new List<MonitorService>();
+            if (start <= end)
+            {
+                DateTime curr = start;
+                while (curr <= end)
+                {
+                    DTO_Monitor monitor = Mapper.getInstance().LoadMonitorRecord(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
+                    monitorRecords_list.Add(new MonitorService(monitor.Date, monitor.GuestUsers, monitor.RegisteredUsers, monitor.ManagersNotOwners, monitor.Owners, monitor.Admins));
+                    curr = curr.AddDays(1);
+                }
+
+                return new Result<List<MonitorService>>("Monitor records for the requested dates have been issue", true, monitorRecords_list);
+
+            }
+            else
+            { return new Result<List<MonitorService>>("End date cannot be before start date", false, null); }
+        }
 
         public DTO_SystemAdmins getDTO_admins()
         {
