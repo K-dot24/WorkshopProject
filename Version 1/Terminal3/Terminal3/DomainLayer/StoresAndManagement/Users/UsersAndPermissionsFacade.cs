@@ -31,8 +31,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<Boolean> ExitSystem(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
         Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
-
-
+        Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date);
     }
 
     public class UsersAndPermissionsFacade : IUsersAndPermissionsFacade
