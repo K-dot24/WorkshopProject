@@ -1122,11 +1122,14 @@ namespace Terminal3.DataAccessLayer
 
             // Load admins
             LinkedList<String> admins = LoadAllSystemAdmins();
-            foreach(String id in admins)
+            if (admins != null)
             {
-                // LAZY LOAD
-                RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", id));
-                allusers.Add(registerUser);
+                foreach (String id in admins)
+                {
+                    // LAZY LOAD
+                    RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", id));
+                    allusers.Add(registerUser);
+                }
             }
 
             return allusers;
