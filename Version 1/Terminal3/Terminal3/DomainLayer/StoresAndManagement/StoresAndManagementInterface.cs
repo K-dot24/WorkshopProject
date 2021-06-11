@@ -11,6 +11,8 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using System.Threading;
+using Terminal3.DataAccessLayer.DTOs;
+using System.Globalization;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
@@ -21,6 +23,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> CloseStore(String storeId, String userID);
         Result<StoreService> ReOpenStore(string storeId, string userID);
         Result<RegisteredUser> FindUserByEmail(String email);
+
+        Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date);
+
 
         #region Inventory Management
         Result<ProductService> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
@@ -428,6 +433,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password);
             if (res.ExecStatus)
             {
+                updateMonitor(res.Data.Id);
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
             }
             else
@@ -435,11 +441,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, null);
             }
         }
+
         public Result<RegisteredUserService> Login(string email, string password,string guestUserID)
         {
             Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password, guestUserID);
             if (res.ExecStatus)
             {
+                updateMonitor(res.Data.Id);
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
             }
             else
@@ -649,5 +657,62 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         {
             return StoresFacade.GetIncomeAmountGroupByDay(start_date, end_date);
         }
+
+        public Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date)
+        {
+            return UsersAndPermissionsFacade.GetSystemMonitorRecords(start_date, end_date);
+        }
+
+        public void updateMonitor(String userID)
+        {
+            MonitorController monitor = MonitorController.getInstance();
+            if (UsersAndPermissionsFacade.SystemAdmins.ContainsKey(userID))
+            {
+                monitor.update("Admins");
+                return;
+            }
+            Boolean owner = isOwner(userID);
+            if (isManager(userID) && !owner)
+            {
+                monitor.update("ManagersNotOwners");
+                return;
+            }
+            if (owner)
+            {
+                monitor.update("Owners");
+                return;
+            }
+            monitor.update("RegisteredUsers");
+        }
+
+        public Boolean isManager(String userID)
+        {
+            foreach (var record in StoresFacade.Stores)
+            {
+                Store s = record.Value;
+                foreach(var owner in s.Owners)
+                {
+                    if (owner.Value.GetId() == userID)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public Boolean isOwner(String userID)
+        {
+            foreach (var record in StoresFacade.Stores)
+            {
+                Store s = record.Value;
+                if(s.Founder.GetId() == userID)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
 }
