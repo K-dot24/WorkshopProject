@@ -158,17 +158,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         }
 
-        public new Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        public new Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails, MongoDB.Driver.IClientSessionHandle session = null)
         {
             if (ShoppingCart.ShoppingBags.IsEmpty)
             {
                 return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
             }
 
-            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails);
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails, session);
             if (result.Data != null)
             {
-                History.AddPurchasedShoppingCart(ShoppingCart);
+                History.AddPurchasedShoppingCart(ShoppingCart, session);
                 this.ShoppingCart = new ShoppingCart();          // create new shopping cart for user
 
                /* // Update DB
@@ -180,7 +180,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return result;
         }
     
-        public Result<Boolean> Update(Notification notification)
+        public Result<Boolean> Update(Notification notification, MongoDB.Driver.IClientSessionHandle session = null)
         {
             if (LoggedIn)
             {
@@ -191,7 +191,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
             var update_notification = Builders<BsonDocument>.Update.Set("PendingNotification", getPendingNotificationsDTO());
-            Mapper.getInstance().UpdateRegisteredUser(filter, update_notification);
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_notification , session:session);
             return new Result<Boolean>("User not logged in , therefore the notification is added to pending list\n", false, false);
         }    
 

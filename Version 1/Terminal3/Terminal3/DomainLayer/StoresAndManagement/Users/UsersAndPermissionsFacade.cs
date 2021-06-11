@@ -29,7 +29,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<ShoppingCart> GetUserShoppingCart(string userID);
         Result<Boolean> ExitSystem(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
-        Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails, MongoDB.Driver.IClientSessionHandle session = null);
 
 
     }
@@ -474,23 +474,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         }
 
-        public Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        public Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails , MongoDB.Driver.IClientSessionHandle session = null)
         {
             if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
             {
-                Result<ShoppingCart> ShoppingCart = guest_user.Purchase(paymentDetails, deliveryDetails);
+                Result<ShoppingCart> ShoppingCart = guest_user.Purchase(paymentDetails, deliveryDetails , session);
                 return ShoppingCart;
             }
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
-                Result<ShoppingCart> ShoppingCart = registerd_user.Purchase(paymentDetails, deliveryDetails);
+                Result<ShoppingCart> ShoppingCart = registerd_user.Purchase(paymentDetails, deliveryDetails , session);
                 if (ShoppingCart.ExecStatus)
                 {
                     // Update DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
                     ShoppingCart sc = registerd_user.ShoppingCart;
                     var update_shoppingcart = Builders<BsonDocument>.Update.Set("ShoppingCart", sc.getDTO());
-                    mapper.UpdateRegisteredUser(filter, update_shoppingcart);
+                    mapper.UpdateRegisteredUser(filter, update_shoppingcart , session: session);
                 }
 
                 return ShoppingCart; 

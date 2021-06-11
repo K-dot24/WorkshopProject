@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace Terminal3.DataAccessLayer
 {
@@ -36,6 +37,9 @@ namespace Terminal3.DataAccessLayer
         public MongoClient dbClient;
         public IMongoDatabase database;
         public static ConnectionStatus connectionStatus= ConnectionStatus.OK;
+        public MongoDB.Driver.IClientSessionHandle session;
+        public Boolean transaction;
+
 
         // DAOs
         public DAO<DTO_RegisteredUser> DAO_RegisteredUser;
@@ -116,9 +120,10 @@ namespace Terminal3.DataAccessLayer
             try
             {
                 dbClient = new MongoClient(connection_string);
-                //database = dbClient.GetDatabase("Terminal3-development");
+                database = dbClient.GetDatabase("Terminal3-development");
                 //database = dbClient.GetDatabase("Terminal3-Testing");
-                database = dbClient.GetDatabase("Terminal3-tomer");
+                //database = dbClient.GetDatabase("Terminal3-tomer");
+                transaction = false;
 
                 //DAOs
                 DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
@@ -219,6 +224,16 @@ namespace Terminal3.DataAccessLayer
             return dbClient;
         }
 
+        public void SetSession(MongoDB.Driver.IClientSessionHandle sessionHandle)
+        {
+            this.session = sessionHandle;
+            transaction = true;
+        }
+        public void RemoveSession()
+        {
+            this.session = null;
+            transaction = false;
+        }
 
         #region Private Methods
 
@@ -883,9 +898,9 @@ namespace Terminal3.DataAccessLayer
             user.ShoppingCart = ToObject(dto.ShoppingCart, user);
         }
 
-        public void UpdateRegisteredUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update,Boolean upsert=false )
+        public void UpdateRegisteredUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update,Boolean upsert=false, MongoDB.Driver.IClientSessionHandle session = null)
         {
-            DAO_RegisteredUser.Update(filter, update,upsert);
+            DAO_RegisteredUser.Update(filter, update,upsert , session);
         }
 
         public void DeleteRegisteredUser(FilterDefinition<BsonDocument> filter)
@@ -1165,9 +1180,9 @@ namespace Terminal3.DataAccessLayer
 
         #region Shop till you drop
 
-        public void Create(DTO_Recipt recipt)
+        public void Create(DTO_Recipt recipt, MongoDB.Driver.IClientSessionHandle session = null)
         {
-            DAO_Recipt.Create(recipt);
+            DAO_Recipt.Create(recipt , session);
         }
 
         public List<DTO_Recipt> LoadRecipts(string date, string store_id = "")
@@ -1220,9 +1235,9 @@ namespace Terminal3.DataAccessLayer
             return p;
         }
 
-        public void UpdateProduct(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        public void UpdateProduct(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update, MongoDB.Driver.IClientSessionHandle session = null)
         {
-            DAO_Product.Update(filter, update);
+            DAO_Product.Update(filter, update , session:session);
         }
 
         public void DeleteProduct(FilterDefinition<BsonDocument> filter)
@@ -1325,9 +1340,9 @@ namespace Terminal3.DataAccessLayer
             store.PolicyManager = new PolicyManager(MainDiscount, MainPolicy);
         }
 
-        public void UpdateStore(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        public void UpdateStore(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update, MongoDB.Driver.IClientSessionHandle session = null)
         {
-            DAO_Store.Update(filter, update);
+            DAO_Store.Update(filter, update , session:session);
         }
 
         public void DeleteStore(FilterDefinition<BsonDocument> filter)

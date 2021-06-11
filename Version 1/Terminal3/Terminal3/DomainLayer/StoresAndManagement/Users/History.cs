@@ -26,7 +26,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
 
 
-        public void AddPurchasedShoppingCart(ShoppingCart shoppingCart)
+        public void AddPurchasedShoppingCart(ShoppingCart shoppingCart, MongoDB.Driver.IClientSessionHandle session = null)
         {
             ConcurrentDictionary<String, ShoppingBag> bags = shoppingCart.ShoppingBags;
 
@@ -38,18 +38,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", bag.Value.User.Id);
                 var update_history = Builders<BsonDocument>.Update.Push("History.ShoppingBags", GetDTO_HistoryShoppingBag(shoppingBagService));
                 
-                Mapper.getInstance().UpdateRegisteredUser(filter, update_history);
+                Mapper.getInstance().UpdateRegisteredUser(filter, update_history , session:session);
             }
         }
 
-        public void AddPurchasedShoppingBag(ShoppingBag shoppingBag)
+        public void AddPurchasedShoppingBag(ShoppingBag shoppingBag, MongoDB.Driver.IClientSessionHandle session = null)
         {
             ShoppingBagService shoppingBagService = shoppingBag.GetDAL().Data;
             ShoppingBags.AddLast(shoppingBagService);
 
             var filter = Builders<BsonDocument>.Filter.Eq("_id", shoppingBag.Store.Id);
             var update_history = Builders<BsonDocument>.Update.Push("History.ShoppingBags", GetDTO_HistoryShoppingBag(shoppingBagService));
-            Mapper.getInstance().UpdateStore(filter, update_history);
+            Mapper.getInstance().UpdateStore(filter, update_history , session);
 
         }
 

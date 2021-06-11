@@ -23,7 +23,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Product> RemoveProduct(String userID, String productID);
         Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details);
-        Result<Boolean> UpdateInventory(ShoppingBag bag);
+        Result<Boolean> UpdateInventory(ShoppingBag bag, MongoDB.Driver.IClientSessionHandle session = null);
         #endregion
 
         #region Staff Management
@@ -229,15 +229,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 return new Result<Product>($"{userID} does not have permissions to edit products' information in {this.Name}\n", false, null);
             }
         }
-        public Result<bool> UpdateInventory(ShoppingBag bag)
+        public Result<bool> UpdateInventory(ShoppingBag bag, MongoDB.Driver.IClientSessionHandle session = null)
         {
             ConcurrentDictionary<Product, int> product_quantity = bag.Products;     // <Product, Quantity user bought>
             foreach(var product in product_quantity)
             {
-                product.Key.UpdatePurchasedProductQuantity(product.Value);
+                product.Key.NotifyPurchasedProduct(product.Value , session);
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", product.Key.Id);
                 var update_product = Builders<BsonDocument>.Update.Set("Quantity", product.Key.Quantity);
-                Mapper.getInstance().UpdateProduct(filter , update_product);
+                Mapper.getInstance().UpdateProduct(filter , update_product , session);
             }
 
             return new Result<bool>("Store inventory updated successuly\n", true, true);
