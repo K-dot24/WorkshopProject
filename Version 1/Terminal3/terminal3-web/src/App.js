@@ -183,6 +183,10 @@ const App = () => {
             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
+    const handleMonitorSystem = async () => {
+        ResetSystem(user.id).then(response => response.ok ? 
+            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => alert(err));
+    }
     //#endregion
 
     const handleStoreSearch = async (query) => {
@@ -370,6 +374,14 @@ const App = () => {
                             <Route exact path={`/${user.id}/resetsystem`} 
                                     render={(props) => (<Action name='Reset System' 
                                                                 handleAction={handleResetSystem} {...props} />)} 
+                            />
+                        )}
+
+                        {/* Monitor System Page */}
+                        {systemAdmins.includes(user.id) && (
+                            <Route exact path={`/${user.id}/monitorsystem`} 
+                                    render={(props) => (<Action name='Reset System' 
+                                                                handleAction={handleMonitorSystem} {...props} />)} 
                             />
                         )}
                         
