@@ -14,6 +14,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<RegisteredUserService> RemoveSystemAdmin(string sysAdminID, String email);
         Result<bool> ResetSystem(string sysAdminID);
         Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, string admin_id);
+        Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date, string admin_id);
 
     }
     public class SystemAdminController: ISystemAdminInterface
@@ -127,6 +128,17 @@ namespace Terminal3.ServiceLayer.Controllers
             else
             {
                 return new Result<List<Tuple<DateTime, Double>>>($"user:{admin_id} is not system admin\n", false, null);
+            }
+        }
+        public Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date, string admin_id)
+        {
+            if (isSystemAdmin(admin_id))
+            {
+                return StoresAndManagementInterface.GetSystemMonitorRecords(start_date, end_date);
+            }
+            else
+            {
+                return new Result<List<MonitorService>>($"user:{admin_id} is not system admin\n", false, null);
             }
         }
 
