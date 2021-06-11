@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using SignalRgateway.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 
@@ -81,6 +83,18 @@ namespace Terminal3.ServiceLayer
                 queue.RemoveAll(x => x.ClientId == userId);
             }
             return pendingMessages;
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void Broadcast(string message)
+        {
+            connection.InvokeAsync("SendBroadcast", message);
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void sendMonitorStatus(DTO_Monitor monitor)
+        {
+            connection.InvokeAsync("sendMonitor", new Record(monitor.Date,monitor.GuestUsers,monitor.RegisteredUsers,monitor.ManagersNotOwners,monitor.Owners,monitor.Admins));
         }
 
     }

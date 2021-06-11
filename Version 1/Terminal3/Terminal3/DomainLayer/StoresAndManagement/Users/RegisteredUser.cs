@@ -9,6 +9,8 @@ using Terminal3.DataAccessLayer;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using Terminal3.DataAccessLayer.DTOs;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -28,7 +30,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public RegisteredUser(String email , String password) : base()
         {
             this.Email = email;
-            this.Password = password;
+            var sha1 = new SHA1CryptoServiceProvider();
+            var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));
+
+            this.Password = Encoding.ASCII.GetString(hash_pass);
             this.LoggedIn = false;
             this.History = new History();
             this.PendingNotification = new LinkedList<Notification>();
@@ -39,8 +44,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public RegisteredUser(String Id , String email, String password , Boolean loggedin , History history , LinkedList<Notification> notifications ) : base(Id)
         {
             this.Email = email;
-            this.Password = password;
-            this.LoggedIn = loggedin;
+            var sha1 = new SHA1CryptoServiceProvider();
+            var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));
+
+            this.Password = Encoding.ASCII.GetString(hash_pass); this.LoggedIn = loggedin;
             this.History = history;
             this.PendingNotification = notifications;
             this.NotificationCenter = NotificationCenter.GetInstance();
@@ -50,8 +57,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public RegisteredUser(string id, String email, String password) : base(id)
         {
             this.Email = email;
-            this.Password = password;
-            this.LoggedIn = false;
+            var sha1 = new SHA1CryptoServiceProvider();
+            var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));
+
+            this.Password = Encoding.ASCII.GetString(hash_pass); this.LoggedIn = false;
             this.History = new History();
             this.PendingNotification = new LinkedList<Notification>();
             this.NotificationCenter = NotificationCenter.GetInstance();
@@ -63,16 +72,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 //User already logged in
                 return new Result<RegisteredUser>($"{this.Email} already logged in", false, null);
             }
-            if (Password.Equals(password))
+            var sha1 = new SHA1CryptoServiceProvider();
+            var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));
+
+            if (this.Password.Equals(Encoding.ASCII.GetString(hash_pass)))
             {
                 // Correct paswword
                 LoggedIn = true;
-
-                /*// Update DB
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
-                var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
-                mapper.UpdateRegisteredUser(filter, update); 
-*/
                 DisplayPendingNotifications();
                 return new Result<RegisteredUser>($"{this.Email} is Logged in\n", true, this);
             }
@@ -190,13 +196,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         private void RemoveOpenedNotifications()
         {
-            foreach (Notification notification in PendingNotification)
+            List<Notification> pendings = new List<Notification>(PendingNotification);
+            for(int i=0;i< pendings.Count;i++)
             {
+                Notification notification = pendings[i];
                 if (notification.isOpened)
                 {
                     PendingNotification.Remove(notification);
                 }
             }
+            
         }
 
         public DTO_RegisteredUser getDTO()

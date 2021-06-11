@@ -6,22 +6,40 @@ using System.IO;
 using Terminal3.DomainLayer;
 using System.Text.Json;
 
-namespace Terminal3.ExternalSystems
-{
-    public class ExternalSystemsAPI
+namespace Terminal3.ExternalSystems {
+
+    public interface ExternalSystemsAPIInterface
     {
+
         //static String sourceURL = "https://cs-bgu-wsep.herokuapp.com/";
         string sourceURL { get; set; }
 
-        public static ExternalSystemsAPI Instance = null;
+        bool Handshake();
+        String Pay(IDictionary<String, Object> paymentDetails);
+        String CancelPay(IDictionary<String, Object> paymentDetails);
+        String Supply(IDictionary<String, Object> paymentDetails);
+        String CancelSupply(IDictionary<String, Object> paymentDetails);
+        string HttpClientPost(IDictionary<String, Object> param);
+        HttpWebResponse CreatePostHttpResponse(IDictionary<String, Object> parametersJson, Encoding charset);
+    }
+    public class ExternalSystemsAPI : ExternalSystemsAPIInterface
+    {
+
+        public static ExternalSystemsAPIInterface Instance = null;
+
+        public string sourceURL { get ; set; }
+
         private ExternalSystemsAPI(string sourceURL)
         {
             this.sourceURL = sourceURL;
         }
-        public static ExternalSystemsAPI getInstance(String sourceURL="") {
+        public static ExternalSystemsAPIInterface getInstance(String sourceURL="") {
             if(Instance is null)
             {
-                Instance = new ExternalSystemsAPI(sourceURL);
+                if(sourceURL.Equals(""))
+                    Instance = new MockExternalSystemApi(sourceURL);
+                else
+                    Instance = new ExternalSystemsAPI(sourceURL);
             }
             return Instance;
         }

@@ -20,15 +20,23 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer;
+using System.Security.Cryptography;
+using System.Globalization;
 
 namespace Terminal3.DataAccessLayer
 {
+    public enum ConnectionStatus
+    {
+        OK=0,
+        Error=1
+    }
     public sealed class Mapper
     {
         //Fields
         private static Mapper Instance = null;
         public MongoClient dbClient;
         public IMongoDatabase database;
+        public static ConnectionStatus connectionStatus= ConnectionStatus.OK;
 
         // DAOs
         public DAO<DTO_RegisteredUser> DAO_RegisteredUser;
@@ -65,6 +73,7 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_DiscountAnd> DAO_DiscountAnd;
         public DAO<DTO_DiscountAddition> DAO_DiscountAddition;
         public DAO<DTO_Recipt> DAO_Recipt;
+        public DAO<DTO_Monitor> DAO_Monitor;
 
         // IdentityMaps  <Id , object>
         public ConcurrentDictionary<String, RegisteredUser> RegisteredUsers;
@@ -110,7 +119,8 @@ namespace Terminal3.DataAccessLayer
             {
                 dbClient = new MongoClient(connection_string);
                 //database = dbClient.GetDatabase("Terminal3-development");
-                database = dbClient.GetDatabase("Terminal3-Testing");
+                //database = dbClient.GetDatabase("Terminal3-Testing");
+                database = dbClient.GetDatabase("Terminal3-tomer");
 
                 //DAOs
                 DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
@@ -147,6 +157,7 @@ namespace Terminal3.DataAccessLayer
                 DAO_DiscountAnd = new DAO<DTO_DiscountAnd>(database, "DiscountPolicies");
                 DAO_DiscountAddition = new DAO<DTO_DiscountAddition>(database, "DiscountPolicies");
                 DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
+                DAO_Monitor = new DAO<DTO_Monitor>(database, "Monitor");
 
                 // IdentityMaps  <Id , object>
                 RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
@@ -304,7 +315,7 @@ namespace Terminal3.DataAccessLayer
                     products.TryAdd(LoadProduct(filter), p.Value);
                 }
                 //sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user, LoadStore(), products, bag.Value.TotalBagPrice)); - TODO
-                sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user, products, bag.Value.TotalBagPrice));
+                sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user,LoadStore(Builders<BsonDocument>.Filter.Eq("_id", bag.Value.StoreId)) ,products, bag.Value.TotalBagPrice));
             }
             ShoppingCart sc = new ShoppingCart(dto._id, sb, dto.TotalCartPrice);
             return sc;
@@ -820,7 +831,7 @@ namespace Terminal3.DataAccessLayer
         #region RegisteredUser
         public void Create(RegisteredUser ru)
         {            
-            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, ru.Password, ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification)));
+            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, ru.Password , ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification)));
             RegisteredUsers.TryAdd(ru.Id , ru);
         }        
 
@@ -1151,6 +1162,24 @@ namespace Terminal3.DataAccessLayer
             return recipts;
         }
 
+        public DTO_Monitor LoadMonitorRecord(string date)
+        {
+
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", date);
+
+            List<BsonDocument> docs = DAO_Monitor.collection.Find(filter).ToList();
+
+            DTO_Monitor dto = null;
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                dto = JsonConvert.DeserializeObject<DTO_Monitor>(json);
+            }
+
+            return dto;
+        }
+
         #endregion Shop till you drop
 
         #region Stores
@@ -1226,10 +1255,11 @@ namespace Terminal3.DataAccessLayer
             }
 
             s = new Store(dto._id, dto.Name, new InventoryManager(products), ToObject(dto.History), dto.Rating, dto.NumberOfRates, notificationManager , dto.isClosed);
+            s.NotificationManager.Store = s;
 
             Stores.TryAdd(s.Id, s);
-            DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.DiscountRoot._id));
-            BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.PurchaseRoot._id));
+            DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.MainDiscount._id));
+            BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.MainPolicy._id));
             s.PolicyManager = new PolicyManager(MainDiscount, MainPolicy);
             StoreOwner founder = getOwnershipTree(s, dto.Founder);
 
@@ -2412,6 +2442,13 @@ namespace Terminal3.DataAccessLayer
         #endregion Policies
 
         #region Utils
+        public static void NotifyConnectionError()
+        {
+            if (Mapper.connectionStatus.Equals(ConnectionStatus.Error))
+            {
+                NotificationService.GetInstance().Broadcast("Oops... Its seems like we got some trouble with the DB. Please try again in a few minutes");
+            }
+        }
         public void clearDB()
         {
             if (!(Instance is null))
@@ -2464,6 +2501,33 @@ namespace Terminal3.DataAccessLayer
     }
         #endregion
 
+        #region Monitor
+        public void Update(DTO_Monitor monitor)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", monitor._id);
+            var update = Builders<BsonDocument>.Update.Set("Date", monitor.Date)
+                                                    .Set("GuestUsers", monitor.GuestUsers)
+                                                    .Set("RegisteredUsers", monitor.RegisteredUsers)
+                                                    .Set("ManagersNotOwners", monitor.ManagersNotOwners)
+                                                    .Set("Owners", monitor.Owners)
+                                                    .Set("Admins", monitor.Admins);
+            DAO_Monitor.Update(filter, update, true);
+        }
+        public DTO_Monitor LoadMonitor()
+        {
+
+            String date = DateTime.Now.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo);
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", date);
+
+            DTO_Monitor dto = DAO_Monitor.Load(filter);
+            if(dto is null)
+            {
+                dto = new DTO_Monitor(date, 0, 0, 0, 0, 0);
+            }
+            return dto;
+
+        }
+        #endregion
     }
 }
 

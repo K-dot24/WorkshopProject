@@ -335,6 +335,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 mapper.Create(newStore);
                 mapper.Create(newStore.PolicyManager.MainDiscount);
                 mapper.Create(newStore.PolicyManager.MainPolicy);
+                mapper.Create(newStore.PolicyManager.MainPolicy.Policy);
 
                 Stores.TryAdd(newStore.Id, newStore);
                 NotificationManager notificationManager = new NotificationManager(newStore);
@@ -780,10 +781,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                         {
                             amountPerDay += dto.amount;
                         }
-                        if (amountPerDay > 0)
-                        {
-                            recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
-                        }
+                        
+                        recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));                        
                         curr = curr.AddDays(1);
                     }
 
@@ -815,10 +814,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                     {
                         amountPerDay += dto.amount;
                     }
-                    if (amountPerDay > 0)
-                    {
-                        recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
-                    }
+
+                    recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));                 
 
                     curr = curr.AddDays(1);
                 }
@@ -841,13 +838,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         private void UpdatePolicyRoot(DiscountAddition discountRoot)
         {
-            mapper.DeleteDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", discountRoot.Id));
+            mapper.DAO_DiscountAddition.Delete(Builders<BsonDocument>.Filter.Eq("_id", discountRoot.Id));
             mapper.Create(discountRoot);
         }
         private void UpdatePolicyRoot(BuyNow purchaseRoot)
         {
-            mapper.DeleteBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
+            mapper.DAO_BuyNow.Delete(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
             mapper.Create(purchaseRoot);
+            mapper.Create(purchaseRoot.Policy);
         }
     }
 }
