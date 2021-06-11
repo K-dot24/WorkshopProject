@@ -319,6 +319,11 @@ namespace Terminal3.ServiceLayer
             return SystemAdminInterface.GetIncomeAmountGroupByDay(start_date, end_date, admin_id);
         }
 
+        public Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date, string admin_id)
+        {
+            return SystemAdminInterface.GetSystemMonitorRecords(start_date, end_date, admin_id);
+
+        }
 
         #endregion
 

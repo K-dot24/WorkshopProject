@@ -45,6 +45,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             MainDiscount = new DiscountAddition();
             MainPolicy = new BuyNow();
         }
+        
         public PolicyManager(DiscountAddition mainDiscount, BuyNow mainPolicy)
         {
             MainDiscount = mainDiscount;
