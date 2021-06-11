@@ -628,35 +628,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return StoresFacade.GetIncomeAmountGroupByDay(start_date, end_date);
         }
 
-        public Result<List<DTO_Monitor>> GetMonitoring(String start_date, String end_date)
+        public Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date)
         {
-            DateTime start = DateTime.ParseExact(start_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-            DateTime end = DateTime.ParseExact(end_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-
-            List<Tuple<DateTime, Double>> recipts_list = new List<Tuple<DateTime, double>>();
-
-            if (start <= end)
-            {
-                DateTime curr = start;
-                while (curr <= end)
-                {
-                    List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
-                    Double amountPerDay = 0;
-                    foreach (DTO_Recipt dto in recipts)
-                    {
-                        amountPerDay += dto.amount;
-                    }
-
-                    recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
-
-                    curr = curr.AddDays(1);
-                }
-
-                return new Result<List<Tuple<DateTime, Double>>>("Income for the requested dates have been issue", true, recipts_list);
-
-            }
-            else
-            { return new Result<List<Tuple<DateTime, Double>>>("End date cannot be before start date", false, null); }
+            return UsersAndPermissionsFacade.GetSystemMonitorRecords(start_date, end_date);
         }
 
         public void updateMonitor(String userID)

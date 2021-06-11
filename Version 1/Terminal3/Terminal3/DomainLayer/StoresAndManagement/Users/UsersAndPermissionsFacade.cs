@@ -496,35 +496,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
         }
 
-        public Result<List<DTO_Monitor>> GetSystemMonitorRecords(String start_date, String end_date)
+        public Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date)
         {
             DateTime start = DateTime.ParseExact(start_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
             DateTime end = DateTime.ParseExact(end_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-            List<Tuple<DateTime, Double>> recipts_list = new List<Tuple<DateTime, double>>();
-
+            List<MonitorService> monitorRecords_list = new List<MonitorService>();
             if (start <= end)
             {
                 DateTime curr = start;
                 while (curr <= end)
                 {
-                    List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
-                    Double amountPerDay = 0;
-                    foreach (DTO_Recipt dto in recipts)
-                    {
-                        amountPerDay += dto.amount;
-                    }
-
-                    recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));
-
+                    DTO_Monitor monitor = Mapper.getInstance().LoadMonitorRecord(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
+                    monitorRecords_list.Add(new MonitorService(monitor.Date, monitor.GuestUsers, monitor.RegisteredUsers, monitor.ManagersNotOwners, monitor.Owners, monitor.Admins));
                     curr = curr.AddDays(1);
                 }
 
-                return new Result<List<Tuple<DateTime, Double>>>("Income for the requested dates have been issue", true, recipts_list);
+                return new Result<List<MonitorService>>("Monitor records for the requested dates have been issue", true, monitorRecords_list);
 
             }
             else
-            { return new Result<List<Tuple<DateTime, Double>>>("End date cannot be before start date", false, null); }
+            { return new Result<List<MonitorService>>("End date cannot be before start date", false, null); }
         }
 
         public DTO_SystemAdmins getDTO_admins()

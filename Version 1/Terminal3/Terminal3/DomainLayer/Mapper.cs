@@ -1162,6 +1162,31 @@ namespace Terminal3.DataAccessLayer
             return recipts;
         }
 
+        public DTO_Monitor LoadMonitorRecord(string date, string store_id = "")
+        {
+
+            var filter = Builders<BsonDocument>.Filter.Eq("date", date);
+            if (!store_id.Equals(String.Empty))
+            {
+                filter = Builders<BsonDocument>.Filter.Eq("date", date) &
+                         Builders<BsonDocument>.Filter.Eq("store_id", store_id);
+
+            }
+
+            List<BsonDocument> docs = DAO_Recipt.collection.Find(filter).ToList();
+
+            List<DTO_Recipt> recipts = new List<DTO_Recipt>();
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                DTO_Recipt dto = JsonConvert.DeserializeObject<DTO_Recipt>(json);
+                recipts.Add(dto);
+            }
+
+            return recipts;
+        }
+
         #endregion Shop till you drop
 
         #region Stores
