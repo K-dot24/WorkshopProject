@@ -91,7 +91,7 @@ const Monitor = ({ userID }) => {
                     connection.on('ReceiveMonitor', sample => {
                         setLiveSample(sample);
                         console.log(sample);
-                    });
+                    }); 
 
                     //requesting first sample from the system
                    /* StartMonitorRequest(userID)
