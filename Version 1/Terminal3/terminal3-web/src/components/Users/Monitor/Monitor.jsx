@@ -3,9 +3,8 @@ import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Lin
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { useHistory } from 'react-router-dom';
 import {Action} from '../../../components';
-import {Chart,ChartSeries,ChartSeriesItem,ChartCategoryAxis,ChartCategoryAxisItem} from '@progress/kendo-react-charts';
-import 'hammerjs';
-
+import {LineChart} from '../../../components'
+import  {createDataGroup} from '../../Charts/LineChart'
 
 import useStyles from './styles';
 
@@ -26,22 +25,13 @@ function Copyright() {
 const Monitor = ({ userID }) => {
     // styles.js
     const classes = useStyles();
-
-    const categories = ['Jan', 'Feb', 'Mar', 'Apr'];
-    const ChartContainer = () => (
-        <Chart>
-          <ChartCategoryAxis>
-            <ChartCategoryAxisItem categories={categories} />
-          </ChartCategoryAxis>
-          <ChartSeries>
-            <ChartSeriesItem type="verticalLine" data={[1, 2, 3, 5]} />
-            <ChartSeriesItem type="verticalLine" data={[-1, -2, -3, -5]} />
-          </ChartSeries>
-        </Chart>
-      );
-    
+  
     // states
     const [data, setData] = useState({});
+
+    const sample = createDataGroup('this is first name',['1','2','3','4','5','6','7'],[1,2,3,4,5,6,7]);
+    const sample1 = createDataGroup('this is second name',['1','2','3','4','5','6','7'],[1,2,3,3,3,6,7]);
+    //console.log(sample);
 
     // for redirecting after register
     let history = useHistory();
@@ -127,6 +117,7 @@ const Monitor = ({ userID }) => {
                             label="I want to receive inspiration, marketing promotions and updates via email."
                         />
                         </Grid> */}
+                        < LineChart DataGroups={[sample,sample1]} />
                     </Grid>
                     <Button
                         type="submit"
@@ -141,8 +132,6 @@ const Monitor = ({ userID }) => {
                             fields={[{name: 'Start Date', required: true, type: 'date'},
                                     {name: 'End Date', required: true, type: 'date'}]}   
                             handleAction={handleMonitor}/>
-                    <ChartContainer />
-
                 </form>
             </div>
         <Box mt={5}>
