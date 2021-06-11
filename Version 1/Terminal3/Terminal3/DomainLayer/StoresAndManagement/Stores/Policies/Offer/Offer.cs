@@ -71,7 +71,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
                 { "Price", Price },
             };
             if (CounterOffer != -1)
-                data["Price"] = CounterOffer;
+                data.Add("Counter offer price", CounterOffer);
             return data;
         }
     }

@@ -147,7 +147,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             Offer offer = new Offer(this.Id, productID, amount, price, storeID);
             Offers.AddLast(offer);
-            //TODO mapper?
+            //TODO mapper Zoe
             return new Result<Offer>("", true, offer);
         }
 
@@ -165,7 +165,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (offer == null)
                 return new Result<bool>("Failed to remove offer from user: Failed to locate the offer", false, false);
             Offers.Remove(offer);
-            //TODO mapper?
+            //TODO mapper Zoe
             return new Result<bool>("", true, true);
         }
 
@@ -177,6 +177,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<List<Dictionary<string, object>>> getUserOffers()
         {
+            //TODO: Mapper load Zoe
             List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
             foreach (Offer offer in Offers)
                 list.Add(offer.GetData());

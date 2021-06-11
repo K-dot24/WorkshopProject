@@ -472,7 +472,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
-            // TODO - lock products ?
             try
             {
                 Monitor.Enter(my_lock);
@@ -638,14 +637,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         }
 
         public Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price)
-        {
-            //make store add offer to its offer list and send an alert to all owners and needed managers.
-
+        {            
             Result<Offer> userResult = UsersAndPermissionsFacade.SendOfferToStore(storeID, userID, productID, amount, price);
             if (!userResult.ExecStatus)
                 return new Result<bool>(userResult.Message, false, false);
 
-            //get store and activate function to alert all related staff
             Result<bool> storeResult = StoresFacade.SendOfferToStore(userResult.Data);
             if (!storeResult.ExecStatus)
             {
@@ -674,6 +670,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
         {
+            //TODO: Mapper load offers Zoe
             return StoresFacade.getStoreOffers(storeID);
         }
 

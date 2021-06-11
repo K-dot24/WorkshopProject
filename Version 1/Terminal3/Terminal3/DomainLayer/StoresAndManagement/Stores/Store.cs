@@ -643,8 +643,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<bool> SendOfferToStore(Offer offer)
         {
-            OfferManager.AddOffer(offer);
-            //TODO: mapper?
+            OfferManager.AddOffer(offer);            
 
             return sendNotificationToAllOwners(offer);
         }
