@@ -11,6 +11,7 @@ using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.ServiceLayer.ServiceObjects;
 
@@ -61,6 +62,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> RemovePurchasePolicy(string storeId, string id);
 
         Result<bool> SendOfferToStore(Offer offer);
+        Result<bool> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer);
         #endregion
     }
 
@@ -854,21 +856,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(offer.StoreID, out Store store))
             {
-                Result<bool> res = store.SendOfferToStore(offer);
-                if (res.ExecStatus)
-                {
-                    // Update in DB
-                    mapper.Create(offer);
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
-                    var update = Builders<BsonDocument>.Update.Set("MainDiscount", store.PolicyManager.MainDiscount.getDTO());
-                    mapper.UpdateStore(filter, update);
-                    UpdatePolicyRoot(store.PolicyManager.MainDiscount);
-
-                    return new Result<bool>(res.Message, res.ExecStatus, true);
-                }
-                return res;
+                return store.SendOfferToStore(offer);
             }
             return new Result<bool>("Failed to add an offer: Failed to locate the store\n", false, false);
+        }
+
+        public Result<bool> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer)
+        {
+            if (Stores.TryGetValue(storeID, out Store store))
+            {
+                return store.SendOfferResponseToUser(userID, offerID, accepted, counterOffer);
+            }
+            return new Result<bool>("Failed to response to an offer: Failed to locate the store\n", false, false);
         }
     }
 }

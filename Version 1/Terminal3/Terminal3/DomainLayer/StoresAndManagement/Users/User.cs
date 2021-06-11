@@ -6,7 +6,7 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ExternalSystems;
 using Terminal3.DataAccessLayer.DTOs;
-using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -145,11 +145,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<Offer> SendOfferToStore(string storeID, string productID, int amount, double price)
         {
-            Result<Offer> res_o = Offer.Create();
-            if (!res_o.ExecStatus)
-                return res_o;
-            Offers.AddLast(res_o.Data);
-            return res_o;
+            Offer offer = new Offer(this.Id, productID, amount, price, storeID);
+            Offers.AddLast(offer);
+            //TODO mapper?
+            return new Result<Offer>("", true, offer);
         }
 
         private Offer findOffer(string id)
@@ -166,6 +165,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (offer == null)
                 return new Result<bool>("Failed to remove offer from user: Failed to locate the offer", false, false);
             Offers.Remove(offer);
+            //TODO mapper?
             return new Result<bool>("", true, true);
         }
 

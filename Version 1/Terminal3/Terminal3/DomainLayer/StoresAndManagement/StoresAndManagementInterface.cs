@@ -11,6 +11,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using System.Threading;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
@@ -87,6 +88,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> RemovePurchasePolicy(string storeId, string id);
         Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
+        Result<bool> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -635,6 +637,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
             //get store and activate function to alert all related staff
             Result<bool> storeResult = StoresFacade.SendOfferToStore(userResult.Data);
+            if (!storeResult.ExecStatus)
+            {
+                UsersAndPermissionsFacade.RemoveOffer(userID, userResult.Data.Id);
+                return storeResult;
+            }
+            return new Result<bool>("Offer was added successfully", true, true);
+        }
+
+        public Result<bool> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer)
+        {
+            Result<bool> storeResult = StoresFacade.SendOfferResponseToUser(storeID, userID, offerID, accepted, counterOffer);
             if (!storeResult.ExecStatus)
             {
                 UsersAndPermissionsFacade.RemoveOffer(userID, userResult.Data.Id);

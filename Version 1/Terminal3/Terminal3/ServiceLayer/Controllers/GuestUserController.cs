@@ -23,7 +23,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<HistoryService> GetUserPurchaseHistory(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
         Result<List<Tuple<String, String>>> GetProductReview(String storeID, String productID);
-        Result<bool> SendOfferToStore(string storeID, Dictionary<string, object> info);
+        Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price);
 
     }
     //Basic functionality The every user can preform
@@ -63,9 +63,9 @@ namespace Terminal3.ServiceLayer.Controllers
             return StoresAndManagementInterface.GetProductReview(storeID, productID);
         }
 
-        public Result<bool> SendOfferToStore(string storeID, Dictionary<string, object> info)
+        public Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price)
         {
-            return StoresAndManagementInterface.SendOfferToStore(storeID, info);
+            return StoresAndManagementInterface.SendOfferToStore(storeID, userID, productID, amount, price);
         }
         #endregion
 

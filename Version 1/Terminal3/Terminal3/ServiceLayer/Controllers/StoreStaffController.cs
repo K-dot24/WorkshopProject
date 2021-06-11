@@ -38,6 +38,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<bool> AddPurchasePolicy(string storeId, Dictionary<string, object> info, String id);
         Result<bool> RemovePurchasePolicy(string storeId, String id);
         Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
+        Result<bool> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer);
 
         Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id); 
 
@@ -143,6 +144,11 @@ namespace Terminal3.ServiceLayer.Controllers
         public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id)
         {
             return StoresAndManagementInterface.GetIncomeAmountGroupByDay(start_date, end_date, store_id, owner_id);
+        }
+
+        public Result<bool> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer)
+        {
+            return StoresAndManagementInterface.SendOfferResponseToUser(storeID, userID, offerID, accepted, counterOffer);
         }
 
         #endregion

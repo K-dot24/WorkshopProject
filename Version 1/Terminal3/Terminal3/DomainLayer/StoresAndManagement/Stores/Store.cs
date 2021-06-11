@@ -9,6 +9,8 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using System.Threading;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DataAccessLayer.DTOs;
+using static Terminal3.DomainLayer.StoresAndManagement.Stores.IStoreOperations;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -51,6 +53,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> EditPurchasePolicy(Dictionary<string, object> info, string id);
 
         Result<bool> SendOfferToStore(Offer offer);
+        Result<OfferResponse> SendOfferResponseToUser(string userID, string offerID, bool accepted, double counterOffer);
         #endregion
 
         #region Information        
@@ -67,7 +70,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; set; }
-        public LinkedList<Offer> Offers { get; set; }
+        public OfferManager OfferManager{ get; set; }
         public History History { get; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
@@ -87,6 +90,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Managers = new ConcurrentDictionary<String, StoreManager>();
             InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
+            OfferManager = new OfferManager();
             History = new History();
             isClosed = false;
 
@@ -630,11 +634,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.EditPurchasePolicy(info, id);
         }
 
-        public Result<bool> SendOfferToStore(Offer offer)
+        private Result<bool> sendNotificationToAllOwners(Offer offer)
         {
-            Offers.AddLast(offer);
+            NotificationManager.notifyOfferRecievedStore(offer.UserID, offer.ProductID, offer.Amount, offer.Price);
 
             return new Result<bool>("", true, true);
+        }
+
+        public Result<bool> SendOfferToStore(Offer offer)
+        {
+            OfferManager.AddOffer(offer);
+            //TODO: mapper?
+
+            return sendNotificationToAllOwners(offer);
         }
 
         public DTO_Store getDTO()
@@ -660,6 +672,36 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed,
                 PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO());
 
+        }
+
+        private List<string> ownerIDs()
+        {
+            List<string> ids = new List<string>();
+            foreach (string id in Owners.Keys)
+                ids.Add(id);
+            return ids;
+        }
+
+        public Result<OfferResponse> SendOfferResponseToUser(string userID, string offerID, bool accepted, double counterOffer)
+        {
+            List<string> ids = ownerIDs();
+            if (!ids.Contains(userID))
+                return new Result<OfferResponse>("Failed to reponse to an offer: The responding user is not an owner", false, OfferResponse.None);
+            Result<Tuple<OfferResponse, Offer>> result = OfferManager.SendOfferResponseToUser(userID, offerID, accepted, counterOffer, ids);
+            if (result.ExecStatus)
+            {
+                Offer offer = result.Data.Item2;
+                if (result.Data.Item1 == OfferResponse.Accepted)
+                    NotificationManager.notifyOfferRecievedUser(offer.UserID, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, -1, true);
+                else if (result.Data.Item1 == OfferResponse.Declined)
+                    NotificationManager.notifyOfferRecievedUser(offer.UserID, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, -1, false);
+                else if (result.Data.Item1 == OfferResponse.CounterOffered)
+                    NotificationManager.notifyOfferRecievedUser(offer.UserID, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
+
+                return new Result<OfferResponse>(result.Message, true, result.Data.Item1);
+            }
+            else
+                return new Result<OfferResponse>(result.Message, false, OfferResponse.None);
         }
     }
 }
