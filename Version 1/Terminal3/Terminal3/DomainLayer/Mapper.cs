@@ -1089,26 +1089,48 @@ namespace Terminal3.DataAccessLayer
         }
         #endregion  System Admin
 
+        /*     public List<RegisteredUser> LoadAllRegisterUsers()
+             {
+                 //load all registerUsers dto
+                 var filter = Builders<BsonDocument>.Filter.Empty;
+                 List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
+                 List<DTO_RegisteredUser> registerUsersDTO = new List<DTO_RegisteredUser>();
+                 foreach (BsonDocument doc in docs)
+                 {
+                     var json = doc.ToJson();
+                     if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                     DTO_RegisteredUser dto = JsonConvert.DeserializeObject<DTO_RegisteredUser>(json);
+                     registerUsersDTO.Add(dto);
+                 }
+                 List<RegisteredUser> registeredUsers = new List<RegisteredUser>();
+                 foreach (DTO_RegisteredUser dto in registerUsersDTO)
+                 {
+                     RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
+                     registeredUsers.Add(registerUser);
+                 }
+                 return registeredUsers;
+             }*/
+
         public List<RegisteredUser> LoadAllRegisterUsers()
         {
-            //load all registerUsers dto
-            var filter = Builders<BsonDocument>.Filter.Empty;
-            List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
-            List<DTO_RegisteredUser> registerUsersDTO = new List<DTO_RegisteredUser>();
-            foreach (BsonDocument doc in docs)
+            // Load users from identity map
+            List<RegisteredUser> allusers = new List<RegisteredUser>();
+            foreach (var user in RegisteredUsers)
             {
-                var json = doc.ToJson();
-                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
-                DTO_RegisteredUser dto = JsonConvert.DeserializeObject<DTO_RegisteredUser>(json);
-                registerUsersDTO.Add(dto);
+                allusers.Add(user.Value);
             }
-            List<RegisteredUser> registeredUsers = new List<RegisteredUser>();
-            foreach (DTO_RegisteredUser dto in registerUsersDTO)
+
+            // Load admins
+            LinkedList<String> admins = LoadAllSystemAdmins();
+            foreach(String id in admins)
             {
-                RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
-                registeredUsers.Add(registerUser);
+                // LAZY LOAD
+                RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", id));
+                allusers.Add(registerUser);
             }
-            return registeredUsers;
+
+            return allusers;
+
         }
         public LinkedList<String> LoadAllSystemAdmins()
         {
