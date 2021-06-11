@@ -44,10 +44,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public RegisteredUser(String Id , String email, String password , Boolean loggedin , History history , LinkedList<Notification> notifications ) : base(Id)
         {
             this.Email = email;
-            var sha1 = new SHA1CryptoServiceProvider();
-            var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));
-
-            this.Password = Encoding.ASCII.GetString(hash_pass); this.LoggedIn = loggedin;
+            this.Password = password;
+            this.LoggedIn = loggedin;
             this.History = history;
             this.PendingNotification = notifications;
             this.NotificationCenter = NotificationCenter.GetInstance();
@@ -75,7 +73,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             var sha1 = new SHA1CryptoServiceProvider();
             var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));
 
-            if (this.Password.Equals(Encoding.ASCII.GetString(hash_pass)))
+            String hashed_string = Encoding.ASCII.GetString(hash_pass);
+            if (this.Password.Equals(hashed_string))
             {
                 // Correct paswword
                 LoggedIn = true;
