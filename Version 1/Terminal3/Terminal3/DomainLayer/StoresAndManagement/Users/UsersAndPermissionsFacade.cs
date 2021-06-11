@@ -12,6 +12,7 @@ using MongoDB.Bson;
 using Terminal3.DataAccessLayer.DTOs;
 using System.Security.Cryptography;
 using System.Globalization;
+using Terminal3.ServiceLayer.Controllers;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {

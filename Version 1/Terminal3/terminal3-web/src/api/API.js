@@ -602,6 +602,18 @@ export function GetSystemMonitorRecords( data ) {
     })
 }
 
+/// Request to start live streaming
+/// <param name="AdminID">StoreID</param>
+export function StartMonitorRequest( sysAdminID ) {
+    return fetch(`${API_URL}/SystemAdmin/StartMonitorRequest/${sysAdminID}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
 //#endregion
 
 

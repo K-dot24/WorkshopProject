@@ -6,7 +6,7 @@ using Terminal3.DataAccessLayer;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.ServiceLayer;
 
-namespace Terminal3.DomainLayer.StoresAndManagement.Users
+namespace Terminal3.ServiceLayer.Controllers
 {
     public class MonitorController
     {
@@ -84,9 +84,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
 
             //save in DB
+            sendStatus();
             String date = today.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo);
-            NotificationService.GetInstance().sendMonitorStatus(new DTO_Monitor(date,GuestUsers,RegisteredUsers,ManagersNotOwners,Owners,Admins));
             Mapper.getInstance().Update(new DTO_Monitor(date, GuestUsers, RegisteredUsers, ManagersNotOwners, Owners, Admins));
+        }
+
+        public void sendStatus()
+        {
+            String date = today.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo);
+            NotificationService.GetInstance().sendMonitorStatus(new DTO_Monitor(date, GuestUsers, RegisteredUsers, ManagersNotOwners, Owners, Admins));
         }
     }
 }

@@ -24,7 +24,8 @@ const LineChart = ({DataGroups})=> {
                 data: dg.Ys,
                 fill: false,
                 borderColor: colors[index],
-                tension: 0.1
+                backgroundColor: colors[index],
+                tension: 0.2
                       };
                     })
           }}

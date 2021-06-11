@@ -124,7 +124,15 @@ namespace Terminal3WebAPI.Controllers
             if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result.Message); }
         }
-
+        [Route("StartMonitorRequest/{sysAdminID}")]
+        [HttpGet]
+        public IActionResult StartMonitorRequest(string sysAdminID)
+        {
+            Result<Boolean> result = system.StartMonitorRequest(sysAdminID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+    
         #endregion
     }
 }
