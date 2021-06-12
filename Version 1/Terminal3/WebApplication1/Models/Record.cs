@@ -7,12 +7,12 @@ namespace SignalRgateway.Models
 {
     public class Record
     {
-        string Date { get; set; }
-        int GuestUsers { get; set; }
-        int RegisteredUsers { get; set; }
-        int ManagersNotOwners { get; set; }
-        int Owners { get; set; }
-        int Admins { get; set; }
+        public string Date { get; set; }
+        public int GuestUsers { get; set; }
+        public int RegisteredUsers { get; set; }
+        public int ManagersNotOwners { get; set; }
+        public int Owners { get; set; }
+        public int Admins { get; set; }
 
         public Record(string date, int guestUsers, int registeredUsers, int managersNotOwners, int owners, int admins)
         {

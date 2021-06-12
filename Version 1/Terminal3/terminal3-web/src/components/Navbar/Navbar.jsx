@@ -140,6 +140,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/addsystemadmin`)}>Add System Admin</MenuItem>
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/removesystemadmin`)}>Remove System Admin</MenuItem>
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/resetsystem`)}>Reset System</MenuItem>
+                    <MenuItem onClick={() => handleMenuClick(`/${user.id}/monitorsystem`)}>Monitor System</MenuItem>
                 </>
                 }
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>

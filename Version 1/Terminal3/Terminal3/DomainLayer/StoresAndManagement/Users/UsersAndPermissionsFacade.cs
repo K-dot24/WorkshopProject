@@ -12,6 +12,7 @@ using MongoDB.Bson;
 using Terminal3.DataAccessLayer.DTOs;
 using System.Security.Cryptography;
 using System.Globalization;
+using Terminal3.ServiceLayer.Controllers;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -446,7 +447,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             GuestUser guest = new GuestUser();
             GuestUsers.TryAdd(guest.Id, guest);
-            MonitorController.getInstance().update("GuestUsers");
 
             //TODO - When adding Service Layer
             //checkIfUserWantsToRegister();            
@@ -508,14 +508,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             DateTime end = DateTime.ParseExact(end_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
             List<MonitorService> monitorRecords_list = new List<MonitorService>();
+            Mapper mapper = Mapper.getInstance();
             if (start <= end)
             {
                 DateTime curr = start;
                 while (curr <= end)
                 {
-                    DTO_Monitor monitor = Mapper.getInstance().LoadMonitorRecord(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
-                    monitorRecords_list.Add(new MonitorService(monitor.Date, monitor.GuestUsers, monitor.RegisteredUsers, monitor.ManagersNotOwners, monitor.Owners, monitor.Admins));
+                    DTO_Monitor monitor = mapper.LoadMonitorRecord(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
+                    if(!(monitor is null))
+                    {
+                        monitorRecords_list.Add(new MonitorService(monitor.Date, monitor.GuestUsers, monitor.RegisteredUsers, monitor.ManagersNotOwners, monitor.Owners, monitor.Admins));
+                    }
                     curr = curr.AddDays(1);
+
                 }
 
                 return new Result<List<MonitorService>>("Monitor records for the requested dates have been issue", true, monitorRecords_list);

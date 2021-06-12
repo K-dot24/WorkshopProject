@@ -122,9 +122,9 @@ namespace Terminal3.DataAccessLayer
             try
             {
                 dbClient = new MongoClient(connection_string);
-                database = dbClient.GetDatabase("Terminal3-development");
+                //database = dbClient.GetDatabase("Terminal3-development");
                 //database = dbClient.GetDatabase("Terminal3-Testing");
-                //database = dbClient.GetDatabase("Terminal3-tomer");
+                database = dbClient.GetDatabase("Terminal3-tomer");
                 transaction = false;
 
                 //DAOs
@@ -2641,9 +2641,8 @@ namespace Terminal3.DataAccessLayer
         #region Monitor
         public void Update(DTO_Monitor monitor)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", monitor._id);
-            var update = Builders<BsonDocument>.Update.Set("Date", monitor.Date)
-                                                    .Set("GuestUsers", monitor.GuestUsers)
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", monitor.Date);
+            var update = Builders<BsonDocument>.Update.Set("GuestUsers", monitor.GuestUsers)
                                                     .Set("RegisteredUsers", monitor.RegisteredUsers)
                                                     .Set("ManagersNotOwners", monitor.ManagersNotOwners)
                                                     .Set("Owners", monitor.Owners)

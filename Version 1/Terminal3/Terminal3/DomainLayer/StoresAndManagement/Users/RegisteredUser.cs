@@ -83,7 +83,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             var sha1 = new SHA1CryptoServiceProvider();
             var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));
 
-            if (this.Password.Equals(Encoding.ASCII.GetString(hash_pass)))
+            String hashed_string = Encoding.ASCII.GetString(hash_pass);
+            if (this.Password.Equals(hashed_string))
             {
                 // Correct paswword
                 LoggedIn = true;
