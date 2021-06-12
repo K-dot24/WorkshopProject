@@ -5,6 +5,9 @@ using System;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DataAccessLayer.DTOs;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -23,19 +26,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
 
 
-        public void AddPurchasedShoppingCart(ShoppingCart shoppingCart)
+        public void AddPurchasedShoppingCart(ShoppingCart shoppingCart, MongoDB.Driver.IClientSessionHandle session = null)
         {
             ConcurrentDictionary<String, ShoppingBag> bags = shoppingCart.ShoppingBags;
 
             foreach (var bag in bags)
             {
-                ShoppingBags.AddLast(bag.Value.GetDAL().Data);
+                ShoppingBagService shoppingBagService = bag.Value.GetDAL().Data;
+                ShoppingBags.AddLast(shoppingBagService);
+
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", bag.Value.User.Id);
+                var update_history = Builders<BsonDocument>.Update.Push("History.ShoppingBags", GetDTO_HistoryShoppingBag(shoppingBagService));
+                
+                Mapper.getInstance().UpdateRegisteredUser(filter, update_history , session:session);
             }
         }
 
-        public void AddPurchasedShoppingBag(ShoppingBag shoppingBag)
+        public void AddPurchasedShoppingBag(ShoppingBag shoppingBag, MongoDB.Driver.IClientSessionHandle session = null)
         {
-            ShoppingBags.AddLast(shoppingBag.GetDAL().Data);
+            ShoppingBagService shoppingBagService = shoppingBag.GetDAL().Data;
+            ShoppingBags.AddLast(shoppingBagService);
+
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", shoppingBag.Store.Id);
+            var update_history = Builders<BsonDocument>.Update.Push("History.ShoppingBags", GetDTO_HistoryShoppingBag(shoppingBagService));
+            Mapper.getInstance().UpdateStore(filter, update_history , session);
+
         }
 
         public Result<HistoryService> GetDAL()
@@ -47,17 +62,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             LinkedList<DTO_HistoryShoppingBag> hsp_dto = new LinkedList<DTO_HistoryShoppingBag>();
             foreach (var sb in ShoppingBags)
-            {
-                LinkedList<DTO_HistoryProduct> products_dto = new LinkedList<DTO_HistoryProduct>();
-                foreach(var tup in sb.Products)
-                {
-                    ProductService p = tup.Item1;
-                    DTO_HistoryProduct hp_dto = new DTO_HistoryProduct(p.Id, p.Name, p.Price, tup.Item2, p.Category); 
-                    products_dto.AddLast(hp_dto);
-                }
-                hsp_dto.AddLast(new DTO_HistoryShoppingBag(sb.Id, sb.UserId, sb.StoreId, products_dto, sb.TotalBagPrice));
+            {                
+                hsp_dto.AddLast(GetDTO_HistoryShoppingBag(sb));
             }
             return new DTO_History(hsp_dto);
+        }
+
+        public DTO_HistoryShoppingBag GetDTO_HistoryShoppingBag(ShoppingBagService sb)
+        {
+            LinkedList<DTO_HistoryProduct> products_dto = new LinkedList<DTO_HistoryProduct>();
+            foreach (var tup in sb.Products)
+            {
+                ProductService p = tup.Item1;
+                DTO_HistoryProduct hp_dto = new DTO_HistoryProduct(p.Id, p.Name, p.Price, tup.Item2, p.Category);
+                products_dto.AddLast(hp_dto);
+            }
+            return new DTO_HistoryShoppingBag(sb.Id, sb.UserId, sb.StoreId, products_dto, sb.TotalBagPrice);
         }
     }
 }

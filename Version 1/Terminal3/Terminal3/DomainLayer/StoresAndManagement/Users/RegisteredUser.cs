@@ -19,14 +19,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         //Properties
         public String Email { get; }
-        public String Password { get; set; }        //TODO- change set;
+        public String Password { get; set; }        
         public Boolean LoggedIn { get; set; }
         public History History { get; set; }
-        public LinkedList<Notification> PendingNotification { get; }
-        public NotificationCenter NotificationCenter {get;}
+        public LinkedList<Notification> PendingNotification { get; set; }
+        public NotificationCenter NotificationCenter {get; set; }
 
         //public Mapper mapper = Mapper.getInstance();
-        
+
         //Constructor
         public RegisteredUser(String email , String password) : base()
         {
@@ -36,6 +36,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             this.Password = Encoding.ASCII.GetString(hash_pass);
             this.LoggedIn = false;
+            this.History = new History();
+            this.PendingNotification = new LinkedList<Notification>();
+            this.NotificationCenter = NotificationCenter.GetInstance();
+        }
+
+        public RegisteredUser(String Id, String email, String password , Boolean loggedin) : base(Id)
+        {
+            this.Email = email;
+            this.Password = password;
+            this.LoggedIn = loggedin;
             this.History = new History();
             this.PendingNotification = new LinkedList<Notification>();
             this.NotificationCenter = NotificationCenter.GetInstance();
@@ -74,7 +84,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             var sha1 = new SHA1CryptoServiceProvider();
             var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));
 
-            if (this.Password.Equals(Encoding.ASCII.GetString(hash_pass)))
+            String hashed_string = Encoding.ASCII.GetString(hash_pass);
+            if (this.Password.Equals(hashed_string))
             {
                 // Correct paswword
                 LoggedIn = true;
@@ -147,18 +158,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         }
 
-        public new Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        public new Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails, MongoDB.Driver.IClientSessionHandle session = null)
         {
             if (ShoppingCart.ShoppingBags.IsEmpty)
             {
                 return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
             }
 
-            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails);
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails, session);
             if (result.Data != null)
             {
-                History.AddPurchasedShoppingCart(ShoppingCart);
-                ShoppingCart = new ShoppingCart();          // create new shopping cart for user
+                History.AddPurchasedShoppingCart(ShoppingCart, session);
+                this.ShoppingCart = new ShoppingCart();          // create new shopping cart for user
 
                /* // Update DB
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
@@ -169,7 +180,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return result;
         }
     
-        public Result<Boolean> Update(Notification notification)
+        public Result<Boolean> Update(Notification notification, MongoDB.Driver.IClientSessionHandle session = null)
         {
             if (LoggedIn)
             {
@@ -177,6 +188,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<Boolean>("User is LoggedIn , therefor displaying the notification\n", true, true);
             }
             PendingNotification.AddLast(notification);
+
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_notification = Builders<BsonDocument>.Update.Set("PendingNotification", getPendingNotificationsDTO());
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_notification , session:session);
             return new Result<Boolean>("User not logged in , therefore the notification is added to pending list\n", false, false);
         }    
 
@@ -204,19 +219,26 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     PendingNotification.Remove(notification);
                 }
             }
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_notification = Builders<BsonDocument>.Update.Set("PendingNotification", getPendingNotificationsDTO());
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_notification);
             
         }
 
         public DTO_RegisteredUser getDTO()
+        {            
+            return new DTO_RegisteredUser(Id, ShoppingCart.getDTO(), Email, Password, 
+                                        LoggedIn, History.getDTO(), getPendingNotificationsDTO());
+        }
+
+        public LinkedList<DTO_Notification> getPendingNotificationsDTO()
         {
             LinkedList<DTO_Notification> notifications_dto = new LinkedList<DTO_Notification>();
-            foreach(var n in PendingNotification)
+            foreach (var n in PendingNotification)
             {
-                notifications_dto.AddLast(n.getDTO()); 
+                notifications_dto.AddLast(n.getDTO());
             }
-            return new DTO_RegisteredUser(Id, ShoppingCart.getDTO(), Email, Password, 
-                                        LoggedIn, History.getDTO(), notifications_dto);
-
+            return notifications_dto;
         }
 
         public override Result<bool> AcceptOffer(string offerID)

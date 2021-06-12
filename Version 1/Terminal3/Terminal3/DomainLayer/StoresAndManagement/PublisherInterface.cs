@@ -8,7 +8,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 {
     public interface PublisherInterface
     {
-        Result<Boolean> notifyStorePurchase(Product product , int quantity);
+        Result<Boolean> notifyStorePurchase(Product product , int quantity, MongoDB.Driver.IClientSessionHandle session = null);
         Result<Boolean> notifyStoreClosed();
         Result<Boolean> notifyStoreOpened();
         Result<Boolean> notifyOwnerSubscriptionRemoved(String ownerID , StoreOwner removedOwner);

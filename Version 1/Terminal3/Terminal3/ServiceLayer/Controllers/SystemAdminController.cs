@@ -15,6 +15,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<bool> ResetSystem(string sysAdminID);
         Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, string admin_id);
         Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date, string admin_id);
+        Result<Boolean> StartMonitorRequest(string admin_id);
 
     }
     public class SystemAdminController: ISystemAdminInterface
@@ -141,6 +142,19 @@ namespace Terminal3.ServiceLayer.Controllers
                 return new Result<List<MonitorService>>($"user:{admin_id} is not system admin\n", false, null);
             }
         }
+        public Result<Boolean> StartMonitorRequest(string admin_id)
+        {
+            if (isSystemAdmin(admin_id))
+            {
+                MonitorController.getInstance().sendStatus();
+                return new Result<bool>("Sending first sample of system status", true, true);
+            }
+            else
+            {
+                return new Result<Boolean>($"user:{admin_id} is not system admin\n", false, false);
+            }
+        }
+
 
         #endregion
     }

@@ -27,7 +27,7 @@ namespace Terminal3.ServiceLayer
             HubConnection connection)
         {
             Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(@"..\Terminal3\Config.json"));
-            Mapper.getInstance(config.mongoDB_url);
+            Mapper.getInstance(config.mongoDB_url,config.environment);
 
             StoresAndManagement = new StoresAndManagementInterface(config.email, config.password);
             GuestUserInterface = new GuestUserController(StoresAndManagement);

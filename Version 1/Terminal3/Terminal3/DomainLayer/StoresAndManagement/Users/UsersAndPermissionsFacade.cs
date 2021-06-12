@@ -14,6 +14,7 @@ using System.Text.Json;
 using System.Security.Cryptography;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 using System.Globalization;
+using Terminal3.ServiceLayer.Controllers;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -32,7 +33,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         Result<ShoppingCart> GetUserShoppingCart(string userID);
         Result<Boolean> ExitSystem(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
-        Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails, MongoDB.Driver.IClientSessionHandle session = null);
         Result<Offer> SendOfferToStore(string storeID, string userID, string productID, int amount, double price);
         Result<bool> AcceptOffer(string userID, string offerID);
         Result<bool> DeclineOffer(string userID, string offerID);
@@ -86,7 +87,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 Monitor.Enter(my_lock);
                 try
                 {
-                    if (isUniqueEmail(email))
+                    if (mapper.Query_isUniqEmail(email))
                     {
                         RegisteredUser newUser;                  
                         if (Id == "-1")
@@ -253,7 +254,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
                     mapper.UpdateRegisteredUser(filter, update);
-
+                    mapper.Load_RegisteredUserNotifications(res_ru.Data);
+                    mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
                     return res_ru;
                 }
 
@@ -282,6 +284,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
                     mapper.UpdateRegisteredUser(filter, update);
+                    mapper.Load_RegisteredUserNotifications(res_ru.Data);
+                    mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
                 }
                 return res_ru;
 
@@ -313,6 +317,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", searchResult.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", false);
                     mapper.UpdateRegisteredUser(filter, update);
+                    if (!SystemAdmins.ContainsKey(searchResult.Data.Id))
+                    {
+                        mapper.ClearCache_logout(searchResult.Data.Id);
+                    }
 
                     return new Result<GuestUser>($"{email} logged out\n", true, res.Data);
                 }
@@ -348,6 +356,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             if (RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
             {
+                mapper.Load_RegisteredUserHistory(user);
                 return user.GetUserPurchaseHistory();
             }
             return new Result<History>("Not a registered user\n", false, null);
@@ -357,6 +366,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             if (RegisteredUsers.TryGetValue(userID, out RegisteredUser user))   // Check if user is registered
             {
+                mapper.Load_StorePolicyManager(store);
                 Result<ShoppingCart> res_sc = user.AddProductToCart(product, productQuantity, store);
 
                 // Update DB
@@ -446,7 +456,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             GuestUser guest = new GuestUser();
             GuestUsers.TryAdd(guest.Id, guest);
-            MonitorController.getInstance().update("GuestUsers");
 
             //TODO - When adding Service Layer
             //checkIfUserWantsToRegister();            
@@ -478,30 +487,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         }
 
-        public Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        public Result<ShoppingCart> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails , MongoDB.Driver.IClientSessionHandle session = null)
         {
             if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
             {
-                Result<ShoppingCart> ShoppingCart = guest_user.Purchase(paymentDetails, deliveryDetails);
+                Result<ShoppingCart> ShoppingCart = guest_user.Purchase(paymentDetails, deliveryDetails , session);
                 return ShoppingCart;
             }
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
-                Result<ShoppingCart> ShoppingCart = registerd_user.Purchase(paymentDetails, deliveryDetails);
+                Result<ShoppingCart> ShoppingCart = registerd_user.Purchase(paymentDetails, deliveryDetails , session);
                 if (ShoppingCart.ExecStatus)
                 {
                     // Update DB
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
-                    var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.Data.getDTO());
-                    mapper.UpdateRegisteredUser(filter, update);
+                    ShoppingCart sc = registerd_user.ShoppingCart;
+                    var update_shoppingcart = Builders<BsonDocument>.Update.Set("ShoppingCart", sc.getDTO());
+                    mapper.UpdateRegisteredUser(filter, update_shoppingcart , session: session);
                 }
 
                 return ShoppingCart; 
             }
-            else
-            {
-                return new Result<ShoppingCart>("User does not exist\n", false, null);
-            }
+            else { return new Result<ShoppingCart>("User does not exist\n", false, null); }
         }
 
         public Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date)
@@ -510,14 +517,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             DateTime end = DateTime.ParseExact(end_date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
             List<MonitorService> monitorRecords_list = new List<MonitorService>();
+            Mapper mapper = Mapper.getInstance();
             if (start <= end)
             {
                 DateTime curr = start;
                 while (curr <= end)
                 {
-                    DTO_Monitor monitor = Mapper.getInstance().LoadMonitorRecord(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
-                    monitorRecords_list.Add(new MonitorService(monitor.Date, monitor.GuestUsers, monitor.RegisteredUsers, monitor.ManagersNotOwners, monitor.Owners, monitor.Admins));
+                    DTO_Monitor monitor = mapper.LoadMonitorRecord(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
+                    if(!(monitor is null))
+                    {
+                        monitorRecords_list.Add(new MonitorService(monitor.Date, monitor.GuestUsers, monitor.RegisteredUsers, monitor.ManagersNotOwners, monitor.Owners, monitor.Admins));
+                    }
                     curr = curr.AddDays(1);
+
                 }
 
                 return new Result<List<MonitorService>>("Monitor records for the requested dates have been issue", true, monitorRecords_list);

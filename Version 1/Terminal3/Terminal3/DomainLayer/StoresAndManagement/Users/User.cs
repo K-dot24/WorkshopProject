@@ -102,11 +102,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<ShoppingCart>("User shopping cart\n", true, ShoppingCart);
         }
 
-        public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
-        {
-
-            // TODO - lock products so no two users buy a product simultaneously - the lock needs to be fromt the StoresAndManadement inerface
-
+        public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails , MongoDB.Driver.IClientSessionHandle session = null)
+        {            
             if (ShoppingCart.ShoppingBags.IsEmpty)
             {
                 return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
@@ -117,7 +114,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<ShoppingCart>("Notice - The store is out of stock\n", false, null);   // TODO - do we want to reduce the products from the bag (i think not) and do we want to inform which of the products are out of stock ?
             }
 
-            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails);
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails , session);
             if(result.Data != null)
                 ShoppingCart = new ShoppingCart();              // create new shopping cart for user
 
