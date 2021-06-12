@@ -41,6 +41,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer);
         Result<List<Dictionary<string, object>>> getStoreOffers(string storeID);
         Result<List<Dictionary<string, object>>> getUserOffers(string userID);
+        public Result<bool> AnswerCounterOffer(string userID, string offerID, bool accepted);
 
         Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, String owner_id); 
 
@@ -161,6 +162,11 @@ namespace Terminal3.ServiceLayer.Controllers
         public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
         {
             return StoresAndManagementInterface.getUserOffers(userId);
+        }
+
+        public Result<bool> AnswerCounterOffer(string userID, string offerID, bool accepted)
+        {
+            return StoresAndManagementInterface.AnswerCounterOffer(userID, offerID, accepted);
         }
 
         #endregion

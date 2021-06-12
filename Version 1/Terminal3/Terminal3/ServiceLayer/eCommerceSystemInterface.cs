@@ -142,6 +142,11 @@ namespace Terminal3.ServiceLayer
         {
             return GuestUserInterface.SendOfferToStore(storeID, userID, productID, amount, price);
         }
+
+        public Result<bool> AnswerCounterOffer(string userID, string offerID, bool accepted)
+        {
+            return StoreStaffInterface.AnswerCounterOffer(userID, offerID, accepted);
+        }
         #endregion
         #region Register User Actions
         public Result<RegisteredUserService> Login(string email, string password)

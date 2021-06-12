@@ -165,7 +165,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
             }
 
-            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails, session);
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails, AcceptedOffes, session);
             if (result.Data != null)
             {
                 History.AddPurchasedShoppingCart(ShoppingCart, session);

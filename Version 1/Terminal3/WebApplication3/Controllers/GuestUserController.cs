@@ -262,6 +262,60 @@ namespace Terminal3WebAPI.Controllers
             if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result); }
         }
+
+        /// Getting active user offers
+        /// Template of valid JSON:
+        /// {
+        ///     "UserID":"string"
+        /// }
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [Route("GetUserOffers")]
+        [HttpPost]
+        public IActionResult getUserOffers([FromBody] GetUserOffersModel data)
+        {
+            Result<List<Dictionary<string, object>>> result = system.getUserOffers(data.UserID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        /// User sending an offer request
+        /// Template of valid JSON:
+        /// {
+        ///     "StoreID":"string"
+        ///     "UserID":"string"
+        ///     "ProductID":"string"
+        ///     "Amount":"int"
+        ///     "Price":"double"
+        /// }
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [Route("SendOfferToStore")]
+        [HttpPost]
+        public IActionResult SendOfferToStore([FromBody] SendOfferToStoreModel data)
+        {
+            Result<bool> result = system.SendOfferToStore(data.StoreID, data.UserID, data.ProductID, data.Amount, data.Price);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        /// User sending an answer for a counter offer
+        /// Template of valid JSON:
+        /// {
+        ///     "userID":"string"
+        ///     "offerID":"string"
+        ///     "accepted":"bool"
+        /// }
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [Route("AnswerCounterOffer")]
+        [HttpPost]
+        public IActionResult AnswerCounterOffer([FromBody] AnswerCounterOfferModel data)
+        {
+            Result<bool> result = system.AnswerCounterOffer(data.userID, data.offerID, data.accepted);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
         #endregion
     }
 }
