@@ -117,14 +117,12 @@ namespace Terminal3.DataAccessLayer
 
 
         //Constructor
-        private Mapper(String connection_string)
+        private Mapper(String connection_string, String environment)
         {
             try
             {
                 dbClient = new MongoClient(connection_string);
-                //database = dbClient.GetDatabase("Terminal3-development");
-                //database = dbClient.GetDatabase("Terminal3-Testing");
-                database = dbClient.GetDatabase("Terminal3-tomer");
+                database = dbClient.GetDatabase($"Terminal3-{environment}");
                 transaction = false;
 
                 //DAOs
@@ -213,11 +211,11 @@ namespace Terminal3.DataAccessLayer
             return Instance;
         }
 
-        public static Mapper getInstance(String connection_string)
+        public static Mapper getInstance(String connection_string, String environment)
         {
             if (Instance == null)
             {
-                Instance = new Mapper(connection_string);
+                Instance = new Mapper(connection_string, environment);
             }
             return Instance;
         }
