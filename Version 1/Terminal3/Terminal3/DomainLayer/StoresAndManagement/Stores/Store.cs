@@ -9,6 +9,8 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using System.Threading;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DataAccessLayer.DTOs;
+using static Terminal3.DomainLayer.StoresAndManagement.Stores.IStoreOperations;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Terminal3.DataAccessLayer;
@@ -52,6 +54,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
         Result<IPurchasePolicy> RemovePurchasePolicy(string id);
         Result<Boolean> EditPurchasePolicy(Dictionary<string, object> info, string id);
+
+        Result<bool> SendOfferToStore(Offer offer);
+        Result<OfferResponse> SendOfferResponseToUser(string userID, string offerID, bool accepted, double counterOffer);
         #endregion
 
         #region Information        
@@ -68,6 +73,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; set; }
+        public OfferManager OfferManager{ get; set; }
         public History History { get; set; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
@@ -87,6 +93,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Managers = new ConcurrentDictionary<String, StoreManager>();
             InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
+            OfferManager = new OfferManager();
             History = new History();
             isClosed = false;
 
@@ -645,6 +652,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.EditPurchasePolicy(info, id);
         }
 
+        private Result<bool> sendNotificationToAllOwners(Offer offer)
+        {
+            NotificationManager.notifyOfferRecievedStore(offer.UserID, offer.ProductID, offer.Amount, offer.Price);
+
+            return new Result<bool>("", true, true);
+        }
+
+        public Result<bool> SendOfferToStore(Offer offer)
+        {
+            OfferManager.AddOffer(offer);            
+
+            return sendNotificationToAllOwners(offer);
+        }
+
         public DTO_Store getDTO()
         {
             LinkedList<String> owners_dto = new LinkedList<string>();
@@ -668,6 +689,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed,
                 PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO());
 
-        } 
+        }
+
+        private List<string> ownerIDs()
+        {
+            List<string> ids = new List<string>();
+            foreach (string id in Owners.Keys)
+                ids.Add(id);
+            return ids;
+        }
+
+        public Result<OfferResponse> SendOfferResponseToUser(string ownerID, string offerID, bool accepted, double counterOffer)
+        {
+            List<string> ids = ownerIDs();
+            if (!ids.Contains(ownerID))
+                return new Result<OfferResponse>("Failed to reponse to an offer: The responding user is not an owner", false, OfferResponse.None);
+            return OfferManager.SendOfferResponseToUser(ownerID, offerID, accepted, counterOffer, ids);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers()
+        {
+            return OfferManager.getStoreOffers();
+        }
     }
 }

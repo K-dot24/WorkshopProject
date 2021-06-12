@@ -11,6 +11,7 @@ using MongoDB.Bson;
 using Terminal3.DataAccessLayer.DTOs;
 using System.Security.Cryptography;
 using System.Text;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -83,7 +84,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             var sha1 = new SHA1CryptoServiceProvider();
             var hash_pass = sha1.ComputeHash(Encoding.ASCII.GetBytes(password));
 
-            if (this.Password.Equals(Encoding.ASCII.GetString(hash_pass)))
+            String hashed_string = Encoding.ASCII.GetString(hash_pass);
+            if (this.Password.Equals(hashed_string))
             {
                 // Correct paswword
                 LoggedIn = true;
@@ -237,6 +239,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 notifications_dto.AddLast(n.getDTO());
             }
             return notifications_dto;
+        }
+
+        public override Result<bool> AcceptOffer(string offerID)
+        {
+            //TODO add to the bag
+            Offer offer = findOffer(offerID);
+            RemoveOffer(offerID);
+            return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, true);
+        }
+
+        public override Result<bool> DeclineOffer(string offerID)
+        {
+            Offer offer = findOffer(offerID);
+            RemoveOffer(offerID);
+            return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
+        }
+
+        public override Result<bool> CounterOffer(string offerID)
+        {
+            Offer offer = findOffer(offerID);
+            return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
         }
     }
 }

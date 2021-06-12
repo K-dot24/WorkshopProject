@@ -159,24 +159,26 @@ namespace Terminal3WebAPI.Controllers
         public IActionResult GetUserShoppingCart(String userID)
         {
             Result<ShoppingCartService> result = system.GetUserShoppingCart(userID);
-            ShoppingCartService sc = result.Data;
-            LinkedList<ShoppingBagService> shopinng_bags =  sc.ShoppingBags;
-            LinkedList<GetShoppingBag> shopinng_bags_flat = new LinkedList<GetShoppingBag>();
-            foreach (var sb in shopinng_bags)
-            {
-                LinkedList<Tuple<ProductService, int>> Products = sb.Products;
-                LinkedList<ProductService> products_list = new LinkedList<ProductService>();
-                foreach(var tup in Products)
+            if (result.ExecStatus) {
+                ShoppingCartService sc = result.Data;
+                LinkedList<ShoppingBagService> shopinng_bags = sc.ShoppingBags;
+                LinkedList<GetShoppingBag> shopinng_bags_flat = new LinkedList<GetShoppingBag>();
+                foreach (var sb in shopinng_bags)
                 {
-                    tup.Item1.Quantity = tup.Item2;
-                    products_list.AddLast(tup.Item1);
-                }
-                shopinng_bags_flat.AddLast(new GetShoppingBag(sb.Id, sb.UserId, sb.StoreId, products_list, sb.TotalBagPrice));
+                    LinkedList<Tuple<ProductService, int>> Products = sb.Products;
+                    LinkedList<ProductService> products_list = new LinkedList<ProductService>();
+                    foreach (var tup in Products)
+                    {
+                        tup.Item1.Quantity = tup.Item2;
+                        products_list.AddLast(tup.Item1);
+                    }
+                    shopinng_bags_flat.AddLast(new GetShoppingBag(sb.Id, sb.UserId, sb.StoreId, products_list, sb.TotalBagPrice));
 
+                }
+                GetShoppingCart toReturn = new GetShoppingCart(sc.Id, shopinng_bags_flat, sc.TotalCartPrice);
+                return Ok(toReturn); 
             }
-            GetShoppingCart toReturn = new GetShoppingCart(sc.Id, shopinng_bags_flat, sc.TotalCartPrice);
-            if (result.ExecStatus) { return Ok(toReturn); }
-            else { return BadRequest(toReturn); }
+            else { return BadRequest(result); }
         }
 
         /// <summary>

@@ -11,8 +11,10 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using System.Threading;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 using Terminal3.DataAccessLayer.DTOs;
 using System.Globalization;
+using Terminal3.ServiceLayer.Controllers;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
@@ -64,6 +66,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         //Result<ShoppingCartService> PurchaseAsync(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         System.Threading.Tasks.Task<Result<ShoppingCartService>> PurchaseAsync(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<double> GetTotalShoppingCartPrice(String userID);
+        Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price);
         #endregion
 
         #region System Managment
@@ -92,6 +95,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> RemovePurchasePolicy(string storeId, string id);
         Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
+        Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer);
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID);
+        public Result<List<Dictionary<string, object>>> getUserOffers(string userID);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -388,6 +394,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<User> res = UsersAndPermissionsFacade.EnterSystem();
             if (res.ExecStatus)
             {
+                updateMonitor(res.Data.Id);
                 UserService userDAL = res.Data.GetDAL().Data;
                 return new Result<UserService>(res.Message, true, userDAL);
             }
@@ -461,6 +468,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<GuestUser> result = UsersAndPermissionsFacade.LogOut(email);
             if (result.ExecStatus)
             {
+                updateMonitor(result.Data.Id);
+
                 return new Result<UserService>(result.Message, result.ExecStatus, result.Data.GetDAL().Data);
             }
             return new Result<UserService>(result.Message, result.ExecStatus,null);
@@ -650,6 +659,48 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return StoresFacade.GetIncomeAmountGroupByDay(start_date, end_date);
         }
 
+        public Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price)
+        {            
+            Result<Offer> userResult = UsersAndPermissionsFacade.SendOfferToStore(storeID, userID, productID, amount, price);
+            if (!userResult.ExecStatus)
+                return new Result<bool>(userResult.Message, false, false);
+
+            Result<bool> storeResult = StoresFacade.SendOfferToStore(userResult.Data);
+            if (!storeResult.ExecStatus)
+            {
+                UsersAndPermissionsFacade.RemoveOffer(userID, userResult.Data.Id);
+                return storeResult;
+            }
+            return new Result<bool>("Offer was added successfully", true, true);
+        }
+
+        public Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer)
+        {
+            Result<OfferResponse> storeResult = StoresFacade.SendOfferResponseToUser(storeID, ownerID, offerID, accepted, counterOffer);
+            if (!storeResult.ExecStatus)
+                return new Result<bool>(storeResult.Message, false, false);
+
+            OfferResponse respone = storeResult.Data;
+            if (respone == OfferResponse.Accepted)
+                UsersAndPermissionsFacade.AcceptOffer(userID, offerID);
+            else if (respone == OfferResponse.Declined)
+                UsersAndPermissionsFacade.DeclineOffer(userID, offerID);
+            else if (respone == OfferResponse.CounterOffered)
+                UsersAndPermissionsFacade.CounterOffer(userID, offerID);
+
+            return new Result<bool>("Offer was added successfully", true, true);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
+        {
+            //TODO: Mapper load offers Zoe
+            return StoresFacade.getStoreOffers(storeID);
+        }
+
+        public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
+        {
+            return UsersAndPermissionsFacade.getUserOffers(userId);
+        }
         public Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date)
         {
             return UsersAndPermissionsFacade.GetSystemMonitorRecords(start_date, end_date);
@@ -660,21 +711,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             MonitorController monitor = MonitorController.getInstance();
             if (UsersAndPermissionsFacade.SystemAdmins.ContainsKey(userID))
             {
-                monitor.update("Admins");
+                monitor.update("Admins",userID);
                 return;
             }
             Boolean owner = isOwner(userID);
             if (isManager(userID) && !owner)
             {
-                monitor.update("ManagersNotOwners");
+                monitor.update("ManagersNotOwners", userID);
                 return;
             }
             if (owner)
             {
-                monitor.update("Owners");
+                monitor.update("Owners", userID);
                 return;
             }
-            monitor.update("RegisteredUsers");
+            if (isRegisterUser(userID))
+            {
+                monitor.update("RegisteredUsers", userID);
+            }
+            else {
+                monitor.update("GuestUsers", userID);
+            }
+        }
+        public Boolean isRegisterUser(String userID)
+        {
+            return UsersAndPermissionsFacade.RegisteredUsers.ContainsKey(userID);
         }
 
         public Boolean isManager(String userID)
@@ -682,9 +743,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             foreach (var record in StoresFacade.Stores)
             {
                 Store s = record.Value;
-                foreach(var owner in s.Owners)
+                foreach(var manager in s.Managers)
                 {
-                    if (owner.Value.GetId() == userID)
+                    if (manager.Value.GetId() == userID)
                     {
                         return true;
                     }
@@ -698,13 +759,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             foreach (var record in StoresFacade.Stores)
             {
                 Store s = record.Value;
-                if(s.Founder.GetId() == userID)
+                foreach (var owner in s.Owners)
                 {
-                    return true;
+                    if (owner.Value.GetId() == userID)
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
         }
-
     }
 }

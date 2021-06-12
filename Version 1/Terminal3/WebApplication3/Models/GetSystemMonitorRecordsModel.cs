@@ -7,8 +7,8 @@ namespace Terminal3WebAPI.Models
 {
     public class GetSystemMonitorRecordsModel
     {
-        public String start_date { get; set; } = "";
-        public String end_date { get; set; } = "";
-        public string admin_id { get; set; } = "";
+        public String StartDate { get; set; } = "";
+        public String EndDate { get; set; } = "";
+        public string AdminID { get; set; } = "";
     }
 }

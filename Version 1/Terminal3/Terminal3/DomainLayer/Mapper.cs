@@ -12,6 +12,7 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.ServiceLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountTargets;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions;
@@ -116,14 +117,15 @@ namespace Terminal3.DataAccessLayer
 
 
         //Constructor
-        private Mapper(String connection_string)
+        private Mapper(String connection_string, String environment)
         {
             try
             {
                 dbClient = new MongoClient(connection_string);
-                database = dbClient.GetDatabase("Terminal3-development");
+                //database = dbClient.GetDatabase("Terminal3-development");
                 //database = dbClient.GetDatabase("Terminal3-Testing");
                 //database = dbClient.GetDatabase("Terminal3-tomer");
+                database = dbClient.GetDatabase($"Terminal3-{environment}");
 
                 //DAOs
                 DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
@@ -211,11 +213,11 @@ namespace Terminal3.DataAccessLayer
             return Instance;
         }
 
-        public static Mapper getInstance(String connection_string)
+        public static Mapper getInstance(String connection_string, String environment)
         {
             if (Instance == null)
             {
-                Instance = new Mapper(connection_string);
+                Instance = new Mapper(connection_string, environment);
             }
             return Instance;
         }
@@ -1128,26 +1130,50 @@ namespace Terminal3.DataAccessLayer
         }
         #endregion  System Admin
 
+        /*     public List<RegisteredUser> LoadAllRegisterUsers()
+             {
+                 //load all registerUsers dto
+                 var filter = Builders<BsonDocument>.Filter.Empty;
+                 List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
+                 List<DTO_RegisteredUser> registerUsersDTO = new List<DTO_RegisteredUser>();
+                 foreach (BsonDocument doc in docs)
+                 {
+                     var json = doc.ToJson();
+                     if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                     DTO_RegisteredUser dto = JsonConvert.DeserializeObject<DTO_RegisteredUser>(json);
+                     registerUsersDTO.Add(dto);
+                 }
+                 List<RegisteredUser> registeredUsers = new List<RegisteredUser>();
+                 foreach (DTO_RegisteredUser dto in registerUsersDTO)
+                 {
+                     RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
+                     registeredUsers.Add(registerUser);
+                 }
+                 return registeredUsers;
+             }*/
+
         public List<RegisteredUser> LoadAllRegisterUsers()
         {
-            //load all registerUsers dto
-            var filter = Builders<BsonDocument>.Filter.Empty;
-            List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
-            List<DTO_RegisteredUser> registerUsersDTO = new List<DTO_RegisteredUser>();
-            foreach (BsonDocument doc in docs)
+            // Load users from identity map
+            List<RegisteredUser> allusers = new List<RegisteredUser>();
+            foreach (var user in RegisteredUsers)
             {
-                var json = doc.ToJson();
-                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
-                DTO_RegisteredUser dto = JsonConvert.DeserializeObject<DTO_RegisteredUser>(json);
-                registerUsersDTO.Add(dto);
+                allusers.Add(user.Value);
             }
-            List<RegisteredUser> registeredUsers = new List<RegisteredUser>();
-            foreach (DTO_RegisteredUser dto in registerUsersDTO)
+
+            // Load admins
+            LinkedList<String> admins = LoadAllSystemAdmins();
+            if (admins != null)
             {
-                RegisteredUser registerUser = LazyLoad_RegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
-                registeredUsers.Add(registerUser);
+                foreach (String id in admins)
+                {
+                    RegisteredUser registerUser = LazyLoad_RegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", id));
+                    allusers.Add(registerUser);
+                }
             }
-            return registeredUsers;
+
+            return allusers;
+
         }
         public LinkedList<String> LoadAllSystemAdmins()
         {
@@ -1167,6 +1193,26 @@ namespace Terminal3.DataAccessLayer
             }
             else { return null; }
         }
+
+        public void ClearCache_logout(String userID)
+        {
+            if (!StoreManagers.ContainsKey(userID) && !StoreOwners.ContainsKey(userID))
+            {
+                RegisteredUsers.TryRemove(userID, out RegisteredUser ru);
+            }
+        }
+
+        public Boolean Query_isUniqEmail(String email)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("Email", email);
+            List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
+
+            if (docs.Count == 0)
+                return true;
+            else
+                return false;
+        }
+
         #endregion User
 
         #region Shop till you drop
@@ -1570,8 +1616,9 @@ namespace Terminal3.DataAccessLayer
 
         public void Create(Offer offer)
         {
-            DAO_Offer.Create(new DTO_Offer(offer.Id, offer.LastOffer.Item1, offer.LastOffer.Item2 , offer.CounterOffer , offer.Accepted));
-            Policy_Offers.TryAdd(offer.Id, offer);
+            //Temporary change so there aren't any build errors Kfir
+            //DAO_Offer.Create(new DTO_Offer(offer.Id, offer.LastOffer.Item1, offer.LastOffer.Item2 , offer.CounterOffer , offer.Accepted));
+            //Policy_Offers.TryAdd(offer.Id, offer);
         }
 
         public Offer LoadOfferPolicy(FilterDefinition<BsonDocument> filter)
@@ -1583,7 +1630,9 @@ namespace Terminal3.DataAccessLayer
                 return o;
             }
 
-            o = new Offer(dto._id , new Tuple<Double , string>(dto.LastOffer_Price , dto.LastOffer_UserId) , dto.CounterOffer , dto.Accepted);
+            //Temporary change so there aren't any build errors Kfir
+            //o = new Offer(dto._id , new Tuple<Double , string>(dto.LastOffer_Price , dto.LastOffer_UserId) , dto.CounterOffer , dto.Accepted);
+            o = new Offer("U1", "P1", 1, 10, "S1");
             Policy_Offers.TryAdd(o.Id, o);
             return o;
         }
@@ -2585,9 +2634,8 @@ namespace Terminal3.DataAccessLayer
         #region Monitor
         public void Update(DTO_Monitor monitor)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", monitor._id);
-            var update = Builders<BsonDocument>.Update.Set("Date", monitor.Date)
-                                                    .Set("GuestUsers", monitor.GuestUsers)
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", monitor.Date);
+            var update = Builders<BsonDocument>.Update.Set("GuestUsers", monitor.GuestUsers)
                                                     .Set("RegisteredUsers", monitor.RegisteredUsers)
                                                     .Set("ManagersNotOwners", monitor.ManagersNotOwners)
                                                     .Set("Owners", monitor.Owners)

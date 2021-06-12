@@ -406,6 +406,79 @@ namespace Terminal3WebAPI.Controllers
             if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result.Message); }
         }
+
+        /// Getting active store offers
+        /// Template of valid JSON:
+        /// {
+        ///     "StoreID":"string"
+        /// }
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [Route("GetStoreOffers")]
+        [HttpPost]
+        public IActionResult getStoreOffers([FromBody] GetStoreOffersModel data)
+        {
+            Result<List<Dictionary<string, object>>> result = system.getStoreOffers(data.StoreID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        /// Getting active user offers
+        /// Template of valid JSON:
+        /// {
+        ///     "UserID":"string"
+        /// }
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [Route("GetUserOffers")]
+        [HttpPost]
+        public IActionResult getUserOffers([FromBody] GetUserOffersModel data)
+        {
+            Result<List<Dictionary<string, object>>> result = system.getUserOffers(data.UserID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        /// Owner responding to a user's offer request
+        /// Template of valid JSON:
+        /// {
+        ///     "StoreID":"string"
+        ///     "OwnerID":"string"
+        ///     "UserID":"string"
+        ///     "OfferID":"string"
+        ///     "Accepted":"bool"
+        ///     "CounterOffer":"double"
+        /// }
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [Route("SendOfferResponseToUser")]
+        [HttpPost]
+        public IActionResult SendOfferResponseToUser([FromBody] SendOfferResponseToUserModel data)
+        {
+            Result<bool> result = system.SendOfferResponseToUser(data.StoreID, data.OwnerID, data.UserID, data.OfferID, data.Accepted, data.CounterOffer);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+
+        /// User sending an offer request
+        /// Template of valid JSON:
+        /// {
+        ///     "StoreID":"string"
+        ///     "UserID":"string"
+        ///     "ProductID":"string"
+        ///     "Amount":"int"
+        ///     "Price":"double"
+        /// }
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [Route("SendOfferToStore")]
+        [HttpPost]
+        public IActionResult SendOfferToStore([FromBody] SendOfferToStoreModel data)
+        {
+            Result<bool> result = system.SendOfferToStore(data.StoreID, data.UserID, data.ProductID, data.Amount, data.Price);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
         #endregion
     }
 }
