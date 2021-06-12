@@ -64,6 +64,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
             SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
             GuestUsers = new ConcurrentDictionary<String, GuestUser>();
+            defaultUser = new RegisteredUser("-777", admin_email, admin_password);
+
             testMode = testing;
             if (!testMode) 
             {
@@ -75,7 +77,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             //Add first system admin           
             if (SystemAdmins.IsEmpty)
             {
-                defaultUser = new RegisteredUser("-777", admin_email, admin_password);
                 insertInitializeData(defaultUser);
             }
         }

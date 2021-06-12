@@ -7,6 +7,7 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using System.Linq;
 using Terminal3.ServiceLayer.ServiceObjects;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Tests
 {
@@ -25,6 +26,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
 
         public StoresAndManagementInterfaceTests()
         {
+            //initialize mapper
+            Mapper.getInstance("mongodb+srv://admin:terminal3@cluster0.cbdpv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority" , "Testing");
+
             // Facade to check
             Facade = new StoresAndManagementInterface(adminEmail, adminPassword);
 

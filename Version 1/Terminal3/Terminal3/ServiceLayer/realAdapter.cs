@@ -13,13 +13,8 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
 {
     public class RealAdapter : ISystemInterface
     {
-        public ECommerceSystem system = new ECommerceSystem(@"..\..\..\..\Terminal3\Config.json");
+        public ECommerceSystem system = new ECommerceSystem(@"..\..\..\..\XUnitTestTerminal3\Config.json");
 
-        //TODO
-        public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
-        {
-            throw new NotImplementedException();
-        }
 
         public Result<bool> AddProductToCart(string userID, string ProductID, int ProductQuantity, string StoreID)
         {
@@ -300,7 +295,11 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             else
                 return new Result<List<String>>("", fromSystem.ExecStatus, null);
         }
-         
+        public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<bool> SetPermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)
         {
             Result<bool> fromSystem = system.SetPermissions(storeID, managerID, ownerID, permissions);
