@@ -478,10 +478,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public async System.Threading.Tasks.Task<Result<ShoppingCartService>> PurchaseAsync(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
             using (var session = await Mapper.getInstance().GetMongoClient().StartSessionAsync())
-            {
-                //TODO Zoe
-                //this.Quantity = this.Quantity - quantity;
-                
+            {                
                 // Begin transaction
                 session.StartTransaction();
                 try
@@ -503,35 +500,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
                             // commit the transaction
                             session.CommitTransaction();
-                            Mapper.getInstance().RemoveSession();
                             return new Result<ShoppingCartService>(res.Message, true, res.Data.GetDAL().Data);
                         }
 
                         //else failed
                         await session.AbortTransactionAsync();
-                        Mapper.getInstance().RemoveSession();
+                        Mapper.getInstance().RevertTransaction_Purchase(userID);
                         return new Result<ShoppingCartService>(res.Message, false, null);
                     }
                     finally
                     {
-                        Mapper.getInstance().RemoveSession();
                         Monitor.Exit(my_lock);
                     }                    
                 }
                 catch (SynchronizationLockException SyncEx)
                 {
                     Console.WriteLine("A SynchronizationLockException occurred. Message:");
-                    Console.WriteLine(SyncEx.Message);
-                    Mapper.getInstance().RemoveSession();
-                    // remove user, products , storesfrom identity hashmap and load again
+                    Console.WriteLine(SyncEx.Message);                    
+                    Mapper.getInstance().RevertTransaction_Purchase(userID);                    
                     return new Result<ShoppingCartService>(SyncEx.Message, false, null);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Error writing to MongoDB: " + e.Message);
-                    await session.AbortTransactionAsync();
-                    Mapper.getInstance().RemoveSession();
-                    // remove user, products , storesfrom identity hashmap and load again
+                    await session.AbortTransactionAsync();                    
+                    Mapper.getInstance().RevertTransaction_Purchase(userID);
                     return new Result<ShoppingCartService>(e.Message, false, null);
                 }
             }           
