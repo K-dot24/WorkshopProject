@@ -44,13 +44,14 @@ const OffersPage = ({ type, storeID, userID }) => {
 
     // Offers list data from API
     const [data, setData] = useState(null);
+
+    // TODO: Update on click
     const [forceRender, setForceRender] = useState(0);
 
     // Counter offer
     const [selectedOffer, setSelectedOffer] = useState(null);
     const [showCounterDialog, setShowCounterDialog] = useState(false);
 
-    // TODO: Update on click
     const fetchStoreOffers = async () => {
         GetStoreOffers({ StoreID: storeID }).then(response => response.ok ?
             response.json().then(result => setData(result.data)) : printErrorMessage(response)).catch(err => console.log(err));
