@@ -36,7 +36,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
 
         public DTO_Offer getDTO()
         {
-            return new DTO_Offer(this.Id, this.LastOffer.Item1, this.LastOffer.Item2, this.CounterOffer, this.Accepted);
+            //Temporary change so there aren't any build errors Kfir
+            //return new DTO_Offer(this.Id, this.LastOffer.Item1, this.LastOffer.Item2, this.CounterOffer, this.Accepted);
+            return new DTO_Offer("", 0, "", 0, false);
         }
 
 
@@ -69,9 +71,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
                 { "Store", StoreID },
                 { "Amount", Amount },
                 { "Price", Price },
-            };
-            if (CounterOffer != -1)
-                data.Add("Counter offer price", CounterOffer);
+                { "CounterOfferPrice", CounterOffer},
+            }; 
             return data;
         }
     }
