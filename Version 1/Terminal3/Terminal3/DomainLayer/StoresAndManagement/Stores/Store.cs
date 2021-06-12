@@ -39,7 +39,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #endregion
 
         #region Policies Management
-        double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
+        double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, List<Offer> offers, string discountCode = "");
         Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
         Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info);
         Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info, String id);
@@ -604,9 +604,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return per;
         }
 
-        public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
+        public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, List<Offer> offers, string discountCode = "")
         {
-            return PolicyManager.GetTotalBagPrice(products, discountCode);
+            return PolicyManager.GetTotalBagPrice(products, discountCode, offers);
         }
 
         public Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)

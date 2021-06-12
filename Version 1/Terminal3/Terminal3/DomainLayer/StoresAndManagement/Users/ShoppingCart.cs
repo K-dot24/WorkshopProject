@@ -7,6 +7,7 @@ using Terminal3.ExternalSystems;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DataAccessLayer;
 using System.Globalization;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -65,12 +66,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         }
 
-        public Result<Double> GetTotalShoppingCartPrice()
+        public Result<Double> GetTotalShoppingCartPrice(List<Offer> offers)
         {
             Double sum = 0;
             foreach (ShoppingBag bag in ShoppingBags.Values)
             {
-                sum += bag.GetTotalPrice();
+                sum += bag.GetTotalPrice(offers);
             }
             return new Result<double>($"Total shopping cart price calculated, price = {sum}", true, sum);
         }
@@ -87,7 +88,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<bool>("All bags adhere to their respective store policy", true, true);
         }
 
-        public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails , MongoDB.Driver.IClientSessionHandle session = null)
+        public Result<ShoppingCart> Purchase(IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails, List<Offer> offers, MongoDB.Driver.IClientSessionHandle session = null)
         {
             if(!checkInventory(this.ShoppingBags))
                 return new Result<ShoppingCart>("A bag in the Shopping cart contains more of a product than the store can supply", false, null);
@@ -95,7 +96,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (!AdheresToPolicy().Data)
                 return new Result<ShoppingCart>("A bag in the Shopping cart doesn't adhere to it's respective store's policy", false, null);
 
-            Double amount = GetTotalShoppingCartPrice().Data;
+            Double amount = GetTotalShoppingCartPrice(offers).Data;
 
             int paymentId = PaymentSystem.Pay(amount, paymentDetails);
 

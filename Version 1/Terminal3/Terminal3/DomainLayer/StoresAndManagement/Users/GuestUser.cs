@@ -35,14 +35,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public override Result<bool> AcceptOffer(string offerID)
         {
-            //TODO add to the bag
-            RemoveOffer(offerID);
-            return new Result<bool>("", true, true);
+            return MovePendingOfferToAccepted(offerID);
         }
 
         public override Result<bool> DeclineOffer(string offerID)
         {
-            RemoveOffer(offerID);
+            RemovePendingOffer(offerID);
             return new Result<bool>("", true, true);
         }
 

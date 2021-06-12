@@ -33,7 +33,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         [InlineData(0,false)]
         public void AddProtuctToShoppingBagTest(int quantity, bool expectedResult)
         {
-            Result<bool> res = ShoppingBag.AddProtuctToShoppingBag(Products[0], quantity);
+            Result<bool> res = ShoppingBag.AddProtuctToShoppingBag(Products[0], quantity, new List<Stores.Policies.Offer.Offer>());
             Assert.Equal(expectedResult, res.ExecStatus);
             Assert.Equal(expectedResult, ShoppingBag.Products.ContainsKey(Products[0]));
 
@@ -46,7 +46,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         [InlineData(0,11, false)]
         public void UpdateShoppingBagTest(int productIndex,int quantity, bool expectedResult)
         {
-            ShoppingBag.AddProtuctToShoppingBag(Products[0], 10);
+            ShoppingBag.AddProtuctToShoppingBag(Products[0], 10, new List<Stores.Policies.Offer.Offer>());
             Result<ShoppingBag> res = ShoppingBag.UpdateShoppingBag(Products[productIndex], quantity);
 
             Assert.Equal(expectedResult, res.ExecStatus);
