@@ -69,8 +69,8 @@ namespace Terminal3_E2ETests
         [Fact()]
         public void GetIncomeAmountGroupByDay_data()
         {
-            //ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(Config));
-            ECommerceSystem system = new ECommerceSystem(config_path: @"..\..\..\..\..\Terminal3-E2ETests\Config.json");
+            ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(Config));
+            //ECommerceSystem system = new ECommerceSystem(config_path: @"..\..\..\..\..\Terminal3-E2ETests\Config.json");
 
             //system.ResetSystem("-777");
             //purchase 1
@@ -147,9 +147,9 @@ namespace Terminal3_E2ETests
 
             Assert.True(res2.ExecStatus);
 
-            Result<List<Tuple<DateTime, Double>>> recipts_owner = system.GetIncomeAmountGroupByDay("2021-06-07", "2021-06-07" , store.Data.Id, user.Data.Id);
-            Result<List<Tuple<DateTime, Double>>> recipts_owner2 = system.GetIncomeAmountGroupByDay("2021-06-07", "2021-06-07", store2.Data.Id, user2.Data.Id);
-            Result<List<Tuple<DateTime, Double>>> recipts_admin = system.GetIncomeAmountGroupByDay("2021-06-07", "2021-06-07", "-777");
+            Result<List<Tuple<DateTime, Double>>> recipts_owner = system.GetIncomeAmountGroupByDay("2021-06-12", "2021-06-07" , store.Data.Id, user.Data.Id);
+            Result<List<Tuple<DateTime, Double>>> recipts_owner2 = system.GetIncomeAmountGroupByDay("2021-06-12", "2021-06-07", store2.Data.Id, user2.Data.Id);
+            Result<List<Tuple<DateTime, Double>>> recipts_admin = system.GetIncomeAmountGroupByDay("2021-06-12", "2021-06-07", "-777");
 
             Assert.True(recipts_owner.Data.Count == 1 && recipts_owner.Data[0].Item2 == 9.0);
             Assert.True(recipts_owner2.Data.Count == 1 && recipts_owner2.Data[0].Item2 == 4.5);
@@ -161,8 +161,8 @@ namespace Terminal3_E2ETests
         [Fact()]
         public void GetIncomeAmountGroupByDay_empty()
         {
-            //ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(Config));
-            ECommerceSystem system = new ECommerceSystem(config_path: @"..\..\..\..\..\Terminal3\Config.json");
+            ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(Config));
+            //ECommerceSystem system = new ECommerceSystem(config_path: @"..\..\..\..\..\Terminal3\Config.json");
             system.Register("shaked@gmail.com", "123");
             Result<RegisteredUserService> user = system.Login("shaked@gmail.com", "123");
 
@@ -170,8 +170,8 @@ namespace Terminal3_E2ETests
             Result<StoreService> store = system.OpenNewStore("testStore", user.Data.Id);
             //Result<ProductService> product = system.AddProductToStore(user.Data.Id, store.Data.Id, "testProduct", 10, 1, "Test");
 
-            Result<List<Tuple<DateTime, Double>>> recipts_owner = system.GetIncomeAmountGroupByDay("2021-06-07", "2021-06-07", store.Data.Id, user.Data.Id);
-            Result<List<Tuple<DateTime, Double>>> recipts_admin = system.GetIncomeAmountGroupByDay("2021-06-07", "2021-06-07", "-777");
+            Result<List<Tuple<DateTime, Double>>> recipts_owner = system.GetIncomeAmountGroupByDay("2021-06-12", "2021-06-07", store.Data.Id, user.Data.Id);
+            Result<List<Tuple<DateTime, Double>>> recipts_admin = system.GetIncomeAmountGroupByDay("2021-06-12", "2021-06-07", "-777");
 
             Assert.True(recipts_owner.Data[0].Item2 == 0);
             Assert.True(recipts_admin.Data[0].Item2 == 0);
