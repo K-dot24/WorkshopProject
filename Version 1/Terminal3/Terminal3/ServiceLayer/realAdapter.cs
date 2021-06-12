@@ -295,9 +295,15 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             else
                 return new Result<List<String>>("", fromSystem.ExecStatus, null);
         }
-        public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
+        public Result<String> AddProductReview(string userID, string storeID, string productID, string review)
         {
-            throw new NotImplementedException();
+            Result<ProductService> fromSystem = system.AddProductReview(userID, storeID, productID, review);
+            if (fromSystem.ExecStatus)
+            {
+                return new Result<String>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.Data.Id);
+            }
+            else
+                return new Result<String>(fromSystem.Message, fromSystem.ExecStatus, null);
         }
 
         public Result<bool> SetPermissions(string storeID, string managerID, string ownerID, LinkedList<int> permissions)

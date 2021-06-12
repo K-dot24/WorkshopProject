@@ -193,10 +193,10 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.UpdateShoppingCart(userID, storeId, productID, quantity);
         }
 
-        public Result<bool> AddProductReview(string userID, string storeID, string productID, string review)
+        public Result<String> AddProductReview(string userID, string storeID, string productID, string review)
         {
             if (Real == null)
-                return new Result<bool>(true);
+                return new Result<String>(true);
 
             return Real.AddProductReview(userID, storeID, productID, review);
         }
