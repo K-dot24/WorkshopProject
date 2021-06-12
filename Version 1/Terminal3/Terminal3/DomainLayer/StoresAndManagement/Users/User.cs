@@ -15,13 +15,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public String Id { get;}
         public ShoppingCart ShoppingCart { get; set; }
         public List<Offer> PendingOffers { get; set; }
-        public List<Offer> AcceptedOffes { get; set; }
+        public List<Offer> AcceptedOffers { get; set; }
         protected User()
         {
             Id = Service.GenerateId();
             ShoppingCart = new ShoppingCart();
             PendingOffers = new List<Offer>();
-            AcceptedOffes = new List<Offer>();
+            AcceptedOffers = new List<Offer>();
         }
         protected User(string id)
         {
@@ -30,14 +30,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             else Id = id;
             ShoppingCart = new ShoppingCart();
             PendingOffers = new List<Offer>();
-            AcceptedOffes = new List<Offer>();
+            AcceptedOffers = new List<Offer>();
         }
         protected User(String id , ShoppingCart shoppingCart)
         {
             Id = id;
             ShoppingCart = shoppingCart;
             PendingOffers = new List<Offer>();
-            AcceptedOffes = new List<Offer>();
+            AcceptedOffers = new List<Offer>();
         }
 
 
@@ -54,7 +54,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     if (getSB.ExecStatus)  // Check if shopping bag for store exists
                     {
                         sb = getSB.Data;
-                        res = sb.AddProtuctToShoppingBag(product, productQuantity, AcceptedOffes);
+                        res = sb.AddProtuctToShoppingBag(product, productQuantity, AcceptedOffers);
                         if (res.ExecStatus)
                         {
                             return new Result<ShoppingCart>($"Product {product.Name} was added successfully to shopping cart.\n", true, ShoppingCart);
@@ -64,7 +64,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     }
                     //else create shopping bag for storeID
                     sb = new ShoppingBag(this, store);
-                    res = sb.AddProtuctToShoppingBag(product, productQuantity, AcceptedOffes);
+                    res = sb.AddProtuctToShoppingBag(product, productQuantity, AcceptedOffers);
                     if (res.ExecStatus)
                     {
                         ShoppingCart.AddShoppingBagToCart(sb);
@@ -118,9 +118,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<ShoppingCart>("Notice - The store is out of stock\n", false, null);   // TODO - do we want to reduce the products from the bag (i think not) and do we want to inform which of the products are out of stock ?
             }
 
-            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails , AcceptedOffes, session);
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails , AcceptedOffers, session);
             if(result.Data != null)
                 ShoppingCart = new ShoppingCart();              // create new shopping cart for user
+
+            Result<bool> removeAccatedOffersResult = removeAcceptedOffers();
+            if (!removeAccatedOffersResult.ExecStatus)
+                return new Result<ShoppingCart>("The purchase failed because the system failed to remove accepted offers", false, null);
 
             return result;
         }
@@ -146,7 +150,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public List<Offer> getAcceptedOffers()
         {
-            return AcceptedOffes;
+            return AcceptedOffers;
+        }
+
+        public Result<bool> removeAcceptedOffers()
+        {
+            AcceptedOffers = new List<Offer>();
+            //TODO mapper? Zoe
+
+            return new Result<bool>("", true, true);
         }
 
         public Result<Offer> SendOfferToStore(string storeID, string productID, int amount, double price)
@@ -195,7 +207,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             Result<bool> removeResult = RemovePendingOffer(id);
             if (!removeResult.ExecStatus)
                 return removeResult;
-            AcceptedOffes.Add(offer);
+            AcceptedOffers.Add(offer);
             //TODO mapper? Zoe
             return new Result<bool>("", true, true);
         }

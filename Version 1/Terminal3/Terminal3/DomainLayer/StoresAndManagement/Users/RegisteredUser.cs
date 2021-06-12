@@ -165,16 +165,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
             }
 
-            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails, AcceptedOffes, session);
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails, AcceptedOffers, session);
             if (result.Data != null)
             {
                 History.AddPurchasedShoppingCart(ShoppingCart, session);
                 this.ShoppingCart = new ShoppingCart();          // create new shopping cart for user
 
-               /* // Update DB
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
-                var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.getDTO());
-                mapper.UpdateRegisteredUser(filter, update);*/
+                /* // Update DB
+                 var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
+                 var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.getDTO());
+                 mapper.UpdateRegisteredUser(filter, update);*/
+
+                Result<bool> removeAccatedOffersResult = removeAcceptedOffers();
+                if (!removeAccatedOffersResult.ExecStatus)
+                    return new Result<ShoppingCart>("The purchase failed because the system failed to remove accepted offers", false, null);
 
             }
             return result;
