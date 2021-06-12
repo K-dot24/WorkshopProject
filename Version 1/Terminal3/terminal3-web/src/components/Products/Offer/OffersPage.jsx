@@ -61,7 +61,7 @@ const OffersPage = ({ type, storeID, userID }) => {
             response.json().then(result => setData(result.data)) : printErrorMessage(response)).catch(err => console.log(err)); 
     }
 
-    // TODO: Connect to API
+    // TODO: Connect user to API
     const handleAccept = (offerID, customerID) => {
         if (type === 'store'){
             const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: true }
@@ -72,7 +72,7 @@ const OffersPage = ({ type, storeID, userID }) => {
             console.log("ACCEPTED BY USER");
     };
 
-    // TODO: Connect to API
+    // TODO: Connect user to API
     const handleDecline = (offerID, customerID) => {
         if (type === 'store'){
             const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: false, CounterOffer: -1 }

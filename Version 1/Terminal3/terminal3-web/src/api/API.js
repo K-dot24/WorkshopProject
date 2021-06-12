@@ -745,7 +745,6 @@ export function GetPurchasePolicyData( storeID ) {
 
 //#region Offer
 
-// TODO: Implement with real API
 export function SendOfferToStore( data ) {
     return fetch(`${API_URL}/StoreStaff/SendOfferToStore`, {
         method: 'POST',
@@ -757,7 +756,6 @@ export function SendOfferToStore( data ) {
     })
 }
 
-// TODO: Implement with real API
 export function SendOfferResponseToUser( data ) {
     return fetch(`${API_URL}/StoreStaff/SendOfferResponseToUser`, {
         method: 'POST',
@@ -769,7 +767,6 @@ export function SendOfferResponseToUser( data ) {
     })
 }
 
-// TODO: Implement with real API
 export function GetUserOffers( data ) {
     return fetch(`${API_URL}/StoreStaff/GetUserOffers`, {
         method: 'POST',
@@ -781,7 +778,6 @@ export function GetUserOffers( data ) {
     })
 }
 
-// TODO: Implement with real API
 export function GetStoreOffers( data ) {
     return fetch(`${API_URL}/StoreStaff/GetStoreOffers`, {
         method: 'POST',
