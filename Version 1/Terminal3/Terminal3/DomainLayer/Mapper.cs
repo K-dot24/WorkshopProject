@@ -2584,14 +2584,15 @@ namespace Terminal3.DataAccessLayer
             if (!(Instance is null))
             {
                 var emptyFilter = Builders<BsonDocument>.Filter.Empty;
-                database.GetCollection<BsonDocument>("Discounts").DeleteMany(emptyFilter);
-                database.GetCollection<BsonDocument>("Policies").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("DiscountPolicies").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("PurchasePolicies").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("Products").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("Stores").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("SystemAdmins").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("Users").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("Recipts").DeleteMany(emptyFilter);
                 database.GetCollection<BsonDocument>("StoreStaffs").DeleteMany(emptyFilter);
+                database.GetCollection<BsonDocument>("Monitor").DeleteMany(emptyFilter);
 
                 RegisteredUsers.Clear();
                 GuestUsers.Clear();
