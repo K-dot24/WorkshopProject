@@ -21,9 +21,33 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public String Email { get; }
         public String Password { get; set; }        
         public Boolean LoggedIn { get; set; }
-        public History History { get; set; }
-        public LinkedList<Notification> PendingNotification { get; set; }
-        public NotificationCenter NotificationCenter {get; set; }
+        public History History 
+        { 
+            get
+            {
+                Mapper.getInstance().Load_RegisteredUserHistory(this);
+                return History;
+                    
+            }
+            set
+            {
+                this.History = value;
+            }
+        }
+        public LinkedList<Notification> PendingNotification 
+        {
+            get
+            {
+                Mapper.getInstance().Load_RegisteredUserNotifications(this);
+                return PendingNotification;
+            }
+            set
+            {
+                this.PendingNotification = value;
+            }
+        }
+        public NotificationCenter NotificationCenter { get; set; } 
+        
 
         //public Mapper mapper = Mapper.getInstance();
 
