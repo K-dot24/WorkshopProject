@@ -145,7 +145,6 @@ namespace Terminal3.ServiceLayer
             return GuestUserInterface.SendOfferToStore(storeID, userID, productID, amount, price);
         }
         #endregion
-
         #region Register User Actions
         public Result<RegisteredUserService> Login(string email, string password)
         {
