@@ -3,7 +3,7 @@ import { List, ListItem, ListItemText, Typography, Paper, Button, Divider } from
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Offer } from '../../../components';
-import { GetStoreOffersData, GetUserOffersData } from '../../../api/API';
+import { printErrorMessage, GetStoreOffers, GetUserOffers, SendOfferResponseToUser } from '../../../api/API';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -44,91 +44,115 @@ const OffersPage = ({ type, storeID, userID }) => {
 
     // Offers list data from API
     const [data, setData] = useState(null);
+    const [forceRender, setForceRender] = useState(0);
 
     // Counter offer
-    const [selectedOfferID, setSelectedOfferID] = useState(null);
+    const [selectedOffer, setSelectedOffer] = useState(null);
     const [showCounterDialog, setShowCounterDialog] = useState(false);
 
-    // TODO: Update with real API call
-    const fetchOffers = () => {
-        let res;
-        if (type === 'store')
-            res = GetStoreOffersData(userID, storeID);
-        else if (type === 'user')
-            res = GetUserOffersData(userID);
-        setData(res);
+    // TODO: Update on click
+    const fetchStoreOffers = async () => {
+        GetStoreOffers({ StoreID: storeID }).then(response => response.ok ?
+            response.json().then(result => setData(result.data)) : printErrorMessage(response)).catch(err => console.log(err));
     };
 
+    const fetchUserOffers = async () => {
+        GetUserOffers({ UserID: userID }).then(response => response.ok ?
+            response.json().then(result => setData(result.data)) : printErrorMessage(response)).catch(err => console.log(err)); 
+    }
+
     // TODO: Connect to API
-    const handleAccept = (offerID) => {
+    const handleAccept = (offerID, customerID) => {
         if (type === 'store'){
-            const toSend = { StoreId: storeID, UserId: userID, OfferId: offerID, Accepted: true }
-            console.log(toSend);
+            const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: true }
+            SendOfferResponseToUser(toSend).then(response => response.ok ?
+                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
         }
         else if (type === 'user')
             console.log("ACCEPTED BY USER");
     };
 
     // TODO: Connect to API
-    const handleDecline = (offerID) => {
+    const handleDecline = (offerID, customerID) => {
         if (type === 'store'){
-            const toSend = { StoreId: storeID, UserId: userID, OfferId: offerID, Accepted: false, CounterOffer: -1 }
-            console.log(toSend);
+            const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: false, CounterOffer: -1 }
+            SendOfferResponseToUser(toSend).then(response => response.ok ?
+                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+            setForceRender(prev => prev + 1);
         }
         else if (type === 'user')
             console.log("DECLINED BY USER");
     };
 
-    const onCounter = (offerID) => {
-        setSelectedOfferID(offerID)
+    const onCounter = (offerID, customerID) => {
+        setSelectedOffer({ offerID, customerID })
         setShowCounterDialog(true);
     };
 
-    // TODO: Connect to API
     const handleCounter = (counterOffer) => {
-        const toSend = { StoreId: storeID, UserId: userID, OfferId: selectedOfferID, Accepted: false, CounterOffer: counterOffer.price }
-        console.log(toSend);
+        const toSend = { StoreID: storeID, OwnerID: userID, UserID: selectedOffer.customerID, OfferID: selectedOffer.offerID, Accepted: false, CounterOffer: counterOffer.price }
+        SendOfferResponseToUser(toSend).then(response => response.ok ?
+            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
     };
 
     useEffect(() => {
-        fetchOffers();
+        if (type === 'store')
+            fetchStoreOffers();
+        else if (type === 'user')
+            fetchUserOffers();
     }, []);
+
+    useEffect(() => {
+        if (type === 'store')
+            fetchStoreOffers();
+        else if (type === 'user')
+            fetchUserOffers();
+    }, [forceRender]);
 
     useEffect(() => {
         console.log(data);
     }, [data]);
 
-    // TODO: Check real data properties
     return (
         <div className={classes.root}>
             <div className={classes.toolbar} />
             <main className={classes.layout}>
                 <Paper className={classes.paper}>
                     <List component="nav" aria-label="offers list">
+                        {(data === null || data.length === 0) && (
+                            <Typography variant="body2">No pending offers.</Typography>
+                        )}
                         {(type === 'store' && data !== null) && (
-                            data.offers.map((offer) => (
+                            data.map((offer) => (
                             <>
-                                <ListItem style={{padding: '10px 0'}} key={offer.offerID}>
-                                    <ListItemText primary={offer.productName} secondary={`User: ${offer.userID}`} />
-                                    <Typography variant="body2">{`Amount: ${offer.amount}, Price: ${offer.price}₪`}</Typography>
+                                <ListItem style={{padding: '10px 0'}} key={offer.Id}>
+                                    <ListItemText primary={offer.Product} secondary={`User: ${offer.User}`} />
+                                    <Typography variant="body2">{`Amount: ${offer.Amount}, Price: ${offer.Price}₪`}</Typography>
                                 </ListItem>
-                                <Button color="primary" onClick={() => handleAccept(offer.offerID)}>Accept</Button>
-                                <Button color="primary" onClick={() => onCounter(offer.offerID)}>Counter</Button>
-                                <Button color="secondary" onClick={() => handleDecline(offer.offerID)}>Decline</Button>
+                                <Button color="primary" onClick={() => handleAccept(offer.Id, offer.User)}>Accept</Button>
+                                <Button color="primary" onClick={() => onCounter(offer.Id, offer.User)}>Counter</Button>
+                                <Button color="secondary" onClick={() => handleDecline(offer.Id, offer.User)}>Decline</Button>
                                 <Divider />
                             </>
                             ))
                         )}
 
                         {(type === 'user' && data !== null) && (
-                            data.offers.map((offer) => (
+                            data.map((offer) => (
                             <>
-                                <ListItem style={{padding: '10px 0'}} key={offer.offerID}>
-                                    <ListItemText primary={offer.productName} secondary={`Store: ${offer.storeName}`} />
-                                    <Typography variant="body2">{`Amount: ${offer.amount}, Price: ${offer.price}₪`}</Typography>
+                                <ListItem style={{padding: '10px 0'}} key={offer.Id}>
+                                    <ListItemText primary={offer.Product} secondary={`Store: ${offer.Store}`} />
+                                    <Typography variant="body2">{`Amount: ${offer.Amount}, Price: ${offer.Price}₪`}</Typography>
                                 </ListItem>
-                                <Button color="primary" onClick={() => handleAccept(offer.offerID)}>Accept</Button>
-                                <Button color="secondary" onClick={() => handleDecline(offer.offerID)}>Decline</Button>
+                                {offer.CounterOfferPrice !== -1 ? (
+                                <>
+                                    <Button color="primary" onClick={() => handleAccept(offer.Id)}>Accept</Button>
+                                    <Button color="secondary" onClick={() => handleDecline(offer.Id)}>Decline</Button>
+                                </>
+                                )
+                                :
+                                (<Typography variant="body2">PENDING</Typography>)
+                                }
                                 <Divider />
                             </>
                             ))

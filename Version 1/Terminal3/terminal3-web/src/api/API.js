@@ -759,27 +759,38 @@ export function SendOfferToStore( data ) {
 
 // TODO: Implement with real API
 export function SendOfferResponseToUser( data ) {
-    console.log(data)
+    return fetch(`${API_URL}/StoreStaff/SendOfferResponseToUser`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
 }
 
 // TODO: Implement with real API
-export function GetUserOffersData( userID ) {
-    const data = { offers: [
-        { offerID: 'offer1', storeID: 'StoreID1', storeName: 'Store1', productID: '7a2b9d541fcb464f8924d18d0b91d3fd', amount: 3, price: 10 },
-        { offerID: 'offer2', storeID: 'StoreID2', storeName: 'Store2', productID: 'MadeUpPID', amount: 1, price: 20 },
-    ] }
-
-    return data;
+export function GetUserOffers( data ) {
+    return fetch(`${API_URL}/StoreStaff/GetUserOffers`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
 }
 
 // TODO: Implement with real API
-export function GetStoreOffersData( ownerID, storeID ) {
-    const data = { offers: [
-        { offerID: 'offer1', userID: 'User2ID', productID: '7a2b9d541fcb464f8924d18d0b91d3fd', productName: 'Bamba', amount: 3, price: 15 },
-        { offerID: 'offer2', userID: 'User2ID', productID: 'MadeUpPID', productName: 'Bisli', amount: 1, price: 20 },
-    ] }
-
-    return data;
+export function GetStoreOffers( data ) {
+    return fetch(`${API_URL}/StoreStaff/GetStoreOffers`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
 }
 
 //#endregion

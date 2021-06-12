@@ -308,7 +308,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
     const handleSendOfferToStore = (data) => {
         const fullData = { StoreID: store.id, UserID: user.id, ...data }
         SendOfferToStore(fullData).then(response => response.ok ?
-            response.json().then(result => console.log(result)) : printErrorMessage(response)).catch(err => console.log(err));;
+            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));;
     }
 
     //#endregion
