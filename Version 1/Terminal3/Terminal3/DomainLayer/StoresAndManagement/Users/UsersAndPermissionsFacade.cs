@@ -443,7 +443,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             GuestUser guest = new GuestUser();
             GuestUsers.TryAdd(guest.Id, guest);
-            MonitorController.getInstance().update("GuestUsers");
 
             //TODO - When adding Service Layer
             //checkIfUserWantsToRegister();            

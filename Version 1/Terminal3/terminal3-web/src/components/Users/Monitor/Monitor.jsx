@@ -94,9 +94,10 @@ const Monitor = ({ userID }) => {
                     }); 
 
                     //requesting first sample from the system
-                   /* StartMonitorRequest(userID)
+                    console.log('Requesting to open live stream')
+                    StartMonitorRequest(userID)
                     .then(response => response.ok ?
-                        response.json().then(result => console.log(result) ) : printErrorMessage(response)).catch(err => console.log(err));*/
+                        response.json().then(result => console.log(result) ) : printErrorMessage(response)).catch(err => console.log(err));
 
                 })
                 .catch(e => console.log('Connection failed: ', e));
