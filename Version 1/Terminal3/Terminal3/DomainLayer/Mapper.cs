@@ -122,9 +122,9 @@ namespace Terminal3.DataAccessLayer
             try
             {
                 dbClient = new MongoClient(connection_string);
-                database = dbClient.GetDatabase("Terminal3-development");
+                //database = dbClient.GetDatabase("Terminal3-development");
                 //database = dbClient.GetDatabase("Terminal3-Testing");
-                //database = dbClient.GetDatabase("Terminal3-tomer");
+                database = dbClient.GetDatabase("Terminal3-tomer");
                 transaction = false;
 
                 //DAOs

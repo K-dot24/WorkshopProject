@@ -19,6 +19,8 @@ namespace Terminal3.ServiceLayer.Controllers
         public int Owners { get; set; }
         public int Admins { get; set; }
 
+        public List<String> visitorsIDs { get; set; }
+
         private MonitorController()
         {
             DTO_Monitor dto = Mapper.getInstance().LoadMonitor();
@@ -28,6 +30,7 @@ namespace Terminal3.ServiceLayer.Controllers
             ManagersNotOwners = dto.ManagersNotOwners;
             Owners = dto.Owners;
             Admins = dto.Admins;
+            visitorsIDs = new List<string>();
         }
 
         public static MonitorController getInstance()
@@ -39,7 +42,7 @@ namespace Terminal3.ServiceLayer.Controllers
             return Instance;
         }
 
-        public void update(String fieldName)
+        public void update(String fieldName,String userID)
         {
             if (DateTime.Now.Date > today)
             {
@@ -48,39 +51,50 @@ namespace Terminal3.ServiceLayer.Controllers
                 ManagersNotOwners = 0;
                 Owners = 0;
                 Admins = 0;
+                visitorsIDs.Clear();
             }
-
-            switch (fieldName)
+            //do not count the same user twice
+            if (visitorsIDs.Contains(userID) && !fieldName.Equals("GuestUsers")) {
+                if (GuestUsers > 0)
+                {
+                    GuestUsers--;
+                }
+            }
+            else
             {
-                case "GuestUsers":
-                    GuestUsers++;
-                    break;
+                switch (fieldName)
+                {
+                    case "GuestUsers":
+                        GuestUsers++;
+                        break;
 
-                case "RegisteredUsers":
-                    RegisteredUsers++;
-                    if (GuestUsers > 0)
-                        GuestUsers--;
-                    break;
+                    case "RegisteredUsers":
+                        RegisteredUsers++;
+                        if (GuestUsers > 0)
+                            GuestUsers--;
+                        break;
 
-                case "ManagersNotOwners":
-                    ManagersNotOwners++;
-                    if (GuestUsers > 0)
-                        GuestUsers--;
-                    break;
-
-
-                case "Owners":
-                    Owners++;
-                    if (GuestUsers > 0)
-                        GuestUsers--;
-                    break;
+                    case "ManagersNotOwners":
+                        ManagersNotOwners++;
+                        if (GuestUsers > 0)
+                            GuestUsers--;
+                        break;
 
 
-                case "Admins":
-                    Admins++;
-                    if (GuestUsers > 0)
-                        GuestUsers--;
-                    break;
+                    case "Owners":
+                        Owners++;
+                        if (GuestUsers > 0)
+                            GuestUsers--;
+                        break;
+
+
+                    case "Admins":
+                        Admins++;
+                        if (GuestUsers > 0)
+                            GuestUsers--;
+                        break;
+                }
+                visitorsIDs.Add(userID);
             }
 
             //save in DB

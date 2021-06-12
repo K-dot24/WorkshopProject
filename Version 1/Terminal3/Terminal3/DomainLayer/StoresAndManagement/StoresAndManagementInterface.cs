@@ -389,6 +389,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<User> res = UsersAndPermissionsFacade.EnterSystem();
             if (res.ExecStatus)
             {
+                updateMonitor(res.Data.Id);
                 UserService userDAL = res.Data.GetDAL().Data;
                 return new Result<UserService>(res.Message, true, userDAL);
             }
@@ -462,6 +463,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<GuestUser> result = UsersAndPermissionsFacade.LogOut(email);
             if (result.ExecStatus)
             {
+                updateMonitor(result.Data.Id);
+
                 return new Result<UserService>(result.Message, result.ExecStatus, result.Data.GetDAL().Data);
             }
             return new Result<UserService>(result.Message, result.ExecStatus,null);
@@ -669,21 +672,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             MonitorController monitor = MonitorController.getInstance();
             if (UsersAndPermissionsFacade.SystemAdmins.ContainsKey(userID))
             {
-                monitor.update("Admins");
+                monitor.update("Admins",userID);
                 return;
             }
             Boolean owner = isOwner(userID);
             if (isManager(userID) && !owner)
             {
-                monitor.update("ManagersNotOwners");
+                monitor.update("ManagersNotOwners", userID);
                 return;
             }
             if (owner)
             {
-                monitor.update("Owners");
+                monitor.update("Owners", userID);
                 return;
             }
-            monitor.update("RegisteredUsers");
+            if (isRegisterUser(userID))
+            {
+                monitor.update("RegisteredUsers", userID);
+            }
+            else {
+                monitor.update("GuestUsers", userID);
+            }
+        }
+        public Boolean isRegisterUser(String userID)
+        {
+            return UsersAndPermissionsFacade.RegisteredUsers.ContainsKey(userID);
         }
 
         public Boolean isManager(String userID)
@@ -691,9 +704,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             foreach (var record in StoresFacade.Stores)
             {
                 Store s = record.Value;
-                foreach(var owner in s.Owners)
+                foreach(var manager in s.Managers)
                 {
-                    if (owner.Value.GetId() == userID)
+                    if (manager.Value.GetId() == userID)
                     {
                         return true;
                     }
@@ -707,9 +720,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             foreach (var record in StoresFacade.Stores)
             {
                 Store s = record.Value;
-                if(s.Founder.GetId() == userID)
+                foreach (var owner in s.Owners)
                 {
-                    return true;
+                    if (owner.Value.GetId() == userID)
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
