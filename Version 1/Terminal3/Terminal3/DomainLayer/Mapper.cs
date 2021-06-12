@@ -1391,6 +1391,7 @@ namespace Terminal3.DataAccessLayer
             DTO_Store dto = DAO_Store.Load(filter);
             store.History = ToObject(dto.History);            
         }
+
         public void Load_StorePolicyManager(Store store)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
