@@ -120,7 +120,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 20, 400)]
         public void OrDiscountTest(String productName, int count, Double expectedResult)
         {
-            IDiscountTarget target = new DiscountTargetProducts(new List<string>() { Products[productName].Id });
+            IDiscountTarget target = new DiscountTargetProducts(new List<string>() { Products["Bread"].Id });
             IDiscountCondition c1 = new MinProductCondition(Products["Bread"].Id, 10);
             IDiscountPolicy p1 = new ConditionalDiscount(new VisibleDiscount(DateTime.MaxValue, target, 20), c1);
             IDiscountCondition c2 = new MaxProductCondition(Products["Bread"].Id, 5);
@@ -140,7 +140,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Tests
         [InlineData("Milk", 20, 400)]
         public void OrDiscountConditionTest(String productName, int count, Double expectedResult)
         {
-            IDiscountTarget target = new DiscountTargetProducts(new List<string>() { Products[productName].Id });
+            IDiscountTarget target = new DiscountTargetProducts(new List<string>() { Products["Bread"].Id });
             IDiscountCondition c1 = new MinProductCondition(Products["Bread"].Id, 10);
             IDiscountCondition c2 = new MaxProductCondition(Products["Bread"].Id, 5);
             IDiscountCondition c = new DiscountConditionOr(new List<IDiscountCondition>() { c1, c2 });
