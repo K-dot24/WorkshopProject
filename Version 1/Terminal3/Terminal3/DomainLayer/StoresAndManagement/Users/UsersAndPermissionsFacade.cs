@@ -307,7 +307,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", searchResult.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", false);
                     mapper.UpdateRegisteredUser(filter, update);
-                    //mapper.ClearChace_logout(searchResult.Data.Id);
+                    if (!SystemAdmins.ContainsKey(searchResult.Data.Id))
+                    {
+                        mapper.ClearCache_logout(searchResult.Data.Id);
+                    }
 
                     return new Result<GuestUser>($"{email} logged out\n", true, res.Data);
                 }
