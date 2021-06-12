@@ -62,7 +62,7 @@ namespace Terminal3.ExternalSystems.Tests
             if (isEmpty)
                 Assert.Equal(-1, result);
             else
-                Assert.Equal(1, result);
+                Assert.True(result > 0);
         }
     }
 }
