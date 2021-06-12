@@ -6,6 +6,7 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ExternalSystems;
 using Terminal3.DataAccessLayer.DTOs;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -13,11 +14,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public String Id { get;}
         public ShoppingCart ShoppingCart { get; set; }
-
+        public LinkedList<Offer> Offers { get; set; }
         protected User()
         {
             Id = Service.GenerateId();
             ShoppingCart = new ShoppingCart();
+            Offers = new LinkedList<Offer>();
         }
         protected User(string id)
         {
@@ -25,11 +27,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 Id = Service.GenerateId();
             else Id = id;
             ShoppingCart = new ShoppingCart();
+            Offers = new LinkedList<Offer>();
         }
         protected User(String id , ShoppingCart shoppingCart)
         {
             Id = id;
             ShoppingCart = shoppingCart;
+            Offers = new LinkedList<Offer>();
         }
 
 
@@ -134,6 +138,47 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 }
             }
             return true;
+        }
+
+        public Result<Offer> SendOfferToStore(string storeID, string productID, int amount, double price)
+        {
+            Offer offer = new Offer(this.Id, productID, amount, price, storeID);
+            Offers.AddLast(offer);
+            //TODO mapper Zoe
+            return new Result<Offer>("", true, offer);
+        }
+
+        protected Offer findOffer(string id)
+        {
+            foreach (Offer offer in Offers)
+                if (offer.Id == id)
+                    return offer;
+            return null;
+        }
+
+        public Result<bool> RemoveOffer(string id)
+        {
+            Offer offer = findOffer(id);
+            if (offer == null)
+                return new Result<bool>("Failed to remove offer from user: Failed to locate the offer", false, false);
+            Offers.Remove(offer);
+            //TODO mapper Zoe
+            return new Result<bool>("", true, true);
+        }
+
+        public abstract Result<bool> AcceptOffer(string offerID);
+
+        public abstract Result<bool> DeclineOffer(string offerID);
+
+        public abstract Result<bool> CounterOffer(string offerID);
+
+        public Result<List<Dictionary<string, object>>> getUserOffers()
+        {
+            //TODO: Mapper load Zoe
+            List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
+            foreach (Offer offer in Offers)
+                list.Add(offer.GetData());
+            return new Result<List<Dictionary<string, object>>>("", true, list);
         }
 
         public Result<UserService> GetDAL()

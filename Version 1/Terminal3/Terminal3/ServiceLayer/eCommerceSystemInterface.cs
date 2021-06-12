@@ -13,10 +13,6 @@ using signalRgateway.Models;
 using Newtonsoft.Json;
 using Terminal3.DataAccessLayer;
 using System.IO;
-using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
-using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
-using System.Threading;
-using System.Runtime.InteropServices;
 
 namespace Terminal3.ServiceLayer
 {   
@@ -56,13 +52,13 @@ namespace Terminal3.ServiceLayer
 
             //validate JSON
             if( (config.externalSystem_url is null) || (config.mongoDB_url is null) || (config.signalRServer_url is null)
-                || (config.password is null) || (config.email is null))
+                || (config.password is null) || (config.email is null) || (config.environment is null))
             {
                 Logger.LogError("Invalid JSON format - One or more missing attribute has been found in the config JSON");
                 Environment.Exit(1);
             }
 
-            Mapper.getInstance(config.mongoDB_url);
+            Mapper.getInstance(config.mongoDB_url, config.environment);
             ExternalSystems.ExternalSystemsAPI.getInstance(config.externalSystem_url);
             MonitorController.getInstance();
             
@@ -141,6 +137,10 @@ namespace Terminal3.ServiceLayer
         }
         public Result<List<Tuple<String, String>>> GetProductReview(String storeID, String productID) {
             return GuestUserInterface.GetProductReview(storeID, productID);
+        }
+        public Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price)
+        {
+            return GuestUserInterface.SendOfferToStore(storeID, userID, productID, amount, price);
         }
         #endregion
 
@@ -262,6 +262,21 @@ namespace Terminal3.ServiceLayer
         public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, string owner_id)
         {
             return StoreStaffInterface.GetIncomeAmountGroupByDay(start_date, end_date, store_id, owner_id);
+        }
+
+        public Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer)
+        {
+            return StoreStaffInterface.SendOfferResponseToUser(storeID, ownerID, userID, offerID, accepted, counterOffer);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
+        {
+            return StoreStaffInterface.getStoreOffers(storeID);
+        }
+
+        public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
+        {
+            return StoreStaffInterface.getUserOffers(userId);
         }
         #endregion
 

@@ -8,6 +8,9 @@ namespace Terminal3
 {    
     public class Config
     {
+        [JsonProperty("environment")]
+        public String environment { get; set; }
+
         [JsonProperty("email")]
         public String email { get; set;}
 

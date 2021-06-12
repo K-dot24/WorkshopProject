@@ -11,6 +11,7 @@ using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.ServiceLayer.ServiceObjects;
 
@@ -59,6 +60,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info);
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> RemovePurchasePolicy(string storeId, string id);
+
+        Result<bool> SendOfferToStore(Offer offer);
+        Result<OfferResponse> SendOfferResponseToUser(string storeID, string userID, string offerID, bool accepted, double counterOffer);
         #endregion
     }
 
@@ -969,6 +973,33 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             mapper.DAO_BuyNow.Delete(Builders<BsonDocument>.Filter.Eq("_id", purchaseRoot.Id));
             mapper.Create(purchaseRoot);
             mapper.Create(purchaseRoot.Policy);
+        }
+
+        public Result<bool> SendOfferToStore(Offer offer)
+        {
+            if (Stores.TryGetValue(offer.StoreID, out Store store))
+            {
+                return store.SendOfferToStore(offer);
+            }
+            return new Result<bool>("Failed to add an offer: Failed to locate the store\n", false, false);
+        }
+
+        public Result<OfferResponse> SendOfferResponseToUser(string storeID, string ownerID, string offerID, bool accepted, double counterOffer)
+        {
+            if (Stores.TryGetValue(storeID, out Store store))
+            {
+                return store.SendOfferResponseToUser(ownerID, offerID, accepted, counterOffer);
+            }
+            return new Result<OfferResponse>("Failed to response to an offer: Failed to locate the store\n", false, OfferResponse.None);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
+        {
+            if (Stores.TryGetValue(storeID, out Store store))
+            {
+                return store.getStoreOffers();
+            }
+            return new Result<List<Dictionary<string, object>>>("Failed to get store offers: Failed to locate the store\n", false, null);
         }
     }
 }

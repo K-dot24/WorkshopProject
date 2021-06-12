@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
-using signalRgateway.Model;
 using SignalRgateway.Models;
 using System;
 using System.Collections.Generic;
