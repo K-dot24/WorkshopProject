@@ -14,12 +14,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public String Id { get;}
         public ShoppingCart ShoppingCart { get; set; }
-        public LinkedList<Offer> Offers { get; set; }
+        public LinkedList<Offer> PendingOffers { get; set; }
+        public LinkedList<Offer> AcceptedOffes { get; set; }
         protected User()
         {
             Id = Service.GenerateId();
             ShoppingCart = new ShoppingCart();
-            Offers = new LinkedList<Offer>();
+            PendingOffers = new LinkedList<Offer>();
+            AcceptedOffes = new LinkedList<Offer>();
         }
         protected User(string id)
         {
@@ -27,13 +29,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 Id = Service.GenerateId();
             else Id = id;
             ShoppingCart = new ShoppingCart();
-            Offers = new LinkedList<Offer>();
+            PendingOffers = new LinkedList<Offer>();
+            AcceptedOffes = new LinkedList<Offer>();
         }
         protected User(String id , ShoppingCart shoppingCart)
         {
             Id = id;
             ShoppingCart = shoppingCart;
-            Offers = new LinkedList<Offer>();
+            PendingOffers = new LinkedList<Offer>();
+            AcceptedOffes = new LinkedList<Offer>();
         }
 
 
@@ -143,26 +147,38 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<Offer> SendOfferToStore(string storeID, string productID, int amount, double price)
         {
             Offer offer = new Offer(this.Id, productID, amount, price, storeID);
-            Offers.AddLast(offer);
+            PendingOffers.AddLast(offer);
             //TODO mapper Zoe
             return new Result<Offer>("", true, offer);
         }
 
-        protected Offer findOffer(string id)
+        protected Offer findPendingOffer(string id)
         {
-            foreach (Offer offer in Offers)
+            foreach (Offer offer in PendingOffers)
                 if (offer.Id == id)
                     return offer;
             return null;
         }
 
-        public Result<bool> RemoveOffer(string id)
+        public Result<bool> RemovePendingOffer(string id)
         {
-            Offer offer = findOffer(id);
+            Offer offer = findPendingOffer(id);
             if (offer == null)
                 return new Result<bool>("Failed to remove offer from user: Failed to locate the offer", false, false);
-            Offers.Remove(offer);
+            PendingOffers.Remove(offer);
             //TODO mapper Zoe
+            return new Result<bool>("", true, true);
+        }
+
+        public Result<bool> MovePendingOfferToAccepted(string id)
+        {
+            Offer offer = findPendingOffer(id);
+            if (offer == null)
+                return new Result<bool>("Failed to move an offer from pending to accepted: Failed to locate the offer", false, false);
+            Result<bool> removeResult = RemovePendingOffer(id);
+            if (!removeResult.ExecStatus)
+                return removeResult;
+            AcceptedOffes.AddLast(offer);
             return new Result<bool>("", true, true);
         }
 
@@ -172,11 +188,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public abstract Result<bool> CounterOffer(string offerID);
 
-        public Result<List<Dictionary<string, object>>> getUserOffers()
+        public Result<List<Dictionary<string, object>>> getUserPendingOffers()
         {
             //TODO: Mapper load Zoe
             List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
-            foreach (Offer offer in Offers)
+            foreach (Offer offer in PendingOffers)
                 list.Add(offer.GetData());
             return new Result<List<Dictionary<string, object>>>("", true, list);
         }
