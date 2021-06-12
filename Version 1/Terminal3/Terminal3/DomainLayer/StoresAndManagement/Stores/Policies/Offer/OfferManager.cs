@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Terminal3.DataAccessLayer.DTOs;
+using System.Threading;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
 {
@@ -41,17 +42,33 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
 
         public Result<OfferResponse> SendOfferResponseToUser(string ownerID, string offerID, bool accepted, double counterOffer, List<string> allOwners)
         {
-            Offer offer = getOffer(offerID);
-            if (offer == null)
-                return new Result<OfferResponse>("Failed to response to an offer: Failed to locate the offer", false, OfferResponse.None);
-            if (accepted)
-                return AcceptedResponse(ownerID, offer, allOwners);
+            try
+            {
+                Monitor.Enter(offerID);
+                try
+                {
+                    Offer offer = getOffer(offerID);
+                    if (offer == null)
+                        return new Result<OfferResponse>("Failed to response to an offer: Failed to locate the offer", false, OfferResponse.None);
+                    if (accepted)
+                        return AcceptedResponse(ownerID, offer, allOwners);
 
-            PendingOffers.Remove(offer);
-
-            if (counterOffer == -1)
-                return DeclinedResponse(offer);
-            return CounterOfferResponse(offer, counterOffer);
+                    PendingOffers.Remove(offer);
+                    //TODO mapper Zoe
+                    if (counterOffer == -1)
+                        return DeclinedResponse(offer);
+                    return CounterOfferResponse(offer, counterOffer);
+                }
+                finally
+                {
+                    Monitor.Exit(offerID);
+                }
+            }catch(SynchronizationLockException SyncEx)
+            {
+                Console.WriteLine("A SynchronizationLockException occurred. Message:");
+                Console.WriteLine(SyncEx.Message);
+                return new Result<OfferResponse>(SyncEx.Message, false, OfferResponse.None);
+            }
         }
 
         private Result<OfferResponse> CounterOfferResponse(Offer offer, double counterOffer)

@@ -190,16 +190,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<ShoppingCart>("The shopping cart is empty\n", false, null);
             }
 
-            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails, session);
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails, AcceptedOffers, session);
             if (result.Data != null)
             {
                 History.AddPurchasedShoppingCart(ShoppingCart, session);
                 this.ShoppingCart = new ShoppingCart();          // create new shopping cart for user
 
-               /* // Update DB
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
-                var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.getDTO());
-                mapper.UpdateRegisteredUser(filter, update);*/
+                /* // Update DB
+                 var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
+                 var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.getDTO());
+                 mapper.UpdateRegisteredUser(filter, update);*/
+
+                Result<bool> removeAccatedOffersResult = removeAcceptedOffers();
+                if (!removeAccatedOffersResult.ExecStatus)
+                    return new Result<ShoppingCart>("The purchase failed because the system failed to remove accepted offers", false, null);
 
             }
             return result;
@@ -268,22 +272,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public override Result<bool> AcceptOffer(string offerID)
         {
-            //TODO add to the bag
-            Offer offer = findOffer(offerID);
-            RemoveOffer(offerID);
+            Offer offer = findPendingOffer(offerID);
+            Result<bool> res = MovePendingOfferToAccepted(offerID);
+            if (!res.ExecStatus)
+                return res;
             return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, true);
         }
 
         public override Result<bool> DeclineOffer(string offerID)
         {
-            Offer offer = findOffer(offerID);
-            RemoveOffer(offerID);
+            Offer offer = findPendingOffer(offerID);
+            RemovePendingOffer(offerID);
             return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
         }
 
         public override Result<bool> CounterOffer(string offerID)
         {
-            Offer offer = findOffer(offerID);
+            Offer offer = findPendingOffer(offerID);
             return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
         }
     }

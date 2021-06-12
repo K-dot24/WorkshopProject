@@ -907,6 +907,12 @@ namespace Terminal3.DataAccessLayer
             DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
             user.History = ToObject(dto.History);
         }
+        public void Load_RegisteredUserAcceptedOffers(RegisteredUser user)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
+            DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
+            user.AcceptedOffers = ToObject(dto.AcceptedOffers);
+        }
         public void Load_RegisteredUserNotifications(RegisteredUser user)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
@@ -2722,6 +2728,7 @@ namespace Terminal3.DataAccessLayer
             Load_RegisteredUserShoppingCart(user);
             Load_RegisteredUserOffer(user);
             Load_RegisteredUserNotifications(user);
+            Load_RegisteredUserAcceptedOffers(user);
 
             ShoppingCart shoppingCart = user.ShoppingCart;
             foreach(var bag in shoppingCart.ShoppingBags)

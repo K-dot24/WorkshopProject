@@ -472,13 +472,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (RegisteredUsers.ContainsKey(userID))
             {
                 //User Found
-                Double TotalPrice = RegisteredUsers[userID].ShoppingCart.GetTotalShoppingCartPrice().Data;
+                Double TotalPrice = RegisteredUsers[userID].ShoppingCart.GetTotalShoppingCartPrice(RegisteredUsers[userID].getAcceptedOffers()).Data;
                 return new Result<double>($"Total price of current shoppinh cart is: {TotalPrice}", true, TotalPrice);
             }
             else if (GuestUsers.ContainsKey(userID))
             {
                 //Guest User Found
-                Double TotalPrice = GuestUsers[userID].ShoppingCart.GetTotalShoppingCartPrice().Data;
+                Double TotalPrice = GuestUsers[userID].ShoppingCart.GetTotalShoppingCartPrice(GuestUsers[userID].getAcceptedOffers()).Data;
                 return new Result<double>($"Total price of current shoppinh cart is: {TotalPrice}", true, TotalPrice);
             }
             else
@@ -617,9 +617,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<bool> RemoveOffer(string userID, string id)
         {
             if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
-                return guest_user.RemoveOffer(id);
+                return guest_user.RemovePendingOffer(id);
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
-                return registerd_user.RemoveOffer(id);
+                return registerd_user.RemovePendingOffer(id);
             return new Result<bool>("Failed to remove offer: Failed to locate the user", false, false);
         }
 
@@ -653,13 +653,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
         {
             if (GuestUsers.TryGetValue(userId, out GuestUser guest_user))
-                return guest_user.getUserOffers();
+                return guest_user.getUserPendingOffers();
             else if (RegisteredUsers.TryGetValue(userId, out RegisteredUser registerd_user))
             {
                 Mapper.getInstance().Load_RegisteredUserOffer(registerd_user);
-                return registerd_user.getUserOffers();
-            }
+                return registerd_user.getUserPendingOffers();
+            }                
             return new Result<List<Dictionary<string, object>>>("Failed to get user offers: Failed to locate the user", false, null);
+        }
+
+        public Result<bool> AnswerCounterOffer(string userID, string offerID, bool accepted)
+        {
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+                return guest_user.AnswerCounterOffer(offerID, accepted);
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+                return registerd_user.AnswerCounterOffer(offerID, accepted);
+            return new Result<bool>("Failed to responde to a counter offer: Failed to locate the user", false, false);
         }
     }
 }

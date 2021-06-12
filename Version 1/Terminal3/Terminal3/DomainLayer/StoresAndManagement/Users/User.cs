@@ -17,12 +17,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
     {
         public String Id { get;}
         public ShoppingCart ShoppingCart { get; set; }
-        public LinkedList<Offer> Offers { get; set; }
+        public List<Offer> PendingOffers { get; set; }
+        public List<Offer> AcceptedOffers { get; set; }
         protected User()
         {
             Id = Service.GenerateId();
             ShoppingCart = new ShoppingCart();
-            Offers = new LinkedList<Offer>();
+            PendingOffers = new List<Offer>();
+            AcceptedOffers = new List<Offer>();
         }
         protected User(string id)
         {
@@ -30,13 +32,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 Id = Service.GenerateId();
             else Id = id;
             ShoppingCart = new ShoppingCart();
-            this.Offers = new LinkedList<Offer>();  //placeholder when loaded from db
+            PendingOffers = new List<Offer>();
+            AcceptedOffers = new List<Offer>();
         }
         protected User(String id , ShoppingCart shoppingCart)
         {
             Id = id;
             ShoppingCart = shoppingCart;
-            Offers = new LinkedList<Offer>();
+            PendingOffers = new List<Offer>();
+            AcceptedOffers = new List<Offer>();
         }
         protected User(String id, LinkedList<Offer> Offers)
         {
@@ -58,7 +62,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     if (getSB.ExecStatus)  // Check if shopping bag for store exists
                     {
                         sb = getSB.Data;
-                        res = sb.AddProtuctToShoppingBag(product, productQuantity);
+                        res = sb.AddProtuctToShoppingBag(product, productQuantity, AcceptedOffers);
                         if (res.ExecStatus)
                         {
                             return new Result<ShoppingCart>($"Product {product.Name} was added successfully to shopping cart.\n", true, ShoppingCart);
@@ -68,7 +72,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     }
                     //else create shopping bag for storeID
                     sb = new ShoppingBag(this, store);
-                    res = sb.AddProtuctToShoppingBag(product, productQuantity);
+                    res = sb.AddProtuctToShoppingBag(product, productQuantity, AcceptedOffers);
                     if (res.ExecStatus)
                     {
                         ShoppingCart.AddShoppingBagToCart(sb);
@@ -122,9 +126,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<ShoppingCart>("Notice - The store is out of stock\n", false, null);   // TODO - do we want to reduce the products from the bag (i think not) and do we want to inform which of the products are out of stock ?
             }
 
-            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails , session);
+            Result<ShoppingCart> result = ShoppingCart.Purchase(paymentDetails, deliveryDetails , AcceptedOffers, session);
             if(result.Data != null)
                 ShoppingCart = new ShoppingCart();              // create new shopping cart for user
+
+            Result<bool> removeAccatedOffersResult = removeAcceptedOffers();
+            if (!removeAccatedOffersResult.ExecStatus)
+                return new Result<ShoppingCart>("The purchase failed because the system failed to remove accepted offers", false, null);
 
             return result;
         }
@@ -148,34 +156,71 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return true;
         }
 
+        public List<Offer> getAcceptedOffers()
+        {
+            return AcceptedOffers;
+        }
+
+        public Result<bool> removeAcceptedOffers()
+        {
+            AcceptedOffers = new List<Offer>();
+            //TODO mapper? Zoe
+
+            return new Result<bool>("", true, true);
+        }
+
         public Result<Offer> SendOfferToStore(string storeID, string productID, int amount, double price)
         {
             Offer offer = new Offer(this.Id, productID, amount, price, storeID);
-            Offers.AddLast(offer);
-            //var update_offer = Builders<BsonDocument>.Update.Push("Offers", offer.getDTO());
+            PendingOffers.Add(offer);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
             var update_offer = Builders<BsonDocument>.Update.Set("Offers", Mapper.getInstance().Get_DTO_Offers(Offers));
             Mapper.getInstance().UpdateRegisteredUser(filter, update_offer, session);
             return new Result<Offer>("", true, offer);
         }
 
-        protected Offer findOffer(string id)
+        protected Offer findPendingOffer(string id)
         {
-            foreach (Offer offer in Offers)
+            foreach (Offer offer in PendingOffers)
                 if (offer.Id == id)
                     return offer;
             return null;
         }
 
-        public Result<bool> RemoveOffer(string id)
+        public Result<bool> AnswerCounterOffer(string offerID, bool accepted)
         {
-            Offer offer = findOffer(id);
+            Offer offer = findPendingOffer(offerID);
+            if (offer == null)
+                return new Result<bool>("Failed to respond to a counter offer: Failed to locate the offer", false, false);
+            if (offer.CounterOffer == -1)
+                return new Result<bool>("Failed to respond to a counter offer: The offer is not a counter offer", false, false);
+            if(accepted)
+                return MovePendingOfferToAccepted(offerID);
+            return RemovePendingOffer(offerID);
+        }
+
+        public Result<bool> RemovePendingOffer(string id)
+        {
+            Offer offer = findPendingOffer(id);
             if (offer == null)
                 return new Result<bool>("Failed to remove offer from user: Failed to locate the offer", false, false);
-            Offers.Remove(offer);
+            PendingOffers.Remove(offer);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Mapper.getInstance().Get_DTO_Offers(Offers));
+            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Mapper.getInstance().Get_DTO_Offers(PendingOffers));
             Mapper.getInstance().UpdateRegisteredUser(filter, update_offer, session);
+            return new Result<bool>("", true, true);
+        }
+
+        public Result<bool> MovePendingOfferToAccepted(string id)
+        {
+            Offer offer = findPendingOffer(id);
+            if (offer == null)
+                return new Result<bool>("Failed to move an offer from pending to accepted: Failed to locate the offer", false, false);
+            Result<bool> removeResult = RemovePendingOffer(id);
+            if (!removeResult.ExecStatus)
+                return removeResult;
+            AcceptedOffers.Add(offer);
+            //TODO mapper? Zoe
             return new Result<bool>("", true, true);
         }
 
@@ -185,10 +230,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public abstract Result<bool> CounterOffer(string offerID);
 
-        public Result<List<Dictionary<string, object>>> getUserOffers()
-        {            
+        public Result<List<Dictionary<string, object>>> getUserPendingOffers()
+        {
+            //TODO: Mapper load Zoe
             List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
-            foreach (Offer offer in Offers)
+            foreach (Offer offer in PendingOffers)
                 list.Add(offer.GetData());
             return new Result<List<Dictionary<string, object>>>("", true, list);
         }
