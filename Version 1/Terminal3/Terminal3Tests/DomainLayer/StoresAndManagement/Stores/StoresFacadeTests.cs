@@ -20,7 +20,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
             Facade = new StoresFacade(true);
             EmailToID = new ConcurrentDictionary<string, string>();
 
-            //Initial data
+            //Initial data 
             Founder = new RegisteredUser("papi@hotmale.com", "qwerty1", true);
             EmailToID.TryAdd("papi@hotmale.com", Founder.Id);
             TestStore = new Store("The Testore", Founder);
