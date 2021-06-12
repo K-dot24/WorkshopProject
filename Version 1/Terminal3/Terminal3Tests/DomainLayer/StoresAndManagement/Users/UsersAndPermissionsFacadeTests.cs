@@ -21,7 +21,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         //Constructor
         public UsersAndPermissionsFacadeTests()
         {
-            Facade = new UsersAndPermissionsFacade(adminEmail, adminPassword);
+            Facade = new UsersAndPermissionsFacade(adminEmail, adminPassword, true);
 
         }
 
@@ -91,7 +91,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         {
             String email = "tomer@gmail.com";
             String password = "password";
-            Facade.Register(email, password,user1_id);
+            Facade.Register(email, password, "-1");
             Result<RegisteredUser> loginResult = Facade.Login(email, password);
             Assert.True(loginResult.ExecStatus, "Fail to login");
             if (loginResult.ExecStatus)
@@ -105,7 +105,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         {
             String email = "tomer@gmail.com";
             String password = "password";
-            RegisteredUser user = Facade.Register(email, password,user2_id).Data;
+            RegisteredUser user = Facade.Register(email, password,"-1").Data;
             Assert.False(Facade.LogOut(email).ExecStatus, "Able to loggout twice");
             Assert.False(user.LoggedIn, "Logout returned false, but the user is actually loged in");
             Facade.Login(email, password);
@@ -124,7 +124,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         public void AddProductToCartTest(string email, int productQuantity, Boolean expectedResult, Boolean expectedResult2)
         {
             // Open store
-            RegisteredUser founder = Facade.Register(email, "password",user1_id).Data;
+            RegisteredUser founder = Facade.Register(email, "password","-1").Data;
             Assert.NotNull(founder);
             Store store = new Store("Testore", founder);
 
@@ -224,7 +224,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
         {
             string email = "igor@gmail.com";
             string password = "pass123";
-            Facade.Register(email, password,user1_id);
+            Facade.Register(email, password,"-1");
             RegisteredUser user = Facade.Login("igor@gmail.com", "pass123").Data;
             Facade.ExitSystem(user.Id);
 
@@ -279,7 +279,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
 
         }
 
-        [Fact]
+        [Fact(Skip ="Not in unit test anymore")]
         [Trait("Category", "Unit")]
         public void PurchaseTest()
         {
@@ -337,7 +337,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users.Tests
 
         }
 
-        [Fact]
+        [Fact(Skip = "Not in unit test anymore")]
         [Trait("Category", "Unit")]
         public void PurchaseTest2()
         {

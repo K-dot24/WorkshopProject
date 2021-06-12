@@ -23,11 +23,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public History History { get; set; }
         public LinkedList<Notification> PendingNotification { get; set; }
         public NotificationCenter NotificationCenter {get; set; }
-
-        //public Mapper mapper = Mapper.getInstance();
+        private Boolean testMode { get; set; } = false;
 
         //Constructor
-        public RegisteredUser(String email , String password) : base()
+        public RegisteredUser(String email , String password, Boolean testing = false) : base()
         {
             this.Email = email;
             var sha1 = new SHA1CryptoServiceProvider();
@@ -38,6 +37,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.History = new History();
             this.PendingNotification = new LinkedList<Notification>();
             this.NotificationCenter = NotificationCenter.GetInstance();
+            this.testMode = testing;
         }
 
         public RegisteredUser(String Id, String email, String password , Boolean loggedin) : base(Id)
@@ -48,6 +48,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             this.History = new History();
             this.PendingNotification = new LinkedList<Notification>();
             this.NotificationCenter = NotificationCenter.GetInstance();
+
         }
 
         // For database load
@@ -188,9 +189,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
             PendingNotification.AddLast(notification);
 
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_notification = Builders<BsonDocument>.Update.Set("PendingNotification", getPendingNotificationsDTO());
-            Mapper.getInstance().UpdateRegisteredUser(filter, update_notification , session:session);
+            if (!testMode)
+            {
+                // Update DB
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+                var update_notification = Builders<BsonDocument>.Update.Set("PendingNotification", getPendingNotificationsDTO());
+                Mapper.getInstance().UpdateRegisteredUser(filter, update_notification, session: session);
+            }
             return new Result<Boolean>("User not logged in , therefore the notification is added to pending list\n", false, false);
         }    
 
@@ -198,7 +203,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             foreach(Notification notification in PendingNotification)
             {
-                if (!notification.isOpened)
+                if (!notification.isOpened && !(NotificationCenter is null))
                 {
                     NotificationCenter.notifyNotificationServer(notification);
                 }
@@ -218,9 +223,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     PendingNotification.Remove(notification);
                 }
             }
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_notification = Builders<BsonDocument>.Update.Set("PendingNotification", getPendingNotificationsDTO());
-            Mapper.getInstance().UpdateRegisteredUser(filter, update_notification);
+
+            if (!testMode)
+            {
+                // update DB
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+                var update_notification = Builders<BsonDocument>.Update.Set("PendingNotification", getPendingNotificationsDTO());
+                Mapper.getInstance().UpdateRegisteredUser(filter, update_notification);
+            }
             
         }
 

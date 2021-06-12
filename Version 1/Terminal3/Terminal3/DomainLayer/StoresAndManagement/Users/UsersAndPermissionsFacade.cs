@@ -41,21 +41,29 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public ConcurrentDictionary<String,RegisteredUser> RegisteredUsers { get; }
         public ConcurrentDictionary<String, RegisteredUser> SystemAdmins { get; }
         public ConcurrentDictionary<String, GuestUser> GuestUsers { get; }
+
         public Mapper mapper;
+
+        private Boolean testMode { get; set; } = false;
 
         private readonly object my_lock = new object();
         private RegisteredUser defaultUser;
 
         //Constructor
-        public UsersAndPermissionsFacade(String admin_email, String admin_password)
+        public UsersAndPermissionsFacade(String admin_email, String admin_password, Boolean testing = false)
         {
             RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
             SystemAdmins = new ConcurrentDictionary<String, RegisteredUser>();
             GuestUsers = new ConcurrentDictionary<String, GuestUser>();
-            mapper = Mapper.getInstance();
-            //Add first system admin
-            LoadAllRegisterUsers();
-            LoadSystemAdmins();
+            testMode = testing;
+            if (!testMode) 
+            {
+                mapper = Mapper.getInstance();
+                LoadAllRegisterUsers();
+                LoadSystemAdmins();
+
+            }
+            //Add first system admin           
             if (SystemAdmins.IsEmpty)
             {
                 defaultUser = new RegisteredUser("-777", admin_email, admin_password);
@@ -82,15 +90,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     {
                         RegisteredUser newUser;                  
                         if (Id == "-1")
-                            newUser = new RegisteredUser(email, password);
+                            newUser = new RegisteredUser(email, password, testMode);
                         else
                             newUser = new RegisteredUser(Id , email, password);
 
                         this.RegisteredUsers.TryAdd(newUser.Id, newUser);
 
-                        //create in DB
-                        mapper.Create(newUser);
-                        
+                        if (!testMode) { 
+                            //create in DB
+                            mapper.Create(newUser);
+                        }                        
                         return new Result<RegisteredUser>($"{email} is registered as new user", true, newUser);
                     }
                     else
@@ -125,11 +134,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (searchResult.ExecStatus)
             {
                 this.SystemAdmins.TryAdd(searchResult.Data.Id, searchResult.Data);
-
-                // Update DB
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", "");  //TODO Mongo _id empty 
-                var update = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
-                mapper.UpdateSystemAdmins(filter, update);
+                if (!testMode)
+                {
+                    // Update DB
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", "");  //TODO Mongo _id empty 
+                    var update = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
+                    mapper.UpdateSystemAdmins(filter, update);
+                }
 
                 return new Result<RegisteredUser>($"{email} has been added as system admin\n", true, searchResult.Data);
             }
@@ -160,11 +171,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 if (this.SystemAdmins.Count > 1)
                 {
                     this.SystemAdmins.TryRemove(searchResult.Data.Id, out removedUser);
-
-                    // Update DB
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", "");  //TODO Mongo _id empty 
-                    var update = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
-                    mapper.UpdateSystemAdmins(filter, update);
+                    if (!testMode)
+                    {
+                        // Update DB
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", "");  //TODO Mongo _id empty 
+                        var update = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
+                        mapper.UpdateSystemAdmins(filter, update);
+                    }
 
                     return new Result<RegisteredUser>($"{removedUser.Email} has been removed as system admin\n", true, removedUser);
                 }
@@ -240,13 +253,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 {
                     //Delete relevant guest user from list 
                     GuestUsers.TryRemove(guestId , out GuestUser guest);
+                    if (!testMode)
+                    {
+                        // Update DB
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
+                        var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
+                        mapper.UpdateRegisteredUser(filter, update);
+                        mapper.Load_RegisteredUserNotifications(res_ru.Data);
+                        mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
+                    }
 
-                    // Update DB
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
-                    var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
-                    mapper.UpdateRegisteredUser(filter, update);
-                    mapper.Load_RegisteredUserNotifications(res_ru.Data);
-                    mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
                     return res_ru;
                 }
 
@@ -269,14 +285,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 //User Found
                 Result<RegisteredUser> res_ru =  searchResult.Data.Login(password);
 
-                // Update DB
-                if (res_ru.ExecStatus)
+                if (!testMode)
                 {
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
-                    var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
-                    mapper.UpdateRegisteredUser(filter, update);
-                    mapper.Load_RegisteredUserNotifications(res_ru.Data);
-                    mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
+                    // Update DB
+                    if (res_ru.ExecStatus)
+                    {
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
+                        var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
+                        mapper.UpdateRegisteredUser(filter, update);
+                        mapper.Load_RegisteredUserNotifications(res_ru.Data);
+                        mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
+                    }
                 }
                 return res_ru;
 
@@ -304,10 +323,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 if (res.ExecStatus)
                 {
                     GuestUsers.TryAdd(res.Data.Id, res.Data);
-                    // Update DB
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", searchResult.Data.Id);
-                    var update = Builders<BsonDocument>.Update.Set("LoggedIn", false);
-                    mapper.UpdateRegisteredUser(filter, update);
+                    if (!testMode)
+                    {
+                        // Update DB
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", searchResult.Data.Id);
+                        var update = Builders<BsonDocument>.Update.Set("LoggedIn", false);
+                        mapper.UpdateRegisteredUser(filter, update);
+                    }
 
                     return new Result<GuestUser>($"{email} logged out\n", true, res.Data);
                 }
@@ -327,12 +349,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if(RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
             {
                 Result<Product>  res_p = user.AddProductReview(store, product, review);
-                // Update Product in DB
-                if (res_p.ExecStatus)
+
+                if (!testMode)
                 {
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", product.Id);
-                    var update = Builders<BsonDocument>.Update.Set("Review", res_p.Data.Review);
-                    mapper.UpdateProduct(filter, update);
+                    // Update Product in DB
+                    if (res_p.ExecStatus)
+                    {
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", product.Id);
+                        var update = Builders<BsonDocument>.Update.Set("Review", res_p.Data.Review);
+                        mapper.UpdateProduct(filter, update);
+                    }
                 }
                 return res_p; 
             }
@@ -353,15 +379,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             if (RegisteredUsers.TryGetValue(userID, out RegisteredUser user))   // Check if user is registered
             {
-                mapper.Load_StorePolicyManager(store);
+                if (!testMode)
+                {
+                    mapper.Load_StorePolicyManager(store);
+                }
                 Result<ShoppingCart> res_sc = user.AddProductToCart(product, productQuantity, store);
-
+                              
                 // Update DB
                 if (res_sc.ExecStatus)
                 {
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
-                    var update = Builders<BsonDocument>.Update.Set("ShoppingCart", res_sc.Data.getDTO());
-                    mapper.UpdateRegisteredUser(filter, update);
+                    if (!testMode)
+                    {
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
+                        var update = Builders<BsonDocument>.Update.Set("ShoppingCart", res_sc.Data.getDTO());
+                        mapper.UpdateRegisteredUser(filter, update);
+                    }
                     return new Result<Boolean>(res_sc.Message, res_sc.ExecStatus, true);
                 }
                 return new Result<Boolean>(res_sc.Message, res_sc.ExecStatus, false);
@@ -385,13 +417,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
                 Result<ShoppingCart> res_sc = registerd_user.UpdateShoppingCart(storeID, product, quantity);
-
-                // Update DB
                 if (res_sc.ExecStatus)
                 {
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
-                    var update = Builders<BsonDocument>.Update.Set("ShoppingCart", res_sc.Data.getDTO());
-                    mapper.UpdateRegisteredUser(filter, update);
+                    // Update DB
+                    if (!testMode)
+                    {
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
+                        var update = Builders<BsonDocument>.Update.Set("ShoppingCart", res_sc.Data.getDTO());
+                        mapper.UpdateRegisteredUser(filter, update);
+                    }
                     return new Result<Boolean>(res_sc.Message, res_sc.ExecStatus, true);
                 }
                 return new Result<Boolean>(res_sc.Message, res_sc.ExecStatus, false);
@@ -484,13 +518,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
                 Result<ShoppingCart> ShoppingCart = registerd_user.Purchase(paymentDetails, deliveryDetails , session);
-                if (ShoppingCart.ExecStatus)
+                if (!testMode)
                 {
-                    // Update DB
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
-                    ShoppingCart sc = registerd_user.ShoppingCart;
-                    var update_shoppingcart = Builders<BsonDocument>.Update.Set("ShoppingCart", sc.getDTO());
-                    mapper.UpdateRegisteredUser(filter, update_shoppingcart , session: session);
+                    if (ShoppingCart.ExecStatus)
+                    {
+                        // Update DB
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", registerd_user.Id);
+                        ShoppingCart sc = registerd_user.ShoppingCart;
+                        var update_shoppingcart = Builders<BsonDocument>.Update.Set("ShoppingCart", sc.getDTO());
+                        mapper.UpdateRegisteredUser(filter, update_shoppingcart, session: session);
+                    }
                 }
 
                 return ShoppingCart; 
@@ -548,22 +585,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             this.SystemAdmins.TryAdd(defaultUser.Id, defaultUser);
             this.RegisteredUsers.TryAdd(defaultUser.Id, defaultUser);
-            mapper = Mapper.getInstance();
-            // Update DB
-            DTO_RegisteredUser user_dto = defaultUser.getDTO();
-            var filter_gu = Builders<BsonDocument>.Filter.Eq("_id", "-777");
-            var update_gu = Builders<BsonDocument>.Update.Set("ShoppingCart", user_dto.ShoppingCart)
-                                                         .Set("Email", user_dto.Email)
-                                                         .Set("Password", user_dto.Password)
-                                                         .Set("LoggedIn", user_dto.LoggedIn)
-                                                         .Set("History", user_dto.History)
-                                                         .Set("PendingNotification", user_dto.PendingNotification);
-            mapper.UpdateRegisteredUser(filter_gu, update_gu, true);
 
-            var filter_admin = Builders<BsonDocument>.Filter.Eq("_id", "");
-            var update_admin = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
-            mapper.UpdateSystemAdmins(filter_admin, update_admin, true);
+            if (!testMode)
+            {
+                mapper = Mapper.getInstance();
+                // Update DB
+                DTO_RegisteredUser user_dto = defaultUser.getDTO();
+                var filter_gu = Builders<BsonDocument>.Filter.Eq("_id", "-777");
+                var update_gu = Builders<BsonDocument>.Update.Set("ShoppingCart", user_dto.ShoppingCart)
+                                                             .Set("Email", user_dto.Email)
+                                                             .Set("Password", user_dto.Password)
+                                                             .Set("LoggedIn", user_dto.LoggedIn)
+                                                             .Set("History", user_dto.History)
+                                                             .Set("PendingNotification", user_dto.PendingNotification);
+                mapper.UpdateRegisteredUser(filter_gu, update_gu, true);
 
+                var filter_admin = Builders<BsonDocument>.Filter.Eq("_id", "");
+                var update_admin = Builders<BsonDocument>.Update.Set("SystemAdmins", getDTO_admins().SystemAdmins);
+                mapper.UpdateSystemAdmins(filter_admin, update_admin, true);
+            }
         }
 
         public void LoadAllRegisterUsers()

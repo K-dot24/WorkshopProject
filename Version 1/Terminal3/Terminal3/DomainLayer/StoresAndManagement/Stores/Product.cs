@@ -77,7 +77,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             //TODO - check if user can add only one review and then overrride the last review ? or can add multiple reviews?
             Review.TryAdd(userId, review);
-            return NotificationManager.notifyProductReview(this, review);
+            if(!(NotificationManager is null))
+            {
+                return NotificationManager.notifyProductReview(this, review);
+            }
+            else { return new Result<bool>(true); }
+
         }
 
         public Result<ProductService> GetDAL()
