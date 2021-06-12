@@ -256,6 +256,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     mapper.UpdateRegisteredUser(filter, update);
                     //mapper.Load_RegisteredUserNotifications(res_ru.Data);
                     mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
+                    mapper.Load_RegisteredUserOffer(res_ru.Data);
+
                     return res_ru;
                 }
 
@@ -286,6 +288,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     mapper.UpdateRegisteredUser(filter, update);
                     //mapper.Load_RegisteredUserNotifications(res_ru.Data);
                     mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
+                    mapper.Load_RegisteredUserOffer(res_ru.Data);
                 }
                 return res_ru;
 
@@ -652,7 +655,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (GuestUsers.TryGetValue(userId, out GuestUser guest_user))
                 return guest_user.getUserOffers();
             else if (RegisteredUsers.TryGetValue(userId, out RegisteredUser registerd_user))
+            {
+                Mapper.getInstance().Load_RegisteredUserOffer(registerd_user);
                 return registerd_user.getUserOffers();
+            }
             return new Result<List<Dictionary<string, object>>>("Failed to get user offers: Failed to locate the user", false, null);
         }
     }

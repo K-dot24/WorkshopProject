@@ -286,6 +286,27 @@ namespace Terminal3.DataAccessLayer
             return dto_pendingNotifications;
         }
 
+        public LinkedList<DTO_Offer> Get_DTO_Offers(LinkedList<Offer> offers)
+        {
+            LinkedList<DTO_Offer> dto_offers = new LinkedList<DTO_Offer>();
+            foreach (Offer offer in offers)
+            {
+                dto_offers.AddLast(new DTO_Offer(offer.Id, offer.UserID, offer.ProductID, offer.StoreID, offer.Amount, offer.Price, offer.CounterOffer, offer.acceptedOwners));
+            }
+
+            return dto_offers;
+        }
+
+        public List<DTO_Offer> Get_DTO_Offers(List<Offer> offers)
+        {
+            List<DTO_Offer> dto_offers = new List<DTO_Offer>();
+            foreach (Offer offer in offers)
+            {
+                dto_offers.Add(new DTO_Offer(offer.Id, offer.UserID, offer.ProductID, offer.StoreID, offer.Amount, offer.Price, offer.CounterOffer, offer.acceptedOwners));
+            }
+
+            return dto_offers;
+        }
         public LinkedList<String> Get_DTO_ManagerList(LinkedList<StoreManager> list)
         {            
             LinkedList<String> managers = new LinkedList<String>();
@@ -329,7 +350,15 @@ namespace Terminal3.DataAccessLayer
             ShoppingCart sc = new ShoppingCart(dto._id, sb, dto.TotalCartPrice);
             return sc;
         }
-
+        private LinkedList<Offer> ToObject(LinkedList<DTO_Offer> dto, User user)
+        {
+            LinkedList<Offer> Offers = new LinkedList<Offer>();
+            foreach(DTO_Offer offer in dto)
+            {
+                Offers.AddLast(new Offer(offer.UserID, offer.ProductID, offer.Amount, offer.Price, offer.StoreID, offer._id));
+            }
+            return Offers;
+        }
         private History ToObject(DTO_History dto)
         {
             LinkedList<ShoppingBagService> shoppingBags = new LinkedList<ShoppingBagService>();
@@ -840,11 +869,11 @@ namespace Terminal3.DataAccessLayer
         #region RegisteredUser
         public void Create(RegisteredUser ru)
         {            
-            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, ru.Password , ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification)));
+            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, ru.Password , ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification) , Get_DTO_Offers(ru.Offers)));
             RegisteredUsers.TryAdd(ru.Id , ru);
         }        
 
-        public RegisteredUser LoadRegisteredUser(FilterDefinition<BsonDocument> filter)
+        private RegisteredUser LoadRegisteredUser(FilterDefinition<BsonDocument> filter)
         {
             RegisteredUser ru;
             DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
@@ -890,6 +919,13 @@ namespace Terminal3.DataAccessLayer
             DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
             user.ShoppingCart = ToObject(dto.ShoppingCart, user);
         }
+        public void Load_RegisteredUserOffer(RegisteredUser user)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
+            DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
+            user.Offers = ToObject(dto.Offers, user);
+        }
+
 
         public void UpdateRegisteredUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update,Boolean upsert=false, MongoDB.Driver.IClientSessionHandle session = null)
         {
@@ -1318,7 +1354,7 @@ namespace Terminal3.DataAccessLayer
             foreach(var product in s.InventoryManager.Products) { inventory.AddLast(product.Key); }
 
             DAO_Store.Create(new DTO_Store(s.Id, s.Name, s.Founder.GetId(), owners, managers, inventory, Get_DTO_History(s.History),
-                                            s.Rating, s.NumberOfRates , s.isClosed, s.PolicyManager.MainDiscount.getDTO(), s.PolicyManager.MainPolicy.getDTO()));
+                                            s.Rating, s.NumberOfRates , s.isClosed, s.PolicyManager.MainDiscount.getDTO(), s.PolicyManager.MainPolicy.getDTO() , s.OfferManager.GetDTO()));
             Stores.TryAdd(s.Id, s);
         }
 
@@ -1394,6 +1430,20 @@ namespace Terminal3.DataAccessLayer
             DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.MainDiscount._id));
             BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.MainPolicy._id));
             store.PolicyManager = new PolicyManager(MainDiscount, MainPolicy);
+        }
+
+        public void Load_StoreOfferManager(Store store)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+            DTO_Store dto = DAO_Store.Load(filter);
+
+            List<Offer> offers = new List<Offer>();
+            foreach(DTO_Offer offer in dto.OfferManager)
+            {
+                offers.Add(new Offer(offer.UserID, offer.ProductID, offer.Amount, offer.Price, offer.StoreID, offer._id));
+            }
+
+            store.OfferManager = new OfferManager(offers);
         }
 
         public void UpdateStore(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update, MongoDB.Driver.IClientSessionHandle session = null)
@@ -2670,6 +2720,7 @@ namespace Terminal3.DataAccessLayer
             // Revert User - History , ShoppingCart , Notifications
             Load_RegisteredUserHistory(user);
             Load_RegisteredUserShoppingCart(user);
+            Load_RegisteredUserOffer(user);
             Load_RegisteredUserNotifications(user);
 
             ShoppingCart shoppingCart = user.ShoppingCart;

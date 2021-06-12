@@ -693,7 +693,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
         {
-            //TODO: Mapper load offers Zoe
             return StoresFacade.getStoreOffers(storeID);
         }
 

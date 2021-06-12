@@ -7,6 +7,9 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ExternalSystems;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
+using MongoDB.Driver;
+using MongoDB.Bson;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -27,7 +30,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 Id = Service.GenerateId();
             else Id = id;
             ShoppingCart = new ShoppingCart();
-            Offers = new LinkedList<Offer>();
+            this.Offers = new LinkedList<Offer>();  //placeholder when loaded from db
         }
         protected User(String id , ShoppingCart shoppingCart)
         {
@@ -35,7 +38,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             ShoppingCart = shoppingCart;
             Offers = new LinkedList<Offer>();
         }
-
+        protected User(String id, LinkedList<Offer> Offers)
+        {
+            Id = id;
+            ShoppingCart = new ShoppingCart();
+            this.Offers = Offers;
+        }
 
         public Result<ShoppingCart> AddProductToCart(Product product, int productQuantity, Store store)
         {
@@ -144,7 +152,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             Offer offer = new Offer(this.Id, productID, amount, price, storeID);
             Offers.AddLast(offer);
-            //TODO mapper Zoe
+            //var update_offer = Builders<BsonDocument>.Update.Push("Offers", offer.getDTO());
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Mapper.getInstance().Get_DTO_Offers(Offers));
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer, session);
             return new Result<Offer>("", true, offer);
         }
 
@@ -162,7 +173,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (offer == null)
                 return new Result<bool>("Failed to remove offer from user: Failed to locate the offer", false, false);
             Offers.Remove(offer);
-            //TODO mapper Zoe
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Mapper.getInstance().Get_DTO_Offers(Offers));
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer, session);
             return new Result<bool>("", true, true);
         }
 
@@ -173,8 +186,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public abstract Result<bool> CounterOffer(string offerID);
 
         public Result<List<Dictionary<string, object>>> getUserOffers()
-        {
-            //TODO: Mapper load Zoe
+        {            
             List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
             foreach (Offer offer in Offers)
                 list.Add(offer.GetData());
@@ -188,6 +200,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
 
 
+        public LinkedList<DTO_Offer> Get_DTO_Offers()
+        {
+            LinkedList<DTO_Offer> dto_offers = new LinkedList<DTO_Offer>();
+            foreach (Offer offer in Offers)
+            {
+                dto_offers.AddLast(new DTO_Offer(offer.Id, offer.UserID, offer.ProductID, offer.StoreID, offer.Amount, offer.Price, offer.CounterOffer, offer.acceptedOwners));
+            }
 
+            return dto_offers;
+        }
     }
 }
