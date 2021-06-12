@@ -387,7 +387,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             if (RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
             {
-                mapper.Load_RegisteredUserHistory(user);
+                //mapper.Load_RegisteredUserHistory(user);
                 return user.GetUserPurchaseHistory();
             }
             return new Result<History>("Not a registered user\n", false, null);
