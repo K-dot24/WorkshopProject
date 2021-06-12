@@ -12,7 +12,7 @@ const Product = ({ product, onAddToBag, handleSendOfferToStore }) => {
     const [showOfferDialog, setShowOfferDialog] = useState(false);
 
     const onSendOffer = (data) => {
-        const toSend = { ProductId: product.id, Amount: data.amount, Price: data.price };
+        const toSend = { ProductID: product.id, Amount: data.amount, Price: data.price };
         handleSendOfferToStore(toSend);
     };
 

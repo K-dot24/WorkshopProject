@@ -747,7 +747,14 @@ export function GetPurchasePolicyData( storeID ) {
 
 // TODO: Implement with real API
 export function SendOfferToStore( data ) {
-    console.log(data)
+    return fetch(`${API_URL}/StoreStaff/SendOfferToStore`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
 }
 
 // TODO: Implement with real API
