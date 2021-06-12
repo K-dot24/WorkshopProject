@@ -352,7 +352,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<History>("Store Id does not exists\n", false, null);
         }
 
-        public Result<Store> OpenNewStore(RegisteredUser founder, string storeName, String storeID)
+        public Result<Store> OpenNewStore(RegisteredUser founder, string storeName, String storeID = "-1")
         {
             if (!Stores.ContainsKey(storeID))
             {
@@ -389,7 +389,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if(store.Founder.GetId() == founder.Id)
                 {
                     store.isClosed = true;
-                    store.NotificationManager.notifyStoreClosed();
+                    if (store.NotificationManager != null) {store.NotificationManager.notifyStoreClosed();}
+
                     if (!testMode)
                     {
                         // Update Store in DB
@@ -414,7 +415,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 if (store.Owners.ContainsKey(owner.Id))
                 {
                     store.isClosed = false;
-                    store.NotificationManager.notifyStoreOpened();
+                    if (store.NotificationManager != null) { store.NotificationManager.notifyStoreOpened();}
+
                     if (!testMode)
                     {
                         // Update Store in DB
@@ -898,18 +900,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             if (start <= end)
             {
                 Stores.TryGetValue(store_id, out Store store);
-                if (store.Owners.ContainsKey(owner_id)) {
+                if (store != null && store.Owners.ContainsKey(owner_id)) {
                     DateTime curr = start;
                     while (curr <= end)
                     {
                         List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo), store_id);
-                        Double amountPerDay = 0; 
-                        foreach(DTO_Recipt dto in recipts)
+                        Double amountPerDay = 0;
+                        if (recipts != null)
                         {
-                            amountPerDay += dto.amount;
+                            foreach (DTO_Recipt dto in recipts)
+                            {
+                                amountPerDay += dto.amount;
+                            }
+
+                            recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));                        
                         }
                         
-                        recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));                        
                         curr = curr.AddDays(1);
                     }
 
