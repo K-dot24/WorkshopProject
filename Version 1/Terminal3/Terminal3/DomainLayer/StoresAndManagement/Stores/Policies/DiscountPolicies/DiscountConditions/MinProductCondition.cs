@@ -36,8 +36,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public override Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)
         {
             Product myProduct = ContainsProduct(products);
-            if(myProduct == null && MinQuantity == 0)
-                return new Result<bool>("", true, true);
+            if(myProduct == null)
+            {
+                if(MinQuantity == 0)
+                    return new Result<bool>("", true, true);
+                return new Result<bool>("", true, false);
+            }
             if (products.ContainsKey(myProduct) && products[myProduct] >= MinQuantity)
                 return new Result<bool>("", true, true);
             return new Result<bool>("", true, false);

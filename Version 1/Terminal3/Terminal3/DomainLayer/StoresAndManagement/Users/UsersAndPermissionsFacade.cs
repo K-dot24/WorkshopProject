@@ -96,7 +96,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 Monitor.Enter(my_lock);
                 try
                 {
-                    if (mapper.Query_isUniqEmail(email))
+                    Boolean isUniq;
+                    if (!testMode) { isUniq = mapper.Query_isUniqEmail(email); }
+                    else { isUniq = isUniqueEmail(email); }
+
+                    if (isUniq)
                     {
                         RegisteredUser newUser;                  
                         if (Id == "-1")
