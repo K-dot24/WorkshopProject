@@ -33,6 +33,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new DTO_GuestUser(Id, ShoppingCart.getDTO(), Active);
         }
 
-        
+        public override Result<bool> AcceptOffer(string offerID)
+        {
+            //TODO add to the bag
+            RemoveOffer(offerID);
+            return new Result<bool>("", true, true);
+        }
+
+        public override Result<bool> DeclineOffer(string offerID)
+        {
+            RemoveOffer(offerID);
+            return new Result<bool>("", true, true);
+        }
+
+        public override Result<bool> CounterOffer(string offerID)
+        {
+            return new Result<bool>("", true, true);
+        }
     }
 }

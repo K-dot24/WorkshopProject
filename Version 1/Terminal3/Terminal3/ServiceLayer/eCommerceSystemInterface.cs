@@ -138,6 +138,10 @@ namespace Terminal3.ServiceLayer
         public Result<List<Tuple<String, String>>> GetProductReview(String storeID, String productID) {
             return GuestUserInterface.GetProductReview(storeID, productID);
         }
+        public Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price)
+        {
+            return GuestUserInterface.SendOfferToStore(storeID, userID, productID, amount, price);
+        }
         #endregion
 
         #region Register User Actions
@@ -258,6 +262,21 @@ namespace Terminal3.ServiceLayer
         public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, string owner_id)
         {
             return StoreStaffInterface.GetIncomeAmountGroupByDay(start_date, end_date, store_id, owner_id);
+        }
+
+        public Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer)
+        {
+            return StoreStaffInterface.SendOfferResponseToUser(storeID, ownerID, userID, offerID, accepted, counterOffer);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
+        {
+            return StoreStaffInterface.getStoreOffers(storeID);
+        }
+
+        public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
+        {
+            return StoreStaffInterface.getUserOffers(userId);
         }
         #endregion
 
