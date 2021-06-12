@@ -672,26 +672,26 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             MonitorController monitor = MonitorController.getInstance();
             if (UsersAndPermissionsFacade.SystemAdmins.ContainsKey(userID))
             {
-                monitor.update("Admins");
+                monitor.update("Admins",userID);
                 return;
             }
             Boolean owner = isOwner(userID);
             if (isManager(userID) && !owner)
             {
-                monitor.update("ManagersNotOwners");
+                monitor.update("ManagersNotOwners", userID);
                 return;
             }
             if (owner)
             {
-                monitor.update("Owners");
+                monitor.update("Owners", userID);
                 return;
             }
             if (isRegisterUser(userID))
             {
-                monitor.update("RegisteredUsers");
+                monitor.update("RegisteredUsers", userID);
             }
             else {
-                monitor.update("GuestUsers");
+                monitor.update("GuestUsers", userID);
             }
         }
         public Boolean isRegisterUser(String userID)
