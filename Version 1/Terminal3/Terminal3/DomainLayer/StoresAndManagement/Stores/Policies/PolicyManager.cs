@@ -40,18 +40,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 
         public DiscountAddition MainDiscount { get; }
         public BuyNow MainPolicy { get; set; }
-
         public PolicyManager()
         {
             MainDiscount = new DiscountAddition();
             MainPolicy = new BuyNow();
         }
+        
         public PolicyManager(DiscountAddition mainDiscount, BuyNow mainPolicy)
         {
             MainDiscount = mainDiscount;
             MainPolicy = mainPolicy;
         }
-
 
         public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
         {
@@ -370,6 +369,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             }
             return result;
         }
+
+        
     }
 
 /*    // Update Store in DB

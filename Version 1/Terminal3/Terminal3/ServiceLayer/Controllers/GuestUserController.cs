@@ -23,6 +23,7 @@ namespace Terminal3.ServiceLayer.Controllers
         Result<HistoryService> GetUserPurchaseHistory(String userID);
         Result<double> GetTotalShoppingCartPrice(String userID);
         Result<List<Tuple<String, String>>> GetProductReview(String storeID, String productID);
+        Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price);
 
     }
     //Basic functionality The every user can preform
@@ -53,13 +54,20 @@ namespace Terminal3.ServiceLayer.Controllers
         public Result<Boolean> UpdateShoppingCart(String userID, String storeID, String productID, int quantity) { return StoresAndManagementInterface.UpdateShoppingCart(userID, storeID, productID, quantity); }
         public Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
-            return StoresAndManagementInterface.Purchase(userID, paymentDetails, deliveryDetails);
+            //return StoresAndManagementInterface.PurchaseAsync(userID, paymentDetails, deliveryDetails);
+            System.Threading.Tasks.Task<Result<ShoppingCartService>> async_res = StoresAndManagementInterface.PurchaseAsync(userID, paymentDetails, deliveryDetails);
+            return async_res.Result;
         }
         public Result<HistoryService> GetUserPurchaseHistory(String userID) { return StoresAndManagementInterface.GetUserPurchaseHistory(userID); }
         public Result<double> GetTotalShoppingCartPrice(String userID) { return StoresAndManagementInterface.GetTotalShoppingCartPrice(userID); }
         public Result<List<Tuple<string, string>>> GetProductReview(string storeID, string productID)
         {
             return StoresAndManagementInterface.GetProductReview(storeID, productID);
+        }
+
+        public Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price)
+        {
+            return StoresAndManagementInterface.SendOfferToStore(storeID, userID, productID, amount, price);
         }
         #endregion
 

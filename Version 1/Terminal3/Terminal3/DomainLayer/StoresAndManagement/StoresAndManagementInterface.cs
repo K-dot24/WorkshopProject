@@ -11,6 +11,10 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using System.Threading;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
+using Terminal3.DataAccessLayer.DTOs;
+using System.Globalization;
+using Terminal3.ServiceLayer.Controllers;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
@@ -21,6 +25,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> CloseStore(String storeId, String userID);
         Result<StoreService> ReOpenStore(string storeId, string userID);
         Result<RegisteredUser> FindUserByEmail(String email);
+
+        Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date);
+
 
         #region Inventory Management
         Result<ProductService> AddProductToStore(String userID, String storeID, String productName, double price, int initialQuantity, String category, LinkedList<String> keywords = null);
@@ -56,8 +63,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<ProductService> AddProductReview(String userID, String storeID, String productID, String review);
         Result<Boolean> ExitSystem(String userID);
         Result<UserService> EnterSystem();
-        Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        //Result<ShoppingCartService> PurchaseAsync(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
+        System.Threading.Tasks.Task<Result<ShoppingCartService>> PurchaseAsync(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails);
         Result<double> GetTotalShoppingCartPrice(String userID);
+        Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price);
         #endregion
 
         #region System Managment
@@ -86,6 +95,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<Boolean> AddPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
         Result<Boolean> RemovePurchasePolicy(string storeId, string id);
         Result<bool> EditPurchasePolicy(string storeId, Dictionary<string, object> info, string id);
+        Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer);
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID);
+        public Result<List<Dictionary<string, object>>> getUserOffers(string userID);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -382,6 +394,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<User> res = UsersAndPermissionsFacade.EnterSystem();
             if (res.ExecStatus)
             {
+                updateMonitor(res.Data.Id);
                 UserService userDAL = res.Data.GetDAL().Data;
                 return new Result<UserService>(res.Message, true, userDAL);
             }
@@ -427,6 +440,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password);
             if (res.ExecStatus)
             {
+                updateMonitor(res.Data.Id);
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
             }
             else
@@ -434,11 +448,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, null);
             }
         }
+
         public Result<RegisteredUserService> Login(string email, string password,string guestUserID)
         {
             Result<RegisteredUser> res = UsersAndPermissionsFacade.Login(email, password, guestUserID);
             if (res.ExecStatus)
             {
+                updateMonitor(res.Data.Id);
                 return new Result<RegisteredUserService>(res.Message, res.ExecStatus, res.Data.GetDAL().Data);
             }
             else
@@ -452,47 +468,66 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<GuestUser> result = UsersAndPermissionsFacade.LogOut(email);
             if (result.ExecStatus)
             {
+                updateMonitor(result.Data.Id);
+
                 return new Result<UserService>(result.Message, result.ExecStatus, result.Data.GetDAL().Data);
             }
             return new Result<UserService>(result.Message, result.ExecStatus,null);
         }
 
-        public Result<ShoppingCartService> Purchase(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
+        public async System.Threading.Tasks.Task<Result<ShoppingCartService>> PurchaseAsync(String userID, IDictionary<String, Object> paymentDetails, IDictionary<String, Object> deliveryDetails)
         {
-            // TODO - lock products ?
-            try
-            {
-                Monitor.Enter(my_lock);
+            using (var session = await Mapper.getInstance().GetMongoClient().StartSessionAsync())
+            {                
+                // Begin transaction
+                session.StartTransaction();
                 try
                 {
-                    Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails);
-                    if (res.Data != null)
+                    Monitor.Enter(my_lock);
+                    try
                     {
-                        ShoppingCart purchasedCart = res.Data;
-                        ConcurrentDictionary<String, ShoppingBag> purchasedBags = purchasedCart.ShoppingBags;
-                        foreach (var bag in purchasedBags)
+                        Result<ShoppingCart> res = UsersAndPermissionsFacade.Purchase(userID, paymentDetails, deliveryDetails, session);
+                        if (res.Data != null)
                         {
-                            Store store = StoresFacade.GetStore(bag.Key).Data;
-                            store.UpdateInventory(bag.Value);
-                            store.History.AddPurchasedShoppingBag(bag.Value);
-                        }
-                        return new Result<ShoppingCartService>(res.Message, true, res.Data.GetDAL().Data);
-                    }
+                            ShoppingCart purchasedCart = res.Data;
+                            ConcurrentDictionary<String, ShoppingBag> purchasedBags = purchasedCart.ShoppingBags;
+                            foreach (var bag in purchasedBags)
+                            {
+                                Store store = StoresFacade.GetStore(bag.Key).Data;
+                                store.UpdateInventory(bag.Value , session);
+                                store.History.AddPurchasedShoppingBag(bag.Value ,session);
+                            }
 
-                    //else failed
-                    return new Result<ShoppingCartService>(res.Message, false, null);
+                            // commit the transaction
+                            session.CommitTransaction();
+                            return new Result<ShoppingCartService>(res.Message, true, res.Data.GetDAL().Data);
+                        }
+
+                        //else failed
+                        await session.AbortTransactionAsync();
+                        Mapper.getInstance().RevertTransaction_Purchase(userID);
+                        return new Result<ShoppingCartService>(res.Message, false, null);
+                    }
+                    finally
+                    {
+                        Monitor.Exit(my_lock);
+                    }                    
                 }
-                finally
+                catch (SynchronizationLockException SyncEx)
                 {
-                    Monitor.Exit(my_lock);
+                    Console.WriteLine("A SynchronizationLockException occurred. Message:");
+                    Console.WriteLine(SyncEx.Message);                    
+                    Mapper.getInstance().RevertTransaction_Purchase(userID);                    
+                    return new Result<ShoppingCartService>(SyncEx.Message, false, null);
                 }
-            }
-            catch (SynchronizationLockException SyncEx)
-            {
-                Console.WriteLine("A SynchronizationLockException occurred. Message:");
-                Console.WriteLine(SyncEx.Message);
-                return new Result<ShoppingCartService>(SyncEx.Message, false, null);
-            }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error writing to MongoDB: " + e.Message);
+                    await session.AbortTransactionAsync();                    
+                    Mapper.getInstance().RevertTransaction_Purchase(userID);
+                    return new Result<ShoppingCartService>(e.Message, false, null);
+                }
+            }           
         }
        
         public Result<double> GetTotalShoppingCartPrice(String userID)
@@ -622,6 +657,117 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date)
         {
             return StoresFacade.GetIncomeAmountGroupByDay(start_date, end_date);
+        }
+
+        public Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price)
+        {            
+            Result<Offer> userResult = UsersAndPermissionsFacade.SendOfferToStore(storeID, userID, productID, amount, price);
+            if (!userResult.ExecStatus)
+                return new Result<bool>(userResult.Message, false, false);
+
+            Result<bool> storeResult = StoresFacade.SendOfferToStore(userResult.Data);
+            if (!storeResult.ExecStatus)
+            {
+                UsersAndPermissionsFacade.RemoveOffer(userID, userResult.Data.Id);
+                return storeResult;
+            }
+            return new Result<bool>("Offer was added successfully", true, true);
+        }
+
+        public Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer)
+        {
+            Result<OfferResponse> storeResult = StoresFacade.SendOfferResponseToUser(storeID, ownerID, offerID, accepted, counterOffer);
+            if (!storeResult.ExecStatus)
+                return new Result<bool>(storeResult.Message, false, false);
+
+            OfferResponse respone = storeResult.Data;
+            if (respone == OfferResponse.Accepted)
+                UsersAndPermissionsFacade.AcceptOffer(userID, offerID);
+            else if (respone == OfferResponse.Declined)
+                UsersAndPermissionsFacade.DeclineOffer(userID, offerID);
+            else if (respone == OfferResponse.CounterOffered)
+                UsersAndPermissionsFacade.CounterOffer(userID, offerID);
+
+            return new Result<bool>("Offer was added successfully", true, true);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
+        {
+            //TODO: Mapper load offers Zoe
+            return StoresFacade.getStoreOffers(storeID);
+        }
+
+        public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
+        {
+            return UsersAndPermissionsFacade.getUserOffers(userId);
+        }
+        public Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date)
+        {
+            return UsersAndPermissionsFacade.GetSystemMonitorRecords(start_date, end_date);
+        }
+
+        public void updateMonitor(String userID)
+        {
+            MonitorController monitor = MonitorController.getInstance();
+            if (UsersAndPermissionsFacade.SystemAdmins.ContainsKey(userID))
+            {
+                monitor.update("Admins",userID);
+                return;
+            }
+            Boolean owner = isOwner(userID);
+            if (isManager(userID) && !owner)
+            {
+                monitor.update("ManagersNotOwners", userID);
+                return;
+            }
+            if (owner)
+            {
+                monitor.update("Owners", userID);
+                return;
+            }
+            if (isRegisterUser(userID))
+            {
+                monitor.update("RegisteredUsers", userID);
+            }
+            else {
+                monitor.update("GuestUsers", userID);
+            }
+        }
+        public Boolean isRegisterUser(String userID)
+        {
+            return UsersAndPermissionsFacade.RegisteredUsers.ContainsKey(userID);
+        }
+
+        public Boolean isManager(String userID)
+        {
+            foreach (var record in StoresFacade.Stores)
+            {
+                Store s = record.Value;
+                foreach(var manager in s.Managers)
+                {
+                    if (manager.Value.GetId() == userID)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public Boolean isOwner(String userID)
+        {
+            foreach (var record in StoresFacade.Stores)
+            {
+                Store s = record.Value;
+                foreach (var owner in s.Owners)
+                {
+                    if (owner.Value.GetId() == userID)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

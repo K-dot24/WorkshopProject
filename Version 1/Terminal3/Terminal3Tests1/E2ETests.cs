@@ -69,7 +69,8 @@ namespace Terminal3_E2ETests
         [Fact()]
         public void GetIncomeAmountGroupByDay_data()
         {
-            ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(Config));
+            //ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(Config));
+            ECommerceSystem system = new ECommerceSystem(config_path: @"..\..\..\..\..\Terminal3-E2ETests\Config.json");
 
             //system.ResetSystem("-777");
             //purchase 1
@@ -160,7 +161,8 @@ namespace Terminal3_E2ETests
         [Fact()]
         public void GetIncomeAmountGroupByDay_empty()
         {
-             ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(Config));
+            //ECommerceSystem system = new ECommerceSystem(configData: File.ReadAllText(Config));
+            ECommerceSystem system = new ECommerceSystem(config_path: @"..\..\..\..\..\Terminal3\Config.json");
             system.Register("shaked@gmail.com", "123");
             Result<RegisteredUserService> user = system.Login("shaked@gmail.com", "123");
 

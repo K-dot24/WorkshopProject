@@ -9,6 +9,11 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using System.Threading;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DataAccessLayer.DTOs;
+using static Terminal3.DomainLayer.StoresAndManagement.Stores.IStoreOperations;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 {
@@ -20,7 +25,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<Product> AddNewProduct(String userID, String productName, Double price, int initialQuantity, String category, LinkedList<String> keywords = null);
         Result<Product> RemoveProduct(String userID, String productID);
         Result<Product> EditProduct(String userID, String productID, IDictionary<String, Object> details);
-        Result<Boolean> UpdateInventory(ShoppingBag bag);
+        Result<Boolean> UpdateInventory(ShoppingBag bag, MongoDB.Driver.IClientSessionHandle session = null);
         #endregion
 
         #region Staff Management
@@ -49,6 +54,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         Result<IPurchasePolicy> AddPurchasePolicy(Dictionary<string, object> info, string id);
         Result<IPurchasePolicy> RemovePurchasePolicy(string id);
         Result<Boolean> EditPurchasePolicy(Dictionary<string, object> info, string id);
+
+        Result<bool> SendOfferToStore(Offer offer);
+        Result<OfferResponse> SendOfferResponseToUser(string userID, string offerID, bool accepted, double counterOffer);
         #endregion
 
         #region Information        
@@ -65,7 +73,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
         public PolicyManager PolicyManager { get; set; }
-        public History History { get; }
+        public OfferManager OfferManager{ get; set; }
+        public History History { get; set; }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
         public NotificationManager NotificationManager { get; set; }
@@ -84,6 +93,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Managers = new ConcurrentDictionary<String, StoreManager>();
             InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
+            OfferManager = new OfferManager();
             History = new History();
             isClosed = false;
 
@@ -100,7 +110,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Id = id;
             Name = name;            
             InventoryManager = inventoryManager;
-            //PolicyManager = policyManager;     TODO
+            //PolicyManager = policyManager;     
             History = history;
             Rating = rating;
             NumberOfRates = numberOfRates;
@@ -110,7 +120,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             this.isClosed = isClosed;
 
         }
-
+        public Store(string id, string name, InventoryManager inventoryManager, double rating, int numberOfRates, NotificationManager notificationManager, Boolean isClosed = false)
+        {
+            Id = id;
+            Name = name;
+            InventoryManager = inventoryManager;
+            Rating = rating;
+            NumberOfRates = numberOfRates;
+            NotificationManager = notificationManager;
+            History = new History();
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+            this.isClosed = isClosed;
+        }
 
 
         //For Testing ONLY
@@ -214,17 +236,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 return new Result<Product>($"{userID} does not have permissions to edit products' information in {this.Name}\n", false, null);
             }
         }
-        public Result<bool> UpdateInventory(ShoppingBag bag)
+        public Result<bool> UpdateInventory(ShoppingBag bag, MongoDB.Driver.IClientSessionHandle session = null)
         {
             ConcurrentDictionary<Product, int> product_quantity = bag.Products;     // <Product, Quantity user bought>
             foreach(var product in product_quantity)
             {
-                product.Key.UpdatePurchasedProductQuantity(product.Value);
+                product.Key.NotifyPurchasedProduct(product.Value , session);
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", product.Key.Id);
+                var update_product = Builders<BsonDocument>.Update.Set("Quantity", product.Key.Quantity);
+                Mapper.getInstance().UpdateProduct(filter , update_product , session);
             }
 
             return new Result<bool>("Store inventory updated successuly\n", true, true);
 
-    }
+        }
         #endregion
 
         public Result<StoreOwner> AddStoreOwner(RegisteredUser futureOwner, string currentlyOwnerID)
@@ -627,6 +652,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.EditPurchasePolicy(info, id);
         }
 
+        private Result<bool> sendNotificationToAllOwners(Offer offer)
+        {
+            NotificationManager.notifyOfferRecievedStore(offer.UserID, offer.ProductID, offer.Amount, offer.Price);
+
+            return new Result<bool>("", true, true);
+        }
+
+        public Result<bool> SendOfferToStore(Offer offer)
+        {
+            OfferManager.AddOffer(offer);            
+
+            return sendNotificationToAllOwners(offer);
+        }
+
         public DTO_Store getDTO()
         {
             LinkedList<String> owners_dto = new LinkedList<string>();
@@ -650,6 +689,27 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed,
                 PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO());
 
-        } 
+        }
+
+        private List<string> ownerIDs()
+        {
+            List<string> ids = new List<string>();
+            foreach (string id in Owners.Keys)
+                ids.Add(id);
+            return ids;
+        }
+
+        public Result<OfferResponse> SendOfferResponseToUser(string ownerID, string offerID, bool accepted, double counterOffer)
+        {
+            List<string> ids = ownerIDs();
+            if (!ids.Contains(ownerID))
+                return new Result<OfferResponse>("Failed to reponse to an offer: The responding user is not an owner", false, OfferResponse.None);
+            return OfferManager.SendOfferResponseToUser(ownerID, offerID, accepted, counterOffer, ids);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers()
+        {
+            return OfferManager.getStoreOffers();
+        }
     }
 }

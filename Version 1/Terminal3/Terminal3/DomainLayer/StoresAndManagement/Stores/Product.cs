@@ -85,14 +85,14 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<ProductService>("Product DAL object", true, new ProductService(this.Id, this.Name, this.Price, this.Quantity, this.Category));
         }
 
-        public Result<Boolean> UpdatePurchasedProductQuantity(int quantity)
-        {
+        public Result<Boolean> NotifyPurchasedProduct(int quantity, MongoDB.Driver.IClientSessionHandle session = null)
+        {   //Zoe
             if (this.NotificationManager == null)
             {
                 return new Result<bool>("Error: No Notification Manager set for this product\n", false, false);
             }
-            Quantity = Quantity - quantity;
-            return NotificationManager.notifyStorePurchase(this, quantity);
+            this.Quantity = this.Quantity - quantity;   
+            return NotificationManager.notifyStorePurchase(this, quantity , session);
         }
 
         public DTO_Product getDTO()

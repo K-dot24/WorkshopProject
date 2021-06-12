@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
-using signalRgateway.Model;
+using SignalRgateway.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,15 +40,29 @@ namespace Terminal3WebAPI.Controllers
             while (connection.State != HubConnectionState.Connected) { }
 
         }
-
+        [Route("Broadcast")]
         [HttpPost]
-        public async Task<string> Post([FromBody] Notification msg)
+        public async Task<string> Broadcast([FromBody] string msg)
         {
             var retMessage = string.Empty;
             try
             {
-                //hubProxy.Invoke("SendBroadcast",msg);
                 await connection.InvokeAsync("SendBroadcast",msg);
+            }
+            catch (Exception e)
+            {
+                retMessage = e.ToString();
+            }
+            return retMessage;
+        }
+        [Route("Monitor")]
+        [HttpPost]
+        public async Task<string> sendMonitor([FromBody] MonitorRecordModel record)
+        {
+            var retMessage = string.Empty;
+            try
+            {
+                await connection.InvokeAsync("sendMonitor", new Record(record.Date,record.GuestUsers,record.RegisteredUsers,record.ManagersNotOwners,record.Owners,record.Admins));
             }
             catch (Exception e)
             {

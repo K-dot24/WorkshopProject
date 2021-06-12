@@ -151,6 +151,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/admingetuserpurchasehistory`)}>Get User Purchase History</MenuItem>
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/admingetstorepurchasehistory`)}>Get Store Purchase History</MenuItem>
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/resetsystem`)}>Reset System</MenuItem>
+                    <MenuItem onClick={() => handleMenuClick(`/${user.id}/monitorsystem`)}>Monitor System</MenuItem>
                 </>
                 }
                 { /* Registered User Actions Menu */}

@@ -12,6 +12,7 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using Terminal3.ServiceLayer;
 using Terminal3.DomainLayer.StoresAndManagement;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountTargets;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions;
@@ -20,15 +21,26 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies;
 using Terminal3.DomainLayer;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
+using System.Globalization;
 
 namespace Terminal3.DataAccessLayer
 {
+    public enum ConnectionStatus
+    {
+        OK=0,
+        Error=1
+    }
     public sealed class Mapper
     {
         //Fields
         private static Mapper Instance = null;
         public MongoClient dbClient;
         public IMongoDatabase database;
+        public static ConnectionStatus connectionStatus= ConnectionStatus.OK;
+
+
 
         // DAOs
         public DAO<DTO_RegisteredUser> DAO_RegisteredUser;
@@ -65,6 +77,7 @@ namespace Terminal3.DataAccessLayer
         public DAO<DTO_DiscountAnd> DAO_DiscountAnd;
         public DAO<DTO_DiscountAddition> DAO_DiscountAddition;
         public DAO<DTO_Recipt> DAO_Recipt;
+        public DAO<DTO_Monitor> DAO_Monitor;
 
         // IdentityMaps  <Id , object>
         public ConcurrentDictionary<String, RegisteredUser> RegisteredUsers;
@@ -104,13 +117,15 @@ namespace Terminal3.DataAccessLayer
 
 
         //Constructor
-        private Mapper(String connection_string)
+        private Mapper(String connection_string, String environment)
         {
             try
             {
                 dbClient = new MongoClient(connection_string);
                 //database = dbClient.GetDatabase("Terminal3-development");
-                database = dbClient.GetDatabase("Terminal3-Testing");
+                //database = dbClient.GetDatabase("Terminal3-Testing");
+                //database = dbClient.GetDatabase("Terminal3-tomer");
+                database = dbClient.GetDatabase($"Terminal3-{environment}");
 
                 //DAOs
                 DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
@@ -147,6 +162,7 @@ namespace Terminal3.DataAccessLayer
                 DAO_DiscountAnd = new DAO<DTO_DiscountAnd>(database, "DiscountPolicies");
                 DAO_DiscountAddition = new DAO<DTO_DiscountAddition>(database, "DiscountPolicies");
                 DAO_Recipt = new DAO<DTO_Recipt>(database, "Recipts");
+                DAO_Monitor = new DAO<DTO_Monitor>(database, "Monitor");
 
                 // IdentityMaps  <Id , object>
                 RegisteredUsers = new ConcurrentDictionary<String, RegisteredUser>();
@@ -197,13 +213,18 @@ namespace Terminal3.DataAccessLayer
             return Instance;
         }
 
-        public static Mapper getInstance(String connection_string)
+        public static Mapper getInstance(String connection_string, String environment)
         {
             if (Instance == null)
             {
-                Instance = new Mapper(connection_string);
+                Instance = new Mapper(connection_string, environment);
             }
             return Instance;
+        }
+
+        public MongoClient GetMongoClient()
+        {
+            return dbClient;
         }
 
 
@@ -303,8 +324,7 @@ namespace Terminal3.DataAccessLayer
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", p.Key);
                     products.TryAdd(LoadProduct(filter), p.Value);
                 }
-                //sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user, LoadStore(), products, bag.Value.TotalBagPrice)); - TODO
-                sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user,LoadStore(Builders<BsonDocument>.Filter.Eq("_id", bag.Value.StoreId)) ,products, bag.Value.TotalBagPrice));
+                sb.TryAdd(bag.Key, new ShoppingBag(bag.Key, user, LazyLoad_Store(Builders<BsonDocument>.Filter.Eq("_id", bag.Value.StoreId)) ,products, bag.Value.TotalBagPrice));
             }
             ShoppingCart sc = new ShoppingCart(dto._id, sb, dto.TotalCartPrice);
             return sc;
@@ -820,7 +840,7 @@ namespace Terminal3.DataAccessLayer
         #region RegisteredUser
         public void Create(RegisteredUser ru)
         {            
-            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, ru.Password, ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification)));
+            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, ru.Password , ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification)));
             RegisteredUsers.TryAdd(ru.Id , ru);
         }        
 
@@ -839,9 +859,41 @@ namespace Terminal3.DataAccessLayer
             return ru;
         }
 
-        public void UpdateRegisteredUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update,Boolean upsert=false )
+        public RegisteredUser LazyLoad_RegisteredUser(FilterDefinition<BsonDocument> filter)
         {
-            DAO_RegisteredUser.Update(filter, update,upsert);
+            RegisteredUser ru;
+            DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
+            if (dto != null && RegisteredUsers.TryGetValue(dto._id, out ru))
+            {
+                return ru;
+            }
+
+            ru = new RegisteredUser(dto._id, dto.Email, dto.Password , dto.LoggedIn);
+            RegisteredUsers.TryAdd(ru.Id, ru);
+            return ru;
+        }
+        public void Load_RegisteredUserHistory(RegisteredUser user)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
+            DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
+            user.History = ToObject(dto.History);
+        }
+        public void Load_RegisteredUserNotifications(RegisteredUser user)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
+            DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
+            user.PendingNotification = ToObject(dto.PendingNotification);
+        }
+        public void Load_RegisteredUserShoppingCart(RegisteredUser user)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
+            DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
+            user.ShoppingCart = ToObject(dto.ShoppingCart, user);
+        }
+
+        public void UpdateRegisteredUser(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update,Boolean upsert=false, MongoDB.Driver.IClientSessionHandle session = null)
+        {
+            DAO_RegisteredUser.Update(filter, update,upsert , session);
         }
 
         public void DeleteRegisteredUser(FilterDefinition<BsonDocument> filter)
@@ -989,7 +1041,7 @@ namespace Terminal3.DataAccessLayer
             var filter = Builders<BsonDocument>.Filter.Eq("UserId", founder_id) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
             DTO_StoreOwner founder_dto = DAO_StoreOwner.Load(filter);
             var filter2 = Builders<BsonDocument>.Filter.Eq("_id", founder_dto.UserId);
-            StoreOwner founder = new StoreOwner(LoadRegisteredUser(filter2), store ,null);
+            StoreOwner founder = new StoreOwner(LazyLoad_RegisteredUser(filter2), store ,null);
 
             if (founder_dto.StoreOwners.Count > 0)
             {
@@ -1007,7 +1059,7 @@ namespace Terminal3.DataAccessLayer
                     var manager_filter = Builders<BsonDocument>.Filter.Eq("UserId", manager_id) & Builders<BsonDocument>.Filter.Eq("StoreId", store.Id);
                     DTO_StoreManager manager_dto = DAO_StoreManager.Load(manager_filter);
                     var user_filter = Builders<BsonDocument>.Filter.Eq("_id", manager_id);
-                    StoreManager manager = new StoreManager(LoadRegisteredUser(user_filter), store , new Permission(manager_dto.Permission) , founder );
+                    StoreManager manager = new StoreManager(LazyLoad_RegisteredUser(user_filter), store , new Permission(manager_dto.Permission) , founder );
                     founder.StoreManagers.AddLast(manager);
                     store.Managers.TryAdd(manager_id, manager);
 
@@ -1078,26 +1130,50 @@ namespace Terminal3.DataAccessLayer
         }
         #endregion  System Admin
 
+        /*     public List<RegisteredUser> LoadAllRegisterUsers()
+             {
+                 //load all registerUsers dto
+                 var filter = Builders<BsonDocument>.Filter.Empty;
+                 List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
+                 List<DTO_RegisteredUser> registerUsersDTO = new List<DTO_RegisteredUser>();
+                 foreach (BsonDocument doc in docs)
+                 {
+                     var json = doc.ToJson();
+                     if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                     DTO_RegisteredUser dto = JsonConvert.DeserializeObject<DTO_RegisteredUser>(json);
+                     registerUsersDTO.Add(dto);
+                 }
+                 List<RegisteredUser> registeredUsers = new List<RegisteredUser>();
+                 foreach (DTO_RegisteredUser dto in registerUsersDTO)
+                 {
+                     RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
+                     registeredUsers.Add(registerUser);
+                 }
+                 return registeredUsers;
+             }*/
+
         public List<RegisteredUser> LoadAllRegisterUsers()
         {
-            //load all registerUsers dto
-            var filter = Builders<BsonDocument>.Filter.Empty;
-            List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
-            List<DTO_RegisteredUser> registerUsersDTO = new List<DTO_RegisteredUser>();
-            foreach (BsonDocument doc in docs)
+            // Load users from identity map
+            List<RegisteredUser> allusers = new List<RegisteredUser>();
+            foreach (var user in RegisteredUsers)
             {
-                var json = doc.ToJson();
-                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
-                DTO_RegisteredUser dto = JsonConvert.DeserializeObject<DTO_RegisteredUser>(json);
-                registerUsersDTO.Add(dto);
+                allusers.Add(user.Value);
             }
-            List<RegisteredUser> registeredUsers = new List<RegisteredUser>();
-            foreach (DTO_RegisteredUser dto in registerUsersDTO)
+
+            // Load admins
+            LinkedList<String> admins = LoadAllSystemAdmins();
+            if (admins != null)
             {
-                RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
-                registeredUsers.Add(registerUser);
+                foreach (String id in admins)
+                {
+                    RegisteredUser registerUser = LazyLoad_RegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", id));
+                    allusers.Add(registerUser);
+                }
             }
-            return registeredUsers;
+
+            return allusers;
+
         }
         public LinkedList<String> LoadAllSystemAdmins()
         {
@@ -1117,13 +1193,33 @@ namespace Terminal3.DataAccessLayer
             }
             else { return null; }
         }
+
+        public void ClearCache_logout(String userID)
+        {
+            if (!StoreManagers.ContainsKey(userID) && !StoreOwners.ContainsKey(userID))
+            {
+                RegisteredUsers.TryRemove(userID, out RegisteredUser ru);
+            }
+        }
+
+        public Boolean Query_isUniqEmail(String email)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("Email", email);
+            List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
+
+            if (docs.Count == 0)
+                return true;
+            else
+                return false;
+        }
+
         #endregion User
 
         #region Shop till you drop
 
-        public void Create(DTO_Recipt recipt)
+        public void Create(DTO_Recipt recipt, MongoDB.Driver.IClientSessionHandle session = null)
         {
-            DAO_Recipt.Create(recipt);
+            DAO_Recipt.Create(recipt , session);
         }
 
         public List<DTO_Recipt> LoadRecipts(string date, string store_id = "")
@@ -1151,6 +1247,24 @@ namespace Terminal3.DataAccessLayer
             return recipts;
         }
 
+        public DTO_Monitor LoadMonitorRecord(string date)
+        {
+
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", date);
+
+            List<BsonDocument> docs = DAO_Monitor.collection.Find(filter).ToList();
+
+            DTO_Monitor dto = null;
+            foreach (BsonDocument doc in docs)
+            {
+                var json = doc.ToJson();
+                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                dto = JsonConvert.DeserializeObject<DTO_Monitor>(json);
+            }
+
+            return dto;
+        }
+
         #endregion Shop till you drop
 
         #region Stores
@@ -1176,9 +1290,9 @@ namespace Terminal3.DataAccessLayer
             return p;
         }
 
-        public void UpdateProduct(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        public void UpdateProduct(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update, MongoDB.Driver.IClientSessionHandle session = null)
         {
-            DAO_Product.Update(filter, update);
+            DAO_Product.Update(filter, update , session:session);
         }
 
         public void DeleteProduct(FilterDefinition<BsonDocument> filter)
@@ -1239,9 +1353,51 @@ namespace Terminal3.DataAccessLayer
             return s;
         }
 
-        public void UpdateStore(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update)
+        public Store LazyLoad_Store(FilterDefinition<BsonDocument> filter)
         {
-            DAO_Store.Update(filter, update);
+            Store s;
+            DTO_Store dto = DAO_Store.Load(filter);
+            if (Stores.TryGetValue(dto._id, out s)) { return s; }
+
+            ConcurrentDictionary<String, Product> products = new ConcurrentDictionary<String, Product>();
+            NotificationManager notificationManager = new NotificationManager();
+
+            foreach (String product in dto.InventoryManager)
+            {
+                var filter3 = Builders<BsonDocument>.Filter.Eq("_id", product);
+                Product p = LoadProduct(filter3);
+                p.NotificationManager = notificationManager;
+                products.TryAdd(product, p);
+            }
+
+            s = new Store(dto._id, dto.Name, new InventoryManager(products), dto.Rating, dto.NumberOfRates, notificationManager, dto.isClosed);
+            s.NotificationManager.Store = s;
+
+            Stores.TryAdd(s.Id, s);
+            StoreOwner founder = getOwnershipTree(s, dto.Founder);
+            s.Founder = founder;
+
+            return s;
+        }
+        public void Load_StoreHistory(Store store)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+            DTO_Store dto = DAO_Store.Load(filter);
+            store.History = ToObject(dto.History);            
+        }
+        public void Load_StorePolicyManager(Store store)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", store.Id);
+            DTO_Store dto = DAO_Store.Load(filter);
+
+            DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.MainDiscount._id));
+            BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.MainPolicy._id));
+            store.PolicyManager = new PolicyManager(MainDiscount, MainPolicy);
+        }
+
+        public void UpdateStore(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update, MongoDB.Driver.IClientSessionHandle session = null)
+        {
+            DAO_Store.Update(filter, update , session:session);
         }
 
         public void DeleteStore(FilterDefinition<BsonDocument> filter)
@@ -1270,7 +1426,7 @@ namespace Terminal3.DataAccessLayer
             foreach(DTO_Store dto in storesDTOs)
             {
                 var f = Builders<BsonDocument>.Filter.Eq("_id", dto._id);
-                Store s = LoadStore(f);
+                Store s = LazyLoad_Store(f);
                 stores.Add(s);
             }
             return stores;
@@ -1460,8 +1616,9 @@ namespace Terminal3.DataAccessLayer
 
         public void Create(Offer offer)
         {
-            DAO_Offer.Create(new DTO_Offer(offer.Id, offer.LastOffer.Item1, offer.LastOffer.Item2 , offer.CounterOffer , offer.Accepted));
-            Policy_Offers.TryAdd(offer.Id, offer);
+            //Temporary change so there aren't any build errors Kfir
+            //DAO_Offer.Create(new DTO_Offer(offer.Id, offer.LastOffer.Item1, offer.LastOffer.Item2 , offer.CounterOffer , offer.Accepted));
+            //Policy_Offers.TryAdd(offer.Id, offer);
         }
 
         public Offer LoadOfferPolicy(FilterDefinition<BsonDocument> filter)
@@ -1473,7 +1630,9 @@ namespace Terminal3.DataAccessLayer
                 return o;
             }
 
-            o = new Offer(dto._id , new Tuple<Double , string>(dto.LastOffer_Price , dto.LastOffer_UserId) , dto.CounterOffer , dto.Accepted);
+            //Temporary change so there aren't any build errors Kfir
+            //o = new Offer(dto._id , new Tuple<Double , string>(dto.LastOffer_Price , dto.LastOffer_UserId) , dto.CounterOffer , dto.Accepted);
+            o = new Offer("U1", "P1", 1, 10, "S1");
             Policy_Offers.TryAdd(o.Id, o);
             return o;
         }
@@ -2413,6 +2572,13 @@ namespace Terminal3.DataAccessLayer
         #endregion Policies
 
         #region Utils
+        public static void NotifyConnectionError()
+        {
+            if (Mapper.connectionStatus.Equals(ConnectionStatus.Error))
+            {
+                NotificationService.GetInstance().Broadcast("Oops... Its seems like we got some trouble with the DB. Please try again in a few minutes");
+            }
+        }
         public void clearDB()
         {
             if (!(Instance is null))
@@ -2465,6 +2631,61 @@ namespace Terminal3.DataAccessLayer
     }
         #endregion
 
+        #region Monitor
+        public void Update(DTO_Monitor monitor)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", monitor.Date);
+            var update = Builders<BsonDocument>.Update.Set("GuestUsers", monitor.GuestUsers)
+                                                    .Set("RegisteredUsers", monitor.RegisteredUsers)
+                                                    .Set("ManagersNotOwners", monitor.ManagersNotOwners)
+                                                    .Set("Owners", monitor.Owners)
+                                                    .Set("Admins", monitor.Admins);
+            DAO_Monitor.Update(filter, update, true);
+        }
+        public DTO_Monitor LoadMonitor()
+        {
+
+            String date = DateTime.Now.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo);
+            var filter = Builders<BsonDocument>.Filter.Eq("Date", date);
+
+            DTO_Monitor dto = DAO_Monitor.Load(filter);
+            if(dto is null)
+            {
+                dto = new DTO_Monitor(date, 0, 0, 0, 0, 0);
+            }
+            return dto;
+
+        }
+        #endregion
+
+
+        #region Revert Transactions
+
+        public void RevertTransaction_Purchase(String userID)
+        {
+            RegisteredUser user;
+            RegisteredUsers.TryGetValue(userID, out user);
+            // Revert User - History , ShoppingCart , Notifications
+            Load_RegisteredUserHistory(user);
+            Load_RegisteredUserShoppingCart(user);
+            Load_RegisteredUserNotifications(user);
+
+            ShoppingCart shoppingCart = user.ShoppingCart;
+            foreach(var bag in shoppingCart.ShoppingBags)
+            {
+                Load_StoreHistory(bag.Value.Store);        // Revert each Store - History
+
+                foreach(var product in bag.Value.Products)              // Revert each Product - Quantity
+                {
+                    Product p = product.Key;
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", p.Id);
+                    DTO_Product dto = DAO_Product.Load(filter);
+                    p.Quantity = dto.Quantity;
+                }
+            }
+        }
+
+        #endregion Revert Transactions
     }
 }
 
