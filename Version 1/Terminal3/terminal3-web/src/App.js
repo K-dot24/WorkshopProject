@@ -168,11 +168,6 @@ const App = () => {
         ResetSystem(user.id).then(response => response.ok ? 
             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => alert(err));
     }
-
-    const handleMonitorSystem = async () => {
-        ResetSystem(user.id).then(response => response.ok ? 
-            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => alert(err));
-    }
     //#endregion
 
     const handleStoreSearch = async (query) => {
