@@ -1140,27 +1140,50 @@ namespace Terminal3.DataAccessLayer
         }
         #endregion  System Admin
 
+        /*     public List<RegisteredUser> LoadAllRegisterUsers()
+             {
+                 //load all registerUsers dto
+                 var filter = Builders<BsonDocument>.Filter.Empty;
+                 List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
+                 List<DTO_RegisteredUser> registerUsersDTO = new List<DTO_RegisteredUser>();
+                 foreach (BsonDocument doc in docs)
+                 {
+                     var json = doc.ToJson();
+                     if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
+                     DTO_RegisteredUser dto = JsonConvert.DeserializeObject<DTO_RegisteredUser>(json);
+                     registerUsersDTO.Add(dto);
+                 }
+                 List<RegisteredUser> registeredUsers = new List<RegisteredUser>();
+                 foreach (DTO_RegisteredUser dto in registerUsersDTO)
+                 {
+                     RegisteredUser registerUser = LoadRegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
+                     registeredUsers.Add(registerUser);
+                 }
+                 return registeredUsers;
+             }*/
+
         public List<RegisteredUser> LoadAllRegisterUsers()
         {
-            //load all registerUsers dto
-            var filter = Builders<BsonDocument>.Filter.Empty;
-            List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
-            List<DTO_RegisteredUser> registerUsersDTO = new List<DTO_RegisteredUser>();
-            foreach (BsonDocument doc in docs)
+            // Load users from identity map
+            List<RegisteredUser> allusers = new List<RegisteredUser>();
+            foreach (var user in RegisteredUsers)
             {
-                var json = doc.ToJson();
-                if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
-                DTO_RegisteredUser dto = JsonConvert.DeserializeObject<DTO_RegisteredUser>(json);
-                registerUsersDTO.Add(dto);
-            }
-            List<RegisteredUser> registeredUsers = new List<RegisteredUser>();
-            foreach (DTO_RegisteredUser dto in registerUsersDTO)
-            {
-                RegisteredUser registerUser = LazyLoad_RegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", dto._id));
-                registeredUsers.Add(registerUser);
+                allusers.Add(user.Value);
             }
 
-            return registeredUsers;
+            // Load admins
+            LinkedList<String> admins = LoadAllSystemAdmins();
+            if (admins != null)
+            {
+                foreach (String id in admins)
+                {
+                    RegisteredUser registerUser = LazyLoad_RegisteredUser(Builders<BsonDocument>.Filter.Eq("_id", id));
+                    allusers.Add(registerUser);
+                }
+            }
+
+            return allusers;
+
         }
         public LinkedList<String> LoadAllSystemAdmins()
         {
@@ -1180,6 +1203,26 @@ namespace Terminal3.DataAccessLayer
             }
             else { return null; }
         }
+
+        public void ClearCache_logout(String userID)
+        {
+            if (!StoreManagers.ContainsKey(userID) && !StoreOwners.ContainsKey(userID))
+            {
+                RegisteredUsers.TryRemove(userID, out RegisteredUser ru);
+            }
+        }
+
+        public Boolean Query_isUniqEmail(String email)
+        {
+            var filter = Builders<BsonDocument>.Filter.Eq("Email", email);
+            List<BsonDocument> docs = DAO_RegisteredUser.collection.Find(filter).ToList();
+
+            if (docs.Count == 0)
+                return true;
+            else
+                return false;
+        }
+
         #endregion User
 
         #region Shop till you drop
