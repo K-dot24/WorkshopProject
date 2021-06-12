@@ -110,27 +110,33 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Id = id;
             Name = name;            
             InventoryManager = inventoryManager;
-            //PolicyManager = policyManager;     
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+            // Inventory Manager
             History = history;
             Rating = rating;
             NumberOfRates = numberOfRates;
             NotificationManager = notificationManager;
-            Owners = new ConcurrentDictionary<String, StoreOwner>();
-            Managers = new ConcurrentDictionary<String, StoreManager>();
             this.isClosed = isClosed;
 
         }
+        
+        // Constructor for Lazy Load
         public Store(string id, string name, InventoryManager inventoryManager, double rating, int numberOfRates, NotificationManager notificationManager, Boolean isClosed = false)
         {
             Id = id;
             Name = name;
+            //Founder is injected manually
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
             InventoryManager = inventoryManager;
+            //PolicyManager = policyManager;
+            //OfferManager
+
             Rating = rating;
             NumberOfRates = numberOfRates;
             NotificationManager = notificationManager;
             History = new History();
-            Owners = new ConcurrentDictionary<String, StoreOwner>();
-            Managers = new ConcurrentDictionary<String, StoreManager>();
             this.isClosed = isClosed;
         }
 
