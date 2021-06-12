@@ -829,11 +829,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 {
                     List<DTO_Recipt> recipts = Mapper.getInstance().LoadRecipts(curr.Date.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo));
                     Double amountPerDay = 0;
-                    foreach (DTO_Recipt dto in recipts)
+                    if(! (recipts is null))
                     {
-                        amountPerDay += dto.amount;
+                        foreach (DTO_Recipt dto in recipts)
+                        {
+                            amountPerDay += dto.amount;
+                        }
                     }
-
                     recipts_list.Add(new Tuple<DateTime, double>(curr, amountPerDay));                 
 
                     curr = curr.AddDays(1);
