@@ -22,7 +22,7 @@ namespace XUnitTestTerminal3
         }
 
 
-        [Fact]
+        [Fact(Skip = "Not relevent")]
         [Trait("Category", "acceptance")]
         public void SerchProductByName()
         {
@@ -33,7 +33,7 @@ namespace XUnitTestTerminal3
         }
 
 
-        [Fact]
+        [Fact(Skip = "Not relevent")]
         [Trait("Category", "acceptance")]
         public void SerchProductByPrice()
         {

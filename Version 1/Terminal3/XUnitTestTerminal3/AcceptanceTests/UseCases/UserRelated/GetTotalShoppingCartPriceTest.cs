@@ -41,10 +41,10 @@ namespace XUnitTestTerminal3
         public void GetTotalShoppingCartPrice2products()
         {
             String store_id = sut.OpenNewStore("test_store", user_id).Data;
-            String product_id1 = sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test").Data;
+            String product_id1 = sut.AddProductToStore(user_id, store_id, "test_product1", 10, 10, "test").Data;
             sut.AddProductToCart(user_id, product_id1, 1, store_id);
 
-            String product_id2 = sut.AddProductToStore(user_id, store_id, "test_product", 15, 10, "test").Data;
+            String product_id2 = sut.AddProductToStore(user_id, store_id, "test_product2", 15, 10, "test").Data;
             sut.AddProductToCart(user_id, product_id2, 1, store_id);
 
             double price = sut.GetTotalShoppingCartPrice(user_id).Data;
