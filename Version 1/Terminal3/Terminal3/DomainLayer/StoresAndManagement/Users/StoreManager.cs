@@ -43,9 +43,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return User.Id;
         }
 
-        public Result<Boolean> Update(Notification notification)
+        public Result<Boolean> Update(Notification notification, MongoDB.Driver.IClientSessionHandle session = null)
         {
-            return User.Update(notification);
+            return User.Update(notification , session);
         }
 
         public DTO_StoreManager getDTO()

@@ -8,6 +8,7 @@ using Terminal3.DomainLayer;
 using Terminal3.ServiceLayer;
 using Terminal3.ServiceLayer.Controllers;
 using Terminal3.ServiceLayer.ServiceObjects;
+using Terminal3WebAPI.Models;
 
 namespace Terminal3WebAPI.Controllers
 {
@@ -114,6 +115,24 @@ namespace Terminal3WebAPI.Controllers
             if (result.ExecStatus) { return Ok(result); }
             else { return BadRequest(result.Message); }
         }
+
+        [Route("GetSystemMonitorRecords")]
+        [HttpPost]
+        public IActionResult GetSystemMonitorRecords([FromBody] GetSystemMonitorRecordsModel data)
+        {
+            Result<List<MonitorService>> result = system.GetSystemMonitorRecords(data.StartDate, data.EndDate, data.AdminID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+        [Route("StartMonitorRequest/{sysAdminID}")]
+        [HttpGet]
+        public IActionResult StartMonitorRequest(string sysAdminID)
+        {
+            Result<Boolean> result = system.StartMonitorRequest(sysAdminID);
+            if (result.ExecStatus) { return Ok(result); }
+            else { return BadRequest(result.Message); }
+        }
+    
         #endregion
     }
 }

@@ -4,6 +4,7 @@ using Terminal3.ServiceLayer.ServiceObjects;
 using System;
 using System.Collections.Concurrent;
 using Terminal3.DataAccessLayer.DTOs;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -106,6 +107,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         internal Result<bool> AdheresToPolicy()
         {
+            Mapper.getInstance().Load_StorePolicyManager(Store);
             return Store.PolicyManager.AdheresToPolicy(this.Products, this.User);
         }
 

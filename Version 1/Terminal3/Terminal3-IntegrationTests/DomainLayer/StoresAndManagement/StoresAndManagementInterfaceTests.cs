@@ -324,7 +324,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
             // The bag is not purchased yet
             Assert.Empty(RegisteredUser.History.ShoppingBags);
 
-            Result<ShoppingCartService> res = Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
+            //Result<ShoppingCartService> res = Facade.PurchaseAsync(RegisteredUser.Id, paymentDetails, deliveryDetails);
+            //Assert.True(res.ExecStatus);
+            System.Threading.Tasks.Task<Result<ShoppingCartService>> async_res = Facade.PurchaseAsync(RegisteredUser.Id, paymentDetails, deliveryDetails);
+            Result<ShoppingCartService> res = async_res.Result;
             Assert.True(res.ExecStatus);
 
             ShoppingCartService cart = res.Data;
@@ -370,7 +373,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
             // The bag is not purchased yet
             Assert.Empty(RegisteredUser.History.ShoppingBags);
 
-            Result<ShoppingCartService> res = Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
+            //Result<ShoppingCartService> res = Facade.PurchaseAsync(RegisteredUser.Id, paymentDetails, deliveryDetails);
+            System.Threading.Tasks.Task<Result<ShoppingCartService>> async_res = Facade.PurchaseAsync(RegisteredUser.Id, paymentDetails, deliveryDetails);
+            Result<ShoppingCartService> res = async_res.Result;
             Assert.True(res.ExecStatus);
 
             ShoppingCartService cart = res.Data;
@@ -420,7 +425,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Tests
 
             Founder.LoggedIn = loggedin;
 
-            Facade.Purchase(RegisteredUser.Id, paymentDetails, deliveryDetails);
+            Facade.PurchaseAsync(RegisteredUser.Id, paymentDetails, deliveryDetails);
 
             if (loggedin)
             {

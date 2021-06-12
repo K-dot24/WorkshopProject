@@ -23,6 +23,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
             PendingOffers = new List<Offer>();
         }
 
+        public OfferManager(List<Offer> pendingOffers)
+        {
+            PendingOffers = pendingOffers;
+        }
+
         private Offer getOffer(string id)
         {
             foreach (Offer offer in PendingOffers)
@@ -40,7 +45,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
                 return AcceptedResponse(ownerID, offer, allOwners);
 
             PendingOffers.Remove(offer);
-            //TODO mapper?
+            //TODO mapper Zoe
             if (counterOffer == -1)
                 return DeclinedResponse(offer);
             return CounterOfferResponse(offer, counterOffer);
@@ -65,7 +70,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
             if(response.Data == OfferResponse.Accepted)
             {
                 PendingOffers.Remove(offer);
-                //TODo mapper?
+                //TODO mapper Zoe
             }
             return response;
         }
@@ -73,6 +78,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
         internal void AddOffer(Offer offer)
         {
             PendingOffers.Add(offer);
+            //TODO: mapper Zoe
         }
 
         public Result<List<Dictionary<string, object>>> getStoreOffers()
