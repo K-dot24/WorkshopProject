@@ -38,7 +38,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
         {
             //Temporary change so there aren't any build errors Kfir
             //return new DTO_Offer(this.Id, this.LastOffer.Item1, this.LastOffer.Item2, this.CounterOffer, this.Accepted);
-            return new DTO_Offer("", 0, "", 0, false);
+            return new DTO_Offer(this.Id, this.UserID, this.ProductID, this.StoreID, this.Amount, this.Price, this.CounterOffer, this.acceptedOwners);
         }
 
 

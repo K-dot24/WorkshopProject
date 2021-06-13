@@ -31,11 +31,9 @@ namespace Terminal3.DataAccessLayer.DTOs
         public DTO_DiscountAddition MainDiscount { get; set; } // List of IDiscountPolicy ids 
         [BsonElement]
         public DTO_BuyNow MainPolicy { get; set; }
+        public List<DTO_Offer> OfferManager { get; set; }
 
-
-
-        public DTO_Store(String id, String name, String founder, LinkedList<String> owners, LinkedList<String> managers, LinkedList<String> inventoryManager, DTO_History history, 
-                            Double rating, int numberOfRates, Boolean isclosed , DTO_DiscountAddition discount , DTO_BuyNow by_now)
+        public DTO_Store(string id, string name, string founder, LinkedList<string> owners, LinkedList<string> managers, LinkedList<string> inventoryManager, DTO_History history, double rating, int numberOfRates, bool isClosed, DTO_DiscountAddition mainDiscount, DTO_BuyNow mainPolicy, List<DTO_Offer> offerManager)
         {
             _id = id;
             Name = name;
@@ -46,9 +44,10 @@ namespace Terminal3.DataAccessLayer.DTOs
             History = history;
             Rating = rating;
             NumberOfRates = numberOfRates;
-            isClosed = isclosed;
-            MainDiscount = discount;
-            MainPolicy = by_now;
+            this.isClosed = isClosed;
+            MainDiscount = mainDiscount;
+            MainPolicy = mainPolicy;
+            OfferManager = offerManager;
         }
     }
 }
