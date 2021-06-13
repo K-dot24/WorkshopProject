@@ -746,7 +746,18 @@ export function GetPurchasePolicyData( storeID ) {
 //#region Offer
 
 export function SendOfferToStore( data ) {
-    return fetch(`${API_URL}/StoreStaff/SendOfferToStore`, {
+    return fetch(`${API_URL}/GuestUser/SendOfferToStore`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+export function AnswerCounterOffer( data ) {
+    return fetch(`${API_URL}/GuestUser/AnswerCounterOffer`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -768,7 +779,7 @@ export function SendOfferResponseToUser( data ) {
 }
 
 export function GetUserOffers( data ) {
-    return fetch(`${API_URL}/StoreStaff/GetUserOffers`, {
+    return fetch(`${API_URL}/GuestUser/GetUserOffers`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
