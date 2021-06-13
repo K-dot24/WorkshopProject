@@ -7,7 +7,7 @@ import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromSt
         printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
         AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition, AddPurchasePolicy, 
         AddPurchasePolicyById, RemovePurchasePolicy, GetIncomeAmountGroupByDay, GetStorePurchaseHistory,
-        SendOfferToStore } from '../../../../api/API';
+        SendOfferToStore, GetProductReview } from '../../../../api/API';
 
 
 const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
@@ -303,12 +303,17 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     //#endregion
 
-    //#region Offer
+    //#region User Actions
 
     const handleSendOfferToStore = (data) => {
         const fullData = { StoreID: store.id, UserID: user.id, ...data }
         SendOfferToStore(fullData).then(response => response.ok ?
-            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));;
+            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+    }
+    
+    const handleGetProductReview = (data) => {
+        GetProductReview(store.id, data.productID).then(response => response.ok ?
+            response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'productReview'})) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     //#endregion
@@ -361,7 +366,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                 {/* Main Store Page */}
                 <Route exact path={match.url}>
                     <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} 
-                            handleSendOfferToStore={handleSendOfferToStore} 
+                            handleSendOfferToStore={handleSendOfferToStore} handleGetProductReview={handleGetProductReview} 
                     />
                 </Route>
 

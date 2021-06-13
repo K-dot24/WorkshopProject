@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardMedia, CardContent, CardActions, Typography, IconButton } from '@material-ui/core';
-import { AddShoppingCart, AttachMoney } from '@material-ui/icons';
+import { AddShoppingCart, AttachMoney, RateReview } from '@material-ui/icons';
 
 import useStyles from './styles';
 import { products_image_url } from '../../../api/API';
 import { Offer } from '../../../components';
 
-const Product = ({ product, onAddToBag, handleSendOfferToStore }) => {
+const Product = ({ product, onAddToBag, handleSendOfferToStore, handleGetProductReview }) => {
     const classes = useStyles();
 
     const [showOfferDialog, setShowOfferDialog] = useState(false);
@@ -14,6 +14,10 @@ const Product = ({ product, onAddToBag, handleSendOfferToStore }) => {
     const onSendOffer = (data) => {
         const toSend = { ProductID: product.id, Amount: data.amount, Price: data.price };
         handleSendOfferToStore(toSend);
+    };
+
+    const onGetProductReview = (productID) => {
+        handleGetProductReview({ productID });
     };
 
     return (
@@ -42,6 +46,9 @@ const Product = ({ product, onAddToBag, handleSendOfferToStore }) => {
                     </IconButton>
                     <IconButton aria-label="Submit Offer" onClick={() => setShowOfferDialog(true)}>
                         <AttachMoney />
+                    </IconButton>
+                    <IconButton aria-label="Get Reviews" onClick={() => onGetProductReview(product.id)}>
+                        <RateReview />
                     </IconButton>
                 </>
                 }

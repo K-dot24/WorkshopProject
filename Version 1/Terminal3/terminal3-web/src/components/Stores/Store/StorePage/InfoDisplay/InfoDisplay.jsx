@@ -15,7 +15,7 @@ const InfoDisplay = ({ info }) => {
                 <Avatar className={classes.avatar}>
                     <Receipt />
                 </Avatar>
-                <Typography variant="h6" gutterBottom>Results</Typography>
+                <Typography variant="h6" gutterBottom>{info.type === 'productReview' ? 'Reviews' : 'Results'}</Typography>
             </div>
             <Paper className={classes.paper}>
                 <List disablePadding>
@@ -26,6 +26,15 @@ const InfoDisplay = ({ info }) => {
                                 <Typography variant="body2">{product.item1.price * product.item2}₪</Typography>
                             </ListItem>
                         )))
+                    )
+                    :
+                    info.type === 'productReview' ? (
+                        info.data.map((review, index) => (
+                            <ListItem style={{padding: '10px 0'}} key={index}>
+                                <ListItemText primary={review.item2} secondary={`User: ${review.item1}`} />
+                                {/* <Typography variant="body2">{product.item1.price * product.item2}₪</Typography> */}
+                            </ListItem>
+                        ))
                     )
                     :
                     info.data.map((item, index) => ( info.type === 'incomes' ?
