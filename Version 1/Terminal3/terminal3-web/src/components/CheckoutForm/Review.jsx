@@ -1,12 +1,29 @@
-import React from 'react'
-import { Typography, List, ListItem, ListItemText, Paper, Divider } from '@material-ui/core';
+import React, { useState } from 'react'
+import { Typography, List, ListItem, ListItemText, Paper, Divider, Button } from '@material-ui/core';
 import { useLocation } from 'react-router-dom';
 
-import useStyles from './styles'; 
+import { printErrorMessage, AddProductReview } from '../../api/API';
+import useStyles from './styles';
+import UserReviewDialog from './UserReviewDialog';
 
 const Review = ({ checkoutToken }) => {
     const location = useLocation();
     const classes = useStyles();
+
+    // User Review
+    const [reviewDetails, setReviewDetails] = useState(null);
+    const [showReviewDialog, setShowReviewDialog] = useState(false);
+
+    const onReview = (userID, storeID, productID) => {
+        setReviewDetails({ userID, storeID, productID })
+        setShowReviewDialog(true);
+    };
+    
+    const handleAddReview = (review) => {
+        const toSend = { ...reviewDetails, ...review }
+        AddProductReview(toSend).then(response => response.ok ?
+            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
+    };
 
     return (
         <>
@@ -34,14 +51,21 @@ const Review = ({ checkoutToken }) => {
                         <Typography variant="h6" gutterBottom>Purchase History</Typography>
                         <List disablePadding>
                             {checkoutToken && checkoutToken.shoppingBags.map((bag) => bag.products.map((product) => (
-                                <ListItem style={{padding: '10px 0'}} key={product.item1.name}>
+                            <div key={product.item1.id}>
+                                <ListItem style={{padding: '10px 0'}} key={product.item1.id}>
                                     <ListItemText primary={product.item1.name} secondary={`Quantity: ${product.item2}`} />
                                     <Typography variant="body2">{product.item1.price * product.item2}₪</Typography>
                                 </ListItem>
+                                <Button color="primary" onClick={() => onReview(bag.userId, bag.storeId, product.item1.id)}>Add Review</Button>
+                                <Divider />
+                            </div>
                             )))}
                         </List>
                     </Paper>
-                </main>                  
+                </main>
+                {showReviewDialog && 
+                    <UserReviewDialog setOpen={setShowReviewDialog} open={showReviewDialog} onAddReview={handleAddReview} />
+                } 
             </>  
             )}
         </>
