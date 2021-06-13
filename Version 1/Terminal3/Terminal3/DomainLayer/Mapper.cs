@@ -882,7 +882,7 @@ namespace Terminal3.DataAccessLayer
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
             DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
-            user.AcceptedOffers = ToObject(dto.AcceptedOffers);
+            //user.AcceptedOffers = ToObject(dto.AcceptedOffers);
         }
         public void Load_RegisteredUserNotifications(RegisteredUser user)
         {
