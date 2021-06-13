@@ -108,7 +108,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         internal Result<bool> AdheresToPolicy()
         {
-            //Mapper.getInstance().Load_StorePolicyManager(Store);
+            Mapper.getInstance().Load_StorePolicyManager(Store);
             return Store.PolicyManager.AdheresToPolicy(this.Products, this.User);
         }
 

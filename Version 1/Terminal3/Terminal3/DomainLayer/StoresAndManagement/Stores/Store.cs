@@ -72,42 +72,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, StoreOwner> Owners { get; set; }
         public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
-        public PolicyManager PolicyManager
-        {
-            get 
-            {
-                Mapper.getInstance().Load_StorePolicyManager(this);
-                return PolicyManager;
-            }
-            set
-            {
-                this.PolicyManager = value;
-            }
-        }
-        public OfferManager OfferManager
-        { 
-            get
-            {
-                Mapper.getInstance().Load_StoreOfferManager(this);
-                return OfferManager;
-            }
-            set
-            {
-                this.OfferManager = value;
-            }
-        }
-        public History History 
-        { 
-            get
-            {
-                Mapper.getInstance().Load_StoreHistory(this);
-                return History;
-            }
-            set
-            {
-                this.History = value;
-            }
-        }
+        public PolicyManager PolicyManager { get; set; }
+        public OfferManager OfferManager{ get; set; }
+        public History History { get; set; }
+
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
         public NotificationManager NotificationManager { get; set; }
