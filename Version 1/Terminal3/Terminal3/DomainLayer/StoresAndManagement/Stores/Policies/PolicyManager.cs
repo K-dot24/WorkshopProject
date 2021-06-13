@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.Json;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountComposition;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
@@ -13,7 +14,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
 {
     public interface IPolicyManager
     {
-        double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
+        double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "", List<Offer.Offer> offers = null);
         Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
         Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info);
         Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info, String id);
@@ -52,8 +53,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             MainPolicy = mainPolicy;
         }
 
-        public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
+        public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "", List<Offer.Offer> offers = null)
         {
+            if (offers == null)
+                offers = new List<Offer.Offer>();
             Result<Dictionary<Product, Double>> discountsResult = MainDiscount.CalculateDiscount(products, discountCode);
             if (!discountsResult.ExecStatus)
                 return -1;
@@ -62,12 +65,28 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
             Double price = 0;
             foreach (KeyValuePair<Product, int> entry in products)
             {
+                double discount = 0;
                 if (discounts.ContainsKey(entry.Key))
-                    price += entry.Key.Price * entry.Value * (100 - discounts[entry.Key]) / 100;
-                else
-                    price += entry.Key.Price * entry.Value;
+                    discount = discounts[entry.Key];
+                price += calculateProductPrice(entry.Key.Id, entry.Value, entry.Key.Price, discount, offers);
             }
 
+            return price;
+        }
+
+        private double calculateProductPrice(string productId, int amount, double basePrice, double discount, List<Offer.Offer> offers)
+        {
+            double price = 0;
+            foreach(Offer.Offer offer in offers)
+            {
+                if(productId.Equals(offer.ProductID) && amount >= offer.Amount)
+                {
+                    amount -= offer.Amount;
+                    price += offer.Price;
+                }
+            }
+
+            price += amount * basePrice * (100 - discount) / 100;
             return price;
         }
    

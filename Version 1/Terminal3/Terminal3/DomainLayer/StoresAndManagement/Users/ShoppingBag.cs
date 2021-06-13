@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DataAccessLayer;
+using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -46,12 +47,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             TotalBagPrice = totalBagPrice;
         }
 
-        public Result<bool> AddProtuctToShoppingBag(Product product, int quantity)
+        public Result<bool> AddProtuctToShoppingBag(Product product, int quantity, List<Offer> offers)
         {
             if (product.Quantity >= quantity && quantity > 0)
             {
                 Products.TryAdd(product, quantity);
-                this.TotalBagPrice = GetTotalPrice();
+                this.TotalBagPrice = GetTotalPrice(offers);
                 return new Result<bool>($"Product {product.Name} was added successfully to shopping bag of {Store.Name}\n", true, true);
             }
             //else failed
@@ -97,9 +98,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return new Result<ShoppingBagService>("Shopping bag DAL object", true, new ShoppingBagService(Id , User.Id, Store.Id, products , TotalBagPrice));
         }
 
-        internal double GetTotalPrice(String DiscountCode = "")
+        internal double GetTotalPrice(List<Offer> offers, String DiscountCode = "")
         {
-            Double amount = Store.PolicyManager.GetTotalBagPrice(this.Products, DiscountCode);
+            Double amount = Store.PolicyManager.GetTotalBagPrice(this.Products, DiscountCode, offers);
             this.TotalBagPrice = amount; 
 
             return amount; 

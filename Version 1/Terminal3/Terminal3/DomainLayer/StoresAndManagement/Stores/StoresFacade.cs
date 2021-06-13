@@ -494,11 +494,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return result;
         }
 
-        public double GetTotalBagPrice(string storeId, ConcurrentDictionary<Product, int> products, string discountCode = "")
+        public double GetTotalBagPrice(string storeId, ConcurrentDictionary<Product, int> products, List<Offer> offers, string discountCode = "")
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                return store.GetTotalBagPrice(products, discountCode);
+                return store.GetTotalBagPrice(products, offers, discountCode);
             }
             new Result<Store>("Store does not exists\n", false, null);
             return -1;
@@ -564,7 +564,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                mapper.Load_StorePolicyManager(store);
+               mapper.Load_StorePolicyManager(store);
                 Result<IDiscountCondition> res =  store.AddDiscountCondition(info, id);
                 if (res.ExecStatus)
                 {

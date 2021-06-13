@@ -39,7 +39,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         #endregion
 
         #region Policies Management
-        double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "");
+        double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, List<Offer> offers, string discountCode = "");
         Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user);
         Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info);
         Result<IDiscountPolicy> AddDiscountPolicy(Dictionary<string, object> info, String id);
@@ -75,6 +75,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public PolicyManager PolicyManager { get; set; }
         public OfferManager OfferManager{ get; set; }
         public History History { get; set; }
+
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
         public NotificationManager NotificationManager { get; set; }
@@ -110,27 +111,32 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Id = id;
             Name = name;            
             InventoryManager = inventoryManager;
-            //PolicyManager = policyManager;     
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+            // Inventory Manager
             History = history;
             Rating = rating;
             NumberOfRates = numberOfRates;
             NotificationManager = notificationManager;
-            Owners = new ConcurrentDictionary<String, StoreOwner>();
-            Managers = new ConcurrentDictionary<String, StoreManager>();
             this.isClosed = isClosed;
 
         }
+        
+        // Constructor for Lazy Load
         public Store(string id, string name, InventoryManager inventoryManager, double rating, int numberOfRates, NotificationManager notificationManager, Boolean isClosed = false)
         {
             Id = id;
             Name = name;
+            //Founder is injected manually
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
             InventoryManager = inventoryManager;
+            PolicyManager = new PolicyManager();   //PolicyManager is injected manually when needed for lazy load
+            //OfferManager
+            History = new History();
             Rating = rating;
             NumberOfRates = numberOfRates;
             NotificationManager = notificationManager;
-            History = new History();
-            Owners = new ConcurrentDictionary<String, StoreOwner>();
-            Managers = new ConcurrentDictionary<String, StoreManager>();
             this.isClosed = isClosed;
         }
 
@@ -577,9 +583,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return per;
         }
 
-        public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, string discountCode = "")
+        public double GetTotalBagPrice(ConcurrentDictionary<Product, int> products, List<Offer> offers, string discountCode = "")
         {
-            return PolicyManager.GetTotalBagPrice(products, discountCode);
+            return PolicyManager.GetTotalBagPrice(products, discountCode, offers);
         }
 
         public Result<bool> AdheresToPolicy(ConcurrentDictionary<Product, int> products, User user)

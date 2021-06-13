@@ -98,6 +98,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer);
         public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID);
         public Result<List<Dictionary<string, object>>> getUserOffers(string userID);
+        public Result<bool> AnswerCounterOffer(string userID, string offerID, bool accepted);
         #endregion
     }
     public class StoresAndManagementInterface : IStoresAndManagementInterface
@@ -700,6 +701,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
         {
             return UsersAndPermissionsFacade.getUserOffers(userId);
+        }
+
+        public Result<bool> AnswerCounterOffer(string userID, string offerID, bool accepted)
+        {
+            return UsersAndPermissionsFacade.AnswerCounterOffer(userID, offerID, accepted);
         }
         public Result<List<MonitorService>> GetSystemMonitorRecords(String start_date, String end_date)
         {
