@@ -86,7 +86,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         }
 
         public Result<Boolean> NotifyPurchasedProduct(int quantity, MongoDB.Driver.IClientSessionHandle session = null)
-        {   //Zoe
+        {   
             if (this.NotificationManager == null)
             {
                 return new Result<bool>("Error: No Notification Manager set for this product\n", false, false);

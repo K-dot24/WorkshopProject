@@ -7,6 +7,9 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores;
 using Terminal3.ExternalSystems;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
+using MongoDB.Driver;
+using MongoDB.Bson;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -23,14 +26,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             PendingOffers = new List<Offer>();
             AcceptedOffers = new List<Offer>();
         }
+        // aslo used for DB
         protected User(string id)
         {
             if (id.Equals("-1"))
                 Id = Service.GenerateId();
             else Id = id;
-            ShoppingCart = new ShoppingCart();
-            PendingOffers = new List<Offer>();
-            AcceptedOffers = new List<Offer>();
+            ShoppingCart = new ShoppingCart();      // when used with lazy loading from db this field will be a place holder
+            PendingOffers = new List<Offer>();      // when used with lazy loading from db this field will be a place holder 
+            AcceptedOffers = new List<Offer>();     // when used with lazy loading from db this field will be a place holder
         }
         protected User(String id , ShoppingCart shoppingCart)
         {
@@ -39,7 +43,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             PendingOffers = new List<Offer>();
             AcceptedOffers = new List<Offer>();
         }
-
 
         public Result<ShoppingCart> AddProductToCart(Product product, int productQuantity, Store store)
         {
@@ -122,7 +125,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if(result.Data != null)
                 ShoppingCart = new ShoppingCart();              // create new shopping cart for user
 
-            Result<bool> removeAccatedOffersResult = removeAcceptedOffers();
+            Result<bool> removeAccatedOffersResult = removeAcceptedOffers(session);
             if (!removeAccatedOffersResult.ExecStatus)
                 return new Result<ShoppingCart>("The purchase failed because the system failed to remove accepted offers", false, null);
 
@@ -153,10 +156,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             return AcceptedOffers;
         }
 
-        public Result<bool> removeAcceptedOffers()
+        public Result<bool> removeAcceptedOffers(MongoDB.Driver.IClientSessionHandle session)
         {
             AcceptedOffers = new List<Offer>();
-            //TODO mapper? Zoe
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Get_DTO_Offers(AcceptedOffers));
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
 
             return new Result<bool>("", true, true);
         }
@@ -165,12 +170,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             Offer offer = new Offer(this.Id, productID, amount, price, storeID);
             PendingOffers.Add(offer);
-            //TODO mapper Zoe
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Get_DTO_Offers(PendingOffers));
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
             return new Result<Offer>("", true, offer);
         }
 
         protected Offer findPendingOffer(string id)
         {
+
             foreach (Offer offer in PendingOffers)
                 if (offer.Id == id)
                     return offer;
@@ -195,7 +203,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (offer == null)
                 return new Result<bool>("Failed to remove offer from user: Failed to locate the offer", false, false);
             PendingOffers.Remove(offer);
-            //TODO mapper Zoe
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Get_DTO_Offers(PendingOffers));
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
             return new Result<bool>("", true, true);
         }
 
@@ -208,7 +218,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (!removeResult.ExecStatus)
                 return removeResult;
             AcceptedOffers.Add(offer);
-            //TODO mapper? Zoe
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Get_DTO_Offers(AcceptedOffers));
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
+
             return new Result<bool>("", true, true);
         }
 
@@ -219,8 +232,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public abstract Result<bool> CounterOffer(string offerID);
 
         public Result<List<Dictionary<string, object>>> getUserPendingOffers()
-        {
-            //TODO: Mapper load Zoe
+        {            
             List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
             foreach (Offer offer in PendingOffers)
                 list.Add(offer.GetData());
@@ -234,6 +246,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         }
 
 
+        public List<DTO_Offer> Get_DTO_Offers(List<Offer> Offers)
+        {
+            List<DTO_Offer> dto_offers = new List<DTO_Offer>();
+            foreach (Offer offer in Offers)
+            {
+                dto_offers.Add(new DTO_Offer(offer.Id, offer.UserID, offer.ProductID, offer.StoreID, offer.Amount, offer.Price, offer.CounterOffer, offer.acceptedOwners));
+            }
 
+            return dto_offers;
+        }
     }
 }

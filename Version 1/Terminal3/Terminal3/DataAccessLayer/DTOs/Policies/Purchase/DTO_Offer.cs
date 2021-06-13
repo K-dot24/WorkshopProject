@@ -7,24 +7,34 @@ namespace Terminal3.DataAccessLayer.DTOs
 {
     public class DTO_Offer : DTO_Policies
     {
+
         [BsonId]
         public string _id { get; set; }
         [BsonElement]
-        public Double LastOffer_Price { get; set; }    // Customer offer <price, UserID>
+        public String UserID { get; set; }     
         [BsonElement]
-        public String LastOffer_UserId { get; set; }    // Customer offer <price, UserID>
+        public String ProductID { get; set; }     
         [BsonElement]
-        public Double CounterOffer { get; set; }    // Store offer
+        public String StoreID { get; set; }
         [BsonElement]
-        public Boolean Accepted { get; set; }
+        public int Amount { get; }
+        [BsonElement]
+        public Double Price { get; }
+        [BsonElement]
+        public Double CounterOffer { get; set; }
+        [BsonElement]
+        public List<String> acceptedOwners { get; }
 
-        public DTO_Offer(string id, double lastOffer_Price, string lastOffer_UserId, double counterOffer, bool accepted)
+        public DTO_Offer(string id, string userID, string productID, string storeID, int amount, double price, double counterOffer, List<string> acceptedOwners)
         {
             _id = id;
-            LastOffer_Price = lastOffer_Price;
-            LastOffer_UserId = lastOffer_UserId;
+            UserID = userID;
+            ProductID = productID;
+            StoreID = storeID;
+            Amount = amount;
+            Price = price;
             CounterOffer = counterOffer;
-            Accepted = accepted;
+            this.acceptedOwners = acceptedOwners;
         }
     }
 }
