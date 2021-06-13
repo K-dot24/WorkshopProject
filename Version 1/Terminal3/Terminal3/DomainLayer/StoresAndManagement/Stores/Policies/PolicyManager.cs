@@ -39,7 +39,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
     public class PolicyManager : IPolicyManager
     {
 
-        public DiscountAddition MainDiscount { get; }
+        public DiscountAddition MainDiscount { get; set; }
         public BuyNow MainPolicy { get; set; }
         public PolicyManager()
         {

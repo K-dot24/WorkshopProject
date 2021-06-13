@@ -173,12 +173,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 History.AddPurchasedShoppingCart(ShoppingCart, session);
                 this.ShoppingCart = new ShoppingCart();          // create new shopping cart for user
 
-                /* // Update DB
-                 var filter = Builders<BsonDocument>.Filter.Eq("_id", this.Id);
-                 var update = Builders<BsonDocument>.Update.Set("ShoppingCart", ShoppingCart.getDTO());
-                 mapper.UpdateRegisteredUser(filter, update);*/
-
-                Result<bool> removeAccatedOffersResult = removeAcceptedOffers();
+                Result<bool> removeAccatedOffersResult = removeAcceptedOffers(session);
                 if (!removeAccatedOffersResult.ExecStatus)
                     return new Result<ShoppingCart>("The purchase failed because the system failed to remove accepted offers", false, null);
 
@@ -234,7 +229,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public DTO_RegisteredUser getDTO()
         {            
             return new DTO_RegisteredUser(Id, ShoppingCart.getDTO(), Email, Password, 
-                                        LoggedIn, History.getDTO(), getPendingNotificationsDTO() , Get_DTO_Offers() );
+                                        LoggedIn, History.getDTO(), getPendingNotificationsDTO() , Get_DTO_Offers(PendingOffers), Get_DTO_Offers(AcceptedOffers));
         }
 
         public LinkedList<DTO_Notification> getPendingNotificationsDTO()

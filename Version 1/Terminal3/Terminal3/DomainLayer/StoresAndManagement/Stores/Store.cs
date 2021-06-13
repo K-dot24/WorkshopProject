@@ -132,7 +132,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Managers = new ConcurrentDictionary<String, StoreManager>();
             InventoryManager = inventoryManager;
             PolicyManager = new PolicyManager();   //PolicyManager is injected manually when needed for lazy load
-            //OfferManager
+            OfferManager = new OfferManager();     //OfferManager is injected manually when needed for lazy load
             History = new History();
             Rating = rating;
             NumberOfRates = numberOfRates;
@@ -670,7 +670,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             OfferManager.AddOffer(offer);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
             var update_offer = Builders<BsonDocument>.Update.Set("Offers", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
-            Mapper.getInstance().UpdateStore(filter, update_offer, session);
+            Mapper.getInstance().UpdateStore(filter, update_offer);
             return sendNotificationToAllOwners(offer);
         }
 
@@ -715,7 +715,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Result<OfferResponse>  res = OfferManager.SendOfferResponseToUser(ownerID, offerID, accepted, counterOffer, ids);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
             var update_offer = Builders<BsonDocument>.Update.Set("Offers", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
-            Mapper.getInstance().UpdateStore(filter, update_offer, session);
+            Mapper.getInstance().UpdateStore(filter, update_offer);
             return res;
         }
 
@@ -726,6 +726,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public List<DTO_Offer> Get_DTO_Offers()
         {
+            Mapper.getInstance().Load_StoreOfferManager(this);   //just in case
+
             List<DTO_Offer> dto_offers = new List<DTO_Offer>();
             foreach (Offer offer in OfferManager.PendingOffers)
             {

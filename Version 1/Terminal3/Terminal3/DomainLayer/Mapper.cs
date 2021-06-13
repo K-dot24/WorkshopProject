@@ -127,6 +127,9 @@ namespace Terminal3.DataAccessLayer
                 //database = dbClient.GetDatabase("Terminal3-tomer");
                 database = dbClient.GetDatabase($"Terminal3-{environment}");
 
+                //var adminDb = dbClient.GetDatabase("admin");
+                //adminDb.RunCommand<BsonDocument>("{ setParameter: 1, transactionLifetimeLimitSeconds: 300 }");
+
                 //DAOs
                 DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
                 DAO_Product = new DAO<DTO_Product>(database, "Products");
@@ -286,17 +289,6 @@ namespace Terminal3.DataAccessLayer
             return dto_pendingNotifications;
         }
 
-        public LinkedList<DTO_Offer> Get_DTO_Offers(LinkedList<Offer> offers)
-        {
-            LinkedList<DTO_Offer> dto_offers = new LinkedList<DTO_Offer>();
-            foreach (Offer offer in offers)
-            {
-                dto_offers.AddLast(new DTO_Offer(offer.Id, offer.UserID, offer.ProductID, offer.StoreID, offer.Amount, offer.Price, offer.CounterOffer, offer.acceptedOwners));
-            }
-
-            return dto_offers;
-        }
-
         public List<DTO_Offer> Get_DTO_Offers(List<Offer> offers)
         {
             List<DTO_Offer> dto_offers = new List<DTO_Offer>();
@@ -350,12 +342,15 @@ namespace Terminal3.DataAccessLayer
             ShoppingCart sc = new ShoppingCart(dto._id, sb, dto.TotalCartPrice);
             return sc;
         }
-        private LinkedList<Offer> ToObject(LinkedList<DTO_Offer> dto, User user)
+        private List<Offer> ToObject(List<DTO_Offer> dto, User user)
         {
-            LinkedList<Offer> Offers = new LinkedList<Offer>();
-            foreach(DTO_Offer offer in dto)
+            List<Offer> Offers = new List<Offer>();
+            if(dto!=null)
             {
-                Offers.AddLast(new Offer(offer.UserID, offer.ProductID, offer.Amount, offer.Price, offer.StoreID, offer._id));
+                foreach(DTO_Offer offer in dto)
+                {
+                    Offers.Add(new Offer(offer.UserID, offer.ProductID, offer.Amount, offer.Price, offer.StoreID, offer._id));
+                }
             }
             return Offers;
         }
@@ -869,7 +864,7 @@ namespace Terminal3.DataAccessLayer
         #region RegisteredUser
         public void Create(RegisteredUser ru)
         {            
-            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, ru.Password , ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification) , Get_DTO_Offers(ru.Offers)));
+            DAO_RegisteredUser.Create(new DTO_RegisteredUser(ru.Id, Get_DTO_ShoppingCart(ru), ru.Email, ru.Password , ru.LoggedIn, Get_DTO_History(ru.History), Get_DTO_Notifications(ru.PendingNotification) , Get_DTO_Offers(ru.PendingOffers), Get_DTO_Offers(ru.AcceptedOffers)));
             RegisteredUsers.TryAdd(ru.Id , ru);
         }        
 
@@ -907,12 +902,6 @@ namespace Terminal3.DataAccessLayer
             DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
             user.History = ToObject(dto.History);
         }
-        public void Load_RegisteredUserAcceptedOffers(RegisteredUser user)
-        {
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
-            DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
-            //user.AcceptedOffers = ToObject(dto.AcceptedOffers);
-        }
         public void Load_RegisteredUserNotifications(RegisteredUser user)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
@@ -925,11 +914,12 @@ namespace Terminal3.DataAccessLayer
             DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
             user.ShoppingCart = ToObject(dto.ShoppingCart, user);
         }
-        public void Load_RegisteredUserOffer(RegisteredUser user)
+        public void Load_RegisteredUserOffers(RegisteredUser user)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_id", user.Id);
             DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
-            user.Offers = ToObject(dto.Offers, user);
+            user.PendingOffers = ToObject(dto.PendingOffers, user);
+            user.AcceptedOffers = ToObject(dto.AcceptedOffers, user);
         }
 
 
@@ -1435,7 +1425,8 @@ namespace Terminal3.DataAccessLayer
 
             DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.MainDiscount._id));
             BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.MainPolicy._id));
-            store.PolicyManager = new PolicyManager(MainDiscount, MainPolicy);
+            store.PolicyManager.MainDiscount = MainDiscount;
+            store.PolicyManager.MainPolicy = MainPolicy;
         }
 
         public void Load_StoreOfferManager(Store store)
@@ -1444,12 +1435,16 @@ namespace Terminal3.DataAccessLayer
             DTO_Store dto = DAO_Store.Load(filter);
 
             List<Offer> offers = new List<Offer>();
-            foreach(DTO_Offer offer in dto.OfferManager)
+            if(dto.OfferManager != null)
             {
-                offers.Add(new Offer(offer.UserID, offer.ProductID, offer.Amount, offer.Price, offer.StoreID, offer._id));
+                foreach (DTO_Offer offer in dto.OfferManager)
+                {
+                    offers.Add(new Offer(offer.UserID, offer.ProductID, offer.Amount, offer.Price, offer.StoreID, offer._id));
+                }
             }
+           
 
-            store.OfferManager = new OfferManager(offers);
+            store.OfferManager.PendingOffers = offers;
         }
 
         public void UpdateStore(FilterDefinition<BsonDocument> filter, UpdateDefinition<BsonDocument> update, MongoDB.Driver.IClientSessionHandle session = null)
@@ -2726,9 +2721,8 @@ namespace Terminal3.DataAccessLayer
             // Revert User - History , ShoppingCart , Notifications
             Load_RegisteredUserHistory(user);
             Load_RegisteredUserShoppingCart(user);
-            Load_RegisteredUserOffer(user);
+            Load_RegisteredUserOffers(user);
             Load_RegisteredUserNotifications(user);
-            Load_RegisteredUserAcceptedOffers(user);
 
             ShoppingCart shoppingCart = user.ShoppingCart;
             foreach(var bag in shoppingCart.ShoppingBags)
