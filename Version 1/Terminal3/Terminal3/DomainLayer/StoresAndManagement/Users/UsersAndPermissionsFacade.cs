@@ -227,6 +227,24 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     return new Result<RegisteredUser>($"found user with email:{email}\n", true, registeredUser);
                 }
             }
+            //Only if we are looking for a register user in lazy mode
+            if(table.Equals(RegisteredUsers))
+            {
+                // trying to load from DB
+                var filter = Builders<BsonDocument>.Filter.Eq("Email", email);
+                RegisteredUser user = Mapper.getInstance().LazyLoad_RegisteredUser(filter);
+
+                //user could not be found in DB
+                if(user is null)
+                {
+                    return new Result<RegisteredUser>($"could not find user with email:{email}\n", false, null);
+                }
+                else
+                {
+                    RegisteredUsers.TryAdd(user.Id, user);
+                    return new Result<RegisteredUser>($"found user with email:{email}\n", true, user);
+                }
+            }
 
             return new Result<RegisteredUser>($"could not find user with email:{email}\n", false, null);
         }
