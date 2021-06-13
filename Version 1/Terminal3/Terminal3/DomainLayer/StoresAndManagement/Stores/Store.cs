@@ -72,9 +72,31 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, StoreOwner> Owners { get; set; }
         public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
-        public PolicyManager PolicyManager { get; set; }
+        public PolicyManager PolicyManager
+        {
+            get 
+            {
+                Mapper.getInstance().Load_StorePolicyManager(this);
+                return PolicyManager;
+            }
+            set
+            {
+                this.PolicyManager = value;
+            }
+        }
         public OfferManager OfferManager{ get; set; }
-        public History History { get; set; }
+        public History History 
+        { 
+            get
+            {
+                Mapper.getInstance().Load_StoreHistory(this);
+                return History;
+            }
+            set
+            {
+                this.History = value;
+            }
+        }
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
         public NotificationManager NotificationManager { get; set; }
@@ -110,27 +132,32 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Id = id;
             Name = name;            
             InventoryManager = inventoryManager;
-            //PolicyManager = policyManager;     
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
+            // Inventory Manager
             History = history;
             Rating = rating;
             NumberOfRates = numberOfRates;
             NotificationManager = notificationManager;
-            Owners = new ConcurrentDictionary<String, StoreOwner>();
-            Managers = new ConcurrentDictionary<String, StoreManager>();
             this.isClosed = isClosed;
 
         }
+        
+        // Constructor for Lazy Load
         public Store(string id, string name, InventoryManager inventoryManager, double rating, int numberOfRates, NotificationManager notificationManager, Boolean isClosed = false)
         {
             Id = id;
             Name = name;
+            //Founder is injected manually
+            Owners = new ConcurrentDictionary<String, StoreOwner>();
+            Managers = new ConcurrentDictionary<String, StoreManager>();
             InventoryManager = inventoryManager;
+            PolicyManager = new PolicyManager();   //PolicyManager is injected manually when needed for lazy load
+            //OfferManager
+            History = new History();
             Rating = rating;
             NumberOfRates = numberOfRates;
             NotificationManager = notificationManager;
-            History = new History();
-            Owners = new ConcurrentDictionary<String, StoreOwner>();
-            Managers = new ConcurrentDictionary<String, StoreManager>();
             this.isClosed = isClosed;
         }
 
