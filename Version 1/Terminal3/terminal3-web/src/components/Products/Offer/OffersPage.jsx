@@ -3,7 +3,7 @@ import { List, ListItem, ListItemText, Typography, Paper, Button, Divider } from
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Offer } from '../../../components';
-import { printErrorMessage, GetStoreOffers, GetUserOffers, SendOfferResponseToUser } from '../../../api/API';
+import { printErrorMessage, GetStoreOffers, GetUserOffers, SendOfferResponseToUser, AnswerCounterOffer } from '../../../api/API';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -46,7 +46,7 @@ const OffersPage = ({ type, storeID, userID }) => {
     const [data, setData] = useState(null);
 
     // TODO: Update on click
-    const [forceRender, setForceRender] = useState(0);
+    // const [forceRender, setForceRender] = useState(0);
 
     // Counter offer
     const [selectedOffer, setSelectedOffer] = useState(null);
@@ -62,27 +62,33 @@ const OffersPage = ({ type, storeID, userID }) => {
             response.json().then(result => setData(result.data)) : printErrorMessage(response)).catch(err => console.log(err)); 
     }
 
-    // TODO: Connect user to API
+    // TODO: Check AnswerCounterOffer API call
     const handleAccept = (offerID, customerID) => {
         if (type === 'store'){
             const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: true }
             SendOfferResponseToUser(toSend).then(response => response.ok ?
                 response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
         }
-        else if (type === 'user')
-            console.log("ACCEPTED BY USER");
+        else if (type === 'user'){
+            const toSend = { userID, offerID, accepted: true }
+            AnswerCounterOffer(toSend).then(response => response.ok ?
+                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+        }
     };
 
-    // TODO: Connect user to API
+    // TODO: Check AnswerCounterOffer API call
     const handleDecline = (offerID, customerID) => {
         if (type === 'store'){
             const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: false, CounterOffer: -1 }
             SendOfferResponseToUser(toSend).then(response => response.ok ?
                 response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
-            setForceRender(prev => prev + 1);
+            // setForceRender(prev => prev + 1);
         }
-        else if (type === 'user')
-            console.log("DECLINED BY USER");
+        else if (type === 'user'){
+            const toSend = { userID, offerID, accepted: false }
+            AnswerCounterOffer(toSend).then(response => response.ok ?
+                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+        }
     };
 
     const onCounter = (offerID, customerID) => {
@@ -103,12 +109,12 @@ const OffersPage = ({ type, storeID, userID }) => {
             fetchUserOffers();
     }, []);
 
-    useEffect(() => {
-        if (type === 'store')
-            fetchStoreOffers();
-        else if (type === 'user')
-            fetchUserOffers();
-    }, [forceRender]);
+    // useEffect(() => {
+    //     if (type === 'store')
+    //         fetchStoreOffers();
+    //     else if (type === 'user')
+    //         fetchUserOffers();
+    // }, [forceRender]);
 
     useEffect(() => {
         console.log(data);
@@ -121,11 +127,11 @@ const OffersPage = ({ type, storeID, userID }) => {
                 <Paper className={classes.paper}>
                     <List component="nav" aria-label="offers list">
                         {(data === null || data.length === 0) && (
-                            <Typography variant="body2">No pending offers.</Typography>
+                            <Typography variant="body2">No pending offers</Typography>
                         )}
                         {(type === 'store' && data !== null) && (
                             data.map((offer) => (
-                            <>
+                            <div key={offer.Id}>
                                 <ListItem style={{padding: '10px 0'}} key={offer.Id}>
                                     <ListItemText primary={offer.Product} secondary={`User: ${offer.User}`} />
                                     <Typography variant="body2">{`Amount: ${offer.Amount}, Price: ${offer.Price}₪`}</Typography>
@@ -134,13 +140,13 @@ const OffersPage = ({ type, storeID, userID }) => {
                                 <Button color="primary" onClick={() => onCounter(offer.Id, offer.User)}>Counter</Button>
                                 <Button color="secondary" onClick={() => handleDecline(offer.Id, offer.User)}>Decline</Button>
                                 <Divider />
-                            </>
+                            </div>
                             ))
                         )}
 
                         {(type === 'user' && data !== null) && (
                             data.map((offer) => (
-                            <>
+                            <div key={offer.Id}>
                                 <ListItem style={{padding: '10px 0'}} key={offer.Id}>
                                     <ListItemText primary={offer.Product} secondary={`Store: ${offer.Store}`} />
                                     <Typography variant="body2">{`Amount: ${offer.Amount}, Price: ${offer.Price}₪`}</Typography>
@@ -155,7 +161,7 @@ const OffersPage = ({ type, storeID, userID }) => {
                                 (<Typography variant="body2">PENDING</Typography>)
                                 }
                                 <Divider />
-                            </>
+                            </div>
                             ))
                         )}
                     </List>
