@@ -887,6 +887,13 @@ namespace Terminal3.DataAccessLayer
         {
             RegisteredUser ru;
             DTO_RegisteredUser dto = DAO_RegisteredUser.Load(filter);
+
+            //User is not found in DB
+            if (dto is null)
+            {
+                return null;
+            }
+
             if (dto != null && RegisteredUsers.TryGetValue(dto._id, out ru))
             {
                 return ru;
