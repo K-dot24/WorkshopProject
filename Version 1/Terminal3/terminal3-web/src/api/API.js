@@ -222,14 +222,13 @@ export function GetTotalShoppingCartPrice( userID ) {
 
 
 /// Returns all the reviews on a specific product
-export function GetProductReview( data ) {    
-    return fetch(`${API_URL}/GuestUser/GetProductReview/${data.storeID}/${data.productID}`, {
+export function GetProductReview( storeID, productID) {    
+    return fetch(`${API_URL}/GuestUser/GetProductReview/${storeID}/${productID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
