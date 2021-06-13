@@ -28,14 +28,14 @@ const InfoDisplay = ({ info }) => {
                         )))
                     )
                     :
-                    info.type === 'productReview' ? (
+                    info.type === 'productReview' ? info.data.length > 0 ? (
                         info.data.map((review, index) => (
                             <ListItem style={{padding: '10px 0'}} key={index}>
                                 <ListItemText primary={review.item2} secondary={`User: ${review.item1}`} />
                                 {/* <Typography variant="body2">{product.item1.price * product.item2}₪</Typography> */}
                             </ListItem>
                         ))
-                    )
+                    ) : (<Typography variant="body2">No available reviews on this product at the moment.</Typography>)
                     :
                     info.data.map((item, index) => ( info.type === 'incomes' ?
                         <ListItem style={{padding: '10px 0'}} key={index}>
