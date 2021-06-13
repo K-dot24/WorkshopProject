@@ -10,14 +10,16 @@ const Product = ({ product, onAddToBag, handleSendOfferToStore, handleGetProduct
     const classes = useStyles();
 
     const [showOfferDialog, setShowOfferDialog] = useState(false);
+    const [showUserReviews, setShowUserReviews] = useState(false);
 
     const onSendOffer = (data) => {
         const toSend = { ProductID: product.id, Amount: data.amount, Price: data.price };
         handleSendOfferToStore(toSend);
     };
 
-    const onGetProductReview = (productID) => {
-        handleGetProductReview({ productID });
+    const onGetProductReview = (productID, toShow) => {
+        setShowUserReviews(toShow);
+        handleGetProductReview({ productID }, toShow);
     };
 
     return (
@@ -47,7 +49,7 @@ const Product = ({ product, onAddToBag, handleSendOfferToStore, handleGetProduct
                     <IconButton aria-label="Submit Offer" onClick={() => setShowOfferDialog(true)}>
                         <AttachMoney />
                     </IconButton>
-                    <IconButton aria-label="Get Reviews" onClick={() => onGetProductReview(product.id)}>
+                    <IconButton aria-label="Get Reviews" onClick={() => onGetProductReview(product.id, !showUserReviews)}>
                         <RateReview />
                     </IconButton>
                 </>

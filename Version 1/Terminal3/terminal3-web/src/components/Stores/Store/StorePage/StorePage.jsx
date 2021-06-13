@@ -311,9 +311,14 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
     
-    const handleGetProductReview = (data) => {
-        GetProductReview(store.id, data.productID).then(response => response.ok ?
-            response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'productReview'})) : printErrorMessage(response)).catch(err => console.log(err));
+    const handleGetProductReview = (data, toShow) => {
+        if (toShow) {
+            GetProductReview(store.id, data.productID).then(response => response.ok ?
+                response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'productReview'})) : printErrorMessage(response)).catch(err => console.log(err));   
+        } else {
+            setIssued(false);
+            setInfo(null);
+        }
     }
 
     //#endregion
