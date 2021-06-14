@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal3.DataAccessLayer.DTOs;
 using System.Threading;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
 {
@@ -54,10 +55,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
                         return AcceptedResponse(ownerID, offer, allOwners);
 
                     PendingOffers.Remove(offer);
-                    //TODO mapper Zoe
+                    
                     if (counterOffer == -1)
+                    {
                         return DeclinedResponse(offer);
-                    return CounterOfferResponse(offer, counterOffer);
+                    }
+
+                    Result<OfferResponse> res = CounterOfferResponse(offer, counterOffer);
+                    //Zoe - check counter updated in db
+                    return res;
                 }
                 finally
                 {
