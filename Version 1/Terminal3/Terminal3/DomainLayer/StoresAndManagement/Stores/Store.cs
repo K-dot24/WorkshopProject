@@ -72,31 +72,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public ConcurrentDictionary<String, StoreOwner> Owners { get; set; }
         public ConcurrentDictionary<String, StoreManager> Managers { get; set; }
         public InventoryManager InventoryManager { get; }
-        public PolicyManager PolicyManager
-        {
-            get 
-            {
-                Mapper.getInstance().Load_StorePolicyManager(this);
-                return PolicyManager;
-            }
-            set
-            {
-                this.PolicyManager = value;
-            }
-        }
+        public PolicyManager PolicyManager { get; set; }
         public OfferManager OfferManager{ get; set; }
-        public History History 
-        { 
-            get
-            {
-                Mapper.getInstance().Load_StoreHistory(this);
-                return History;
-            }
-            set
-            {
-                this.History = value;
-            }
-        }
+        public History History { get; set; }
+
         public Double Rating { get; private set; }
         public int NumberOfRates { get; private set; }
         public NotificationManager NotificationManager { get; set; }
@@ -153,7 +132,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Managers = new ConcurrentDictionary<String, StoreManager>();
             InventoryManager = inventoryManager;
             PolicyManager = new PolicyManager();   //PolicyManager is injected manually when needed for lazy load
-            //OfferManager
+            OfferManager = new OfferManager();     //OfferManager is injected manually when needed for lazy load
             History = new History();
             Rating = rating;
             NumberOfRates = numberOfRates;
@@ -688,8 +667,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<bool> SendOfferToStore(Offer offer)
         {
-            OfferManager.AddOffer(offer);            
-
+            OfferManager.AddOffer(offer);
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
+            Mapper.getInstance().UpdateStore(filter, update_offer);
             return sendNotificationToAllOwners(offer);
         }
 
@@ -714,7 +695,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
             return new DTO_Store(Id, Name, Founder.User.Id, owners_dto, managers_dto,
                 inventoryManagerProducts_dto, History.getDTO(), Rating, NumberOfRates, isClosed,
-                PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO());
+                PolicyManager.MainDiscount.getDTO(), PolicyManager.MainPolicy.getDTO() , Get_DTO_Offers());
 
         }
 
@@ -731,12 +712,29 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             List<string> ids = ownerIDs();
             if (!ids.Contains(ownerID))
                 return new Result<OfferResponse>("Failed to reponse to an offer: The responding user is not an owner", false, OfferResponse.None);
-            return OfferManager.SendOfferResponseToUser(ownerID, offerID, accepted, counterOffer, ids);
+            Result<OfferResponse>  res = OfferManager.SendOfferResponseToUser(ownerID, offerID, accepted, counterOffer, ids);
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
+            Mapper.getInstance().UpdateStore(filter, update_offer);
+            return res;
         }
 
         public Result<List<Dictionary<string, object>>> getStoreOffers()
         {
             return OfferManager.getStoreOffers();
+        }
+
+        public List<DTO_Offer> Get_DTO_Offers()
+        {
+            Mapper.getInstance().Load_StoreOfferManager(this);   //just in case
+
+            List<DTO_Offer> dto_offers = new List<DTO_Offer>();
+            foreach (Offer offer in OfferManager.PendingOffers)
+            {
+                dto_offers.Add(new DTO_Offer(offer.Id, offer.UserID, offer.ProductID, offer.StoreID, offer.Amount, offer.Price, offer.CounterOffer, offer.acceptedOwners));
+            }
+
+            return dto_offers;
         }
     }
 }

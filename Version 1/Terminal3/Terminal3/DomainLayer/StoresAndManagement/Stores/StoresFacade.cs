@@ -322,7 +322,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if(Stores.TryGetValue(storeID, out Store store))
             {
-                //mapper.Load_StoreHistory(store);
+                mapper.Load_StoreHistory(store);
                 return store.GetStorePurchaseHistory(userID,sysAdmin);
             }
             return new Result<History>("Store Id does not exists\n", false, null);
@@ -511,7 +511,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
+                mapper.Load_StoreOfferManager(store);
                 return store.AdheresToPolicy(products, user);
             }
             return new Result<bool>("Store does not exists\n", false, false);
@@ -521,7 +522,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
                 Result<IDiscountPolicy> res = store.AddDiscountPolicy(info);
                 if (res.ExecStatus)
                 {
@@ -542,7 +543,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
                 Result<IDiscountPolicy> res = store.AddDiscountPolicy(info, id);
                 if (res.ExecStatus)
                 {
@@ -564,7 +565,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-               //mapper.Load_StorePolicyManager(store);
+               mapper.Load_StorePolicyManager(store);
                 Result<IDiscountCondition> res =  store.AddDiscountCondition(info, id);
                 if (res.ExecStatus)
                 {
@@ -588,7 +589,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
                 Result<IDiscountPolicy> res = store.RemoveDiscountPolicy(id);
                 if (res.ExecStatus)
                 {
@@ -610,7 +611,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
                 Result<IDiscountCondition> res = store.RemoveDiscountCondition(id);
                 if (res.ExecStatus)
                 {
@@ -631,7 +632,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
+                mapper.Load_StoreOfferManager(store);
                 return store.GetPoliciesData();
             }
             return new Result<IDictionary<string, object>>("Store does not exists\n", false, null);
@@ -642,7 +644,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
+                mapper.Load_StoreOfferManager(store);
                 Result<IPurchasePolicy> res =  store.RemovePurchasePolicy(id);
                 if (res.ExecStatus)
                 {
@@ -662,7 +665,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
                 Result<bool> res = store.EditDiscountPolicy(info, id);
                 if (res.ExecStatus)
                 {
@@ -682,7 +685,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
                 Result<bool> res = store.EditDiscountCondition(info, id);
                 if (res.ExecStatus)
                 {
@@ -702,7 +705,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
+                mapper.Load_StoreOfferManager(store);
                 Result<bool> res = store.EditPurchasePolicy(info, id);
                 if (res.ExecStatus)
                 {
@@ -722,7 +726,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
+                mapper.Load_StoreOfferManager(store);
                 return store.GetPurchasePolicyData();
             }
             return new Result<IDictionary<string, object>>("Store does not exists\n", false, null);
@@ -732,7 +737,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
+                mapper.Load_StoreOfferManager(store);
                 Result<IPurchasePolicy> res = store.AddPurchasePolicy(info);
                 if (res.ExecStatus)
                 {
@@ -754,7 +760,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeId, out Store store))
             {
-                //mapper.Load_StorePolicyManager(store);
+                mapper.Load_StorePolicyManager(store);
+                mapper.Load_StoreOfferManager(store);
                 Result<IPurchasePolicy> res =  store.AddPurchasePolicy(info, id);
                 if (res.ExecStatus)
                 {
@@ -873,6 +880,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(offer.StoreID, out Store store))
             {
+                mapper.Load_StoreOfferManager(store);
                 return store.SendOfferToStore(offer);
             }
             return new Result<bool>("Failed to add an offer: Failed to locate the store\n", false, false);
@@ -882,6 +890,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeID, out Store store))
             {
+                mapper.Load_StoreOfferManager(store);
                 return store.SendOfferResponseToUser(ownerID, offerID, accepted, counterOffer);
             }
             return new Result<OfferResponse>("Failed to response to an offer: Failed to locate the store\n", false, OfferResponse.None);
@@ -891,6 +900,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             if (Stores.TryGetValue(storeID, out Store store))
             {
+                mapper.Load_StoreOfferManager(store);
                 return store.getStoreOffers();
             }
             return new Result<List<Dictionary<string, object>>>("Failed to get store offers: Failed to locate the store\n", false, null);

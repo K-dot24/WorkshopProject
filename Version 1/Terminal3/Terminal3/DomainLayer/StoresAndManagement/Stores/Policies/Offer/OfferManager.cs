@@ -1,6 +1,9 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DataAccessLayer.DTOs;
 using System.Threading;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
@@ -17,7 +20,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
     public class OfferManager
     {
 
-        List<Offer> PendingOffers { get; }
+        public List<Offer> PendingOffers { get; set; }
 
         public OfferManager()
         {
@@ -87,7 +90,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
             if(response.Data == OfferResponse.Accepted)
             {
                 PendingOffers.Remove(offer);
-                //TODO mapper Zoe
             }
             return response;
         }
@@ -95,7 +97,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
         internal void AddOffer(Offer offer)
         {
             PendingOffers.Add(offer);
-            //TODO: mapper Zoe
         }
 
         public Result<List<Dictionary<string, object>>> getStoreOffers()
@@ -104,6 +105,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
             foreach (Offer offer in PendingOffers)
                 list.Add(offer.GetData());
             return new Result<List<Dictionary<string, object>>>("", true, list);
+        }
+
+        public List<DTO_Offer> GetDTO()
+        {
+            List<DTO_Offer> dto_offers = new List<DTO_Offer>();
+            foreach(Offer offer in PendingOffers)
+            {
+                dto_offers.Add(new DTO_Offer(offer.Id, offer.UserID, offer.ProductID, offer.StoreID, offer.Amount, offer.Price, offer.CounterOffer, offer.acceptedOwners));
+            }
+            return dto_offers;
         }
     }
 }

@@ -22,8 +22,12 @@ namespace Terminal3.DataAccessLayer.DTOs
         public DTO_History History { get; set; }
         [BsonElement]
         public LinkedList<DTO_Notification> PendingNotification { get; set; }
+        [BsonElement]
+        public List<DTO_Offer> PendingOffers { get; set; }
+        [BsonElement]
+        public List<DTO_Offer> AcceptedOffers { get; set; }
 
-        public DTO_RegisteredUser(String id, DTO_ShoppingCart shoppingCart, String email, String password, Boolean loggedIn, DTO_History history, LinkedList<DTO_Notification> pendingNotification)
+        public DTO_RegisteredUser(string id, DTO_ShoppingCart shoppingCart, string email, string password, bool loggedIn, DTO_History history, LinkedList<DTO_Notification> pendingNotification, List<DTO_Offer> pendingOffers, List<DTO_Offer> acceptedOffers)
         {
             _id = id;
             ShoppingCart = shoppingCart;
@@ -32,6 +36,8 @@ namespace Terminal3.DataAccessLayer.DTOs
             LoggedIn = loggedIn;
             History = history;
             PendingNotification = pendingNotification;
+            PendingOffers = pendingOffers;
+            AcceptedOffers = acceptedOffers;
         }
     }
 }
