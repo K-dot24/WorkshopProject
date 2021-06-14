@@ -517,6 +517,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
+                Mapper.getInstance().Load_RegisteredUserHistory(registerd_user);
                 Result<ShoppingCart> ShoppingCart = registerd_user.Purchase(paymentDetails, deliveryDetails , session);
                 if (ShoppingCart.ExecStatus)
                 {
@@ -688,5 +689,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return registerd_user.AnswerCounterOffer(offerID, accepted);
             return new Result<bool>("Failed to responde to a counter offer: Failed to locate the user", false, false);
         }
+
+        public void UpdateUserOffers_DB(String userID , String offerID , double counterOffer)
+        {           
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", userID) ;
+            if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+                return;
+            else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
+            {
+                Offer offer = registerd_user.findPendingOffer(offerID);
+                offer.CounterOffer = counterOffer;
+                var update_offer = Builders<BsonDocument>.Update.Set("PendingOffers", registerd_user.Get_DTO_Offers(registerd_user.PendingOffers));
+                Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
+            }
+        }
+
     }
 }
