@@ -317,5 +317,44 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
+        public Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price)
+        {
+            Result<bool> fromSystem = system.SendOfferToStore(storeID, userID, productID, amount, price);
+            if(fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+        }
+
+        public Result<bool> AnswerCounterOffer(string userID, string offerID, bool accepted)
+        {
+            Result<bool> fromSystem = system.AnswerCounterOffer(userID, offerID, accepted);
+            if (fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+        }
+
+        public Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer)
+        {
+            Result<bool> fromSystem = system.SendOfferResponseToUser(storeID, ownerID, userID, offerID, accepted, counterOffer);
+            if (fromSystem.ExecStatus)
+                return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+            return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
+        {
+            Result<List<Dictionary<string, object>>> fromSystem = system.getStoreOffers(storeID);
+            if (fromSystem.ExecStatus)
+                return new Result<List<Dictionary<string, object>>>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.Data);
+            return new Result<List<Dictionary<string, object>>>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.Data);
+        }
+
+        public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
+        {
+            Result<List<Dictionary<string, object>>> fromSystem = system.getUserOffers(userId);
+            if (fromSystem.ExecStatus)
+                return new Result<List<Dictionary<string, object>>>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.Data);
+            return new Result<List<Dictionary<string, object>>>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.Data);
+        }
     }
 }
