@@ -375,6 +375,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Result<History> GetUserPurchaseHistory(String userID)
         {
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", userID);
+            mapper.LazyLoad_RegisteredUser(filter);
             if (RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
             {
                 mapper.Load_RegisteredUserHistory(user);

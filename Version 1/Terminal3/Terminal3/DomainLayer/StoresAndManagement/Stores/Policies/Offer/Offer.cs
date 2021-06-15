@@ -15,9 +15,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
         public string StoreID { get; }
         public int Amount { get; }
         public double Price { get; }
-
         public double CounterOffer { get; set; }
-
         public List<string> acceptedOwners { get; }
 
         public Offer(string userID, string productID, int amount, double price, string storeID, string id = "", double counterOffer = -1, List<string> acceptedOwners = null)
@@ -34,6 +32,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
             this.acceptedOwners = acceptedOwners;
             if (acceptedOwners == null)
                 this.acceptedOwners = new List<string>();
+        }
+
+        public Offer(string id, string userID, string productID, string storeID, int amount, double price, double counterOffer, List<string> acceptedOwners)
+        {
+            Id = id;
+            UserID = userID;
+            ProductID = productID;
+            StoreID = storeID;
+            Amount = amount;
+            Price = price;
+            CounterOffer = counterOffer;
+            this.acceptedOwners = acceptedOwners;
         }
 
         public DTO_Offer getDTO()
