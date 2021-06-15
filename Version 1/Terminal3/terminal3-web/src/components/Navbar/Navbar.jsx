@@ -154,15 +154,20 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/monitorsystem`)}>Monitor System</MenuItem>
                 </>
                 }
+                <MenuItem onClick={() => handleMenuClick(`/${user.id}/checkuseroffers`)}>Check Offers</MenuItem>
                 { /* Registered User Actions Menu */}
-                <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
-                <MenuItem onClick={() => handleHistory(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
-                <MenuItem onClick={() => handleHistory(`/${user.id}/checkuseroffers`)}>Check Offers</MenuItem>
-
+                {user.loggedIn &&
+                <>
+                    <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
+                    <MenuItem onClick={() => handleHistory(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
+                    {/* <MenuItem onClick={() => handleMenuClick(`/${user.id}/checkuseroffers`)}>Check Offers</MenuItem> */}
+                </>
+                }
             </div>
         ) : (
             // Store Menu
-            <StoreActions />
+            user.loggedIn &&
+                <StoreActions />
         )
         
         }
@@ -262,11 +267,11 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                     </div> */}
 
                     {/* Menu Icon */}
-                    {(user.loggedIn) &&
+                    {/* {(user.loggedIn) && */}
                         <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="open drawer" onClick={handleMenuOpen}>
                             <MenuIcon />
                         </IconButton>
-                    }
+                    {/* } */}
                 </Toolbar>
             </AppBar>
             {renderMenu}
