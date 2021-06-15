@@ -151,6 +151,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Managers = new ConcurrentDictionary<String, StoreManager>();
             InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
+            OfferManager = new OfferManager();
             History = new History();
             isClosed = false;
 
