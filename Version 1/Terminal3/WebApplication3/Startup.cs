@@ -1,3 +1,4 @@
+using log4net.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -22,6 +23,8 @@ namespace WebApplication3
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            string log4netConfigPath= Path.GetFullPath("Log4Net.config");
+            XmlConfigurator.Configure(new FileInfo(log4netConfigPath));
         }
 
         public IConfiguration Configuration { get; }
