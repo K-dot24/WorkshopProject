@@ -49,7 +49,7 @@ namespace XUnitTestTerminal3
             sut.SendOfferToStore(StoreID, RegisteredUserID, ProductID, 2, 1);
             sut.SendOfferToStore(StoreID, RegisteredUserID, ProductID, 1, 2);
             sut.SendOfferResponseToUser(StoreID, OwnerID, RegisteredUserID, OfferID, true, -1);
-            sut.AddProductToCart(RegisteredUserID, ProductID, 4, StoreID);
+            sut.AddProductToCart(RegisteredUserID, ProductID, 3, StoreID);
             Assert.True(sut.GetTotalShoppingCartPrice(RegisteredUserID).Data == 3);
         }
 
@@ -80,9 +80,24 @@ namespace XUnitTestTerminal3
             sut.SendOfferToStore(StoreID, RegisteredUserID, ProductID, 2, 1);
             sut.SendOfferResponseToUser(StoreID, OwnerID, RegisteredUserID, OfferID, true, -1);
             sut.AddProductToCart(RegisteredUserID, ProductID, 2, StoreID);
-            IDictionary<String, Object> dictionaryPay = new Dictionary<String, Object>() { { "Name", "test_product" } };
-            IDictionary<String, Object> dictionaryDeliver = new Dictionary<String, Object>() { { "Name", "test_product" } };
-            Assert.True(sut.Purchase(RegisteredUserID, dictionaryPay, dictionaryDeliver).ExecStatus);
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>
+                    {
+                     { "card_number", "2222333344445555" },
+                     { "month", "4" },
+                     { "year", "2021" },
+                     { "holder", "Israel Israelovice" },
+                     { "ccv", "262" },
+                     { "id", "20444444" }
+                    };
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>
+                    {
+                     { "name", "Israel Israelovice" },
+                     { "address", "Rager Blvd 12" },
+                     { "city", "Beer Sheva" },
+                     { "country", "Israel" },
+                     { "zip", "8458527" }
+                    };
+            Assert.True(sut.Purchase(RegisteredUserID, paymentDetails, deliveryDetails).ExecStatus);
 
             sut.AddProductToCart(RegisteredUserID, ProductID, 2, StoreID);
             Assert.True(sut.GetTotalShoppingCartPrice(RegisteredUserID).Data == 20);
