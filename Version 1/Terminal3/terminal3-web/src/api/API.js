@@ -10,7 +10,6 @@ export function printErrorMessage(response) {
 export function GetAllStoresToDisplay() {
     return fetch(`${API_URL}/Data/GetAllStoresToDisplay`, {
         method: 'GET',
-        // agent: httpsAgent,
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',

@@ -204,7 +204,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         }
 
         allData = { storeId: store.id, info };
-        // console.log(allData);
 
         if ('nodeid' in data) {
             AddDiscountPolicyById(data.nodeid, allData).then(response => response.ok ? 
@@ -236,7 +235,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         }
 
         const allData = { storeId: store.id, info };
-        // console.log(allData);
 
         AddDiscountCondition(data.nodeid, allData).then(response => response.ok ? 
             response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
@@ -323,30 +321,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     //#endregion
 
-    //#region Search (commented out)
-
-    // const [searchQuery, setsearchQuery] = useState('');
-    
-    // const searchProductsByQuery = async () => {
-    //     const query = {Name: searchQuery};
-    //     console.log(query);
-    //     SearchProduct(query).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
-    // }
-
-    // const handleProductSearch = async (query) => {
-    //     setsearchQuery(query);
-    // }
-
-    // useEffect(() => {
-    //     
-    //     if (searchQuery !== '')
-    //         searchProductsByQuery();
-    //     // else
-    //     //     fetchStores();
-    // }, [searchQuery]);
-
-    //#endregion
-
     // Fetch products on first render of page
     useEffect(() => {
         fetchProducts();
@@ -359,9 +333,9 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         setInfo(null);
     }, [match]);
 
-    useEffect(() => {
-        console.log(info);
-    }, [info]);
+    // useEffect(() => {
+    //     console.log(info);
+    // }, [info]);
 
     return (
         <div>

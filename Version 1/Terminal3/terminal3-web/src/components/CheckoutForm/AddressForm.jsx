@@ -20,7 +20,6 @@ const AddressForm = ({ next }) => {
     }
 
     const handleSubmit = (e) => {
-        // e.preventDefault();
         next({ ...data, shippingCountry });
     }
 

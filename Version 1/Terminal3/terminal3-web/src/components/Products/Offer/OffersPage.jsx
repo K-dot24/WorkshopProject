@@ -44,8 +44,7 @@ const OffersPage = ({ type, storeID, userID }) => {
 
     // Offers list data from API
     const [data, setData] = useState(null);
-
-    // TODO: Update on click
+    // For updating offers list on action
     const [forceRender, setForceRender] = useState(0);
 
     // Counter offer
@@ -62,7 +61,6 @@ const OffersPage = ({ type, storeID, userID }) => {
             response.json().then(result => setData(result.data)) : printErrorMessage(response)).catch(err => console.log(err)); 
     }
 
-    // TODO: Check AnswerCounterOffer API call
     const handleAccept = (offerID, customerID) => {
         if (type === 'store'){
             const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: true }
@@ -76,7 +74,6 @@ const OffersPage = ({ type, storeID, userID }) => {
         }
     };
 
-    // TODO: Check AnswerCounterOffer API call
     const handleDecline = (offerID, customerID) => {
         if (type === 'store'){
             const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: false, CounterOffer: -1 }
@@ -115,9 +112,9 @@ const OffersPage = ({ type, storeID, userID }) => {
             fetchUserOffers();
     }, [forceRender]);
 
-    useEffect(() => {
-        console.log(data);
-    }, [data]);
+    // useEffect(() => {
+    //     console.log(data);
+    // }, [data]);
 
     return (
         <div className={classes.root}>

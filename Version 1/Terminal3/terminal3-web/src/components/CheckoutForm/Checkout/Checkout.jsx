@@ -45,12 +45,6 @@ const Checkout = ({ userID, cart, setUpdateCart }) => {
         nextStep();
     }
 
-    // const timeout = () => {
-    //     setTimeout(() => {
-    //         setIsFinished(true);
-    //     }, 2000);
-    // }
-
     const Confirmation = () => !isFinished ? (
         <>
             {/* {timeout()} */}

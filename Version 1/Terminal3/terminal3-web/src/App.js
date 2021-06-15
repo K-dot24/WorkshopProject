@@ -152,7 +152,6 @@ const App = () => {
             response.json().then(result => setSystemAdmins(prev => prev.filter(id => id !== result.data.id)) & alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
-    //setIssued(true) & setInfo({data, type: 'purchaseHistory'})
     const handleAdminGetUserPurchaseHistory = async (data) => {
         AdminGetUserPurchaseHistory(user.id, data.userid).then(response => response.ok ? 
             response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'purchaseHistory'})) : printErrorMessage(response)).catch(err => alert(err));
@@ -194,8 +193,6 @@ const App = () => {
                                                         .catch(err => console.log(err))))
                                     .catch(err => console.log(err))))
             .catch(err => console.log(err));
-
-        // SearchProduct({ Category: productSearchQuery }).then(response => response.json().then(result => result.execStatus ? setProducts(result.data) : alert(result.message))).catch(err => console.log(err));
     }
 
     //#region Signal-R Functionality
@@ -225,7 +222,7 @@ const App = () => {
     // Update cart when user change (login/sign out)
     useEffect(() => {
         fetchCart();
-        console.log(user);
+        // console.log(user);
     }, [user]);
 
     // Update cart
@@ -362,9 +359,7 @@ const App = () => {
 
                         {/* Admin Get User Purchase History */}
                         {systemAdmins.includes(user.id) && (
-                            <Route exact path={`/${user.id}/admingetuserpurchasehistory`} 
-                                    // render={(props) => (<Action name='Get User Purhcase History' fields={[{name: 'User ID', required: true}]} 
-                                    //                             handleAction={handleAdminGetUserPurchaseHistory} {...props} />)} 
+                            <Route exact path={`/${user.id}/admingetuserpurchasehistory`}
                                     render={function(props) {
                                         if (!issued)
                                             return (<Action name='Get User Purhcase History' fields={[{name: 'User ID', required: true}]} 
@@ -375,9 +370,7 @@ const App = () => {
 
                         {/* Admin Get Store Purchase History */}
                         {systemAdmins.includes(user.id) && (
-                            <Route exact path={`/${user.id}/admingetstorepurchasehistory`} 
-                                    // render={(props) => (<Action name='Get Store Purhcase History' fields={[{name: 'Store ID', required: true}]} 
-                                    //                             handleAction={handleAdminGetStorePurchaseHistory} {...props} />)} 
+                            <Route exact path={`/${user.id}/admingetstorepurchasehistory`}
                                     render={function(props) {
                                         if (!issued)
                                             return (<Action name='Get Store Purhcase History' fields={[{name: 'Store ID', required: true}]} 

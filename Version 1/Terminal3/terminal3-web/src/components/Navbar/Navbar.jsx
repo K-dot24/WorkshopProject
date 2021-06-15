@@ -126,7 +126,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
 
     useEffect(() => {
         fetchPermissions();
-        console.log(user);
+        // console.log(user);
     }, [user]);
 
     const menuId = 'primary-search-account-menu';
@@ -154,13 +154,15 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/monitorsystem`)}>Monitor System</MenuItem>
                 </>
                 }
+
+                {/* User Actions Menu */}
                 <MenuItem onClick={() => handleMenuClick(`/${user.id}/checkuseroffers`)}>Check Offers</MenuItem>
+
                 { /* Registered User Actions Menu */}
                 {user.loggedIn &&
                 <>
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
                     <MenuItem onClick={() => handleHistory(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
-                    {/* <MenuItem onClick={() => handleMenuClick(`/${user.id}/checkuseroffers`)}>Check Offers</MenuItem> */}
                 </>
                 }
             </div>
