@@ -15,6 +15,8 @@ using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
 using Terminal3.DataAccessLayer.DTOs;
 using System.Globalization;
 using Terminal3.ServiceLayer.Controllers;
+using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace Terminal3.DomainLayer.StoresAndManagement
 {
@@ -213,6 +215,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID)
         {
+            var filter1 = Builders<BsonDocument>.Filter.Eq("_id", addedOwnerID);
+            //var filter2 = Builders<BsonDocument>.Filter.Eq("_id", currentlyOwnerID);
+            Mapper.getInstance().LazyLoad_RegisteredUser(filter1);
+            //Mapper.getInstance().LazyLoad_RegisteredUser(filter2);
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(addedOwnerID, out RegisteredUser futureOwner))  // Check if addedOwnerID is a registered user
             {
                 return StoresFacade.AddStoreOwner(futureOwner, currentlyOwnerID, storeID);
@@ -223,6 +229,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID)
         {
+            var filter1 = Builders<BsonDocument>.Filter.Eq("_id", addedManagerID);
+            //var filter2 = Builders<BsonDocument>.Filter.Eq("_id", currentlyOwnerID);
+            Mapper.getInstance().LazyLoad_RegisteredUser(filter1);
+            //Mapper.getInstance().LazyLoad_RegisteredUser(filter2);
             if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(addedManagerID, out RegisteredUser futureManager))  // Check if addedManagerID is a registered user
             {
                 return StoresFacade.AddStoreManager(futureManager, currentlyOwnerID, storeID);
