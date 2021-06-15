@@ -63,7 +63,7 @@ const OffersPage = ({ type, storeID, userID }) => {
 
     const handleAccept = (offerID, customerID) => {
         if (type === 'store'){
-            const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: true }
+            const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: true, CounterOffer: -1 }
             SendOfferResponseToUser(toSend).then(response => response.ok ?
                 response.json().then(result => alert(result.message) & setForceRender(prev => prev + 1)) : printErrorMessage(response)).catch(err => console.log(err));
         }
@@ -112,9 +112,9 @@ const OffersPage = ({ type, storeID, userID }) => {
             fetchUserOffers();
     }, [forceRender]);
 
-    // useEffect(() => {
-    //     console.log(data);
-    // }, [data]);
+    useEffect(() => {
+        console.log(data);
+    }, [data]);
 
     return (
         <div className={classes.root}>
