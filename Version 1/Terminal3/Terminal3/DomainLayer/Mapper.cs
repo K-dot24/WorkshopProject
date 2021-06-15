@@ -349,7 +349,7 @@ namespace Terminal3.DataAccessLayer
             {
                 foreach(DTO_Offer offer in dto)
                 {
-                    Offers.Add(new Offer(offer.UserID, offer.ProductID, offer.Amount, offer.Price, offer.StoreID, offer._id));
+                    Offers.Add(new Offer(offer._id, offer.UserID, offer.ProductID, offer.StoreID, offer.Amount, offer.Price, offer.CounterOffer, offer.acceptedOwners));
                 }
             }
             return Offers;
