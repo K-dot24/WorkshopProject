@@ -680,6 +680,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             Result<OfferResponse> storeResult = StoresFacade.SendOfferResponseToUser(storeID, ownerID, offerID, accepted, counterOffer);
             if (!storeResult.ExecStatus)
                 return new Result<bool>(storeResult.Message, false, false);
+            if (storeResult.ExecStatus)  {  UsersAndPermissionsFacade.UpdateUserOffers_DB(userID , offerID , counterOffer);   }
 
             OfferResponse respone = storeResult.Data;
             if (respone == OfferResponse.Accepted)
