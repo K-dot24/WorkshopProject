@@ -201,6 +201,44 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.AddProductReview(userID, storeID, productID, review);
         }
 
+        public Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price)
+        {
+            if (Real == null)
+                return new Result<bool>(true);
 
+            return Real.SendOfferToStore(storeID, userID, productID, amount, price);
+        }
+
+        public Result<bool> AnswerCounterOffer(string userID, string offerID, bool accepted)
+        {
+            if (Real == null)
+                return new Result<bool>(true);
+
+            return Real.AnswerCounterOffer(userID, offerID, accepted);
+        }
+
+        public Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer)
+        {
+            if (Real == null)
+                return new Result<bool>(true);
+
+            return Real.SendOfferResponseToUser(storeID, ownerID, userID, offerID, accepted, counterOffer);
+        }
+
+        public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)
+        {
+            if (Real == null)
+                return new Result<List<Dictionary<string, object>>>(true);
+
+            return Real.getStoreOffers(storeID);
+        }
+
+        public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
+        {
+            if (Real == null)
+                return new Result<List<Dictionary<string, object>>>(true);
+
+            return Real.getUserOffers(userId);
+        }
     }
 }

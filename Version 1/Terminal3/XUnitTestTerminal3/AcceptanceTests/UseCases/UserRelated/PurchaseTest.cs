@@ -52,9 +52,24 @@ namespace XUnitTestTerminal3
         public void SuccessPurchaseSystemTest()
         {
             sut.AddProductToCart(this.user_id, this.product_id, 5, this.store_id);
-            IDictionary<String, Object> dictionaryPay = new Dictionary<String, Object>() { { "Name", "test_product" } };
-            IDictionary<String, Object> dictionaryDeliver = new Dictionary<String, Object>() { { "Name", "test_product" } };
-            Assert.NotNull(sut.Purchase(this.user_id, dictionaryPay, dictionaryDeliver).Data);            
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>
+                    {
+                     { "card_number", "2222333344445555" },
+                     { "month", "4" },
+                     { "year", "2021" },
+                     { "holder", "Israel Israelovice" },
+                     { "ccv", "262" },
+                     { "id", "20444444" }
+                    };
+            IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>
+                    {
+                     { "name", "Israel Israelovice" },
+                     { "address", "Rager Blvd 12" },
+                     { "city", "Beer Sheva" },
+                     { "country", "Israel" },
+                     { "zip", "8458527" }
+                    };
+            Assert.NotNull(sut.Purchase(this.user_id, paymentDetails, deliveryDetails).Data);            
         }
 
     }
