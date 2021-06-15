@@ -672,7 +672,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 UsersAndPermissionsFacade.RemoveOffer(userID, userResult.Data.Id);
                 return storeResult;
             }
-            return new Result<bool>("Offer was added successfully", true, true);
+            return new Result<bool>("Offer was sent successfully", true, true);
         }
 
         public Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer)
@@ -689,7 +689,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             else if (respone == OfferResponse.CounterOffered)
                 UsersAndPermissionsFacade.CounterOffer(userID, offerID);
 
-            return new Result<bool>("Offer was added successfully", true, true);
+            return new Result<bool>("Offer response was sent successfully", true, true);
         }
 
         public Result<List<Dictionary<string, object>>> getStoreOffers(string storeID)

@@ -30,7 +30,6 @@ namespace XUnitTestTerminal3
 
             sut.Register("user@offer", "pass2");
             RegisteredUserID = sut.Login("user@offer", "pass2").Data;
-
         }
 
         [Fact]

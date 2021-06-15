@@ -194,7 +194,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<bool>("Failed to respond to a counter offer: The offer is not a counter offer", false, false);
             if(accepted)
                 return MovePendingOfferToAccepted(offerID);
-            return RemovePendingOffer(offerID);
+            Result<bool> result = RemovePendingOffer(offerID);
+            if (!result.ExecStatus)
+                return result;
+            return new Result<bool>("A counter offer response was sent successfully", true, true);
         }
 
         public Result<bool> RemovePendingOffer(string id)
