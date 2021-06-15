@@ -11,7 +11,7 @@ import useStyles from './styles';
 
 import logo from '../../assets/terminal3_logo.png';
 
-const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handleSearch, handleGetUserPurchaseHistory }) => {
+const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handleSearch, handleGetUserPurchaseHistory, setUpdateCart }) => {
     const [permissions, setPermissions] = useState([]);
     
     const classes = useStyles();
@@ -33,7 +33,8 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
     const purchasePolicySubOptions = [
         'Add Purchase Policy', 'Remove Purchase Policy'
     ];
-    
+
+    let isStoreOwner = arr => arr.every(Boolean);
 
     //#region API Calls
 
@@ -96,7 +97,13 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                             <MenuItem key={index} onClick={() => handleMenuClick(`/stores/${storeId}/${action.replace(/\s/g, "").toLowerCase()}`)}>{action}</MenuItem>    
                         )  
             )}
-            <MenuItem key="getIncome" onClick={() => handleMenuClick(`/stores/${storeId}/getincomesbyday`)}>Get Incomes by Day</MenuItem>
+            {isStoreOwner(permissions) && (
+            <>
+                <MenuItem key="getIncome" onClick={() => handleMenuClick(`/stores/${storeId}/getincomesbyday`)}>Get Incomes by Day</MenuItem>
+                <MenuItem key="removeStoreOwner" onClick={() => handleMenuClick(`/stores/${storeId}/removestoreowner`)}>Remove Store Owner</MenuItem>
+                <MenuItem key="checkoffers" onClick={() => handleMenuClick(`/stores/${storeId}/checkoffers`)}>Check Offers</MenuItem>
+            </>
+            )}
         </div>
         );
     });
@@ -119,7 +126,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
 
     useEffect(() => {
         fetchPermissions();
-        console.log(user);
+        // console.log(user);
     }, [user]);
 
     const menuId = 'primary-search-account-menu';
@@ -133,23 +140,36 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
         open={isMenuOpen}
         onClose={() => setAnchorEl(null)}
         >
+        {/* Main Page Menu */}
         {storeId === -1 ? (
             <div>
+                { /* System Admin Actions Menu */}
                 {isSystemAdmin &&
                 <>
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/addsystemadmin`)}>Add System Admin</MenuItem>
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/removesystemadmin`)}>Remove System Admin</MenuItem>
+                    <MenuItem onClick={() => handleMenuClick(`/${user.id}/admingetuserpurchasehistory`)}>Get User Purchase History</MenuItem>
+                    <MenuItem onClick={() => handleMenuClick(`/${user.id}/admingetstorepurchasehistory`)}>Get Store Purchase History</MenuItem>
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/resetsystem`)}>Reset System</MenuItem>
                     <MenuItem onClick={() => handleMenuClick(`/${user.id}/monitorsystem`)}>Monitor System</MenuItem>
                 </>
                 }
-                <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
-                <MenuItem onClick={() => handleMenuClick(`/${user.id}/review`)}>Write Review</MenuItem>
-                <MenuItem onClick={() => handleHistory(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
 
+                {/* User Actions Menu */}
+                <MenuItem onClick={() => handleMenuClick(`/${user.id}/checkuseroffers`)}>Check Offers</MenuItem>
+
+                { /* Registered User Actions Menu */}
+                {user.loggedIn &&
+                <>
+                    <MenuItem onClick={() => handleMenuClick(`/${user.id}/openstore`)}>Open New Store</MenuItem>
+                    <MenuItem onClick={() => handleHistory(`/${user.id}/purchasehistory`)}>Purchase History</MenuItem>
+                </>
+                }
             </div>
         ) : (
-            <StoreActions />
+            // Store Menu
+            user.loggedIn &&
+                <StoreActions />
         )
         
         }
@@ -161,7 +181,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
             <AppBar position="fixed" className={classes.appBar} color="inherit">
                 <Toolbar>
                     {/* Terminal 3 Logo */}
-                    <Typography component={Link} to="/" variant="h6" className={classes.title} color="inherit">
+                    <Typography component={Link} to="/" onClick={ setUpdateCart && (() => setUpdateCart(true))} variant="h6" className={classes.title} color="inherit">
                         <img src={logo} alt="Terminal 3" height="50px" className={classes.image} />
                     </Typography>
 
@@ -249,11 +269,11 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
                     </div> */}
 
                     {/* Menu Icon */}
-                    {(user.loggedIn) &&
+                    {/* {(user.loggedIn) && */}
                         <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="open drawer" onClick={handleMenuOpen}>
                             <MenuIcon />
                         </IconButton>
-                    }
+                    {/* } */}
                 </Toolbar>
             </AppBar>
             {renderMenu}

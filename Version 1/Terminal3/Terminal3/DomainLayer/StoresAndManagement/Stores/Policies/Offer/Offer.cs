@@ -20,7 +20,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
 
         public List<string> acceptedOwners { get; }
 
-        public Offer(string userID, string productID, int amount, double price, string storeID, string id = "")
+        public Offer(string userID, string productID, int amount, double price, string storeID, string id = "", double counterOffer = -1, List<string> acceptedOwners = null)
         {           
             this.Id = id;
             if (id.Equals(""))
@@ -30,8 +30,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
             this.StoreID = storeID;
             this.Amount = amount;
             this.Price = price;
-            this.CounterOffer = -1;
-            this.acceptedOwners = new List<string>();
+            this.CounterOffer = counterOffer;
+            this.acceptedOwners = acceptedOwners;
+            if (acceptedOwners == null)
+                this.acceptedOwners = new List<string>();
         }
 
         public DTO_Offer getDTO()

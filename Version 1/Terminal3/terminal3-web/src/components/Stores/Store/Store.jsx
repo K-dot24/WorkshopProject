@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 import useStyles from './styles';
 
-const Store = ({ store }) => {
+const Store = ({ store, isSystemAdmin }) => {
     const classes = useStyles();
 
     const image_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Store_Building_Flat_Icon_Vector.svg/1024px-Store_Building_Flat_Icon_Vector.svg.png';
@@ -23,6 +23,11 @@ const Store = ({ store }) => {
                         {store.rating}★
                     </Typography>
                 </div>
+                {isSystemAdmin && (
+                    <Typography variant="subtitle2" gutterBottom>
+                        {store.id}
+                    </Typography>
+                )}
                 <Typography variant="body2" color="textSecondary">{store.category}</Typography>
             </CardContent>
             <CardActions disableSpacing className={classes.cardActions}>

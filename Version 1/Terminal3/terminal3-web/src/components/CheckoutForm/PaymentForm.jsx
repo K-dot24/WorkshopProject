@@ -35,8 +35,6 @@ const PaymentForm = ({ userID, shippingData, checkoutToken, nextStep, backStep, 
         year = year.replace(' ', '');
 
         const orderData = {
-            // products: checkoutToken.products,
-            // customer: { firstname: shippingData.firstName, lastname: shippingData.lastName, email: shippingData.email },
             userID: userID,
             deliveryDetails: {
                 name: fullName,
@@ -56,9 +54,6 @@ const PaymentForm = ({ userID, shippingData, checkoutToken, nextStep, backStep, 
         }
 
         handlePurchase(orderData);
-
-        // Purchase(orderData).then(response => response.ok ?
-        //     response.json().then(result => result.execStatus ? nextStep() : console.log(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
     return (

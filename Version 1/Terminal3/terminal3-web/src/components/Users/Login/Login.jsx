@@ -37,17 +37,6 @@ const Login = ({ handleLogin }) => {
         history.push('/');
     }
 
-    // const submit = e => {
-    //     e.preventDefault()
-    //     fetch('/api', {
-    //       method: 'POST',
-    //       body: JSON.stringify({ user }),
-    //       headers: { 'Content-Type': 'application/json' },
-    //     })
-    //       .then(res => res.json())
-    //       .then(json => setUser(json.user))
-    // }
-
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />

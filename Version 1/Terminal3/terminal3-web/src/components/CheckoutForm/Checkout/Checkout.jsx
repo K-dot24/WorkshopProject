@@ -9,7 +9,7 @@ import PaymentForm from '../PaymentForm';
 
 const steps = ['Shipping Address', 'Payment Details'];
 
-const Checkout = ({ userID, cart, handleEmptyCart }) => {
+const Checkout = ({ userID, cart, setUpdateCart }) => {
     const [activeStep, setActiveStep] = useState(0);
     const [checkoutToken, setCheckoutToken] = useState(null);
     const [shippingData, setShippingData] = useState({});
@@ -45,12 +45,6 @@ const Checkout = ({ userID, cart, handleEmptyCart }) => {
         nextStep();
     }
 
-    // const timeout = () => {
-    //     setTimeout(() => {
-    //         setIsFinished(true);
-    //     }, 2000);
-    // }
-
     const Confirmation = () => !isFinished ? (
         <>
             {/* {timeout()} */}
@@ -66,7 +60,7 @@ const Checkout = ({ userID, cart, handleEmptyCart }) => {
                 {/* <Typography variant="subtitle2">Order ref: ref</Typography> */}
             </div>
             <br />
-            <Button component={Link} to="/" variant="outlined" type="button" onClick={handleEmptyCart}>Take me back</Button>
+            <Button component={Link} to="/" variant="outlined" type="button" onClick={() => setUpdateCart(true)}>Take me back</Button>
         </>
     );
 
