@@ -1446,7 +1446,7 @@ namespace Terminal3.DataAccessLayer
             {
                 foreach (DTO_Offer offer in dto.OfferManager)
                 {
-                    offers.Add(new Offer(offer.UserID, offer.ProductID, offer.Amount, offer.Price, offer.StoreID, offer._id));
+                    offers.Add(new Offer(offer.UserID, offer.ProductID, offer.Amount, offer.Price, offer.StoreID, offer._id, offer.CounterOffer, offer.acceptedOwners));
                 }
             }
            
