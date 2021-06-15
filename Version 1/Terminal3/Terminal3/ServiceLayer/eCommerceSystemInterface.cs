@@ -217,14 +217,14 @@ namespace Terminal3.ServiceLayer
             return StoreStaffInterface.EditProductDetails(userID,storeID,productID, details);
         }
 
-        public Result<bool> AddStoreOwner(string addedOwnerID, string currentlyOwnerID, string storeID)
+        public Result<bool> AddStoreOwner(string addedOwnerEmail, string currentlyOwnerID, string storeID)
         {
-            return StoreStaffInterface.AddStoreOwner(addedOwnerID, currentlyOwnerID, storeID);
+            return StoreStaffInterface.AddStoreOwner(addedOwnerEmail, currentlyOwnerID, storeID);
         }
 
-        public Result<bool> AddStoreManager(string addedManagerID, string currentlyOwnerID, string storeID)
+        public Result<bool> AddStoreManager(string addedManagerEmail, string currentlyOwnerID, string storeID)
         {
-            return StoreStaffInterface.AddStoreManager(addedManagerID,currentlyOwnerID, storeID);
+            return StoreStaffInterface.AddStoreManager(addedManagerEmail, currentlyOwnerID, storeID);
 
         }
 
@@ -253,14 +253,14 @@ namespace Terminal3.ServiceLayer
 
         }
 
-        public Result<bool> RemoveStoreManager(string removedManagerID, string currentlyOwnerID, string storeID)
+        public Result<bool> RemoveStoreManager(string removedManagerEmail, string currentlyOwnerID, string storeID)
         {
-            return StoreStaffInterface.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID);
+            return StoreStaffInterface.RemoveStoreManager(removedManagerEmail, currentlyOwnerID, storeID);
         }
 
-        public Result<bool> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID)
+        public Result<bool> RemoveStoreOwner(string removedOwnerEmail, string currentlyOwnerID, string storeID)
         {
-            return StoreStaffInterface.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID);
+            return StoreStaffInterface.RemoveStoreOwner(removedOwnerEmail, currentlyOwnerID, storeID);
         }
 
         public Result<List<Tuple<DateTime, Double>>> GetIncomeAmountGroupByDay(String start_date, String end_date, String store_id, string owner_id)
