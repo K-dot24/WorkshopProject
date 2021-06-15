@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 // SignalR
 import { HubConnectionBuilder } from '@microsoft/signalr';
 
-import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products, Review, Monitor } from './components';
+import { Stores, Navbar, Cart, Checkout, Register, Login, Action, Products, Review, InfoDisplay, OfferPage, Monitor } from './components';
 import { Register as RegisterAPI, Login as LoginAPI, Logout, OpenNewStore, AddProductToCart, 
         GetUserShoppingCart, UpdateShoppingCart, EnterSystem, SearchProduct, GetTotalShoppingCartPrice,
-        GetUserPurchaseHistory, AddSystemAdmin, RemoveSystemAdmin, printErrorMessage, ResetSystem } from './api/API';
+        GetUserPurchaseHistory, AddSystemAdmin, RemoveSystemAdmin, printErrorMessage, ResetSystem,
+        AdminGetUserPurchaseHistory, AdminGetStorePurchaseHistory } from './api/API';
 
 // primary and secondary colors for the app
 const theme = createMuiTheme({
@@ -23,11 +24,15 @@ const theme = createMuiTheme({
   });
 
 const App = () => {
+
     // states
     const [user, setUser] = useState({id: -1, email: '', loggedIn: false});
     const [cart, setCart] = useState({id: 0, products: [], totalPrice: 0});
     const [systemAdmins, setSystemAdmins] = useState(['-777']);
     const [storeSearchQuery, setStoreSearchQuery] = useState('');
+    
+    // state for calling fetchCart on change (checkout, add, update)
+    const [updateCart, setUpdateCart] = useState(false);
     
     // Products Search
     const [productSearchQuery, setProductSearchQuery] = useState('');
@@ -35,6 +40,11 @@ const App = () => {
     
     // User's Purchase History
     const [userPurchaseHistory, setUserPurchaseHistory] = useState(null);
+
+    // States for information display (Store/User Purchase History)
+    const [issued, setIssued] = useState(false);
+    const [info, setInfo] = useState(null);
+    const [pathname, setPathname] = useState('/');
 
     // SignalR
     const [connection, setConnection] = useState(null);
@@ -60,14 +70,14 @@ const App = () => {
                                                                 // data.shoppingBags.reduce(function(total, bag) {
                                                                 //                 return total + bag.totalBagPrice;
                                                                 //             }, 0)
-                                                    })) : null)
+                                                    }) & setUpdateCart(false)) : null)
                                 .catch(err => console.log(err));
         }
     }
 
     const handleAddToCart = async (storeId, productId, name, price, quantity, image) => {
         AddProductToCart({ userID: user.id, productID: productId, ProductQuantity: quantity, storeID: storeId }).then(response => response.ok ? 
-            response.json().then(status => status && (alert("Product added successfully") & fetchCart())) : printErrorMessage(response)).catch(err => alert(err));
+            response.json().then(status => status && setUpdateCart(true)) : printErrorMessage(response)).catch(err => alert(err));
 
     }
 
@@ -75,47 +85,12 @@ const App = () => {
         const data = { userID: user.id, storeID, productID, quantity };
 
         UpdateShoppingCart(data).then(response => response.ok ? 
-            response.json().then(result => result.execStatus ? fetchCart() : console.log(result.message)) : console.log("NOT OKAY")).catch(err => alert(err));
+            response.json().then(result => result.execStatus ? setUpdateCart(true) : console.log(result.message)) : console.log("NOT OKAY")).catch(err => alert(err));
     }
 
-    // const handleUpdateCartQuantity = async (productId, quantity) => {
-        
-    //     if (quantity === 0) {
-    //         handleRemoveFromCart(productId);
-    //     } else {
-    //         setCart(function(prevState) {
-    //             const product = prevState.products.filter(product => product.id === productId)[0];
-    //             const toAdd = quantity - product.quantity;
-                
-    //             return {
-    //                 products: prevState.products.map(
-    //                 p => p.id === productId ? { ...p, quantity: quantity }: p
-    //                 ),
-    //                 totalPrice: prevState.totalPrice + product.price * toAdd       
-    //             }
-    //         }); 
-    //     }
-    // }
-
-    // const handleRemoveFromCart = async (productId) => {
-    //     setCart(function(prevState) {
-    //         const product = prevState.products.filter(product => product.id === productId)[0];
-            
-    //         return {
-    //         products: prevState.products.filter(
-    //             product => product.id !== productId
-    //         ),
-    //         totalPrice: prevState.totalPrice - product.price * product.quantity       
-    //         }
-    //     }); 
-    // }
-
     const handleEmptyCart = () => {
-        console.log("EMPTY CART");
         const allProducts = cart.products;
         allProducts.map((product) => handleUpdateCartQuantity(product.storeID, product.id, 0));
-
-        // setCart({products: [], totalPrice: 0});
     }
 
     const fakeEmptyCart = () => {
@@ -177,13 +152,18 @@ const App = () => {
             response.json().then(result => setSystemAdmins(prev => prev.filter(id => id !== result.data.id)) & alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
     }
 
-    // TODO: Check
-    const handleResetSystem = async () => {
-        ResetSystem(user.id).then(response => response.ok ? 
-            response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => alert(err));
+    const handleAdminGetUserPurchaseHistory = async (data) => {
+        AdminGetUserPurchaseHistory(user.id, data.userid).then(response => response.ok ? 
+            response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'purchaseHistory'})) : printErrorMessage(response)).catch(err => alert(err));
     }
 
-    const handleMonitorSystem = async () => {
+    const handleAdminGetStorePurchaseHistory = async (data) => {
+        AdminGetStorePurchaseHistory(user.id, data.storeid).then(response => response.ok ? 
+            response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'purchaseHistory'})) : printErrorMessage(response)).catch(err => alert(err));
+    }
+
+    // TODO: Check
+    const handleResetSystem = async () => {
         ResetSystem(user.id).then(response => response.ok ? 
             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => alert(err));
     }
@@ -213,8 +193,6 @@ const App = () => {
                                                         .catch(err => console.log(err))))
                                     .catch(err => console.log(err))))
             .catch(err => console.log(err));
-
-        // SearchProduct({ Category: productSearchQuery }).then(response => response.json().then(result => result.execStatus ? setProducts(result.data) : alert(result.message))).catch(err => console.log(err));
     }
 
     //#region Signal-R Functionality
@@ -244,8 +222,14 @@ const App = () => {
     // Update cart when user change (login/sign out)
     useEffect(() => {
         fetchCart();
-        console.log(user);
+        // console.log(user);
     }, [user]);
+
+    // Update cart
+    useEffect(() => {
+        if (updateCart)
+            fetchCart();
+    }, [updateCart]);
 
     useEffect(() => {
         if (productSearchQuery !== '')
@@ -254,13 +238,10 @@ const App = () => {
             setProducts([]);
     }, [productSearchQuery]);
 
-    // useEffect(() => {
-    //     console.log(cart.products);
-    // }, [cart]);
-
     useEffect(() => {
-        console.log(systemAdmins);
-    }, [systemAdmins]);
+        setIssued(false);
+        setInfo(null);
+    }, [pathname]);
 
     useEffect(() => {
         handleEnterSystem();
@@ -319,7 +300,9 @@ const App = () => {
                 <div>
                     {/* Navigation Bar */}
                     <Navbar storeId={-1} totalItems={cart.products.length} user={user} isSystemAdmin={systemAdmins.includes(user.id)} handleLogOut={handleLogOut} 
-                            handleSearch={handleProductSearch} handleGetUserPurchaseHistory={handleGetUserPurchaseHistory} />
+                            handleSearch={handleProductSearch} handleGetUserPurchaseHistory={handleGetUserPurchaseHistory}
+                            setUpdateCart={setUpdateCart}
+                    />
                     
                     <Switch>
                         {/* Cart Page */}
@@ -340,7 +323,7 @@ const App = () => {
 
                         {/* Checkout Page */}
                         <Route exact path="/checkout">
-                            <Checkout userID={user.id} cart={cart} handleEmptyCart={handleEmptyCart} />
+                            <Checkout userID={user.id} cart={cart} setUpdateCart={setUpdateCart} />
                         </Route>
                         
                         {/* Open New Store Page */}
@@ -352,6 +335,11 @@ const App = () => {
                         {/* Purchase History Page */}
                         <Route exact path={`/${user.id}/purchasehistory`}
                                 render = {() => (<Review checkoutToken={userPurchaseHistory} />)} />
+
+                        {/* Check User's Offers */}
+                        <Route exact path={`/${user.id}/checkuseroffers`} 
+                                render={(props) => (<OfferPage type='user' userID={user.id} {...props} />)} 
+                        />
                         
                         {/* Add System Admin Page */}
                         {systemAdmins.includes(user.id) && (
@@ -366,6 +354,28 @@ const App = () => {
                             <Route exact path={`/${user.id}/removesystemadmin`} 
                                     render={(props) => (<Action name='Remove System Admin' fields={[{name: 'Email', required: true}]} 
                                                                 handleAction={handleRemoveSystemAdmin} {...props} />)} 
+                            />
+                        )}
+
+                        {/* Admin Get User Purchase History */}
+                        {systemAdmins.includes(user.id) && (
+                            <Route exact path={`/${user.id}/admingetuserpurchasehistory`}
+                                    render={function(props) {
+                                        if (!issued)
+                                            return (<Action name='Get User Purhcase History' fields={[{name: 'User ID', required: true}]} 
+                                                            handleAction={handleAdminGetUserPurchaseHistory} {...props} />)
+                                    }}
+                            />
+                        )}
+
+                        {/* Admin Get Store Purchase History */}
+                        {systemAdmins.includes(user.id) && (
+                            <Route exact path={`/${user.id}/admingetstorepurchasehistory`}
+                                    render={function(props) {
+                                        if (!issued)
+                                            return (<Action name='Get Store Purhcase History' fields={[{name: 'Store ID', required: true}]} 
+                                                            handleAction={handleAdminGetStorePurchaseHistory} {...props} />)
+                                    }}
                             />
                         )}
 
@@ -388,10 +398,14 @@ const App = () => {
                         { products.length > 0 ? (
                             <Products storeName={'SEARCH_RES'} products={products} onAddToBag={handleAddToCart} />
                         ) : (
-                            <Route path="/" render={(props) => (<Stores user={user} searchQuery={storeSearchQuery} handleAddToCart={handleAddToCart} handleLogOut={handleLogOut} {...props} />)} />
+                            <Route path="/" render={(props) => (<Stores setPathname={setPathname} user={user} searchQuery={storeSearchQuery} 
+                                                                        handleAddToCart={handleAddToCart} handleLogOut={handleLogOut}
+                                                                        isSystemAdmin={systemAdmins.includes(user.id)} {...props} />)} />
                         )}
                         
                     </Switch>
+                    {/* Information display */}
+                    {(issued && info !== null) && <InfoDisplay info={info} />}
                 </div>
             </Router>
         </MuiThemeProvider>

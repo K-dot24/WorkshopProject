@@ -57,7 +57,14 @@ namespace Terminal3.ServiceLayer
         Result<List<String>> GetStorePurchaseHistory(String ownerID, String storeID); //userID to List<permissions>
 
         #endregion
+        #region Offer
+        Result<bool> SendOfferToStore(string storeID, string userID, string productID, int amount, double price);
+        Result<bool> AnswerCounterOffer(string userID, string offerID, bool accepted);
+        Result<bool> SendOfferResponseToUser(string storeID, string ownerID, string userID, string offerID, bool accepted, double counterOffer);
+        Result<List<Dictionary<string, object>>> getStoreOffers(string storeID);
+        Result<List<Dictionary<string, object>>> getUserOffers(string userId);
 
+        #endregion
 
     }
 }

@@ -46,8 +46,7 @@ const Policy = ({ match, storeID }) => {
     //#endregion
 
     const renderTree = (nodes) => (
-        <TreeItem key={nodes.id} nodeId={nodes.id} 
-                // label={nodes.name}
+        <TreeItem key={nodes.id} nodeId={nodes.id}
                 label={
                     <div className={classes.labelRoot}>
                       <Typography variant="body2" className={classes.labelText}>
@@ -69,10 +68,6 @@ const Policy = ({ match, storeID }) => {
         else if (match.url.includes('getpurchasepolicy'))
             handleGetPurchasePolicyData();
     }, [match])
-
-    // useEffect(() => {
-    //     console.log(data);
-    // }, [data])
 
     return (
         <Container component="main" maxWidth="xs">

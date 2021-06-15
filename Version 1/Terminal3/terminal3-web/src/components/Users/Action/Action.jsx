@@ -25,7 +25,6 @@ const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
             handleAction(checkBoxArray, data);
          }
          else {
-            // console.log(data);
             if (currentType.value === '')
                 handleAction(data);
             else
@@ -51,10 +50,6 @@ const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
             [name]: event.target.value,
         });
     };
-
-    // useEffect(() => {
-    //     console.log(currentType);
-    // }, [currentType]);
 
     return (
         <Container component="main" maxWidth="xs">

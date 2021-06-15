@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
-import { Products, Navbar, Cart, Action, Policy, InfoDisplay } from '../../../../components';
+import { Products, Navbar, Cart, Action, Policy, InfoDisplay, OfferPage } from '../../../../components';
 
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
-        AddStoreOwner, AddStoreManager, RemoveStoreManager, GetStoreStaff, SetPermissions, SearchProduct,
+        AddStoreOwner, AddStoreManager, RemoveStoreManager, RemoveStoreOwner, GetStoreStaff, SetPermissions,
         printErrorMessage, RemovePermissions, GetPermission, AddDiscountPolicy, AddDiscountPolicyById,
         AddDiscountCondition, RemoveDiscountPolicy, RemoveDiscountCondition, AddPurchasePolicy, 
-        AddPurchasePolicyById, RemovePurchasePolicy, GetIncomeAmountGroupByDay, GetStorePurchaseHistory } from '../../../../api/API';
+        AddPurchasePolicyById, RemovePurchasePolicy, GetIncomeAmountGroupByDay, GetStorePurchaseHistory,
+        SendOfferToStore, GetProductReview } from '../../../../api/API';
 
 
 const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
@@ -122,6 +123,11 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
     }
 
+    const handleRemoveStoreOwner = async (data) => {
+        RemoveStoreOwner(store.id, user.id, data.removedownerid).then(response => response.ok ?
+            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+    }
+
     const handleRemoveStoreManager = async (data) => {
         RemoveStoreManager(store.id, user.id, data.removedmanagerid).then(response => response.ok ?
             response.json().then(message => alert(message)) : printErrorMessage(response)).catch(err => console.log(err));
@@ -198,7 +204,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         }
 
         allData = { storeId: store.id, info };
-        // console.log(allData);
 
         if ('nodeid' in data) {
             AddDiscountPolicyById(data.nodeid, allData).then(response => response.ok ? 
@@ -230,7 +235,6 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         }
 
         const allData = { storeId: store.id, info };
-        // console.log(allData);
 
         AddDiscountCondition(data.nodeid, allData).then(response => response.ok ? 
             response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => alert(err));
@@ -297,27 +301,23 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
     //#endregion
 
-    //#region Search (commented out)
+    //#region User Actions
 
-    // const [searchQuery, setsearchQuery] = useState('');
+    const handleSendOfferToStore = (data) => {
+        const fullData = { StoreID: store.id, UserID: user.id, ...data }
+        SendOfferToStore(fullData).then(response => response.ok ?
+            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+    }
     
-    // const searchProductsByQuery = async () => {
-    //     const query = {Name: searchQuery};
-    //     console.log(query);
-    //     SearchProduct(query).then(response => response.json().then(json => console.log(json))).catch(err => console.log(err));
-    // }
-
-    // const handleProductSearch = async (query) => {
-    //     setsearchQuery(query);
-    // }
-
-    // useEffect(() => {
-    //     
-    //     if (searchQuery !== '')
-    //         searchProductsByQuery();
-    //     // else
-    //     //     fetchStores();
-    // }, [searchQuery]);
+    const handleGetProductReview = (data, toShow) => {
+        if (toShow) {
+            GetProductReview(store.id, data.productID).then(response => response.ok ?
+                response.json().then(result => setIssued(true) & setInfo({data: result.data, type: 'productReview'})) : printErrorMessage(response)).catch(err => console.log(err));   
+        } else {
+            setIssued(false);
+            setInfo(null);
+        }
+    }
 
     //#endregion
 
@@ -333,9 +333,9 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
         setInfo(null);
     }, [match]);
 
-    useEffect(() => {
-        console.log(info);
-    }, [info]);
+    // useEffect(() => {
+    //     console.log(info);
+    // }, [info]);
 
     return (
         <div>
@@ -344,7 +344,9 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
             <Switch>
                 {/* Main Store Page */}
                 <Route exact path={match.url}>
-                    <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} />
+                    <Products storeName={store.name} products={products} onAddToBag={handleAddToBag} 
+                            handleSendOfferToStore={handleSendOfferToStore} handleGetProductReview={handleGetProductReview} 
+                    />
                 </Route>
 
                 {/* Bag Page */}
@@ -407,6 +409,13 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                     render={(props) => (<Action name='Remove Store Manager' 
                                                 fields={[{name: 'Removed Manager ID', required: true}]} 
                                                 handleAction={handleRemoveStoreManager} {...props} />)} 
+                />
+
+                {/* Remove Store Owner */}
+                <Route exact path={match.url + `/removestoreowner`} 
+                    render={(props) => (<Action name='Remove Store Owner' 
+                                                fields={[{name: 'Removed Owner ID', required: true}]} 
+                                                handleAction={handleRemoveStoreOwner} {...props} />)} 
                 />
 
                 {/* Get Store Staff */}
@@ -531,6 +540,20 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
                                     {name: 'End Date', required: true, type: 'date'}]}   
                             handleAction={handleGetIncomeAmountGroupByDay} {...props} />)
                     }}
+                />
+
+                {/* Admin Get Purchase History */}
+                <Route exact path={match.url + `/${user.id}/admingetstorepurchasehistory/${store.id}`}                       
+                    render={function(props) {
+                        if (!issued)
+                            return (<Action name='Get Purhcase History'     
+                                            handleAction={handleGetStorePurchaseHistory} {...props} />)
+                    }}
+                />
+
+                { /* Get Discount Policy Data */}
+                <Route exact path={match.url + `/checkoffers`} 
+                    render={(props) => (<OfferPage type='store' storeID={store.id} userID={user.id} {...props} />)} 
                 />
 
             </Switch>

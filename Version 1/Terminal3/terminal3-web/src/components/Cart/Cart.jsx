@@ -67,8 +67,6 @@ const Cart = ({ id, cart, handleUpdateCartQuantity, handleEmptyCart, handleAddTo
         </>
     );
 
-    // if (!cart.products.length) return 'Loading...';
-
     return (
         <Container>
             <div className={classes.toolbar}/>

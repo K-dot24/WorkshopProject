@@ -10,7 +10,6 @@ export function printErrorMessage(response) {
 export function GetAllStoresToDisplay() {
     return fetch(`${API_URL}/Data/GetAllStoresToDisplay`, {
         method: 'GET',
-        // agent: httpsAgent,
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -222,14 +221,13 @@ export function GetTotalShoppingCartPrice( userID ) {
 
 
 /// Returns all the reviews on a specific product
-export function GetProductReview( data ) {    
-    return fetch(`${API_URL}/GuestUser/GetProductReview/${data.storeID}/${data.productID}`, {
+export function GetProductReview( storeID, productID) {    
+    return fetch(`${API_URL}/GuestUser/GetProductReview/${storeID}/${productID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
@@ -482,12 +480,26 @@ export function GetStorePurchaseHistory( ownerID, storeID ) {
 }
 
 
-/// Removing excisting store manager by an owner
+/// Removing existing store manager by an owner
 /// <param name="storeID">StoreID</param>
 /// <param name="currentlyOwnerID">OwnerID</param>
 /// <param name="removedManagerID">ID of the manager to be removed</param>
 export function RemoveStoreManager( storeID, currentlyOwnerID, removedManagerID ) {
     return fetch(`${API_URL}/StoreStaff/RemoveStoreManager/${storeID}/${currentlyOwnerID}/${removedManagerID}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
+/// Removing existing store owner by the appointing owner
+/// <param name="storeID">StoreID</param>
+/// <param name="currentlyOwnerID">OwnerID</param>
+/// <param name="removedOwnerID">ID of the owner to be removed</param>
+export function RemoveStoreOwner( storeID, currentlyOwnerID, removedOwnerID ) {
+    return fetch(`${API_URL}/StoreStaff/RemoveStoreOwner/${storeID}/${currentlyOwnerID}/${removedOwnerID}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',
@@ -520,14 +532,13 @@ export function GetIncomeAmountGroupByDay( data ) {
 /// Returns user's purchase history
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="userID">ID of the user to get the purchase history</param>
-export function AdminGetUserPurchaseHistory( data ) {
-    return fetch(`${API_URL}/SystemAdmin/GetUserPurchaseHistory/${data.sysAdminID}/${data.userID}`, {
+export function AdminGetUserPurchaseHistory( sysAdminID, userID ) {
+    return fetch(`${API_URL}/SystemAdmin/GetUserPurchaseHistory/${sysAdminID}/${userID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
@@ -535,14 +546,13 @@ export function AdminGetUserPurchaseHistory( data ) {
 /// Returns in-store purchase history
 /// <param name="sysAdminID">system admin ID</param>
 /// <param name="storeId">ID of the store to get the purchase history</param>
-export function AdminGetStorePurchaseHistory( data ) {
-    return fetch(`${API_URL}/SystemAdmin/GetStorePurchaseHistory/${data.sysAdminID}/${data.storeID}`, {
+export function AdminGetStorePurchaseHistory( sysAdminID, storeID ) {
+    return fetch(`${API_URL}/SystemAdmin/GetStorePurchaseHistory/${sysAdminID}/${storeID}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
     })
 }
 
@@ -726,6 +736,65 @@ export function GetPurchasePolicyData( storeID ) {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
+    })
+}
+
+//#endregion
+
+//#region Offer
+
+export function SendOfferToStore( data ) {
+    return fetch(`${API_URL}/GuestUser/SendOfferToStore`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+export function AnswerCounterOffer( data ) {
+    return fetch(`${API_URL}/GuestUser/AnswerCounterOffer`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+export function SendOfferResponseToUser( data ) {
+    return fetch(`${API_URL}/StoreStaff/SendOfferResponseToUser`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+export function GetUserOffers( data ) {
+    return fetch(`${API_URL}/GuestUser/GetUserOffers`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+}
+
+export function GetStoreOffers( data ) {
+    return fetch(`${API_URL}/StoreStaff/GetStoreOffers`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
     })
 }
 
