@@ -648,7 +648,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return guest_user.AcceptOffer(offerID);
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
                 return registerd_user.AcceptOffer(offerID);
-            return new Result<bool>("Failed to remove offer: Failed to locate the user", false, false);
+            return new Result<bool>("Failed to accept offer: Failed to locate the user", false, false);
         }
 
         public Result<bool> DeclineOffer(string userID, string offerID)
@@ -657,7 +657,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return guest_user.DeclineOffer(offerID);
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
                 return registerd_user.DeclineOffer(offerID);
-            return new Result<bool>("Failed to remove offer: Failed to locate the user", false, false);
+            return new Result<bool>("Failed to decline offer: Failed to locate the user", false, false);
         }
 
         public Result<bool> CounterOffer(string userID, string offerID)
@@ -666,7 +666,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return guest_user.CounterOffer(offerID);
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
                 return registerd_user.CounterOffer(offerID);
-            return new Result<bool>("Failed to remove offer: Failed to locate the user", false, false);
+            return new Result<bool>("Failed to counter the offer: Failed to locate the user", false, false);
         }
 
         public Result<List<Dictionary<string, object>>> getUserOffers(string userId)
@@ -687,18 +687,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return guest_user.AnswerCounterOffer(offerID, accepted);
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
                 return registerd_user.AnswerCounterOffer(offerID, accepted);
-            return new Result<bool>("Failed to responde to a counter offer: Failed to locate the user", false, false);
+            return new Result<bool>("Failed to respond to a counter offer: Failed to locate the user", false, false);
         }
 
         public void UpdateUserOffers_DB(String userID , String offerID , double counterOffer)
         {           
             var filter = Builders<BsonDocument>.Filter.Eq("_id", userID) ;
             if (GuestUsers.TryGetValue(userID, out GuestUser guest_user))
-                return;
+            {
+                Offer offer = guest_user.findPendingOffer(offerID);
+                if(offer.CounterOffer == -1)
+                    offer.CounterOffer = counterOffer;
+            }                
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
                 Offer offer = registerd_user.findPendingOffer(offerID);
-                offer.CounterOffer = counterOffer;
+                if (offer.CounterOffer == -1)
+                    offer.CounterOffer = counterOffer;
                 var update_offer = Builders<BsonDocument>.Update.Set("PendingOffers", registerd_user.Get_DTO_Offers(registerd_user.PendingOffers));
                 Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
             }

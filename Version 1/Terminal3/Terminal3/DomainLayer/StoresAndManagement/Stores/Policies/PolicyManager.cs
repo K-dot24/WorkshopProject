@@ -82,7 +82,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies
                 if(productId.Equals(offer.ProductID) && amount >= offer.Amount)
                 {
                     amount -= offer.Amount;
-                    price += offer.Price;
+                    if(offer.CounterOffer == -1)
+                        price += offer.Price;
+                    else
+                        price += offer.CounterOffer;
                 }
             }
 
