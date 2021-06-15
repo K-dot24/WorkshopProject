@@ -31,6 +31,9 @@ const App = () => {
     const [systemAdmins, setSystemAdmins] = useState(['-777']);
     const [storeSearchQuery, setStoreSearchQuery] = useState('');
     
+    // state for calling fetchCart on change (checkout, add, update)
+    const [updateCart, setUpdateCart] = useState(false);
+    
     // Products Search
     const [productSearchQuery, setProductSearchQuery] = useState('');
     const [products, setProducts] = useState([]);
@@ -67,14 +70,14 @@ const App = () => {
                                                                 // data.shoppingBags.reduce(function(total, bag) {
                                                                 //                 return total + bag.totalBagPrice;
                                                                 //             }, 0)
-                                                    })) : null)
+                                                    }) & setUpdateCart(false)) : null)
                                 .catch(err => console.log(err));
         }
     }
 
     const handleAddToCart = async (storeId, productId, name, price, quantity, image) => {
         AddProductToCart({ userID: user.id, productID: productId, ProductQuantity: quantity, storeID: storeId }).then(response => response.ok ? 
-            response.json().then(status => status && (alert("Product added successfully") & fetchCart())) : printErrorMessage(response)).catch(err => alert(err));
+            response.json().then(status => status && setUpdateCart(true)) : printErrorMessage(response)).catch(err => alert(err));
 
     }
 
@@ -82,15 +85,12 @@ const App = () => {
         const data = { userID: user.id, storeID, productID, quantity };
 
         UpdateShoppingCart(data).then(response => response.ok ? 
-            response.json().then(result => result.execStatus ? fetchCart() : console.log(result.message)) : console.log("NOT OKAY")).catch(err => alert(err));
+            response.json().then(result => result.execStatus ? setUpdateCart(true) : console.log(result.message)) : console.log("NOT OKAY")).catch(err => alert(err));
     }
 
     const handleEmptyCart = () => {
-        console.log("EMPTY CART");
         const allProducts = cart.products;
         allProducts.map((product) => handleUpdateCartQuantity(product.storeID, product.id, 0));
-
-        // setCart({products: [], totalPrice: 0});
     }
 
     const fakeEmptyCart = () => {
@@ -228,6 +228,12 @@ const App = () => {
         console.log(user);
     }, [user]);
 
+    // Update cart
+    useEffect(() => {
+        if (updateCart)
+            fetchCart();
+    }, [updateCart]);
+
     useEffect(() => {
         if (productSearchQuery !== '')
             searchProductsByQuery();
@@ -297,7 +303,9 @@ const App = () => {
                 <div>
                     {/* Navigation Bar */}
                     <Navbar storeId={-1} totalItems={cart.products.length} user={user} isSystemAdmin={systemAdmins.includes(user.id)} handleLogOut={handleLogOut} 
-                            handleSearch={handleProductSearch} handleGetUserPurchaseHistory={handleGetUserPurchaseHistory} />
+                            handleSearch={handleProductSearch} handleGetUserPurchaseHistory={handleGetUserPurchaseHistory}
+                            setUpdateCart={setUpdateCart}
+                    />
                     
                     <Switch>
                         {/* Cart Page */}
@@ -318,7 +326,7 @@ const App = () => {
 
                         {/* Checkout Page */}
                         <Route exact path="/checkout">
-                            <Checkout userID={user.id} cart={cart} handleEmptyCart={handleEmptyCart} />
+                            <Checkout userID={user.id} cart={cart} setUpdateCart={setUpdateCart} />
                         </Route>
                         
                         {/* Open New Store Page */}

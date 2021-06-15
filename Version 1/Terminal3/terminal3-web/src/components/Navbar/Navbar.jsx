@@ -11,7 +11,7 @@ import useStyles from './styles';
 
 import logo from '../../assets/terminal3_logo.png';
 
-const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handleSearch, handleGetUserPurchaseHistory }) => {
+const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handleSearch, handleGetUserPurchaseHistory, setUpdateCart }) => {
     const [permissions, setPermissions] = useState([]);
     
     const classes = useStyles();
@@ -174,7 +174,7 @@ const Navbar = ( { storeId, totalItems, user, isSystemAdmin, handleLogOut, handl
             <AppBar position="fixed" className={classes.appBar} color="inherit">
                 <Toolbar>
                     {/* Terminal 3 Logo */}
-                    <Typography component={Link} to="/" variant="h6" className={classes.title} color="inherit">
+                    <Typography component={Link} to="/" onClick={ setUpdateCart && (() => setUpdateCart(true))} variant="h6" className={classes.title} color="inherit">
                         <img src={logo} alt="Terminal 3" height="50px" className={classes.image} />
                     </Typography>
 

@@ -46,7 +46,7 @@ const OffersPage = ({ type, storeID, userID }) => {
     const [data, setData] = useState(null);
 
     // TODO: Update on click
-    // const [forceRender, setForceRender] = useState(0);
+    const [forceRender, setForceRender] = useState(0);
 
     // Counter offer
     const [selectedOffer, setSelectedOffer] = useState(null);
@@ -67,12 +67,12 @@ const OffersPage = ({ type, storeID, userID }) => {
         if (type === 'store'){
             const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: true }
             SendOfferResponseToUser(toSend).then(response => response.ok ?
-                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+                response.json().then(result => alert(result.message) & setForceRender(prev => prev + 1)) : printErrorMessage(response)).catch(err => console.log(err));
         }
         else if (type === 'user'){
             const toSend = { userID, offerID, accepted: true }
             AnswerCounterOffer(toSend).then(response => response.ok ?
-                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+                response.json().then(result => alert(result.message) & setForceRender(prev => prev + 1)) : printErrorMessage(response)).catch(err => console.log(err));
         }
     };
 
@@ -81,13 +81,12 @@ const OffersPage = ({ type, storeID, userID }) => {
         if (type === 'store'){
             const toSend = { StoreId: storeID, OwnerID: userID, UserID: customerID, OfferID: offerID, Accepted: false, CounterOffer: -1 }
             SendOfferResponseToUser(toSend).then(response => response.ok ?
-                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
-            // setForceRender(prev => prev + 1);
+                response.json().then(result => alert(result.message) & setForceRender(prev => prev + 1)) : printErrorMessage(response)).catch(err => console.log(err));
         }
         else if (type === 'user'){
             const toSend = { userID, offerID, accepted: false }
             AnswerCounterOffer(toSend).then(response => response.ok ?
-                response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+                response.json().then(result => alert(result.message) & setForceRender(prev => prev + 1)) : printErrorMessage(response)).catch(err => console.log(err));
         }
     };
 
@@ -99,7 +98,7 @@ const OffersPage = ({ type, storeID, userID }) => {
     const handleCounter = (counterOffer) => {
         const toSend = { StoreID: storeID, OwnerID: userID, UserID: selectedOffer.customerID, OfferID: selectedOffer.offerID, Accepted: false, CounterOffer: counterOffer.price }
         SendOfferResponseToUser(toSend).then(response => response.ok ?
-            response.json().then(result => alert(result.message)) : printErrorMessage(response)).catch(err => console.log(err));
+            response.json().then(result => alert(result.message) & setForceRender(prev => prev + 1)) : printErrorMessage(response)).catch(err => console.log(err));
     };
 
     useEffect(() => {
@@ -109,12 +108,12 @@ const OffersPage = ({ type, storeID, userID }) => {
             fetchUserOffers();
     }, []);
 
-    // useEffect(() => {
-    //     if (type === 'store')
-    //         fetchStoreOffers();
-    //     else if (type === 'user')
-    //         fetchUserOffers();
-    // }, [forceRender]);
+    useEffect(() => {
+        if (type === 'store')
+            fetchStoreOffers();
+        else if (type === 'user')
+            fetchUserOffers();
+    }, [forceRender]);
 
     useEffect(() => {
         console.log(data);
@@ -149,7 +148,7 @@ const OffersPage = ({ type, storeID, userID }) => {
                             <div key={offer.Id}>
                                 <ListItem style={{padding: '10px 0'}} key={offer.Id}>
                                     <ListItemText primary={offer.Product} secondary={`Store: ${offer.Store}`} />
-                                    <Typography variant="body2">{`Amount: ${offer.Amount}, Price: ${offer.Price}₪`}</Typography>
+                                    <Typography variant="body2">{`Amount: ${offer.Amount}, Price: ${offer.CounterOfferPrice !== -1 ? offer.CounterOfferPrice : offer.Price}₪`}</Typography>
                                 </ListItem>
                                 {offer.CounterOfferPrice !== -1 ? (
                                 <>
