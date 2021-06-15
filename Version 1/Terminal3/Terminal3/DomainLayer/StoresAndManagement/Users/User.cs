@@ -160,7 +160,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             AcceptedOffers = new List<Offer>();
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Get_DTO_Offers(AcceptedOffers));
+            var update_offer = Builders<BsonDocument>.Update.Set("AcceptedOffers", Get_DTO_Offers(AcceptedOffers));
             Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
 
             return new Result<bool>("", true, true);
@@ -171,14 +171,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             Offer offer = new Offer(this.Id, productID, amount, price, storeID);
             PendingOffers.Add(offer);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Get_DTO_Offers(PendingOffers));
+            var update_offer = Builders<BsonDocument>.Update.Set("PendingOffers", Get_DTO_Offers(PendingOffers));
             Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
             return new Result<Offer>("", true, offer);
         }
 
-        protected Offer findPendingOffer(string id)
+        public Offer findPendingOffer(string id)
         {
-
             foreach (Offer offer in PendingOffers)
                 if (offer.Id == id)
                     return offer;
@@ -194,7 +193,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<bool>("Failed to respond to a counter offer: The offer is not a counter offer", false, false);
             if(accepted)
                 return MovePendingOfferToAccepted(offerID);
-            return RemovePendingOffer(offerID);
+            Result<bool> result = RemovePendingOffer(offerID);
+            if (!result.ExecStatus)
+                return result;
+            return new Result<bool>("A counter offer response was sent successfully", true, true);
         }
 
         public Result<bool> RemovePendingOffer(string id)
@@ -204,7 +206,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return new Result<bool>("Failed to remove offer from user: Failed to locate the offer", false, false);
             PendingOffers.Remove(offer);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Get_DTO_Offers(PendingOffers));
+            var update_offer = Builders<BsonDocument>.Update.Set("PendingOffers", Get_DTO_Offers(PendingOffers));
             Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
             return new Result<bool>("", true, true);
         }
@@ -219,7 +221,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return removeResult;
             AcceptedOffers.Add(offer);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Get_DTO_Offers(AcceptedOffers));
+            var update_offer = Builders<BsonDocument>.Update.Set("AcceptedOffers", Get_DTO_Offers(AcceptedOffers));
             Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
 
             return new Result<bool>("", true, true);

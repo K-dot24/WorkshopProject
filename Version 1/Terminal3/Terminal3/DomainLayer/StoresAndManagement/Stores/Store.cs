@@ -151,6 +151,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Managers = new ConcurrentDictionary<String, StoreManager>();
             InventoryManager = new InventoryManager();
             PolicyManager = new PolicyManager();
+            OfferManager = new OfferManager();
             History = new History();
             isClosed = false;
 
@@ -669,7 +670,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         {
             OfferManager.AddOffer(offer);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
+            var update_offer = Builders<BsonDocument>.Update.Set("OfferManager", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
             Mapper.getInstance().UpdateStore(filter, update_offer);
             return sendNotificationToAllOwners(offer);
         }
@@ -714,7 +715,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
                 return new Result<OfferResponse>("Failed to reponse to an offer: The responding user is not an owner", false, OfferResponse.None);
             Result<OfferResponse>  res = OfferManager.SendOfferResponseToUser(ownerID, offerID, accepted, counterOffer, ids);
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("Offers", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
+            var update_offer = Builders<BsonDocument>.Update.Set("OfferManager", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
             Mapper.getInstance().UpdateStore(filter, update_offer);
             return res;
         }

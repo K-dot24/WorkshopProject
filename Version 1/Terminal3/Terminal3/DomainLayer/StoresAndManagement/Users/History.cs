@@ -36,8 +36,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 ShoppingBags.AddLast(shoppingBagService);
 
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", bag.Value.User.Id);
-                var update_history = Builders<BsonDocument>.Update.Push("History.ShoppingBags", GetDTO_HistoryShoppingBag(shoppingBagService));
-                
+                //var update_history = Builders<BsonDocument>.Update.Push("History.ShoppingBags", GetDTO_HistoryShoppingBag(shoppingBagService));
+                var update_history = Builders<BsonDocument>.Update.Set("History", getDTO());
                 Mapper.getInstance().UpdateRegisteredUser(filter, update_history , session:session);
             }
         }
@@ -49,6 +49,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
             var filter = Builders<BsonDocument>.Filter.Eq("_id", shoppingBag.Store.Id);
             var update_history = Builders<BsonDocument>.Update.Push("History.ShoppingBags", GetDTO_HistoryShoppingBag(shoppingBagService));
+            //var update_history = Builders<BsonDocument>.Update.Set("History", GetDTO_HistoryShoppingBag(shoppingBagService));
             Mapper.getInstance().UpdateStore(filter, update_history , session);
 
         }
