@@ -79,6 +79,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer
 
         private Result<OfferResponse> CounterOfferResponse(Offer offer, double counterOffer)
         {
+            if(counterOffer<0)
+                return new Result<OfferResponse>("Illegal counter offer: can't be negative", false, OfferResponse.None);
             offer.CounterOffer = counterOffer;
             return new Result<OfferResponse>("", true, OfferResponse.CounterOffered);
         }
