@@ -147,9 +147,9 @@ namespace Terminal3_E2ETests
 
             Assert.True(res2.ExecStatus);
 
-            Result<List<Tuple<DateTime, Double>>> recipts_owner = system.GetIncomeAmountGroupByDay("2021-06-12", "2021-06-07" , store.Data.Id, user.Data.Id);
-            Result<List<Tuple<DateTime, Double>>> recipts_owner2 = system.GetIncomeAmountGroupByDay("2021-06-12", "2021-06-07", store2.Data.Id, user2.Data.Id);
-            Result<List<Tuple<DateTime, Double>>> recipts_admin = system.GetIncomeAmountGroupByDay("2021-06-12", "2021-06-07", "-777");
+            Result<List<Tuple<DateTime, Double>>> recipts_owner = system.GetIncomeAmountGroupByDay("2021-06-16", "2021-06-07" , store.Data.Id, user.Data.Id);
+            Result<List<Tuple<DateTime, Double>>> recipts_owner2 = system.GetIncomeAmountGroupByDay("2021-06-16", "2021-06-07", store2.Data.Id, user2.Data.Id);
+            Result<List<Tuple<DateTime, Double>>> recipts_admin = system.GetIncomeAmountGroupByDay("2021-06-16", "2021-06-07", "-777");
 
             Assert.True(recipts_owner.Data.Count == 1 && recipts_owner.Data[0].Item2 == 9.0);
             Assert.True(recipts_owner2.Data.Count == 1 && recipts_owner2.Data[0].Item2 == 4.5);
