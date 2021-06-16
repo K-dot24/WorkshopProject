@@ -23,7 +23,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
         {
             Owner1 = new RegisteredUser("owner1@offer", "pass1");
             Owner2 = new RegisteredUser("owner2@offer", "pass2");
-            Store = new Store("store1", Owner1);
+            Store = new Store("store1", Owner1, "-1", true);
             Store.AddStoreOwner(Owner2, Owner1.Id);
             Product = Store.AddNewProduct(Owner1.Id, "product", 100, 100, "").Data;
             RegisteredUser = new RegisteredUser("reg@user", "pass3");

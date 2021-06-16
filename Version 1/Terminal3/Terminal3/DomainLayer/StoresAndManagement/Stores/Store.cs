@@ -81,8 +81,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public NotificationManager NotificationManager { get; set; }
         public Boolean isClosed { get; set; }
 
+        public Boolean testMode { get; set; }
+
         //Constructors
-        public Store(String name, RegisteredUser founder , String storeID = "-1")
+        public Store(String name, RegisteredUser founder , String storeID = "-1", Boolean testMode = false)
         {
             if (storeID.Equals("-1"))
                 Id = Service.GenerateId();
@@ -97,6 +99,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             OfferManager = new OfferManager();
             History = new History();
             isClosed = false;
+            this.testMode = testMode;
 
             //Add founder to list of owners
             Owners.TryAdd(founder.Id, Founder);
@@ -249,9 +252,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             foreach(var product in product_quantity)
             {
                 product.Key.NotifyPurchasedProduct(product.Value , session);
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", product.Key.Id);
-                var update_product = Builders<BsonDocument>.Update.Set("Quantity", product.Key.Quantity);
-                Mapper.getInstance().UpdateProduct(filter , update_product , session);
+                if (!testMode)
+                {
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", product.Key.Id);
+                    var update_product = Builders<BsonDocument>.Update.Set("Quantity", product.Key.Quantity);
+                    Mapper.getInstance().UpdateProduct(filter, update_product, session);
+                }
             }
 
             return new Result<bool>("Store inventory updated successuly\n", true, true);
@@ -671,10 +677,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<bool> SendOfferToStore(Offer offer)
         {
             OfferManager.AddOffer(offer);
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("OfferManager", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
-            Mapper.getInstance().UpdateStore(filter, update_offer);
-            return NotificationManager.notifyOfferRecievedStore(offer.UserID , offer.ProductID , offer.Amount , offer.Price);
+
+            if (!testMode)
+            {
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+                var update_offer = Builders<BsonDocument>.Update.Set("OfferManager", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
+                Mapper.getInstance().UpdateStore(filter, update_offer);
+                return NotificationManager.notifyOfferRecievedStore(offer.UserID , offer.ProductID , offer.Amount , offer.Price);
+            }
+            return new Result<bool>("In test Mode", true, true);
         }
 
         public DTO_Store getDTO()
@@ -718,9 +729,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             Result<OfferResponse>  res = OfferManager.SendOfferResponseToUser(ownerID, offerID, accepted, counterOffer, ids);
             if (!res.ExecStatus)
                 return res;
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("OfferManager", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
-            Mapper.getInstance().UpdateStore(filter, update_offer);
+
+            if (!testMode)
+            {
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+                var update_offer = Builders<BsonDocument>.Update.Set("OfferManager", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
+                Mapper.getInstance().UpdateStore(filter, update_offer);
+            }
             return res;
         }
 
