@@ -18,7 +18,8 @@ namespace signalRgateway.Hubs
 
         public override Task OnConnectedAsync()
         {
-            Console.WriteLine("OnConnected");
+            //Console.WriteLine("OnConnected");
+            LogEvent("[New Incoming connection]");
             return base.OnConnectedAsync();
         }
         public async Task SendMessage(string userID, string message)
@@ -27,36 +28,40 @@ namespace signalRgateway.Hubs
             if (!connectionID.Equals(String.Empty))
             {
                 await Clients.Client(connectionID).ReceiveMessage(message);
+                LogEvent($"[SendMessage -> id:{userID}]: {message}");
             }
             else if (!RegisteredConnections.GetConnections(userID).Equals(String.Empty))
             {
                 connectionID = RegisteredConnections.GetConnections(userID);
                 await Clients.Client(connectionID).ReceiveMessage(message);
+                LogEvent($"[SendMessage -> {userID}]: {message}");
             }
         }
 
         public async Task SendBroadcast(string message)
         {
             await Clients.All.ReceiveMessage(message);
+            LogEvent($"[SendMessage -> {"All"}]: {message}");
+
         }
 
         public async Task Identify(Identifier message)
         {
             GuestConnections.Add(message.UserID, Context.ConnectionId);
-            Console.WriteLine($"Identify: UserID:{message.UserID}, ConnectionID:{Context.ConnectionId}");
+            LogEvent($"[Identify: UserID:{message.UserID}, ConnectionID:{Context.ConnectionId}]");
         }
 
         public async Task Login(SignalRLoginModel message)
         {
             GuestConnections.Remove(message.oldUserID); //Clearing the old etry
             RegisteredConnections.Add(message.newUserID, Context.ConnectionId);
-            Console.WriteLine($"Login: UserID:{message.newUserID}, ConnectionID:{Context.ConnectionId}");
+            LogEvent($"[Login: UserID:{message.newUserID}, ConnectionID:{Context.ConnectionId}]");
         }
         public async Task Logout(SignalRLoginModel message)
         {
             RegisteredConnections.Remove(message.oldUserID); //Clearing the old etry
             GuestConnections.Add(message.newUserID, Context.ConnectionId);
-            Console.WriteLine($"Logout: UserID:{message.newUserID}, ConnectionID:{Context.ConnectionId}");
+            LogEvent($"[Logout: UserID:{message.newUserID}, ConnectionID:{Context.ConnectionId}]");
 
 
         }
@@ -64,6 +69,12 @@ namespace signalRgateway.Hubs
         public async Task sendMonitor(Record status)
         {
             await Clients.All.ReceiveMonitor(status);
+            LogEvent($"[sendMonitor -> {"All"}]");
+
+        }
+        private void LogEvent(String log)
+        {
+            Console.WriteLine(log);
         }
     }
 }
