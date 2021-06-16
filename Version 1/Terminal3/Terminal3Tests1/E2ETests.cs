@@ -74,8 +74,9 @@ namespace Terminal3_E2ETests
 
             //system.ResetSystem("-777");
             //purchase 1
-            system.Register("shaked@gmail.com", "123");
-            Result<RegisteredUserService> user = system.Login("shaked@gmail.com", "123");
+            String randomEmail = Service.GenerateId();
+            system.Register(randomEmail, "123");
+            Result<RegisteredUserService> user = system.Login(randomEmail, "123");
 
 
             Result<StoreService> store = system.OpenNewStore("testStore", user.Data.Id);
@@ -111,8 +112,9 @@ namespace Terminal3_E2ETests
             Assert.True(res.ExecStatus);
 
             //purchase 2
-            system.Register("Tomer@gmail.com", "456");
-            Result<RegisteredUserService> user2 = system.Login("Tomer@gmail.com", "456");
+            String randomEmail2 = Service.GenerateId();
+            system.Register(randomEmail2, "456");
+            Result<RegisteredUserService> user2 = system.Login(randomEmail2, "456");
 
 
             Result<StoreService> store2 = system.OpenNewStore("testStore", user2.Data.Id);
@@ -147,13 +149,13 @@ namespace Terminal3_E2ETests
 
             Assert.True(res2.ExecStatus);
 
-            Result<List<Tuple<DateTime, Double>>> recipts_owner = system.GetIncomeAmountGroupByDay("2021-06-16", "2021-06-07" , store.Data.Id, user.Data.Id);
-            Result<List<Tuple<DateTime, Double>>> recipts_owner2 = system.GetIncomeAmountGroupByDay("2021-06-16", "2021-06-07", store2.Data.Id, user2.Data.Id);
-            Result<List<Tuple<DateTime, Double>>> recipts_admin = system.GetIncomeAmountGroupByDay("2021-06-16", "2021-06-07", "-777");
+            Result<List<Tuple<DateTime, Double>>> recipts_owner = system.GetIncomeAmountGroupByDay("2021-06-16", "2021-06-16" , store.Data.Id, user.Data.Id);
+            Result<List<Tuple<DateTime, Double>>> recipts_owner2 = system.GetIncomeAmountGroupByDay("2021-06-16", "2021-06-16", store2.Data.Id, user2.Data.Id);
+            Result<List<Tuple<DateTime, Double>>> recipts_admin = system.GetIncomeAmountGroupByDay("2021-06-16", "2021-06-16", "-777");
 
-            Assert.True(recipts_owner.Data.Count == 1 && recipts_owner.Data[0].Item2 == 9.0);
-            Assert.True(recipts_owner2.Data.Count == 1 && recipts_owner2.Data[0].Item2 == 4.5);
-            Assert.True(recipts_admin.Data.Count == 1 && recipts_admin.Data[0].Item2 == 13.5);
+            Assert.True(recipts_owner.Data[0].Item2 == 9.0);
+            Assert.True(recipts_owner2.Data[0].Item2 == 4.5);
+            Assert.True(recipts_admin.Data[0].Item2 == 13.5);
             
             system.ResetSystem("-777");
         }
