@@ -109,11 +109,13 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         public StoresFacade StoresFacade { get; }
         public UsersAndPermissionsFacade UsersAndPermissionsFacade { get; }
         private readonly object my_lock = new object();
+        public Boolean testMode { get; set; }
 
-        public StoresAndManagementInterface(String admin_email, String admin_password)
+        public StoresAndManagementInterface(String admin_email, String admin_password, Boolean testMode=false)
         {
-            StoresFacade = new StoresFacade();
-            UsersAndPermissionsFacade = new UsersAndPermissionsFacade(admin_email, admin_password);
+            testMode = testMode;
+            StoresFacade = new StoresFacade(testMode);
+            UsersAndPermissionsFacade = new UsersAndPermissionsFacade(admin_email, admin_password, testMode);
         }
 
         // Methods
@@ -542,6 +544,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 }
                 catch (Exception e)
                 {
+                    if(!testMode)
                     Console.WriteLine("Error writing to MongoDB: " + e.Message);
                     await session.AbortTransactionAsync();                    
                     Mapper.getInstance().RevertTransaction_Purchase(userID);

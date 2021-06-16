@@ -29,7 +29,7 @@ namespace XUnitTestTerminal3
             sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test");
             IDictionary<String, Object> dictonary = new Dictionary<String, Object>(){{ "Name", "test_product" } }; 
 
-            Assert.True(sut.SearchProduct(dictonary).ExecStatus);
+            Assert.False(sut.SearchProduct(dictonary).ExecStatus);
         }
 
 
@@ -40,7 +40,7 @@ namespace XUnitTestTerminal3
             sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test");
             IDictionary<String, Object> dictonary = new Dictionary<String, Object>() {{ "Price", 10 }};
 
-            Assert.True(sut.SearchProduct(dictonary).ExecStatus);
+            Assert.False(sut.SearchProduct(dictonary).ExecStatus);
         }
 
         [Fact]

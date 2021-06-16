@@ -53,7 +53,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         public Mapper mapper;
 
-        private Boolean testMode { get; set; } = false;
+        public Boolean testMode { get; set; } = false;
 
         private readonly object my_lock = new object();
         private RegisteredUser defaultUser;
@@ -246,7 +246,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 }
             }
             //Only if we are looking for a register user in lazy mode
-            if(table.Equals(RegisteredUsers))
+            if(!testMode && table.Equals(RegisteredUsers))
             {
                 // trying to load from DB
                 var filter = Builders<BsonDocument>.Filter.Eq("Email", email);
@@ -555,7 +555,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
-                Mapper.getInstance().Load_RegisteredUserHistory(registerd_user);
+                if (!testMode)
+                {
+                    Mapper.getInstance().Load_RegisteredUserHistory(registerd_user);
+                }
                 Result<ShoppingCart> ShoppingCart = registerd_user.Purchase(paymentDetails, deliveryDetails , session);
                 if (!testMode)
                 {
@@ -719,7 +722,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return guest_user.getUserPendingOffers();
             else if (RegisteredUsers.TryGetValue(userId, out RegisteredUser registerd_user))
             {
-                Mapper.getInstance().Load_RegisteredUserOffers(registerd_user); // it is already loaded but just incase
+                if (!testMode)
+                {
+                    Mapper.getInstance().Load_RegisteredUserOffers(registerd_user); // it is already loaded but just incase
+
+                }
                 return registerd_user.getUserPendingOffers();
             }                
             return new Result<List<Dictionary<string, object>>>("Failed to get user offers: Failed to locate the user", false, null);

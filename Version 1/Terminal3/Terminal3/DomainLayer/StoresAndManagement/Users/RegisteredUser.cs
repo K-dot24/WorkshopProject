@@ -24,6 +24,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public History History { get; set; }
         public LinkedList<Notification> PendingNotification { get; set; }
         public NotificationCenter NotificationCenter { get; set; }
+        public Boolean testMode { get; set; }
 
 
         //public Mapper mapper = Mapper.getInstance();
