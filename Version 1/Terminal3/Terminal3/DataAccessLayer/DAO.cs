@@ -94,6 +94,7 @@ namespace Terminal3.DataAccessLayer.DAOs
                 {
                     Document = collection.Find(filter).FirstOrDefault();
                 }
+                if (Document is null) { return default; }
                 var json = Document.ToJson();
                 if (json.StartsWith("{ \"_id\" : ObjectId(")) { json = "{" + json.Substring(47); }
                 T dto = JsonConvert.DeserializeObject<T>(json);

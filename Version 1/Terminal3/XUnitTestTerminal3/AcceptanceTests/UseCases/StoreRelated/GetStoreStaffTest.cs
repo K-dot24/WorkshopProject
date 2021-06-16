@@ -20,7 +20,7 @@ namespace XUnitTestTerminal3
             //manager
             sut.Register("manager@gmail.com", "manager123");
             this.manager_id = sut.Login("manager@gmail.com", "manager123").Data;
-            sut.AddStoreManager(manager_id, owner_id, store_id);
+            sut.AddStoreManager("manager@gmail.com", owner_id, store_id);
 
             //permition
             LinkedList<int> permission = new LinkedList<int>();

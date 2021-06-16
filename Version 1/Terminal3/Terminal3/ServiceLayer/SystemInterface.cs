@@ -50,8 +50,8 @@ namespace Terminal3.ServiceLayer
         Result<String> AddProductToStore(String userID, String storeID, String productName , double price, int initialQuantity, String category ); //product id
         Result<Boolean> RemoveProductFromStore(String userID, String storeID, String productID);
         Result<String> EditProductDetails(String userID, String storeID , String productID, IDictionary<String, Object> details); //TODO
-        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID); 
-        Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
+        Result<Boolean> AddStoreOwner(String addedOwnerEmail, String currentlyOwnerID, String storeID); 
+        Result<Boolean> AddStoreManager(String addedManagerEmail, String currentlyOwnerID, String storeID);
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Dictionary<String, List<int>>> GetStoreStaff(String ownerID, String storeID);
         Result<List<String>> GetStorePurchaseHistory(String ownerID, String storeID); //userID to List<permissions>

@@ -41,10 +41,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         #endregion
 
         #region Staff Management
-        Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID);
-        Result<Boolean> RemoveStoreOwner(String removedOwnerID, String currentlyOwnerID, String storeID);        
+        Result<Boolean> AddStoreOwner(String addedOwnerEmail, String currentlyOwnerID, String storeID);
+        Result<Boolean> AddStoreManager(String addedManagerEmail, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreManager(String removedManagerEmail, String currentlyOwnerID, String storeID);
+        Result<Boolean> RemoveStoreOwner(String removedOwnerEmail, String currentlyOwnerID, String storeID);        
         Result<Boolean> SetPermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<Boolean> RemovePermissions(String storeID, String managerID, String ownerID, LinkedList<int> permissions);
         Result<List<Tuple<IStoreStaffService, PermissionService>>> GetStoreStaff(String ownerID, String storeID);
@@ -213,52 +213,61 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return new Result<List<ProductService>>(res.Message, false, null);
         }
 
-        public Result<Boolean> AddStoreOwner(String addedOwnerID, String currentlyOwnerID, String storeID)
+        public Result<Boolean> AddStoreOwner(String addedOwnerEmail, String currentlyOwnerID, String storeID)
         {
-            var filter1 = Builders<BsonDocument>.Filter.Eq("_id", addedOwnerID);
+            //var filter1 = Builders<BsonDocument>.Filter.Eq("_id", addedOwnerID);
             //var filter2 = Builders<BsonDocument>.Filter.Eq("_id", currentlyOwnerID);
-            Mapper.getInstance().LazyLoad_RegisteredUser(filter1);
+            //Mapper.getInstance().LazyLoad_RegisteredUser(filter1);
             //Mapper.getInstance().LazyLoad_RegisteredUser(filter2);
-            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(addedOwnerID, out RegisteredUser futureOwner))  // Check if addedOwnerID is a registered user
+            Result<RegisteredUser> futureOwnerResult = LazyLoad_RegisterUser("Email",addedOwnerEmail);
+            if (futureOwnerResult.ExecStatus)  // Check if addedOwnerID is a registered user
             {
-                return StoresFacade.AddStoreOwner(futureOwner, currentlyOwnerID, storeID);
+                LazyLoad_RegisterUser("_id",currentlyOwnerID);
+                return StoresFacade.AddStoreOwner(futureOwnerResult.Data, currentlyOwnerID, storeID);
             }
             //else
-            return new Result<Boolean>($"Failed to appoint store owner: {addedOwnerID} is not a registered user.\n", false, false);
+            return new Result<Boolean>($"Failed to appoint store owner: {addedOwnerEmail} is not a registered user.\n", false, false);
         }
 
-        public Result<Boolean> AddStoreManager(String addedManagerID, String currentlyOwnerID, String storeID)
+        public Result<Boolean> AddStoreManager(String addedManagerEmail, String currentlyOwnerID, String storeID)
         {
-            var filter1 = Builders<BsonDocument>.Filter.Eq("_id", addedManagerID);
+            //var filter1 = Builders<BsonDocument>.Filter.Eq("_id", addedManagerID);
             //var filter2 = Builders<BsonDocument>.Filter.Eq("_id", currentlyOwnerID);
-            Mapper.getInstance().LazyLoad_RegisteredUser(filter1);
+            //Mapper.getInstance().LazyLoad_RegisteredUser(filter1);
             //Mapper.getInstance().LazyLoad_RegisteredUser(filter2);
-            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(addedManagerID, out RegisteredUser futureManager))  // Check if addedManagerID is a registered user
+            //LazyLoad_RegisterUser("Email",addedManagerEmail);
+            Result<RegisteredUser> futureManagerResult = LazyLoad_RegisterUser("Email",addedManagerEmail);
+            if (futureManagerResult.ExecStatus)  // Check if addedManagerID is a registered user
             {
-                return StoresFacade.AddStoreManager(futureManager, currentlyOwnerID, storeID);
+                LazyLoad_RegisterUser("_id",currentlyOwnerID);
+                return StoresFacade.AddStoreManager(futureManagerResult.Data, currentlyOwnerID, storeID);
             }
             //else
-            return new Result<Boolean>($"Failed to appoint store manager: {addedManagerID} is not a registered user.\n", false, false);
+            return new Result<Boolean>($"Failed to appoint store manager: {addedManagerEmail} is not a registered user.\n", false, false);
         }
 
-        public Result<Boolean> RemoveStoreManager(String removedManagerID, String currentlyOwnerID, String storeID)
+        public Result<Boolean> RemoveStoreManager(String removedManagerEmail, String currentlyOwnerID, String storeID)
         {
-            if (UsersAndPermissionsFacade.RegisteredUsers.ContainsKey(removedManagerID))  // Check if addedManagerID is a registered user
+            Result<RegisteredUser> removedManaferResult =  LazyLoad_RegisterUser("Email",removedManagerEmail);
+            if (removedManaferResult.ExecStatus)  // Check if addedManagerID is a registered user
             {
-                return StoresFacade.RemoveStoreManager(removedManagerID, currentlyOwnerID, storeID);
+                LazyLoad_RegisterUser("_id",currentlyOwnerID);
+                return StoresFacade.RemoveStoreManager(removedManaferResult.Data.Id, currentlyOwnerID, storeID);
             }
             //else
-            return new Result<Boolean>($"Failed to remove store manager: {removedManagerID} is not a registered user.\n", false, false);
+            return new Result<Boolean>($"Failed to remove store manager: {removedManagerEmail} is not a registered user.\n", false, false);
         }
 
-        public Result<Boolean> RemoveStoreOwner(string removedOwnerID, string currentlyOwnerID, string storeID)
+        public Result<Boolean> RemoveStoreOwner(string removedOwnerEmail, string currentlyOwnerID, string storeID)
         {
-            if (UsersAndPermissionsFacade.RegisteredUsers.ContainsKey(removedOwnerID))  // Check if addedOwnerID is a registered user
+            Result<RegisteredUser> removerOwnerResult =  LazyLoad_RegisterUser("Email",removedOwnerEmail);
+            if (removerOwnerResult.ExecStatus)  // Check if addedOwnerID is a registered user
             {
-                return StoresFacade.RemoveStoreOwner(removedOwnerID, currentlyOwnerID, storeID);
+                LazyLoad_RegisterUser("_id",currentlyOwnerID);
+                return StoresFacade.RemoveStoreOwner(removerOwnerResult.Data.Id, currentlyOwnerID, storeID);
             }
             //else
-            return new Result<Boolean>($"Failed to remove store owner: {removedOwnerID} is not a registered user.\n", false, false);
+            return new Result<Boolean>($"Failed to remove store owner: {removedOwnerEmail} is not a registered user.\n", false, false);
 
         }
 
@@ -784,6 +793,38 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// searchinf or user in the DB by attribute
+        /// </summary>
+        /// <param name="attribute">may by "_id" or "Email"</param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public Result<RegisteredUser> LazyLoad_RegisterUser(String attribute, String values)
+        {
+            KeyValuePair<String,RegisteredUser> existingEntry;
+            if (attribute.Equals("_id")) { existingEntry = UsersAndPermissionsFacade.RegisteredUsers.Where(entry => entry.Value.Id.Equals(values)).FirstOrDefault(); }
+            else
+            {
+                existingEntry = UsersAndPermissionsFacade.RegisteredUsers.Where(entry => entry.Value.Email.Equals(values)).FirstOrDefault();
+            }
+            if (!(existingEntry.Value is null))
+            {
+                return new Result<RegisteredUser>($"User with {attribute} {values} has been found", true, existingEntry.Value);
+            }
+
+            var filter = Builders<BsonDocument>.Filter.Eq(attribute, values);
+            RegisteredUser loadedUser = Mapper.getInstance().LazyLoad_RegisteredUser(filter);
+            if(loadedUser is null)
+            {
+                return new Result<RegisteredUser>($"No user with {attribute}:{values} has been found", false, null);
+            }
+            else
+            {
+                UsersAndPermissionsFacade.RegisteredUsers.TryAdd(values, loadedUser);
+                return new Result<RegisteredUser>($"User with {attribute} {values} has been found", true, loadedUser);
+            }
         }
     }
 }

@@ -42,15 +42,15 @@ namespace XUnitTestTerminal3.AcceptanceTests.Utils
             }
         }
 
-        public Result<bool> AddStoreManager(string addedManagerID, string currentlyOwnerID, string storeID)
+        public Result<bool> AddStoreManager(string addedManageraddedOwnerEmail, string currentlyOwnerID, string storeID)
         {
-            Result<bool> fromSystem = system.AddStoreManager(addedManagerID, currentlyOwnerID, storeID);         
+            Result<bool> fromSystem = system.AddStoreManager(addedManageraddedOwnerEmail, currentlyOwnerID, storeID);         
             return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
         }
 
-        public Result<bool> AddStoreOwner(string addedOwnerID, string currentlyOwnerID, string storeID)
+        public Result<bool> AddStoreOwner(string addedOwnerEmail, string currentlyOwnerID, string storeID)
         {
-            Result <bool> fromSystem = system.AddStoreOwner(addedOwnerID, currentlyOwnerID, storeID);
+            Result <bool> fromSystem = system.AddStoreOwner(addedOwnerEmail, currentlyOwnerID, storeID);
             if (fromSystem.ExecStatus)
                 return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);
             return new Result<bool>(fromSystem.Message, fromSystem.ExecStatus, fromSystem.ExecStatus);

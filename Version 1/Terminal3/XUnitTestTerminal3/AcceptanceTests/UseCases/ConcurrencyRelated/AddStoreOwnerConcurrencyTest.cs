@@ -29,15 +29,15 @@ namespace XUnitTestTerminal3
             this.shlomot_id = sut.Login("shlomot@gmail.com", "test").Data;
             this.random_id = sut.Login("random@gmail.com", "test123").Data;
             this.store_id = sut.OpenNewStore("test_store", kfir_id).Data;
-            sut.AddStoreOwner(igor_id, kfir_id, store_id);
-            sut.AddStoreOwner(hit_id, kfir_id, store_id);
-            sut.AddStoreOwner(shlomot_id, kfir_id, store_id);
+            sut.AddStoreOwner("igor@gmail.com", kfir_id, store_id);
+            sut.AddStoreOwner("hit@gmail.com", kfir_id, store_id);
+            sut.AddStoreOwner("shlomot@gmail.com", kfir_id, store_id);
             results = new BlockingCollection<bool>();
         }
 
         internal void ThreadWork(string owner_id)
         {
-            Terminal3.DomainLayer.Result<bool> result = sut.AddStoreOwner(random_id, owner_id, store_id);
+            Terminal3.DomainLayer.Result<bool> result = sut.AddStoreOwner("random@gmail.com", owner_id, store_id);
             results.TryAdd(result.ExecStatus);
         }        
 

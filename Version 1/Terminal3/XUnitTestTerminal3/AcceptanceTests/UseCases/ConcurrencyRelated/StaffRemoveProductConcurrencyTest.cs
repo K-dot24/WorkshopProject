@@ -26,9 +26,9 @@ namespace XUnitTestTerminal3
             this.hit_id = sut.Login("hit@gmail.com", "navtut").Data;
             this.shlomot_id = sut.Login("shlomot@gmail.com", "test").Data;
             this.store_id = sut.OpenNewStore("test_store", kfir_id).Data;
-            sut.AddStoreManager(igor_id, kfir_id, store_id);
-            sut.AddStoreManager(hit_id, kfir_id, store_id);
-            sut.AddStoreManager(shlomot_id, kfir_id, store_id);
+            sut.AddStoreManager("igor@gmail.com", kfir_id, store_id);
+            sut.AddStoreManager("hit@gmail.com", kfir_id, store_id);
+            sut.AddStoreManager("shlomot@gmail.com", kfir_id, store_id);
             LinkedList<int> permission = new LinkedList<int>();
             permission.AddLast(0);
             permission.AddLast(1);
