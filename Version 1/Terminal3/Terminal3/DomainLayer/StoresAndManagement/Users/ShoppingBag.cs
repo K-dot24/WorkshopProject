@@ -6,6 +6,8 @@ using System.Collections.Concurrent;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -101,8 +103,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         internal double GetTotalPrice(List<Offer> offers, String DiscountCode = "")
         {
             Double amount = Store.PolicyManager.GetTotalBagPrice(this.Products, DiscountCode, offers);
-            this.TotalBagPrice = amount; 
-
+            this.TotalBagPrice = amount;
             return amount; 
         }
 

@@ -8,6 +8,8 @@ using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DataAccessLayer;
 using System.Globalization;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.Offer;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Users
 {
@@ -66,13 +68,23 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
 
         }
 
-        public Result<Double> GetTotalShoppingCartPrice(List<Offer> offers)
+        public Result<Double> GetTotalShoppingCartPrice(List<Offer> offers, MongoDB.Driver.IClientSessionHandle session = null)
         {
             Double sum = 0;
+            String userId = "";
             foreach (ShoppingBag bag in ShoppingBags.Values)
             {
+                userId = bag.User.Id;
                 sum += bag.GetTotalPrice(offers);
             }
+            this.TotalCartPrice = sum;
+            if(userId != "")
+            {
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", userId );
+                var update_shoppingcart = Builders<BsonDocument>.Update.Set("ShoppingCart", getDTO());
+                Mapper.getInstance().UpdateRegisteredUser(filter, update_shoppingcart, session: session);
+            }
+
             return new Result<double>($"Total shopping cart price calculated, price = {sum}", true, sum);
         }
 
@@ -96,7 +108,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (!AdheresToPolicy().Data)
                 return new Result<ShoppingCart>("A bag in the Shopping cart doesn't adhere to it's respective store's policy", false, null);
 
-            Double amount = GetTotalShoppingCartPrice(offers).Data;
+            Double amount = GetTotalShoppingCartPrice(offers , session).Data;
 
             int paymentId = PaymentSystem.Pay(amount, paymentDetails);
 

@@ -692,14 +692,38 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 return new Result<bool>(storeResult.Message, false, false);
             if (storeResult.ExecStatus)  {  UsersAndPermissionsFacade.UpdateUserOffers_DB(userID , offerID , counterOffer);   }
 
+            Store store;
+            Offer offer;
+            StoresFacade.Stores.TryGetValue(storeID, out store);
+            if (UsersAndPermissionsFacade.GuestUsers.TryGetValue(userID, out GuestUser guest_user))
+            {
+                 offer = guest_user.findPendingOffer(offerID);
+            }
+            else 
+            {
+                UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user);
+                offer = registerd_user.findPendingOffer(offerID);
+            }
+
+
             OfferResponse respone = storeResult.Data;
             if (respone == OfferResponse.Accepted)
+            {
                 UsersAndPermissionsFacade.AcceptOffer(userID, offerID);
+                store.sendNotificationToAllOwners(offer , true);
+            }
             else if (respone == OfferResponse.Declined)
+            {
                 UsersAndPermissionsFacade.DeclineOffer(userID, offerID);
+                store.sendNotificationToAllOwners(offer , false);
+            }
             else if (respone == OfferResponse.CounterOffered)
+            {
                 UsersAndPermissionsFacade.CounterOffer(userID, offerID);
+                store.sendNotificationToAllOwners(offer , false);
+            }
 
+            
             return new Result<bool>("Offer response was sent successfully", true, true);
         }
 

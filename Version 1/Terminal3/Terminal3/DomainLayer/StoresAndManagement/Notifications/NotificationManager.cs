@@ -74,7 +74,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return new Result<bool>($"All staff members are notified that an offer was recieved from the user : {UserID}\n", true, true);
         }
 
+        public Result<bool> notifyOfferRecievedUser(String UserID, String StoreId, String ProductID, int Amount, double price, double CounterOffer, bool Accepted)
+        {
+            String msg = "";
+            if (Accepted)
+                msg = $"Event : An offer has been accepted\nProduct Id : {ProductID}\nStore Id : {StoreId}\nAmount : {Amount}\nPrice : {price}\n";
+            else if (CounterOffer == -1)
+                msg = $"Event : An offer has been declined\nProduct Id : {ProductID}\nStore Id : {StoreId}\nAmount : {Amount}\nPrice : {price}\n";
+            else
+                msg = $"Event : A counter offer was recieved\nProduct Id : {ProductID}\nStore Id : {StoreId}\nAmount : {Amount}\nNew price : {CounterOffer}\n";
 
+            notifyOwners(Event.OfferRecievedStore, msg, false);
+            return new Result<bool>($"All store owners are notified that an offer was recieved from the user : {UserID}\n", true, true);
+        }
 
         // Private Functions
         private void notify(Event eventName,String msg , Boolean isStaff, MongoDB.Driver.IClientSessionHandle session = null)
