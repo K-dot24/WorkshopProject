@@ -219,10 +219,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             //var filter2 = Builders<BsonDocument>.Filter.Eq("_id", currentlyOwnerID);
             //Mapper.getInstance().LazyLoad_RegisteredUser(filter1);
             //Mapper.getInstance().LazyLoad_RegisteredUser(filter2);
-            Result<RegisteredUser> futureOwnerResult = LazyLoad_RegisterUser(addedOwnerEmail, "Email");
+            Result<RegisteredUser> futureOwnerResult = LazyLoad_RegisterUser("Email",addedOwnerEmail);
             if (futureOwnerResult.ExecStatus)  // Check if addedOwnerID is a registered user
             {
-                LazyLoad_RegisterUser(currentlyOwnerID, "_id");
+                LazyLoad_RegisterUser("_id",currentlyOwnerID);
                 return StoresFacade.AddStoreOwner(futureOwnerResult.Data, currentlyOwnerID, storeID);
             }
             //else
@@ -235,11 +235,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             //var filter2 = Builders<BsonDocument>.Filter.Eq("_id", currentlyOwnerID);
             //Mapper.getInstance().LazyLoad_RegisteredUser(filter1);
             //Mapper.getInstance().LazyLoad_RegisteredUser(filter2);
-            LazyLoad_RegisterUser(addedManagerEmail,"Email");
-            Result<RegisteredUser> futureManagerResult = LazyLoad_RegisterUser(addedManagerEmail, "Email");
+            //LazyLoad_RegisterUser("Email",addedManagerEmail);
+            Result<RegisteredUser> futureManagerResult = LazyLoad_RegisterUser("Email",addedManagerEmail);
             if (futureManagerResult.ExecStatus)  // Check if addedManagerID is a registered user
             {
-                LazyLoad_RegisterUser(currentlyOwnerID,"_id");
+                LazyLoad_RegisterUser("_id",currentlyOwnerID);
                 return StoresFacade.AddStoreManager(futureManagerResult.Data, currentlyOwnerID, storeID);
             }
             //else
@@ -248,10 +248,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<Boolean> RemoveStoreManager(String removedManagerEmail, String currentlyOwnerID, String storeID)
         {
-            Result<RegisteredUser> removedManaferResult =  LazyLoad_RegisterUser(removedManagerEmail, "Email");
+            Result<RegisteredUser> removedManaferResult =  LazyLoad_RegisterUser("Email",removedManagerEmail);
             if (removedManaferResult.ExecStatus)  // Check if addedManagerID is a registered user
             {
-                LazyLoad_RegisterUser(currentlyOwnerID,"_id");
+                LazyLoad_RegisterUser("_id",currentlyOwnerID);
                 return StoresFacade.RemoveStoreManager(removedManaferResult.Data.Id, currentlyOwnerID, storeID);
             }
             //else
@@ -260,10 +260,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement
 
         public Result<Boolean> RemoveStoreOwner(string removedOwnerEmail, string currentlyOwnerID, string storeID)
         {
-            Result<RegisteredUser> removerOwnerResult =  LazyLoad_RegisterUser(removedOwnerEmail,"Email");
+            Result<RegisteredUser> removerOwnerResult =  LazyLoad_RegisterUser("Email",removedOwnerEmail);
             if (removerOwnerResult.ExecStatus)  // Check if addedOwnerID is a registered user
             {
-                LazyLoad_RegisterUser(currentlyOwnerID,"_id");
+                LazyLoad_RegisterUser("_id",currentlyOwnerID);
                 return StoresFacade.RemoveStoreOwner(removerOwnerResult.Data.Id, currentlyOwnerID, storeID);
             }
             //else
@@ -803,14 +803,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement
         /// <returns></returns>
         public Result<RegisteredUser> LazyLoad_RegisterUser(String attribute, String values)
         {
-            if (UsersAndPermissionsFacade.RegisteredUsers.TryGetValue(values, out RegisteredUser user))
+            KeyValuePair<String,RegisteredUser> existingEntry;
+            if (attribute.Equals("_id")) { existingEntry = UsersAndPermissionsFacade.RegisteredUsers.Where(entry => entry.Value.Id.Equals(values)).FirstOrDefault(); }
+            else
             {
-                return new Result<RegisteredUser>($"User with {attribute} {values} has been found", true,user );
+                existingEntry = UsersAndPermissionsFacade.RegisteredUsers.Where(entry => entry.Value.Email.Equals(values)).FirstOrDefault();
+            }
+            if (!(existingEntry.Value is null))
+            {
+                return new Result<RegisteredUser>($"User with {attribute} {values} has been found", true, existingEntry.Value);
             }
 
             var filter = Builders<BsonDocument>.Filter.Eq(attribute, values);
             RegisteredUser loadedUser = Mapper.getInstance().LazyLoad_RegisteredUser(filter);
-            if(user is null)
+            if(loadedUser is null)
             {
                 return new Result<RegisteredUser>($"No user with {attribute}:{values} has been found", false, null);
             }
