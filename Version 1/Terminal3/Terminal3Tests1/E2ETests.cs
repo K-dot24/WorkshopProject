@@ -172,8 +172,8 @@ namespace Terminal3_E2ETests
             Result<StoreService> store = system.OpenNewStore("testStore", user.Data.Id);
             //Result<ProductService> product = system.AddProductToStore(user.Data.Id, store.Data.Id, "testProduct", 10, 1, "Test");
 
-            Result<List<Tuple<DateTime, Double>>> recipts_owner = system.GetIncomeAmountGroupByDay("2021-06-16", "2021-06-07", store.Data.Id, user.Data.Id);
-            Result<List<Tuple<DateTime, Double>>> recipts_admin = system.GetIncomeAmountGroupByDay("2021-06-16", "2021-06-07", "-777");
+            Result<List<Tuple<DateTime, Double>>> recipts_owner = system.GetIncomeAmountGroupByDay("2021-06-15", "2021-06-15", store.Data.Id, user.Data.Id);
+            Result<List<Tuple<DateTime, Double>>> recipts_admin = system.GetIncomeAmountGroupByDay("2021-06-15", "2021-06-15", "-777");
 
             Assert.True(recipts_owner.Data[0].Item2 == 0);
             Assert.True(recipts_admin.Data[0].Item2 == 0);
