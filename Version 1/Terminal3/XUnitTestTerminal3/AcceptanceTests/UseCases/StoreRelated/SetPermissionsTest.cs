@@ -20,7 +20,7 @@ namespace XUnitTestTerminal3
             //manager
             sut.Register("manager@gmail.com", "manager123");
             this.manager_id = sut.Login("manager@gmail.com", "manager123").Data;
-            sut.AddStoreManager(manager_id, owner_id, store_id);
+            sut.AddStoreManager("manager@gmail.com", owner_id, store_id);
 
             //permition
             LinkedList<int> permission = new LinkedList<int>();
@@ -51,7 +51,7 @@ namespace XUnitTestTerminal3
             sut.Register("new_manager@gmail.com", "new_manager123");
             string new_manager_id = sut.Login("new_manager@gmail.com", "new_manager123").Data;
             
-            Assert.False(sut.AddStoreManager(new_manager_id, manager_id, store_id).ExecStatus);
+            Assert.False(sut.AddStoreManager("new_manager@gmail.com", manager_id, store_id).ExecStatus);
         }
 
     }

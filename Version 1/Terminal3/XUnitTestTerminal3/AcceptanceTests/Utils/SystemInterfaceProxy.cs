@@ -33,20 +33,20 @@ namespace XUnitTestTerminal3.IntegrationTests
             return Real.AddProductToStore(userID, storeID, productName, price, initialQuantity, category);
         }
 
-        public Result<bool> AddStoreManager(string addedManagerID, string currentlyOwnerID, string storeID)
+        public Result<bool> AddStoreManager(string addedManagerEmail, string currentlyOwnerID, string storeID)
         {
             if (Real == null)
                 return new Result<bool>(true);
 
-            return Real.AddStoreManager(addedManagerID, currentlyOwnerID, storeID);
+            return Real.AddStoreManager(addedManagerEmail, currentlyOwnerID, storeID);
         }
 
-        public Result<bool> AddStoreOwner(string addedOwnerID, string currentlyOwnerID, string storeID)
+        public Result<bool> AddStoreOwner(string addedOwnerEmail, string currentlyOwnerID, string storeID)
         {
             if(Real == null)
                 return new Result<bool>(true);
 
-            return Real.AddStoreOwner(addedOwnerID, currentlyOwnerID, storeID);
+            return Real.AddStoreOwner(addedOwnerEmail, currentlyOwnerID, storeID);
         }
 
         public Result<string> EditProductDetails(string userID, string storeID, string productID, IDictionary<string, object> details)
