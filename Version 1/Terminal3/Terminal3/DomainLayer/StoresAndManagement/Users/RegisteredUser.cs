@@ -30,7 +30,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         //public Mapper mapper = Mapper.getInstance();
 
         //Constructor
-        public RegisteredUser(String email , String password, Boolean testing = false) : base()
+        public RegisteredUser(String email , String password, Boolean testing = false) : base(testing)
         {
             this.Email = email;
             var sha1 = new SHA1CryptoServiceProvider();

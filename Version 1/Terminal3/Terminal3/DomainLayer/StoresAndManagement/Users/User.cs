@@ -19,15 +19,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public ShoppingCart ShoppingCart { get; set; }
         public List<Offer> PendingOffers { get; set; }
         public List<Offer> AcceptedOffers { get; set; }
-        protected User()
+        public Boolean testMode { get; set;} 
+        protected User(Boolean testMode = false)
         {
             Id = Service.GenerateId();
             ShoppingCart = new ShoppingCart();
             PendingOffers = new List<Offer>();
             AcceptedOffers = new List<Offer>();
+            this.testMode = testMode;
         }
         // aslo used for DB
-        protected User(string id)
+        protected User(string id, Boolean testMode = false)
         {
             if (id.Equals("-1"))
                 Id = Service.GenerateId();
@@ -35,13 +37,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             ShoppingCart = new ShoppingCart();      // when used with lazy loading from db this field will be a place holder
             PendingOffers = new List<Offer>();      // when used with lazy loading from db this field will be a place holder 
             AcceptedOffers = new List<Offer>();     // when used with lazy loading from db this field will be a place holder
+
+            this.testMode = testMode;
         }
-        protected User(String id , ShoppingCart shoppingCart)
+        protected User(String id , ShoppingCart shoppingCart, Boolean testMode = false)
         {
             Id = id;
             ShoppingCart = shoppingCart;
             PendingOffers = new List<Offer>();
             AcceptedOffers = new List<Offer>();
+            this.testMode = testMode;
         }
 
         public Result<ShoppingCart> AddProductToCart(Product product, int productQuantity, Store store)
@@ -159,9 +164,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<bool> removeAcceptedOffers(MongoDB.Driver.IClientSessionHandle session)
         {
             AcceptedOffers = new List<Offer>();
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("AcceptedOffers", Get_DTO_Offers(AcceptedOffers));
-            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
+            if (!testMode)
+            {
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+                var update_offer = Builders<BsonDocument>.Update.Set("AcceptedOffers", Get_DTO_Offers(AcceptedOffers));
+                Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
+            }
 
             return new Result<bool>("Accepted offers removed", true, true);
         }
@@ -170,9 +178,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             Offer offer = new Offer(this.Id, productID, amount, price, storeID);
             PendingOffers.Add(offer);
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("PendingOffers", Get_DTO_Offers(PendingOffers));
-            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
+            if (!testMode)
+            {
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+                var update_offer = Builders<BsonDocument>.Update.Set("PendingOffers", Get_DTO_Offers(PendingOffers));
+                Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
+            }
             return new Result<Offer>("Offer sent to store", true, offer);
         }
 
@@ -205,9 +216,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (offer == null)
                 return new Result<bool>("Failed to remove offer from user: Failed to locate the offer", false, false);
             PendingOffers.Remove(offer);
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("PendingOffers", Get_DTO_Offers(PendingOffers));
-            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
+            if (!testMode)
+            {
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+                var update_offer = Builders<BsonDocument>.Update.Set("PendingOffers", Get_DTO_Offers(PendingOffers));
+                Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
+            }
             return new Result<bool>("Offer was removed", true, true);
         }
 
@@ -220,9 +234,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             if (!removeResult.ExecStatus)
                 return removeResult;
             AcceptedOffers.Add(offer);
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
-            var update_offer = Builders<BsonDocument>.Update.Set("AcceptedOffers", Get_DTO_Offers(AcceptedOffers));
-            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
+            if (!testMode)
+            {
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+                var update_offer = Builders<BsonDocument>.Update.Set("AcceptedOffers", Get_DTO_Offers(AcceptedOffers));
+                Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
+            }
 
             return new Result<bool>("Offer was accepted", true, true);
         }

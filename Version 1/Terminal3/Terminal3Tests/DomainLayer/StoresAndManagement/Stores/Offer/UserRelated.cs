@@ -13,7 +13,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Tests
 
         public UserRelated()
         {
-            RegisteredUser = new RegisteredUser("reg@user", "pass3");
+            RegisteredUser = new RegisteredUser("reg@user", "pass3", true);
         }
 
 
