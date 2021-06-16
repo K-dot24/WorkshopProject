@@ -70,6 +70,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 defaultUser = new RegisteredUser("-777", admin_email, admin_password);
                 insertInitializeData(defaultUser);
             }
+            else
+            {
+                SystemAdmins.TryGetValue(admin_email, out RegisteredUser user);
+                defaultUser = user;
+            }
         }
 
         //Methods
@@ -84,7 +89,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             try
             {
-                Monitor.Enter(my_lock);
+                Monitor.Enter(email);
                 try
                 {
                     if (mapper.Query_isUniqEmail(email))
@@ -109,7 +114,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 }
                 finally
                 {
-                    Monitor.Exit(my_lock);
+                    Monitor.Exit(email);
                 }
             }
             catch (SynchronizationLockException SyncEx)
@@ -118,6 +123,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 Console.WriteLine(SyncEx.Message);
                 return new Result<RegisteredUser>(SyncEx.Message, false, null);
             }
+            
         }
 
         /// <summary>
@@ -579,6 +585,15 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             GuestUsers.Clear();
             SystemAdmins.Clear();
             RegisteredUsers.Clear();
+            if (SystemAdmins.IsEmpty)
+            {
+                defaultUser = new RegisteredUser("-777", "admin@terminal3.com", "Admin123");
+            }
+            else
+            {
+                SystemAdmins.TryGetValue("admin@terminal3.com", out RegisteredUser user);
+                defaultUser = user;
+            }
             insertInitializeData(defaultUser);
         }
         private void insertInitializeData(RegisteredUser defaultUser)

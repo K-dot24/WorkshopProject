@@ -21,8 +21,13 @@ namespace WebApplication3
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.UseKestrel(options =>
+                    {
+                        options.Limits.MaxConcurrentConnections = 500;
+                    });
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls("https://localhost:5001;http://localhost:5000");
+                    
 
                 });
     }
