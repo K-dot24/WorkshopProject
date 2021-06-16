@@ -75,7 +75,6 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public Result<Boolean> AddProductReview(String userId , String review)
         {
-            //TODO - check if user can add only one review and then overrride the last review ? or can add multiple reviews?
             Review.TryAdd(userId, review);
             return NotificationManager.notifyProductReview(this, review);
         }

@@ -34,18 +34,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             return NotificationService.Update(notification);
         }
 
-        public Result<bool> notifyOfferRecievedUser(String UserID, String StoreId, String ProductID, int Amount, double price, double CounterOffer, bool Accepted)
-        {
-            String msg = "";
-            if (Accepted)
-                msg = $"Event : An offer has been accepted\nProduct Id : {ProductID}\nStore Id : {StoreId}\nAmount : {Amount}\nPrice : {price}\n";
-            else if (CounterOffer == -1)
-                msg = $"Event : An offer has been declined\nProduct Id : {ProductID}\nStore Id : {StoreId}\nAmount : {Amount}\nPrice : {price}\n";
-            else
-                msg = $"Event : A counter offer was recieved\nProduct Id : {ProductID}\nStore Id : {StoreId}\nAmount : {Amount}\nNew price : {CounterOffer}\n";
+        //public Result<bool> notifyOfferRecievedUser(String UserID, String StoreId, String ProductID, int Amount, double price, double CounterOffer, bool Accepted)
+        //{
+        //    String msg = "";
+        //    if (Accepted)
+        //        msg = $"Event : An offer has been accepted\nProduct Id : {ProductID}\nStore Id : {StoreId}\nAmount : {Amount}\nPrice : {price}\n";
+        //    else if (CounterOffer == -1)
+        //        msg = $"Event : An offer has been declined\nProduct Id : {ProductID}\nStore Id : {StoreId}\nAmount : {Amount}\nPrice : {price}\n";
+        //    else
+        //        msg = $"Event : A counter offer was recieved\nProduct Id : {ProductID}\nStore Id : {StoreId}\nAmount : {Amount}\nNew price : {CounterOffer}\n";
 
-            Notification notification = new Notification(Event.OfferRecievedUser, UserID, msg, false);
-            return notifyNotificationServer(notification);
-        }
+        //    Notification notification = new Notification(Event.OfferRecievedUser, UserID, msg, false);
+        //    return notifyNotificationServer(notification);
+        //}
     }
 }

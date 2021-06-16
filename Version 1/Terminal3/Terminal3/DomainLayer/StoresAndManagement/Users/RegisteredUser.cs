@@ -245,23 +245,26 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public override Result<bool> AcceptOffer(string offerID)
         {
             Offer offer = findPendingOffer(offerID);
-            Result<bool> res = MovePendingOfferToAccepted(offerID);
-            if (!res.ExecStatus)
-                return res;
-            return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, true);
+            return MovePendingOfferToAccepted(offerID);
+            //if (!res.ExecStatus)
+            //    return res;
+            //return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, true);
         }
 
         public override Result<bool> DeclineOffer(string offerID)
         {
             Offer offer = findPendingOffer(offerID);
             RemovePendingOffer(offerID);
-            return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
+            return new Result<bool>("", true, true);
+            //return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
         }
 
         public override Result<bool> CounterOffer(string offerID)
         {
             Offer offer = findPendingOffer(offerID);
-            return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
+            //return NotificationCenter.notifyOfferRecievedUser(this.Id, offer.StoreID, offer.ProductID, offer.Amount, offer.Price, offer.CounterOffer, false);
+            return new Result<bool>("", true, true);
+
         }
     }
 }

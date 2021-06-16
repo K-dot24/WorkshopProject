@@ -659,10 +659,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             return PolicyManager.EditPurchasePolicy(info, id);
         }
 
-        private Result<bool> sendNotificationToAllOwners(Offer offer)
+        public Result<bool> sendNotificationToAllOwners(Offer offer , bool accepted)
         {
-            NotificationManager.notifyOfferRecievedStore(offer.UserID, offer.ProductID, offer.Amount, offer.Price);
-
+            NotificationManager.notifyOfferRecievedUser(offer.UserID, offer.StoreID , offer.ProductID, offer.Amount, offer.Price , offer.CounterOffer , accepted);
             return new Result<bool>("", true, true);
         }
 
@@ -672,7 +671,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
             var update_offer = Builders<BsonDocument>.Update.Set("OfferManager", Mapper.getInstance().Get_DTO_Offers(OfferManager.PendingOffers));
             Mapper.getInstance().UpdateStore(filter, update_offer);
-            return sendNotificationToAllOwners(offer);
+            return NotificationManager.notifyOfferRecievedStore(offer.UserID , offer.ProductID , offer.Amount , offer.Price);
         }
 
         public DTO_Store getDTO()
