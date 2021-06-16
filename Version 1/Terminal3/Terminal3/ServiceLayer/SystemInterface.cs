@@ -42,7 +42,7 @@ namespace Terminal3.ServiceLayer
 
         Result<double> GetTotalShoppingCartPrice(String userID);
 
-        Result<Boolean> AddProductReview(String userID, String storeID, String productID , String review);
+        Result<String> AddProductReview(String userID, String storeID, String productID , String review);
         #endregion
 
         #region Store related operations

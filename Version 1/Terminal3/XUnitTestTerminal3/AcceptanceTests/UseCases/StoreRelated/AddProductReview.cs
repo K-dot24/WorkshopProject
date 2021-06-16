@@ -1,33 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DomainLayer;
 using Xunit;
 
-namespace XUnitTestTerminal3
+namespace XUnitTestTerminal3.AcceptanceTests.UseCases.StoreRelated
 {
-    public class GetStorePurchaseHistoryTest: XUnitTerminal3TestCase
+    public class AddProductReview : XUnitTerminal3TestCase
     {
         private string user_id;
         private string store_id;
         private string product_id;
-        public GetStorePurchaseHistoryTest() : base()
+        public AddProductReview() : base()
         {
             sut.Register("test@gmail.com", "test123");
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
             this.store_id = sut.OpenNewStore("test_store", user_id).Data;
             this.product_id = sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test").Data;
         }
-        [Fact()]
+
+        [Fact]
         [Trait("Category", "acceptance")]
-        public void EmptyHistoryTest()
+        public void AddProductReviewOk()
         {
-            List<string> result =  sut.GetStorePurchaseHistory(user_id,store_id).Data;
-            Assert.Empty(result);
-        }
-        [Fact()]
-        [Trait("Category", "acceptance")]
-        public void NonEmptyHistoryTest()
-        {
+            sut.Register("buyer@gmail.com", "buyer123");
+            String user = sut.Login("buyer@gmail.com", "buyer123").Data;
+            sut.AddProductToCart(user, product_id, 2, store_id);
             IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>
                     {
                      { "card_number", "2222333344445555" },
@@ -37,6 +35,7 @@ namespace XUnitTestTerminal3
                      { "ccv", "262" },
                      { "id", "20444444" }
                     };
+
             IDictionary<String, Object> deliveryDetails = new Dictionary<String, Object>
                     {
                      { "name", "Israel Israelovice" },
@@ -46,10 +45,19 @@ namespace XUnitTestTerminal3
                      { "zip", "8458527" }
                     };
 
-            sut.AddProductToCart(user_id, product_id, 2, store_id);
-            Assert.True(sut.Purchase(user_id, paymentDetails, deliveryDetails).ExecStatus);
-            List<string> result = sut.GetStorePurchaseHistory(user_id, store_id).Data;
-            Assert.NotEmpty(result);
+            Result<List<String>> res = sut.Purchase(user, paymentDetails, deliveryDetails);
+            Assert.True(res.ExecStatus);
+            Assert.True(sut.AddProductReview(user, store_id, product_id, "Great product !").ExecStatus);
+        }
+
+        [Fact]
+        [Trait("Category", "acceptance")]
+        public void AddProductReviewNoPurchase()
+        {
+            sut.Register("buyer@gmail.com", "buyer123");
+            String user = sut.Login("buyer@gmail.com", "buyer123").Data;
+
+            Assert.False(sut.AddProductReview(user, store_id, product_id, "Great product !").ExecStatus);
         }
     }
 }

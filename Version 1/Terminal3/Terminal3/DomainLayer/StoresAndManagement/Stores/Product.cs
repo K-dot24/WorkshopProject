@@ -76,7 +76,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
         public Result<Boolean> AddProductReview(String userId , String review)
         {
             Review.TryAdd(userId, review);
-            return NotificationManager.notifyProductReview(this, review);
+            if(!(NotificationManager is null))
+            {
+                return NotificationManager.notifyProductReview(this, review);
+            }
+            else { return new Result<bool>(true); }
+
         }
 
         public Result<ProductService> GetDAL()

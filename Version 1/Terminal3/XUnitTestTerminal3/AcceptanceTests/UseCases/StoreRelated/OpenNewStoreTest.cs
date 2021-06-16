@@ -18,10 +18,7 @@ namespace XUnitTestTerminal3
         public void OpenNewStore()
         {
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
-            sut.OpenNewStore("test_store" , user_id);
-            IDictionary<String, Object> dictonary = new Dictionary<String, Object>() { { "Name", "test_store" } };
-
-            Assert.True(sut.SearchStore(dictonary).ExecStatus);
+            Assert.True(sut.OpenNewStore("test_store", user_id).ExecStatus);
         }
 
         [Fact]
@@ -29,10 +26,7 @@ namespace XUnitTestTerminal3
         public void OpenNewStoreNotRegister()
         {
             this.user_id = sut.Login("test@gmail.com", "0123").Data;
-            sut.OpenNewStore("test_store", "0123");
-            IDictionary<String, Object> dictonary = new Dictionary<String, Object>() {{ "Name", "test_store" }};
-
-            Assert.False(sut.SearchStore(dictonary).ExecStatus);
+            Assert.False(sut.OpenNewStore("test_store", "0123").ExecStatus);
         }
     }
 }

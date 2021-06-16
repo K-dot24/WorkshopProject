@@ -14,8 +14,7 @@ namespace XUnitTestTerminal3
         public ResetSystemTest() : base()
         {
             //Admin
-            sut.Register("Admin@terminal3", "Admin");
-            this.admin_id = sut.Login("Admin@terminal3", "Admin").Data;
+            this.admin_id = sut.Login("Admin@terminal3.com", "Admin123").Data;
 
             sut.Register("test@gmail.com", "test123");
             this.user_id = sut.Login("test@gmail.com", "test123").Data;

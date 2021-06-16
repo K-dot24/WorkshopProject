@@ -22,10 +22,7 @@ namespace XUnitTestTerminal3
         {
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
             string store_id =  sut.OpenNewStore("test_store", user_id).Data;
-            sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test");
-            IDictionary<String, Object> dictonary = new Dictionary<String, Object>() { { "Name", "test_product" } };
-
-            Assert.True(sut.SearchProduct(dictonary).ExecStatus);
+            Assert.True(sut.AddProductToStore(user_id, store_id, "test_product", 10, 10, "test").ExecStatus);
         }
 
         [Fact]
@@ -34,11 +31,7 @@ namespace XUnitTestTerminal3
         {
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
             sut.OpenNewStore("test_store", user_id);
-            sut.AddProductToStore(user_id, "0123", "test_product", 10, 10, "test");
-
-            IDictionary<String, Object> dictonary = new Dictionary<String, Object>() {{ "Name", "test_product" }};
-
-            Assert.False(sut.SearchProduct(dictonary).ExecStatus);
+            Assert.False(sut.AddProductToStore(user_id, "0123", "test_product", 10, 10, "test").ExecStatus);
         }
 
         [Fact]
@@ -47,11 +40,8 @@ namespace XUnitTestTerminal3
         {
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
             string store_id = sut.OpenNewStore("test_store", user_id).Data;
-            sut.AddProductToStore("0123", store_id, "test_product", 10, 10, "test");
+            Assert.False(sut.AddProductToStore("0123", store_id, "test_product", 10, 10, "test").ExecStatus);
 
-            IDictionary<String, Object> dictonary = new Dictionary<String, Object>() { { "Name", "test_product" } };
-
-            Assert.False(sut.SearchProduct(dictonary).ExecStatus);
         }
     }
 }

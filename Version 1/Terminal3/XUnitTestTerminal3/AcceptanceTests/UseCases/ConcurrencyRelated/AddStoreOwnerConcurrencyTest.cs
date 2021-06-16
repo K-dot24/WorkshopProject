@@ -39,9 +39,9 @@ namespace XUnitTestTerminal3
         {
             Terminal3.DomainLayer.Result<bool> result = sut.AddStoreOwner("random@gmail.com", owner_id, store_id);
             results.TryAdd(result.ExecStatus);
-        }        
+        }
 
-        [Fact]
+        [Fact(Skip = "Not relevent")]
         [Trait("Category", "concurrency")]
         public void AddStoreOwner()
         {

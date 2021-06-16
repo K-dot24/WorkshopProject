@@ -305,14 +305,14 @@ namespace Terminal3.ServiceLayer
         public Result<bool> ResetSystem(String sysAdminID)
         {
             Result<Boolean> res = SystemAdminInterface.ResetSystem(sysAdminID);
-            if (res.ExecStatus)
+            /*  if (res.ExecStatus)
             {
                 //StoresAndManagementInterface StoresAndManagement = new StoresAndManagementInterface();
                 GuestUserInterface = new GuestUserController(StoresAndManagement);
                 RegisteredUserInterface = new RegisteredUserController(StoresAndManagement);
                 StoreStaffInterface = new StoreStaffController(StoresAndManagement);
                 SystemAdminInterface = new SystemAdminController(StoresAndManagement);
-            }
+            }*/
             return res;            
         }
 

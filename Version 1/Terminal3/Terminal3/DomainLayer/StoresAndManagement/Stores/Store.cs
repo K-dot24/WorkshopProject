@@ -389,8 +389,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         private void RemoveAllStaffAppointedByOwner(StoreOwner owner)
         {
-            NotificationManager.notifyOwnerSubscriptionRemoved(owner.GetId() , owner);
-            if(Owners.Count != 0)
+            if(NotificationManager != null)
+            {
+                NotificationManager.notifyOwnerSubscriptionRemoved(owner.GetId(), owner);
+            }
+            if (Owners.Count != 0)
             {
                 foreach (var staff_owner in Owners)
                 {

@@ -14,6 +14,7 @@ namespace XUnitTestTerminal3
         protected XUnitTerminal3TestCase()
         {
             sut = Bridge.getService();
+            sut.ResetSystem("-777");
         }
 
     }

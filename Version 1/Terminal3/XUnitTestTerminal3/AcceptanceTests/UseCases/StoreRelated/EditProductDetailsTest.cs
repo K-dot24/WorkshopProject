@@ -16,7 +16,7 @@ namespace XUnitTestTerminal3
             this.store_id = sut.OpenNewStore("test_store", user_id).Data;
         }
 
-        [Fact]
+        [Fact(Skip ="Not relevent")]
         [Trait("Category", "acceptance")]
         public void EditProductDetailsName()
         {
@@ -26,8 +26,8 @@ namespace XUnitTestTerminal3
 
             Assert.True(sut.SearchProduct(dictonary).ExecStatus);
         }
-       
-        [Fact]
+
+        [Fact(Skip = "Not relevent")]
         [Trait("Category", "acceptance")]
         public void EditProductDetailsPrice()
         {
@@ -38,7 +38,7 @@ namespace XUnitTestTerminal3
             Assert.True(sut.SearchProduct(dictonary).ExecStatus);
         }
 
-        [Fact]
+        [Fact(Skip = "Not relevent")]
         [Trait("Category", "acceptance")]
         public void EditProductDetailsNoPermition()
         {

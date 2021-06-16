@@ -68,7 +68,7 @@ namespace XUnitTestTerminal3
             results.TryAdd(result);
         }
 
-        [Fact]
+        [Fact(Skip = "Not relevent")]
         [Trait("Category", "concurrency")]
         public void Purchase()
         {

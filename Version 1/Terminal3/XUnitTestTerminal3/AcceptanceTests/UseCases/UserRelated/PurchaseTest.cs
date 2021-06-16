@@ -33,9 +33,17 @@ namespace XUnitTestTerminal3
         public void DeliverySystemTest()
         {
             sut.AddProductToCart(this.user_id, this.product_id, 5, this.store_id);
-            IDictionary<String, Object> dictionaryPay = new Dictionary<String, Object>() { { "Name", "test_product" } };
-            IDictionary<String, Object> dictionaryDeliver = new Dictionary<String, Object>();
-            Assert.Equal("Attempt to purchase the shopping cart failed due to error in delivery details\n", sut.Purchase(this.user_id, dictionaryPay, dictionaryDeliver).Message);
+            IDictionary<String, Object> paymentDetails = new Dictionary<String, Object>
+                    {
+                     { "card_number", "2222333344445555" },
+                     { "month", "4" },
+                     { "year", "2021" },
+                     { "holder", "Israel Israelovice" },
+                     { "ccv", "262" },
+                     { "id", "20444444" }
+                    }; IDictionary<String, Object> dictionaryDeliver = new Dictionary<String, Object>();
+            Assert.Equal("Attempt to purchase the shopping cart failed due to error in delivery details\n", sut.Purchase(this.user_id, paymentDetails, dictionaryDeliver).Message);
+            //Assert.False(sut.Purchase(this.user_id, paymentDetails, dictionaryDeliver).ExecStatus);
         }
 
         [Fact]

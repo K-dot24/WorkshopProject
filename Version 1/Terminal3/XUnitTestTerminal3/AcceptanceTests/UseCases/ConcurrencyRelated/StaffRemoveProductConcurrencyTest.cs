@@ -46,7 +46,7 @@ namespace XUnitTestTerminal3
             results.TryAdd(result.ExecStatus);
         }
 
-        [Fact]
+        [Fact(Skip = "Not relevent")]
         [Trait("Category", "concurrency")]
         public void RemoveProduct()
         {

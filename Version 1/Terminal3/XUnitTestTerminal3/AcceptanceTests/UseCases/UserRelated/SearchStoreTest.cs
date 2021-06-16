@@ -14,7 +14,7 @@ namespace XUnitTestTerminal3
             this.user_id = sut.Login("test@gmail.com", "test123").Data;
         }
 
-        [Fact]
+        [Fact(Skip = "Not relevent")]
         [Trait("Category", "acceptance")]
         public void SerchStore()
         {
