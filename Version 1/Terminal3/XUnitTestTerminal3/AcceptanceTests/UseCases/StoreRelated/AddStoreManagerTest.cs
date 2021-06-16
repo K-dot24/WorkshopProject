@@ -23,7 +23,7 @@ namespace XUnitTestTerminal3
             sut.Register("manager@gmail.com", "manager123");
             string managerID = sut.Login("manager@gmail.com", "manager123").Data;
 
-            Assert.True(sut.AddStoreManager(managerID, user_id, store_id).ExecStatus);
+            Assert.True(sut.AddStoreManager("manager@gmail.com", user_id, store_id).ExecStatus);
         }
 
         [Fact]
@@ -33,14 +33,14 @@ namespace XUnitTestTerminal3
             sut.Register("manager@gmail.com", "manager123");
             string managerID = sut.Login("manager@gmail.com", "manager123").Data;
 
-            Assert.False(sut.AddStoreManager(user_id, managerID, store_id).ExecStatus);
+            Assert.False(sut.AddStoreManager("test@gmail.com", managerID, store_id).ExecStatus);
         }
 
         [Fact]
         [Trait("Category", "acceptance")]
         public void AddStoreManagerSameID()
         {
-            Assert.False(sut.AddStoreManager(user_id, user_id, store_id).ExecStatus);
+            Assert.False(sut.AddStoreManager("test@gmail.com", user_id, store_id).ExecStatus);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace XUnitTestTerminal3
             sut.OpenNewStore("newOwner_store", managerID);
 
 
-            Assert.True(sut.AddStoreManager(managerID, user_id, store_id).ExecStatus);
+            Assert.True(sut.AddStoreManager("manager@gmail.com", user_id, store_id).ExecStatus);
         }
 
     }

@@ -29,9 +29,9 @@ namespace XUnitTestTerminal3
             this.shlomot_id = sut.Login("shlomot@gmail.com", "test").Data;
             this.random_id = sut.Login("random@gmail.com", "test123").Data;
             this.store_id = sut.OpenNewStore("test_store", kfir_id).Data;
-            sut.AddStoreManager(igor_id, kfir_id, store_id);
-            sut.AddStoreManager(hit_id, kfir_id, store_id);
-            sut.AddStoreManager(shlomot_id, kfir_id, store_id);
+            sut.AddStoreManager("igor@gmail.com", kfir_id, store_id);
+            sut.AddStoreManager("hit@gmail.com", kfir_id, store_id);
+            sut.AddStoreManager("shlomot@gmail.com", kfir_id, store_id);
             LinkedList<int> permission = new LinkedList<int>();
             permission.AddLast(4);
             sut.SetPermissions(store_id, igor_id, kfir_id, permission);
@@ -42,7 +42,7 @@ namespace XUnitTestTerminal3
 
         internal void ThreadWork(string manager_id)
         {
-            Terminal3.DomainLayer.Result<bool> result = sut.AddStoreManager(random_id, manager_id, store_id);
+            Terminal3.DomainLayer.Result<bool> result = sut.AddStoreManager("random@gmail.com", manager_id, store_id);
             results.TryAdd(result.ExecStatus);
         }
 
