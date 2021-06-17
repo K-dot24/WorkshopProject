@@ -78,12 +78,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 sum += bag.GetTotalPrice(offers);
             }
             this.TotalCartPrice = sum;
-            if(userId != "")
+            /*if(userId != "")
             {
                 var filter = Builders<BsonDocument>.Filter.Eq("_id", userId );
                 var update_shoppingcart = Builders<BsonDocument>.Update.Set("ShoppingCart", getDTO());
                 Mapper.getInstance().UpdateRegisteredUser(filter, update_shoppingcart, session: session);
-            }
+            }*/
 
             return new Result<double>($"Total shopping cart price calculated, price = {sum}", true, sum);
         }
