@@ -1,7 +1,10 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DataAccessLayer;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountComposition;
@@ -60,6 +63,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (Id.Equals(id))
             {
                 Discounts.Add(discount);
+                var update_discount = Builders<BsonDocument>.Update.Set("Discounts", ConvertDiscountToIDs());
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<bool>("", true, true);
             }
             foreach(IDiscountPolicy myDiscount in Discounts)
@@ -79,6 +84,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if(toBeRemoved != null)
             {
                 Discounts.Remove(toBeRemoved);
+                var update_discount = Builders<BsonDocument>.Update.Set("Discounts", ConvertDiscountToIDs());
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<IDiscountPolicy>("", true, toBeRemoved);
             }
             foreach (IDiscountPolicy myDiscount in Discounts)
@@ -192,6 +199,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             }
 
             return new DTO_DiscountAddition(this.Id, Discounts_dto);
+        }
+
+        private ConcurrentDictionary<String, String> ConvertDiscountToIDs()
+        {
+            ConcurrentDictionary<String, String> list = new ConcurrentDictionary<String, String>();    //<id , type>
+            
+            foreach(var discount in Discounts)
+            {
+                string[] type = discount.GetType().ToString().Split('.');
+                string discount_type = type[type.Length - 1];
+                list.TryAdd(discount.Id, discount_type);
+            }
+
+            return list;
         }
     }
 }

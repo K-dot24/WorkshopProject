@@ -1,7 +1,10 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DataAccessLayer;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
@@ -47,6 +50,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             if (this.Id.Equals(id))
             {
                 Policies.Add(policy);
+                var update_discount = Builders<BsonDocument>.Update.Set("Policies", getPolicis_dto());
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<bool>("", true, true);
             }
             foreach (IPurchasePolicy p in Policies)
@@ -67,6 +72,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             if (policy != null)
             {
                 Policies.Remove(policy);
+                var update_discount = Builders<BsonDocument>.Update.Set("Policies", getPolicis_dto());
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<IPurchasePolicy>("", true, policy);
             }
 
@@ -144,6 +151,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 Policies.TryAdd(policy_type, policy.Id);
             }
             return Policies;
+        }
+
+        public ConcurrentDictionary<String, String> getPolicis_dto()
+        {
+            ConcurrentDictionary<String, String> policies_dto = new ConcurrentDictionary<String, String>();
+            foreach (IPurchasePolicy policy in Policies)
+            {
+                string[] type = policy.GetType().ToString().Split('.');
+                string policy_type = type[type.Length - 1];
+                policies_dto.TryAdd(policy.Id, policy_type);
+            }
+
+            return policies_dto;
         }
     }
 }

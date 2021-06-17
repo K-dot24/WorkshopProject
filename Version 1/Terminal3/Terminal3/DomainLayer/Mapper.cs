@@ -2630,6 +2630,160 @@ namespace Terminal3.DataAccessLayer
         }
         #endregion Create from interface
 
+        #region Update from interface
+
+        public void UpdatePolicy(IPurchasePolicy purchasePolicy , UpdateDefinition<BsonDocument> update )
+        {
+            string[] type = purchasePolicy.GetType().ToString().Split('.');
+            string policy_type = type[type.Length - 1];
+
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", purchasePolicy.Id);
+            switch (policy_type)
+            {
+                case "AndPolicy":
+                    UpdateAndPolicy(filter , update);
+                    break;
+
+                case "Auction":
+                    UpdateAuctionPolicy(filter , update);
+                    break;
+
+                case "BuyNow":
+                    UpdateBuyNowPolicy(filter, update);
+                    break;
+
+                case "ConditionalPolicy":
+                    UpdateConditionalPolicy(filter, update);
+                    break;
+
+                case "Lottery":
+                    UpdateLotteryPolicy(filter, update);
+                    break;
+
+                case "MaxProductPolicy":
+                    UpdateMaxProductPolicy(filter, update);
+                    break;
+
+                case "MinAgePolicy":
+                    UpdateMinAgePolicy(filter, update);
+                    break;
+
+                case "MinProductPolicy":
+                    UpdateMinProductPolicy(filter, update);
+                    break;
+
+                case "Offer":
+                    UpdateOfferPolicy(filter, update);
+                    break;
+
+                case "OrPolicy":
+                    UpdateOrPolicy(filter, update);
+                    break;
+
+                case "RestrictedHoursPolicy":
+                    UpdateRestrictedHoursPolicy(filter, update);
+                    break;
+            }
+        }
+
+        public void UpdatePolicy(IDiscountTarget discount , UpdateDefinition<BsonDocument> update)
+        {
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", discount.getId());
+            switch (discount_type)
+            {
+                case "DiscountTargetCategories":
+                    UpdateDiscountTargetCategories(filter, update);
+                    break;
+
+                case "DiscountTargetProducts":
+                    UpdateDiscountTargetProducts(filter, update);
+                    break;
+            }
+        }
+        public void UpdatePolicy(IDiscountPolicy discount, UpdateDefinition<BsonDocument> update)
+        {
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", discount.Id);
+            switch (discount_type)
+            {
+                case "ConditionalDiscount":
+                    UpdateConditionalDiscount(filter, update);
+                    break;
+
+                case "DiscountAddition":
+                    UpdateDiscountAddition(filter, update);
+                    break;
+
+                case "DiscountAnd":
+                    UpdateDiscountAnd(filter, update);
+                    break;
+
+                case "DiscountMax":
+                    UpdateDiscountMax(filter, update);
+                    break;
+
+                case "DiscountOr":
+                    UpdateDiscountOr(filter, update);
+                    break;
+
+                case "DiscountMin":
+                    UpdateDiscountMin(filter, update);
+                    break;
+
+                case "DiscountXor":
+                    UpdateDiscountXor(filter, update);
+                    break;
+
+                case "DiscreetDiscount":
+                    UpdateDiscreetDiscount(filter, update); ;
+                    break;
+
+                case "VisibleDiscount":
+                    UpdateVisibleDiscount(filter, update);
+                    break;
+
+            }
+        }
+        public void UpdatePolicy(IDiscountCondition discount, UpdateDefinition<BsonDocument> update)
+        {
+            string[] type = discount.GetType().ToString().Split('.');
+            string discount_type = type[type.Length - 1];
+
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", discount.Id);
+            switch (discount_type)
+            {
+                case "DiscountConditionAnd":
+                    UpdateDiscountConditionAnd(filter, update);
+                    break;
+
+                case "DiscountConditionOr":
+                    UpdateDiscountConditionOr(filter, update);
+                    break;
+
+                case "MaxProductCondition":
+                    UpdateMaxProductCondition(filter, update);
+                    break;
+
+                case "MinBagPriceCondition":
+                    UpdateMinBagPriceCondition(filter, update);
+                    break;
+
+                case "MinProductCondition":
+                    UpdateMinProductCondition(filter, update);
+                    break;
+
+            }
+        }
+
+
+
+        #endregion Update from interface
+
 
 
         #endregion Discounts

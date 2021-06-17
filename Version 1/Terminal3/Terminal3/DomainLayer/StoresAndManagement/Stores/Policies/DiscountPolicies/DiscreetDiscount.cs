@@ -1,7 +1,10 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.Json;
+using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
@@ -39,8 +42,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
         public override Result<bool> AddDiscount(String id, IDiscountPolicy discount)
         {
             if (Id.Equals(id))
+            {
                 //return new Result<bool>("Can't add a discount to a visible discount with an id " + id, false, false);
                 Discount = discount;
+                var update_discount = Builders<BsonDocument>.Update.Set("Discount", discount.Id);
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
+            }
             if(Discount != null)
                 return Discount.AddDiscount(id, discount);
             return new Result<bool>("", true, false);
@@ -98,7 +105,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             }
 
             if (info.ContainsKey("DiscountCode"))
+            {
                 DiscountCode = ((JsonElement)info["DiscountCode"]).GetString();
+                var update_discount = Builders<BsonDocument>.Update.Set("DiscountCode", DiscountCode);
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
+            }
 
             return new Result<bool>("", true, true);
         }
