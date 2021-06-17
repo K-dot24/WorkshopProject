@@ -19,7 +19,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public static Result<IDiscountCondition> create(Dictionary<string, object> info)
         {
-            return new Result<IDiscountCondition>("", true, new DiscountConditionOr());
+            return new Result<IDiscountCondition>("Succesfuly created discount condition or", true, new DiscountConditionOr());
         }
 
         public DiscountConditionOr(List<IDiscountCondition> conditions, String id = "") : base(new Dictionary<string, object>(), id)

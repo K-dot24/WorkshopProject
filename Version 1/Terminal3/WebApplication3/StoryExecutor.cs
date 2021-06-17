@@ -28,7 +28,8 @@ namespace Terminal3WebAPI
                                         { "LogOut",new Func< string,Result<UserService>>(system.LogOut)},
                                         { "OpenNewStore",new Func< string, string,string,Result<StoreService>>(system.OpenNewStore)},
                                         { "AddProductToStore",new Func< String , String , String , double , int , String , LinkedList<String> ,Result<ProductService>>(system.AddProductToStore)},
-                                        { "AddStoreManager",new Func< String , String , String ,Result<Boolean>>(system.AddStoreManager)}
+                                        { "AddStoreManager",new Func< String , String , String ,Result<Boolean>>(system.AddStoreManager)},
+                                        { "AddStoreOwner",new Func< String , String , String ,Result<Boolean>>(system.AddStoreOwner) }
                                     };
 
             string path = @"stories.json";
@@ -36,7 +37,8 @@ namespace Terminal3WebAPI
             {
                 string json = File.ReadAllText(path);
                 StoryConfig storyConfig = JsonConvert.DeserializeObject<StoryConfig>(json);
-                if (storyConfig.story is null) {
+                if (storyConfig.story is null)
+                {
                     Logger.LogError("Invalid JSON format - One or more missing attribute has been found in the config JSON");
                     Environment.Exit(0);
                 }
@@ -44,7 +46,7 @@ namespace Terminal3WebAPI
                 {
 
                     functionDict[story.function].DynamicInvoke(convertArgs(functionDict[story.function], story.args));
-                }            
+                }
             }
 
         }
@@ -53,15 +55,15 @@ namespace Terminal3WebAPI
         {
             object[] convertedArgs = new object[args.Length];
             ParameterInfo[] parameterInfos = function.Method.GetParameters();
-            for(int i = 0; i < args.Length; i++)
+            for (int i = 0; i < args.Length; i++)
             {
-                if (args[i] is null) { convertedArgs[i] = null;continue; }
+                if (args[i] is null) { convertedArgs[i] = null; continue; }
                 ParameterInfo parameterInfo = parameterInfos[i];
                 string type = parameterInfo.ParameterType.FullName;
                 switch (type)
                 {
                     case "System.String":
-                        convertedArgs[i] = (String)args[i]; 
+                        convertedArgs[i] = (String)args[i];
                         break;
                     case "System.Double":
                         Double d;

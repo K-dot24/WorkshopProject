@@ -30,7 +30,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 return new Result<IDiscountCondition>("ProductId not found", false, null);
             String productId = ((JsonElement)info["ProductId"]).GetString();
 
-            return new Result<IDiscountCondition>("", true, new MaxProductCondition(productId, maxQuantity));
+            return new Result<IDiscountCondition>("Succesfuly created discount condition Max", true, new MaxProductCondition(productId, maxQuantity));
         }
 
         public override Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)

@@ -24,7 +24,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 return new Result<IDiscountCondition>(errorMsg + "MinPrice not found", false, null);
             Double minPrice = ((JsonElement)info["MinPrice"]).GetDouble();
 
-            return new Result<IDiscountCondition>("", true, new MinBagPriceCondition(minPrice));
+            return new Result<IDiscountCondition>("Succesfuly created discount condition Min bag price", true, new MinBagPriceCondition(minPrice));
         }
 
         public override Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)
