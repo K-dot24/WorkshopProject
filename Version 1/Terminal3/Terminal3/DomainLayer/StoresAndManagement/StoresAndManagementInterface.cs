@@ -538,10 +538,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 }
                 catch (SynchronizationLockException SyncEx)
                 {
-                    Console.WriteLine("A SynchronizationLockException occurred. Message:");
-                    Console.WriteLine(SyncEx.Message);                    
+                    //Console.WriteLine("A SynchronizationLockException occurred. Message:");
+                    //Console.WriteLine(SyncEx.Message);  
+                    Logger.LogError(SyncEx.Message);
                     Mapper.getInstance().RevertTransaction_Purchase(userID);                    
-                    return new Result<ShoppingCartService>(SyncEx.Message, false, null);
+                    return new Result<ShoppingCartService>("An error had occurred while you purchase", false, null);
                 }
                 catch (Exception e)
                 {
