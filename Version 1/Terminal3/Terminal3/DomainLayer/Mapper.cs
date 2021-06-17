@@ -124,11 +124,8 @@ namespace Terminal3.DataAccessLayer
                 dbClient = new MongoClient(connection_string);
                 //database = dbClient.GetDatabase("Terminal3-development");
                 //database = dbClient.GetDatabase("Terminal3-Testing");
-                database = dbClient.GetDatabase("Terminal3-tomer");
-                //database = dbClient.GetDatabase($"Terminal3-{environment}");
-
-                //var adminDb = dbClient.GetDatabase("admin");
-                //adminDb.RunCommand<BsonDocument>("{ setParameter: 1, transactionLifetimeLimitSeconds: 300 }");
+                //database = dbClient.GetDatabase("Terminal3-tomer");
+                database = dbClient.GetDatabase($"Terminal3-{environment}");
 
                 //DAOs
                 DAO_RegisteredUser = new DAO<DTO_RegisteredUser>(database, "Users");
