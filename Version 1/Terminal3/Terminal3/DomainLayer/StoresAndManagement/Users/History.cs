@@ -29,17 +29,18 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public void AddPurchasedShoppingCart(ShoppingCart shoppingCart, MongoDB.Driver.IClientSessionHandle session = null)
         {
             ConcurrentDictionary<String, ShoppingBag> bags = shoppingCart.ShoppingBags;
-
+            String userId = "";
             foreach (var bag in bags)
             {
+                userId = bag.Value.User.Id;
                 ShoppingBagService shoppingBagService = bag.Value.GetDAL().Data;
                 ShoppingBags.AddLast(shoppingBagService);
-
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", bag.Value.User.Id);
-                //var update_history = Builders<BsonDocument>.Update.Push("History.ShoppingBags", GetDTO_HistoryShoppingBag(shoppingBagService));
-                var update_history = Builders<BsonDocument>.Update.Set("History", getDTO());
-                Mapper.getInstance().UpdateRegisteredUser(filter, update_history , session:session);
             }
+
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", userId );
+            //var update_history = Builders<BsonDocument>.Update.Push("History.ShoppingBags", GetDTO_HistoryShoppingBag(shoppingBagService));
+            var update_history = Builders<BsonDocument>.Update.Set("History", getDTO());
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_history , session:session);
         }
 
         public void AddPurchasedShoppingBag(ShoppingBag shoppingBag, MongoDB.Driver.IClientSessionHandle session = null)
