@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';   // don't remove Router
-import { Products, Navbar, Cart, Action, Policy, InfoDisplay, OfferPage } from '../../../../components';
+import { Products, Navbar, Cart, Action, Policy, InfoDisplay, OfferPage, CheckboxList } from '../../../../components';
 
 import { GetAllProductByStoreIDToDisplay, AddProductToStore, RemoveProductFromStore, EditProductDetails, 
         AddStoreOwner, AddStoreManager, RemoveStoreManager, RemoveStoreOwner, GetStoreStaff, SetPermissions,
@@ -429,9 +429,7 @@ const StorePage = ({ store, user, match, handleAddToCart, handleLogOut }) => {
 
                 {/* Set Permissions */}
                 <Route exact path={match.url + `/setpermissions`} 
-                    render={(props) => (<Action name='Set Permissions'
-                                                fields={[{name: 'Manager ID', required: true}]}   
-                                                handleAction={handleSetPermissions} {...props} />)} 
+                    render={(props) => (<CheckboxList handleSetPermissions={handleSetPermissions} {...props} />)} 
                 />
 
                 {/* Add Discount Policy */}
