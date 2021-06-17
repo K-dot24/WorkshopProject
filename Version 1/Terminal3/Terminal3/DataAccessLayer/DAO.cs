@@ -35,9 +35,13 @@ namespace Terminal3.DataAccessLayer.DAOs
             }
             catch(MongoWriteException e)
             {
-                Console.WriteLine(e.ToString());
-                Logger.LogError(e.ToString());
-                updateConnectiviyError();
+                if (!e.ToString().Contains("E11000"))
+                {
+                    Console.WriteLine(e.ToString());
+                    Logger.LogError(e.ToString());
+                    updateConnectiviyError();
+                }
+
             }
             catch(Exception e)
             {
