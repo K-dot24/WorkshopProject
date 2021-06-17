@@ -155,7 +155,7 @@ namespace Terminal3WebAPI.Controllers
         public IActionResult SetPermissions([FromBody] SetPermissionsModel data)
         {
             Result<Boolean> result = system.SetPermissions(data.storeID,data.managerID,data.ownerID,data.permissions);
-            if (result.ExecStatus) { return Created("", result.Message); }
+            if (result.ExecStatus) { return Ok(result.Message); }
             else { return BadRequest(result.Message); }
         }
 
