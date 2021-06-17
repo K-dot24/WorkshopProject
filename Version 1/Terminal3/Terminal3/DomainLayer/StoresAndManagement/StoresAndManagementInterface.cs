@@ -125,6 +125,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement
                 Result<Store> res = StoresFacade.OpenNewStore(founder, storeName, storeID);
                 if (res.ExecStatus)
                 {
+                    updateMonitorForOpenStore(userID);
                     return new Result<StoreService>(res.Message, true, res.Data.GetDAL().Data);
                 }
                 //else
@@ -784,6 +785,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement
             }
             else {
                 monitor.update("GuestUsers", userID);
+            }
+        }
+
+        public void updateMonitorForOpenStore (String userID)
+        {
+            MonitorController monitor = MonitorController.getInstance();
+            Boolean owner = isOwner(userID);
+            if (isManager(userID) && !owner)
+            {
+                monitor.updateForOpenStore("ManagersNotOwners", userID);
+                return;
+            }
+            if (isRegisterUser(userID))
+            {
+                monitor.updateForOpenStore("RegisteredUsers", userID);
             }
         }
         public Boolean isRegisterUser(String userID)

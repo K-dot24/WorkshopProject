@@ -50,16 +50,28 @@ const Review = ({ checkoutToken }) => {
                     <Paper className={classes.paper}>
                         <Typography variant="h6" gutterBottom>Purchase History</Typography>
                         <List disablePadding>
-                            {checkoutToken && checkoutToken.shoppingBags.map((bag) => bag.products.map((product) => (
-                            <div key={product.item1.id}>
-                                <ListItem style={{padding: '10px 0'}} key={product.item1.id}>
-                                    <ListItemText primary={product.item1.name} secondary={`Quantity: ${product.item2}`} />
-                                    <Typography variant="body2">{product.item1.price * product.item2}₪</Typography>
-                                </ListItem>
-                                <Button color="primary" onClick={() => onReview(bag.userId, bag.storeId, product.item1.id)}>Add Review</Button>
-                                <Divider />
-                            </div>
-                            )))}
+                        {checkoutToken && checkoutToken.shoppingBags.map(function(bag){
+                                let toRender = bag.products.map((product) => (
+                                    <div key={product.item1.id}>
+                                        <ListItem style={{padding: '10px 0'}} key={product.item1.id}>
+                                            <ListItemText primary={product.item1.name} secondary={`Quantity: ${product.item2}`} />
+                                            {/* <Typography variant="body2">{product.item1.price * product.item2}₪</Typography> */}
+                                        <Button color="primary" onClick={() => onReview(bag.userId, bag.storeId, product.item1.id)}>Add Review</Button>
+                                        </ListItem>
+                                    </div>
+                                ));
+
+                                toRender.push(
+                                    <div>
+                                        <Divider />
+                                        <Typography variant="body2">{`Total Bag Price: ${bag.totalBagPrice}₪`}</Typography>
+                                        <Divider />
+                                    </div>
+                                )
+                                
+                                return toRender;
+                            }
+                            )}
                         </List>
                     </Paper>
                 </main>

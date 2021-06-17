@@ -42,6 +42,38 @@ namespace Terminal3.ServiceLayer.Controllers
             return Instance;
         }
 
+        public void updateForOpenStore(String fieldName, String userID)
+        {
+            if (DateTime.Now.Date > today)
+            {
+                GuestUsers = 0;
+                RegisteredUsers = 0;
+                ManagersNotOwners = 0;
+                Owners = 0;
+                Admins = 0;
+                visitorsIDs.Clear();
+            }
+            switch (fieldName)
+            {
+                case "RegisteredUsers":
+                    Owners++;
+                    if (RegisteredUsers > 0)
+                        RegisteredUsers--;
+                    break;
+
+                case "ManagersNotOwners":
+                    Owners++;
+                    if (ManagersNotOwners > 0)
+                        ManagersNotOwners--;
+                    break;
+            }
+
+            //save in DB
+            sendStatus();
+            String date = today.ToString("yyyy-MM-dd", DateTimeFormatInfo.InvariantInfo);
+            Mapper.getInstance().Update(new DTO_Monitor(date, GuestUsers, RegisteredUsers, ManagersNotOwners, Owners, Admins));
+        }
+
         public void update(String fieldName,String userID)
         {
             if (DateTime.Now.Date > today)

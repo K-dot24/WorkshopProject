@@ -34,7 +34,12 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
         }
 
         public Result<bool> IsConditionMet(ConcurrentDictionary<Product, int> bag, User user)
-        {       
+        {
+            if (Policies.Count == 0)
+            {
+                return new Result<bool>("", true, true);
+
+            }
             foreach (IPurchasePolicy policy in Policies)
             {
                 if (policy.IsConditionMet(bag, user).Data)
