@@ -42,7 +42,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             int count;
             Product product = ContainsProduct(bag);
             if (product == null)
-                return new Result<bool>("", true, false);
+                return new Result<bool>("", true, true);
             bag.TryGetValue(product, out count);
             return new Result<bool>("", true, count <= this.Max);
         }
