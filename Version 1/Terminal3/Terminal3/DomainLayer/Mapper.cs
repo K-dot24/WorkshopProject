@@ -1387,6 +1387,7 @@ namespace Terminal3.DataAccessLayer
             Stores.TryAdd(s.Id, s);
             DiscountAddition MainDiscount = LoadDiscountAddition(Builders<BsonDocument>.Filter.Eq("_id", dto.MainDiscount._id));
             BuyNow MainPolicy = LoadBuyNowPolicy(Builders<BsonDocument>.Filter.Eq("_id", dto.MainPolicy._id));
+            if (MainPolicy is null) { MainPolicy = new BuyNow(); }
             s.PolicyManager = new PolicyManager(MainDiscount, MainPolicy);
             StoreOwner founder = getOwnershipTree(s, dto.Founder);
             s.Founder = founder;
@@ -1860,6 +1861,7 @@ namespace Terminal3.DataAccessLayer
         {
             BuyNow b;
             DTO_BuyNow dto = DAO_BuyNow.Load(filter);
+            if(dto is null) { return null; }
             if (Policy_BuyNows.TryGetValue(dto._id, out b))
             {
                 return b;
