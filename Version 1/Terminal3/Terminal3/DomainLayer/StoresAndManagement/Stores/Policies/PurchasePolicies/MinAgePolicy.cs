@@ -1,8 +1,11 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using Terminal3.DataAccessLayer;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
@@ -71,7 +74,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 return new Result<bool>("", true, false);
 
             if (info.ContainsKey("Age"))
+            {
                 Age = ((JsonElement)info["Age"]).GetInt32();
+                var update_discount = Builders<BsonDocument>.Update.Set("Age", Age);
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
+            }
 
             return new Result<bool>("", true, true);
         }

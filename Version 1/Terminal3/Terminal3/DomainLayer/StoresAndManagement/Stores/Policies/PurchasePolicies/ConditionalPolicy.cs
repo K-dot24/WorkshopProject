@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.DataAccessLayer.DTOs;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
@@ -48,9 +51,17 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             if (this.Id.Equals(id))
             {
                 if (this.PreCond == null)
+                {
                     this.PreCond = policy;
+                    var update_discount = Builders<BsonDocument>.Update.Set("PreCond", PreCond.Id);
+                    Mapper.getInstance().UpdatePolicy(this, update_discount);
+                }
                 else if (this.Cond == null)
+                {
                     this.Cond = policy;
+                    var update_discount = Builders<BsonDocument>.Update.Set("Cond", Cond.Id);
+                    Mapper.getInstance().UpdatePolicy(this, update_discount);
+                }
                 else
                     return new Result<bool>("Cannot add a policy to this type of policy", false, false);
             }
@@ -82,12 +93,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             {
                 IPurchasePolicy temp = PreCond;
                 PreCond = null;
+                var update_discount = Builders<BsonDocument>.Update.Set("PreCond", "");
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<IPurchasePolicy>("", true, temp);
             }
             else if (Cond != null && Cond.Id.Equals(id))
             {
                 IPurchasePolicy temp = Cond;
                 Cond = null;
+                var update_discount = Builders<BsonDocument>.Update.Set("Cond", "");
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<IPurchasePolicy>("", true, temp);
             }
 

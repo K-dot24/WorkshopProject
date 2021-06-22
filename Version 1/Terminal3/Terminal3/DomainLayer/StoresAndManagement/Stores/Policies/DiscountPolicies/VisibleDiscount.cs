@@ -1,7 +1,10 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.Json;
+using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountTargetsData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountTargets;
@@ -152,11 +155,19 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 return new Result<bool>("", true, false);
 
             if (info.ContainsKey("ExpirationDate"))
+            {
                 //ExpirationDate = (DateTime)info["ExpirationDate"];
                 ExpirationDate = createDateTime((JsonElement)info["ExpirationDate"]);
+                var update_discount = Builders<BsonDocument>.Update.Set("ExpirationDate", ExpirationDate.ToString());
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
+            }
 
             if (info.ContainsKey("Percentage"))
+            {
                 Percentage = ((JsonElement)info["Percentage"]).GetDouble();
+                var update_discount = Builders<BsonDocument>.Update.Set("Percentage", Percentage);
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
+            }
 
             if (info.ContainsKey("Target"))
             {

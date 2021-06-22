@@ -1,6 +1,9 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountConditionsData;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
@@ -42,6 +45,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (Id == id)
             {
                 Discount = discount;
+                var update_discount = Builders<BsonDocument>.Update.Set("Discount", discount.Id);
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<bool>("", true, true);
             }
             else if(Discount != null)
@@ -55,6 +60,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             {
                 IDiscountPolicy oldDiscount = Discount;
                 Discount = null;
+                var update_discount = Builders<BsonDocument>.Update.Set("Discount", "");
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<IDiscountPolicy>("", true, oldDiscount);
             }
             else if (Discount != null)
@@ -67,6 +74,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (Id == id)
             {
                 Condition = condition;
+                var update_discount = Builders<BsonDocument>.Update.Set("Condition", condition.Id);
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<bool>("", true, true);
             }
             else if (Condition != null)
@@ -82,6 +91,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             {
                 IDiscountCondition oldCondition = Condition;
                 Condition = null;
+                var update_discount = Builders<BsonDocument>.Update.Set("Condition", "");
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<IDiscountCondition>("", true, oldCondition);
             }
             return Condition.RemoveCondition(id);

@@ -1,8 +1,11 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountConditionsData;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions
@@ -30,7 +33,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 return new Result<IDiscountCondition>("ProductId not found", false, null);
             String productId = ((JsonElement)info["ProductId"]).GetString();
 
-            return new Result<IDiscountCondition>("", true, new MinProductCondition(productId, minQuantity));
+            return new Result<IDiscountCondition>("Succesfuly created discount condition Min", true, new MinProductCondition(productId, minQuantity));
         }
 
         public override Result<bool> isConditionMet(ConcurrentDictionary<Product, int> products)
@@ -86,10 +89,20 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
                 return new Result<bool>("", true, false);
 
             if (info.ContainsKey("MinQuantity"))
+            {
                 MinQuantity = ((JsonElement)info["MinQuantity"]).GetInt32();
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+                var update_discount = Builders<BsonDocument>.Update.Set("MinQuantity", MinQuantity);
+                Mapper.getInstance().UpdateMinProductCondition(filter, update_discount);
+            }
 
             if (info.ContainsKey("ProductId"))
+            {
                 ProductId = ((JsonElement)info["ProductId"]).GetString();
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+                var update_discount = Builders<BsonDocument>.Update.Set("ProductId", ProductId);
+                Mapper.getInstance().UpdateMinProductCondition(filter, update_discount);
+            }
 
             return new Result<bool>("", true, true);
         }

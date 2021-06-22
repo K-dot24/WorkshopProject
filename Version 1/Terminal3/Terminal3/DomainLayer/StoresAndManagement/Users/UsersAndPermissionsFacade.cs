@@ -63,11 +63,11 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             GuestUsers = new ConcurrentDictionary<String, GuestUser>();
             mapper = Mapper.getInstance();
             //Add first system admin
+            defaultUser = new RegisteredUser("-777", admin_email, admin_password);
             LoadAllRegisterUsers();
             LoadSystemAdmins();
             if (SystemAdmins.IsEmpty)
             {
-                defaultUser = new RegisteredUser("-777", admin_email, admin_password);
                 insertInitializeData(defaultUser);
             }
         }
@@ -87,7 +87,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 Monitor.Enter(my_lock);
                 try
                 {
-                    if (mapper.Query_isUniqEmail(email))
+                    if (isUniqueEmail(email))
                     {
                         RegisteredUser newUser;                  
                         if (Id == "-1")
@@ -228,7 +228,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 }
             }
             //Only if we are looking for a register user in lazy mode
-            if(table.Equals(RegisteredUsers))
+        /*    if(table.Equals(RegisteredUsers))
             {
                 // trying to load from DB
                 var filter = Builders<BsonDocument>.Filter.Eq("Email", email);
@@ -244,7 +244,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     RegisteredUsers.TryAdd(user.Id, user);
                     return new Result<RegisteredUser>($"found user with email:{email}\n", true, user);
                 }
-            }
+            }*/
 
             return new Result<RegisteredUser>($"could not find user with email:{email}\n", false, null);
         }
@@ -272,9 +272,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
                     mapper.UpdateRegisteredUser(filter, update);
-                    mapper.Load_RegisteredUserNotifications(res_ru.Data);
-                    mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
-                    mapper.Load_RegisteredUserOffers(res_ru.Data);
+                    //mapper.Load_RegisteredUserNotifications(res_ru.Data);
+                    //mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
+                    //mapper.Load_RegisteredUserOffers(res_ru.Data);
 
                     return res_ru;
                 }
@@ -304,9 +304,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", res_ru.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", true);
                     mapper.UpdateRegisteredUser(filter, update);
-                    mapper.Load_RegisteredUserNotifications(res_ru.Data);
-                    mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
-                    mapper.Load_RegisteredUserOffers(res_ru.Data);
+                    //mapper.Load_RegisteredUserNotifications(res_ru.Data);
+                    //mapper.Load_RegisteredUserShoppingCart(res_ru.Data);
+                    //mapper.Load_RegisteredUserOffers(res_ru.Data);
                 }
                 return res_ru;
 
@@ -338,10 +338,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", searchResult.Data.Id);
                     var update = Builders<BsonDocument>.Update.Set("LoggedIn", false);
                     mapper.UpdateRegisteredUser(filter, update);
-                    if (!SystemAdmins.ContainsKey(searchResult.Data.Id))
+                  /*  if (!SystemAdmins.ContainsKey(searchResult.Data.Id))
                     {
                         mapper.ClearCache_logout(searchResult.Data.Id);
-                    }
+                    }*/
 
                     return new Result<GuestUser>($"{email} logged out\n", true, res.Data);
                 }
@@ -376,10 +376,10 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         public Result<History> GetUserPurchaseHistory(String userID)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_id", userID);
-            mapper.LazyLoad_RegisteredUser(filter);
+            //mapper.LazyLoad_RegisteredUser(filter);
             if (RegisteredUsers.TryGetValue(userID , out RegisteredUser user))
             {
-                mapper.Load_RegisteredUserHistory(user);
+                //mapper.Load_RegisteredUserHistory(user);
                 return user.GetUserPurchaseHistory();
             }
             return new Result<History>("Not a registered user\n", false, null);
@@ -389,7 +389,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
         {
             if (RegisteredUsers.TryGetValue(userID, out RegisteredUser user))   // Check if user is registered
             {
-                mapper.Load_StorePolicyManager(store);
+                //mapper.Load_StorePolicyManager(store);
                 Result<ShoppingCart> res_sc = user.AddProductToCart(product, productQuantity, store);
 
                 // Update DB
@@ -519,7 +519,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             }
             else if (RegisteredUsers.TryGetValue(userID, out RegisteredUser registerd_user))
             {
-                Mapper.getInstance().Load_RegisteredUserHistory(registerd_user);
+                //Mapper.getInstance().Load_RegisteredUserHistory(registerd_user);
                 Result<ShoppingCart> ShoppingCart = registerd_user.Purchase(paymentDetails, deliveryDetails , session);
                 if (ShoppingCart.ExecStatus)
                 {
@@ -677,7 +677,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
                 return guest_user.getUserPendingOffers();
             else if (RegisteredUsers.TryGetValue(userId, out RegisteredUser registerd_user))
             {
-                Mapper.getInstance().Load_RegisteredUserOffers(registerd_user); // it is already loaded but just incase
+                //Mapper.getInstance().Load_RegisteredUserOffers(registerd_user); // it is already loaded but just incase
                 return registerd_user.getUserPendingOffers();
             }                
             return new Result<List<Dictionary<string, object>>>("Failed to get user offers: Failed to locate the user", false, null);

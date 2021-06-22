@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Avatar, ListItemText, ListItem, List, Paper } from '@material-ui/core'
+import { Typography, Avatar, ListItemText, ListItem, List, Paper ,Divider} from '@material-ui/core'
 import { Receipt } from '@material-ui/icons';
 
 import useStyles from './styles';
@@ -20,12 +20,26 @@ const InfoDisplay = ({ info }) => {
             <Paper className={classes.paper}>
                 <List disablePadding>
                     {info.type === 'purchaseHistory' ? (
-                        info.data.shoppingBags.map((bag) => bag.products.map((product) => (
-                            <ListItem style={{padding: '10px 0'}} key={product.item1.name}>
-                                <ListItemText primary={product.item1.name} secondary={`User: ${bag.userId} | Quantity: ${product.item2}`} />
-                                <Typography variant="body2">{product.item1.price * product.item2}₪</Typography>
-                            </ListItem>
-                        )))
+                        info.data.shoppingBags.map(function(bag){
+                            let toRender = bag.products.map((product) => (
+                                <div key={product.item1.id}>
+                                    <ListItem style={{padding: '10px 0'}} key={product.item1.id}>
+                                        <ListItemText primary={product.item1.name} secondary={`User: ${bag.userId} | Quantity: ${product.item2}`} />
+                                        {/* <Typography variant="body2">{product.item1.price * product.item2}₪</Typography> */}
+                                    </ListItem>
+                                </div>
+                            ));
+
+                            toRender.push(
+                                <div>
+                                    <Divider />
+                                    <Typography variant="body2">{`Total Bag Price: ${bag.totalBagPrice}₪`}</Typography>
+                                    <Divider />
+                                </div>
+                            )
+                            
+                            return toRender;
+                        })
                     )
                     :
                     info.type === 'productReview' ? info.data.length > 0 ? (

@@ -728,7 +728,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores
 
         public List<DTO_Offer> Get_DTO_Offers()
         {
-            Mapper.getInstance().Load_StoreOfferManager(this);   //just in case
+            //Mapper.getInstance().Load_StoreOfferManager(this);   //just in case
 
             List<DTO_Offer> dto_offers = new List<DTO_Offer>();
             foreach (Offer offer in OfferManager.PendingOffers)

@@ -161,7 +161,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Users
             AcceptedOffers = new List<Offer>();
             var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
             var update_offer = Builders<BsonDocument>.Update.Set("AcceptedOffers", Get_DTO_Offers(AcceptedOffers));
-            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer);
+            Mapper.getInstance().UpdateRegisteredUser(filter, update_offer , session:session);
 
             return new Result<bool>("Accepted offers removed", true, true);
         }

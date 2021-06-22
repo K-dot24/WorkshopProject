@@ -1,7 +1,10 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountConditions;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountConditionsData;
 
@@ -19,7 +22,7 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
         public static Result<IDiscountCondition> create(Dictionary<string, object> info)
         {
-            return new Result<IDiscountCondition>("", true, new DiscountConditionAnd());
+            return new Result<IDiscountCondition>("Succesfuly created discount condition and", true, new DiscountConditionAnd());
         }
 
         public DiscountConditionAnd(List<IDiscountCondition> conditions, String id = "") : base(new Dictionary<string, object>(), id)
@@ -45,6 +48,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (Id.Equals(id))
             {
                 Conditions.Add(condition);
+                var update_discount = Builders<BsonDocument>.Update.Set("Conditions", ConvertDiscountToIDs());
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<bool>("", true, true);
             }
             foreach (IDiscountCondition myCondition in Conditions)
@@ -64,6 +69,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (toBeRemoved != null)
             {
                 Conditions.Remove(toBeRemoved);
+                var update_discount = Builders<BsonDocument>.Update.Set("Conditions", ConvertDiscountToIDs());
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<IDiscountCondition>("", true, toBeRemoved);
             }
             foreach (IDiscountCondition myCondition in Conditions)
@@ -128,5 +135,21 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
 
             return new Result<bool>("", true, true);
         }
+
+
+        private ConcurrentDictionary<String, String> ConvertDiscountToIDs()
+        {
+            ConcurrentDictionary<String, String> list = new ConcurrentDictionary<String, String>();    //<id , type>
+
+            foreach (var discount in Conditions)
+            {
+                string[] type = discount.GetType().ToString().Split('.');
+                string discount_type = type[type.Length - 1];
+                list.TryAdd(discount.Id, discount_type);
+            }
+
+            return list;
+        }
+
     }
 }

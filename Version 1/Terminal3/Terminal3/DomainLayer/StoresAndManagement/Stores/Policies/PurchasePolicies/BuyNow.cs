@@ -3,7 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 using Terminal3.DataAccessLayer.DTOs;
-
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Terminal3.DataAccessLayer;
 
 namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePolicies
 {
@@ -45,6 +47,9 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
             {
                 IPurchasePolicy temp = this.Policy;
                 this.Policy = new AndPolicy();
+                var update_discount = Builders<BsonDocument>.Update.Set("Policy", Policy.Id);
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", Id);
+                Mapper.getInstance().UpdateBuyNowPolicy(filter, update_discount);
                 return new Result<IPurchasePolicy>("", true, temp);
             }
             return Policy.RemovePolicy(id);            

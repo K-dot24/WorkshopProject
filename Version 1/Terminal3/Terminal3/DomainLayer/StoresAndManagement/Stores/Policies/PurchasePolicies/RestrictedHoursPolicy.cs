@@ -1,8 +1,11 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using Terminal3.DataAccessLayer;
 using Terminal3.DataAccessLayer.DTOs;
 using Terminal3.DomainLayer.StoresAndManagement.Users;
 
@@ -85,13 +88,25 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.PurchasePoli
                 return new Result<bool>("", true, false);
 
             if (info.ContainsKey("StartRestrict"))
+            {
                 StartRestrict  = createDateTime((JsonElement)info["StartRestrict"]);
+                var update_discount = Builders<BsonDocument>.Update.Set("StartRestrict", StartRestrict.ToString());
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
+            }
 
             if (info.ContainsKey("EndRestrict"))
+            {
                 EndRestrict = createDateTime((JsonElement)info["EndRestrict"]);
+                var update_discount = Builders<BsonDocument>.Update.Set("EndRestrict", EndRestrict.ToString());
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
+            }
 
             if (info.ContainsKey("ProductId"))
+            {
                 ProductId = ((JsonElement)info["ProductId"]).GetString();
+                var update_discount = Builders<BsonDocument>.Update.Set("ProductId", ProductId);
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
+            }
 
             return new Result<bool>("", true, true);
         }

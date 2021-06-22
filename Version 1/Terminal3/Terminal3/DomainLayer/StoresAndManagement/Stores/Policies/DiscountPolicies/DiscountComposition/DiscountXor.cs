@@ -1,7 +1,10 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using Terminal3.DataAccessLayer;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountComposition;
 using Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPolicies.DiscountData.DiscountConditionsData;
@@ -56,11 +59,22 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if (Id.Equals(id))
             {
                 if (Discount1 == null)
+                {
                     Discount1 = discount;
+                    var update_discount = Builders<BsonDocument>.Update.Set("Discount1", discount.Id);
+                    Mapper.getInstance().UpdatePolicy(this, update_discount);
+                }
+
                 else if (Discount2 == null)
+                {
                     Discount2 = discount;
+                    var update_discount = Builders<BsonDocument>.Update.Set("Discount2", discount.Id);
+                    Mapper.getInstance().UpdatePolicy(this, update_discount);
+                }
                 else
                     return new Result<bool>("Can't add a discount to a full xor", false, false);
+
+                
                 return new Result<bool>("", true, true);
             }
 
@@ -79,12 +93,16 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             {
                 oldPolicy = Discount1;
                 Discount1 = null;
+                var update_discount = Builders<BsonDocument>.Update.Set("Discount1", "");
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<IDiscountPolicy>("", true, oldPolicy);
             }
             if (Discount2 != null && Discount2.Id.Equals(id))
             {
                 oldPolicy = Discount2;
                 Discount2 = null;
+                var update_discount = Builders<BsonDocument>.Update.Set("Discount1", "");
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<IDiscountPolicy>("", true, oldPolicy);
             }
 
@@ -101,6 +119,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             if(Id == id)
             {
                 ChoosingCondition = condition;
+                var update_discount = Builders<BsonDocument>.Update.Set("ChoosingCondition", condition.Id);
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<bool>("", true, true);
             }
             if(ChoosingCondition != null)
@@ -125,6 +145,8 @@ namespace Terminal3.DomainLayer.StoresAndManagement.Stores.Policies.DiscountPoli
             {
                 IDiscountCondition oldCondition = ChoosingCondition;
                 ChoosingCondition = null;
+                var update_discount = Builders<BsonDocument>.Update.Set("ChoosingCondition", "");
+                Mapper.getInstance().UpdatePolicy(this, update_discount);
                 return new Result<IDiscountCondition>("", true, oldCondition);
             }
             if (ChoosingCondition != null)

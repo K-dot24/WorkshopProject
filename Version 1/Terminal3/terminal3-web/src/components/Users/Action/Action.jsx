@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react'
-import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container,
+import React, { useState } from 'react';
+import { Avatar, Button, CssBaseline, TextField, Typography, Container,
         FormControl, Select, InputLabel, FormHelperText } from '@material-ui/core';
 import { Receipt } from '@material-ui/icons';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import useStyles from './styles';
-import { CheckboxList } from '../../../components';
 
 const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
      // styles.js
@@ -13,7 +12,6 @@ const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
     
      // states
      const [data, setData] = useState({});
-     const [checkBoxArray, setCheckBoxArray] = useState([]);
 
      const location = useLocation();
      let history = useHistory();    // for redirecting after login
@@ -21,25 +19,11 @@ const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
      const handleSubmit = (e) => {
          e.preventDefault();
 
-         if (name === 'Set Permissions') {
-            handleAction(checkBoxArray, data);
-         }
-         else {
-            if (currentType.value === '')
-                handleAction(data);
-            else
-                handleAction(data, currentType.value, currentType.sub);
-         }
-
-        //  redirect back
-        //  const end = location.pathname.lastIndexOf('/');
-        //  const previousUrl = location.pathname.substring(0, end);
-        //  history.push(previousUrl);
+        if (currentType.value === '')
+            handleAction(data);
+        else
+            handleAction(data, currentType.value, currentType.sub);
      }
-
-    const handleCheckBox = (checkList) => {
-        setCheckBoxArray(checkList);
-    }
 
     const [currentType, setCurrentType] = useState({ value: '', sub: '' });
     
@@ -137,8 +121,7 @@ const Action = ({ name, fields, handleAction, mainTypes, subTypes }) => {
                         ))
                     }
 
-                    {name === 'Set Permissions' && (<CheckboxList handleCheckBox={handleCheckBox} />)}
-
+                    {/* OK Button */}
                     <Button
                         type="submit"
                         fullWidth
